@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { ONBOARDING_PATH, SIGNIN_PATH, WAITLIST_PATH } from "@/lib/routes";
 
 const LINKS = [
@@ -14,12 +13,12 @@ export function Footer() {
       <div className="mx-auto max-w-(--container-content)">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
-            <Link
-              to={ONBOARDING_PATH}
+            <a
+              href={ONBOARDING_PATH}
               className="font-display text-xl font-bold text-primary"
             >
               QuestCampus
-            </Link>
+            </a>
             <p className="mt-3 max-w-[280px] text-body-md text-on-surface-variant">
               The university search tool you deserved from the start.
             </p>
@@ -27,13 +26,13 @@ export function Footer() {
 
           <nav aria-label="Footer" className="flex flex-col gap-2">
             {LINKS.map((l) => (
-              <Link
+              <a
                 key={l.label}
-                to={l.href}
+                href={l.href}
                 className="text-body-md text-on-surface-variant transition-colors hover:text-on-surface"
               >
                 {l.label}
-              </Link>
+              </a>
             ))}
           </nav>
 

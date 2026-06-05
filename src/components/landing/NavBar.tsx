@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CTAButton } from "./CTAButton";
 import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
@@ -31,21 +30,21 @@ export function NavBar() {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-(--container-content) items-center justify-between px-4 sm:px-8 lg:px-16">
-        <Link
-          to="/"
+        <a
+          href="/"
           className="font-display text-xl font-bold text-primary tracking-tight"
         >
           QuestCampus
-        </Link>
+        </a>
 
         <div className="flex items-center gap-3 sm:gap-5">
-          <Link
-            to={SIGNIN_PATH}
+          <a
+            href={SIGNIN_PATH}
             className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
           >
             Sign in
-          </Link>
-          <CTAButton to={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
+          </a>
+          <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
             Get started →
           </CTAButton>
         </div>

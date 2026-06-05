@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 type Variant = "primary" | "ghost" | "amber" | "white";
@@ -54,13 +53,13 @@ export function CTAButton({
       whileHover={reduce || hoverScale === 1 ? undefined : { scale: hoverScale }}
       transition={{ duration: 0.15, ease: "easeOut" }}
     >
-      <Link
-        to={href}
+      <a
+        href={href}
         aria-label={ariaLabel}
         className={`${base} ${variants[variant]} ${className}`}
       >
         {children}
-      </Link>
+      </a>
     </motion.div>
   );
 }
