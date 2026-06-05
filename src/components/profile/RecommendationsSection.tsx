@@ -22,10 +22,12 @@ const TEASER: Pick<RecCard, "bucket" | "name">[] = [
 
 export function RecommendationsSection({
   sessionId,
+  token,
   reduce,
   firstName,
 }: {
   sessionId: string;
+  token?: string;
   reduce: boolean;
   firstName?: string;
 }) {
