@@ -62,6 +62,7 @@ function OnboardingPage() {
       <NavBar variant="minimal" />
       <OnboardingFlow
         sessionId={sessionId}
+        token={token}
         initialAnswers={answers}
         initialStep={inProgress ? resumeStep : 1}
       />
