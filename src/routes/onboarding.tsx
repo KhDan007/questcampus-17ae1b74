@@ -28,7 +28,24 @@ function OnboardingPage() {
     sessionId ? { sessionId, token } : "skip",
   );
 
-  if (!sessionId || profile === undefined) {
+  // Decide resume-vs-fresh EXACTLY ONCE, the first time the profile loads.
+  // After that we ignore live query updates (otherwise advancing past step 1
+  // re-triggers the "Welcome back" screen for a brand-new user).
+  const [decided, setDecided] = useState(false);
+  const [resume, setResume] = useState<{ step: number; answers: Answers } | null>(null);
+
+  useEffect(() => {
+    if (decided || profile === undefined) return;
+    if (profile && !profile.completed && (profile.currentStep ?? 1) > 1) {
+      setResume({
+        step: profile.currentStep,
+        answers: (profile.answers as Answers) ?? {},
+      });
+    }
+    setDecided(true);
+  }, [decided, profile]);
+
+  if (!sessionId || profile === undefined || !decided) {
     return (
       <>
         <NavBar variant="minimal" />
@@ -37,19 +54,18 @@ function OnboardingPage() {
     );
   }
 
-  const resumeStep = profile?.currentStep ?? 1;
-  const inProgress = !!profile && !profile.completed && resumeStep > 1;
-  const answers: Answers = inProgress ? ((profile!.answers as Answers) ?? {}) : {};
   const firstName =
-    typeof answers.firstName === "string" ? answers.firstName : undefined;
+    resume && typeof resume.answers.firstName === "string"
+      ? resume.answers.firstName
+      : undefined;
 
-  if (inProgress && !started) {
+  if (resume && !started) {
     return (
       <>
         <NavBar variant="minimal" />
         <WelcomeBack
           name={firstName}
-          step={resumeStep}
+          step={resume.step}
           onResume={() => setStarted(true)}
           onRestart={() => setStarted(true)}
         />
@@ -63,8 +79,8 @@ function OnboardingPage() {
       <OnboardingFlow
         sessionId={sessionId}
         token={token}
-        initialAnswers={answers}
-        initialStep={inProgress ? resumeStep : 1}
+        initialAnswers={resume ? resume.answers : {}}
+        initialStep={resume ? resume.step : 1}
       />
     </>
   );
