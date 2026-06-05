@@ -84,7 +84,7 @@ function ProfilePage() {
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
           {sessionId && (
-            <RecommendationsSection sessionId={sessionId} reduce={reduce} firstName={firstName} />
+            <RecommendationsSection sessionId={sessionId} token={token} reduce={reduce} firstName={firstName} />
           )}
 
           <ProfileChapters answers={answers} reduce={reduce} />
