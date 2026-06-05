@@ -107,23 +107,35 @@ function ProfileHero({
   firstName,
   answers,
   completed,
+  sessionId,
+  token,
+  cachedSummary,
 }: {
   firstName?: string;
   answers: Answers;
   completed: boolean;
+  sessionId?: string;
+  token?: string;
+  cachedSummary?: string;
 }) {
   const stage = (answers.lifeStage as { choice?: string } | undefined)?.choice;
   const home = answers.home as { country: string; city?: string; eduSystem?: string } | undefined;
 
-  const [summary, setSummary] = useState<string | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summary, setSummary] = useState<string | null>(cachedSummary ?? null);
+  const [summaryLoading, setSummaryLoading] = useState(!cachedSummary);
   const generateSummary = useAction(api.profileSummary.generate);
 
   useEffect(() => {
+    if (cachedSummary && cachedSummary.trim().length > 0) {
+      setSummary(cachedSummary);
+      setSummaryLoading(false);
+      return;
+    }
     let cancelled = false;
+    setSummaryLoading(true);
     (async () => {
       try {
-        const result = await generateSummary({ answers });
+        const result = await generateSummary({ answers, sessionId, token });
         if (!cancelled) setSummary((result as string)?.trim() || null);
       } catch {
         if (!cancelled) setSummary(null);
@@ -134,7 +146,7 @@ function ProfileHero({
     return () => {
       cancelled = true;
     };
-  }, [answers, generateSummary]);
+  }, [answers, generateSummary, cachedSummary, sessionId, token]);
 
   const STAGE_LABELS: Record<string, string> = {
     high_school: "High school student",
