@@ -21,7 +21,7 @@ function ProfilePage() {
   const reduce = !!useReducedMotion();
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { token } = useAuth();
+  const token = auth.getSession()?.token;
 
   useEffect(() => {
     setSessionId(getSessionId());
@@ -29,7 +29,7 @@ function ProfilePage() {
 
   const convexProfile = useQuery(
     api.onboarding.getActive,
-    sessionId ? { sessionId, token: token ?? undefined } : "skip",
+    sessionId ? { sessionId, token } : "skip",
   );
 
   const localProfile = useMemo(() => {
