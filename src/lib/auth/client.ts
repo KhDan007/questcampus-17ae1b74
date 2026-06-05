@@ -18,7 +18,9 @@ export type AuthSession = {
 };
 
 function base(): string {
-  const url = import.meta.env.VITE_CONVEX_URL;
+  const explicit = import.meta.env.VITE_CONVEX_SITE_URL;
+  const cloud = import.meta.env.VITE_CONVEX_URL;
+  const url = explicit ?? cloud?.replace(".convex.cloud", ".convex.site");
   if (!url) throw new Error("VITE_CONVEX_URL is not set");
   return url.replace(/\/$/, "");
 }
