@@ -104,7 +104,7 @@ export function OnboardingFlow({
       // immediately. The Convex write is fire-and-forget — we never block the
       // redirect on the network (it would hang if functions aren't deployed).
       saveProfileToLocal(merged, TOTAL_STEPS);
-      void complete({ sessionId, answers: merged, completedAt: Date.now(), token: token ?? undefined }).catch(() => {});
+      void complete({ sessionId, answers: merged, completedAt: Date.now(), token }).catch(() => {});
       navigate({ to: "/profile" });
       return;
     }
