@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "@tanstack/react-router";
+import { LogOut, Sparkles, UserRound } from "lucide-react";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
@@ -55,23 +56,20 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </a>
 
         <div className="flex items-center gap-3 sm:gap-5">
-          {variant === "landing" ? (
+          {isAuthenticated && user ? (
+            <UserMenu user={user} />
+          ) : variant === "landing" ? (
             <>
-              {!isAuthenticated && (
-                <a
-                  href={SIGNIN_PATH}
-                  className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
-                >
-                  Sign in
-                </a>
-              )}
+              <a
+                href={SIGNIN_PATH}
+                className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
+              >
+                Sign in
+              </a>
               <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
                 Get started →
               </CTAButton>
-              {isAuthenticated && user && <UserMenu user={user} />}
             </>
-          ) : isAuthenticated && user ? (
-            <UserMenu user={user} />
           ) : (
             <a
               href={SIGNIN_PATH}
@@ -105,40 +103,61 @@ function UserMenu({ user }: { user: AuthUser }) {
         <button
           type="button"
           aria-label="Account menu"
-          className="rounded-full outline-none ring-offset-2 ring-offset-surface-container-low focus-visible:ring-2 focus-visible:ring-primary"
+          className="rounded-full outline-none ring-offset-2 ring-offset-surface-container-low transition-transform hover:scale-[1.04] focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-9 w-9 ring-1 ring-outline-variant/60">
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name ?? user.email} />}
-            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-primary">
+            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-on-primary-fixed-variant">
               {initialsOf(user)}
             </AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex flex-col gap-0.5">
-          <span className="truncate text-label-md font-semibold text-on-surface">
-            {user.name ?? "Account"}
-          </span>
-          <span className="truncate text-label-sm font-normal text-on-surface-variant">
-            {user.email}
-          </span>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={10}
+        className="w-64 rounded-xl border border-outline-variant/60 bg-surface-container-lowest p-1.5 text-on-surface shadow-[0_16px_40px_-12px_rgba(53,37,205,0.22)]"
+      >
+        <DropdownMenuLabel className="flex items-center gap-3 px-2.5 py-2.5">
+          <Avatar className="h-10 w-10 shrink-0">
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name ?? user.email} />}
+            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-on-primary-fixed-variant">
+              {initialsOf(user)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-label-md font-semibold text-on-surface">
+              {user.name ?? "Account"}
+            </p>
+            <p className="truncate text-label-sm font-normal text-on-surface-variant">
+              {user.email}
+            </p>
+          </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => navigate({ to: "/profile" })}>
+        <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
+        <DropdownMenuItem
+          onSelect={() => navigate({ to: "/profile" })}
+          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+        >
+          <UserRound className="h-4 w-4 text-on-surface-variant" />
           My profile
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => navigate({ to: "/onboarding" })}>
+        <DropdownMenuItem
+          onSelect={() => navigate({ to: "/onboarding" })}
+          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+        >
+          <Sparkles className="h-4 w-4 text-on-surface-variant" />
           Continue onboarding
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
         <DropdownMenuItem
           onSelect={() => {
             auth.signOut();
             window.location.href = "/";
           }}
-          className="text-error focus:bg-error-container/40 focus:text-on-error-container"
+          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-error focus:bg-error-container/60 focus:text-on-error-container"
         >
+          <LogOut className="h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
