@@ -21,8 +21,8 @@ export function CountryCombobox({
 
   const results = useMemo<Country[]>(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return SORTED_COUNTRIES.slice(0, 8);
-    return SORTED_COUNTRIES.filter((c) => c.name.toLowerCase().includes(q)).slice(0, 8);
+    if (!q) return SORTED_COUNTRIES;
+    return SORTED_COUNTRIES.filter((c) => c.name.toLowerCase().includes(q));
   }, [query]);
 
   function choose(c: Country) {
