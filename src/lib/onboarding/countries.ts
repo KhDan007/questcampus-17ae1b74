@@ -237,10 +237,7 @@ export const COUNTRIES: Country[] = [
   { code: "ZW", name: "Zimbabwe" },
 ];
 
-// Priority (MVP-scope) countries first, then the rest alphabetically.
-export const SORTED_COUNTRIES: Country[] = [
-  ...COUNTRIES.filter((c) => PRIORITY_CODES.has(c.code)),
-  ...COUNTRIES.filter((c) => !PRIORITY_CODES.has(c.code)).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  ),
-];
+// All countries sorted alphabetically by name.
+export const SORTED_COUNTRIES: Country[] = [...COUNTRIES].sort((a, b) =>
+  a.name.localeCompare(b.name),
+);
