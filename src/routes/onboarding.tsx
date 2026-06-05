@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { getSessionId } from "@/lib/onboarding/session";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { NavBar } from "@/components/landing/NavBar";
 import type { Answers } from "@/lib/onboarding/types";
 
 export const Route = createFileRoute("/onboarding")({
