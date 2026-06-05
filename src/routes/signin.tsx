@@ -44,15 +44,17 @@ function SignInPage() {
     }
     if (code && state) {
       setGoogleLoading(true);
+      // Strip ?code&state from the URL BEFORE the async call so this effect
+      // can't re-fire with an already-consumed code, and the query doesn't
+      // linger after we route away. On success we replace into /profile; only
+      // on failure do we stay on /signin and surface the error.
+      window.history.replaceState({}, "", "/signin");
       auth
         .exchangeGoogleCode(code, state)
-        .then(() => navigate({ to: "/profile" }))
+        .then(() => navigate({ to: "/profile", replace: true }))
         .catch((e: Error) => {
           setError(e.message);
           setGoogleLoading(false);
-        })
-        .finally(() => {
-          window.history.replaceState({}, "", "/signin");
         });
     }
   }, [navigate]);
