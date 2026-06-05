@@ -9,6 +9,7 @@ import { CHAPTERS, STEPS, getStep, type ChapterId } from "@/lib/onboarding/steps
 import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
+import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "QuestCampus — Your Profile" }] }),
@@ -19,14 +20,15 @@ function ProfilePage() {
   const reduce = !!useReducedMotion();
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     setSessionId(getSessionId());
   }, []);
 
   const convexProfile = useQuery(
-    api.onboarding.getBySession,
-    sessionId ? { sessionId } : "skip",
+    api.onboarding.getActive,
+    sessionId ? { sessionId, token: token ?? undefined } : "skip",
   );
 
   const localProfile = useMemo(() => {
