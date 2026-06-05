@@ -8,6 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { ChapterProgress } from "./ChapterProgress";
 import { StepRenderer } from "./StepRenderer";
 import { saveProfileToLocal } from "@/lib/onboarding/storage";
+import { useAuth } from "@/lib/auth/useAuth";
 import {
   TOTAL_STEPS,
   getStep,
@@ -28,6 +29,7 @@ export function OnboardingFlow({
 }) {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
+  const { token } = useAuth();
   const save = useMutation(api.onboarding.saveProgress);
   const complete = useMutation(api.onboarding.complete);
 
@@ -50,7 +52,7 @@ export function OnboardingFlow({
   }
 
   function persist(nextStep: number, merged: Answers) {
-    void save({ sessionId, answers: merged, currentStep: nextStep }).catch(() => {});
+    void save({ sessionId, answers: merged, currentStep: nextStep, token: token ?? undefined }).catch(() => {});
     saveProfileToLocal(merged, nextStep);
   }
 
@@ -102,7 +104,7 @@ export function OnboardingFlow({
       // immediately. The Convex write is fire-and-forget — we never block the
       // redirect on the network (it would hang if functions aren't deployed).
       saveProfileToLocal(merged, TOTAL_STEPS);
-      void complete({ sessionId, answers: merged, completedAt: Date.now() }).catch(() => {});
+      void complete({ sessionId, answers: merged, completedAt: Date.now(), token: token ?? undefined }).catch(() => {});
       navigate({ to: "/profile" });
       return;
     }

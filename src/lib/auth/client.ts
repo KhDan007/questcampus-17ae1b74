@@ -48,6 +48,50 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return json as T;
 }
 
+// ── Reactive store ──────────────────────────────────────────────────────────
+// useSyncExternalStore-compatible store so the header (and any hook) updates
+// instantly on sign-in / sign-out without a reload.
+
+const listeners = new Set<() => void>();
+
+function readSession(): AuthSession | null {
+  if (typeof window === "undefined") return null;
+  const token = window.localStorage.getItem(TOKEN_KEY);
+  const userRaw = window.localStorage.getItem(USER_KEY);
+  if (!token || !userRaw) return null;
+  try {
+    return { token, user: JSON.parse(userRaw) as AuthUser };
+  } catch {
+    return null;
+  }
+}
+
+let snapshot: AuthSession | null = readSession();
+
+function emit() {
+  snapshot = readSession();
+  listeners.forEach((l) => l());
+}
+
+export function subscribeAuth(cb: () => void): () => void {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
+}
+
+export function getAuthSnapshot(): AuthSession | null {
+  return snapshot;
+}
+
+export function getAuthServerSnapshot(): AuthSession | null {
+  return null;
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === TOKEN_KEY || e.key === USER_KEY || e.key === null) emit();
+  });
+}
+
 export const auth = {
   async signUp(email: string, password: string, name?: string): Promise<AuthSession> {
     const session = await post<AuthSession>("/api/auth/sign-up", { email, password, name });
@@ -75,18 +119,11 @@ export const auth = {
     if (typeof window === "undefined") return;
     window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
+    emit();
   },
 
   getSession(): AuthSession | null {
-    if (typeof window === "undefined") return null;
-    const token = window.localStorage.getItem(TOKEN_KEY);
-    const userRaw = window.localStorage.getItem(USER_KEY);
-    if (!token || !userRaw) return null;
-    try {
-      return { token, user: JSON.parse(userRaw) as AuthUser };
-    } catch {
-      return null;
-    }
+    return readSession();
   },
 };
 
@@ -94,4 +131,5 @@ function saveSession(session: AuthSession) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(TOKEN_KEY, session.token);
   window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
+  emit();
 }

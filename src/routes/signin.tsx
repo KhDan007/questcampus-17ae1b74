@@ -2,8 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { NavBar } from "@/components/landing/NavBar";
 import { auth } from "@/lib/auth/client";
+import { getSessionId } from "@/lib/onboarding/session";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
@@ -30,6 +33,21 @@ function SignInPage() {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const linkOnLogin = useMutation(api.onboarding.linkOnLogin);
+
+  async function afterLogin(token: string) {
+    let doc: { completed?: boolean; currentStep?: number } | null = null;
+    try {
+      doc = await linkOnLogin({ token, sessionId: getSessionId() });
+    } catch {
+      /* non-fatal — fall through to onboarding */
+    }
+    if (doc?.completed) {
+      navigate({ to: "/profile", replace: true });
+    } else {
+      navigate({ to: "/onboarding", replace: true });
+    }
+  }
 
   // Handle Google OAuth callback: backend redirects to /signin?code=...&state=...
   useEffect(() => {
@@ -44,19 +62,16 @@ function SignInPage() {
     }
     if (code && state) {
       setGoogleLoading(true);
-      // Strip ?code&state from the URL BEFORE the async call so this effect
-      // can't re-fire with an already-consumed code, and the query doesn't
-      // linger after we route away. On success we replace into /profile; only
-      // on failure do we stay on /signin and surface the error.
       window.history.replaceState({}, "", "/signin");
       auth
         .exchangeGoogleCode(code, state)
-        .then(() => navigate({ to: "/profile", replace: true }))
+        .then((session) => afterLogin(session.token))
         .catch((e: Error) => {
           setError(e.message);
           setGoogleLoading(false);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -79,12 +94,11 @@ function SignInPage() {
 
     setSubmitting(true);
     try {
-      if (mode === "signin") {
-        await auth.signIn(trimmedEmail, password);
-      } else {
-        await auth.signUp(trimmedEmail, password, name.trim());
-      }
-      navigate({ to: "/profile" });
+      const session =
+        mode === "signin"
+          ? await auth.signIn(trimmedEmail, password)
+          : await auth.signUp(trimmedEmail, password, name.trim());
+      await afterLogin(session.token);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {

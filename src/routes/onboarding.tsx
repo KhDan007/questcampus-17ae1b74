@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { getSessionId } from "@/lib/onboarding/session";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { NavBar } from "@/components/landing/NavBar";
+import { useAuth } from "@/lib/auth/useAuth";
 import type { Answers } from "@/lib/onboarding/types";
 
 export const Route = createFileRoute("/onboarding")({
@@ -16,14 +17,15 @@ export const Route = createFileRoute("/onboarding")({
 function OnboardingPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
+  const { token } = useAuth();
 
   useEffect(() => {
     setSessionId(getSessionId());
   }, []);
 
   const profile = useQuery(
-    api.onboarding.getBySession,
-    sessionId ? { sessionId } : "skip",
+    api.onboarding.getActive,
+    sessionId ? { sessionId, token: token ?? undefined } : "skip",
   );
 
   if (!sessionId || profile === undefined) {

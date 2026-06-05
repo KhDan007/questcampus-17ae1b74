@@ -5,10 +5,23 @@ import { useEffect, useState } from "react";
 import { CTAButton } from "./CTAButton";
 import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
 import logoAsset from "@/assets/questcampus-logo.png.asset.json";
+import { useAuth } from "@/lib/auth/useAuth";
+import { auth, type AuthUser } from "@/lib/auth/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNavigate } from "@tanstack/react-router";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -44,16 +57,21 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         <div className="flex items-center gap-3 sm:gap-5">
           {variant === "landing" ? (
             <>
-              <a
-                href={SIGNIN_PATH}
-                className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
-              >
-                Sign in
-              </a>
+              {!isAuthenticated && (
+                <a
+                  href={SIGNIN_PATH}
+                  className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
+                >
+                  Sign in
+                </a>
+              )}
               <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
                 Get started →
               </CTAButton>
+              {isAuthenticated && user && <UserMenu user={user} />}
             </>
+          ) : isAuthenticated && user ? (
+            <UserMenu user={user} />
           ) : (
             <a
               href={SIGNIN_PATH}
@@ -65,5 +83,65 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </div>
       </nav>
     </motion.header>
+  );
+}
+
+function initialsOf(user: AuthUser): string {
+  const name = (user.name ?? "").trim();
+  if (name) {
+    const parts = name.split(/\s+/);
+    const first = parts[0]?.[0] ?? "";
+    const second = parts[1]?.[0] ?? "";
+    return (first + second).toUpperCase() || first.toUpperCase();
+  }
+  return (user.email[0] ?? "?").toUpperCase();
+}
+
+function UserMenu({ user }: { user: AuthUser }) {
+  const navigate = useNavigate();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Account menu"
+          className="rounded-full outline-none ring-offset-2 ring-offset-surface-container-low focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <Avatar className="h-9 w-9">
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name ?? user.email} />}
+            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-primary">
+              {initialsOf(user)}
+            </AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="flex flex-col gap-0.5">
+          <span className="truncate text-label-md font-semibold text-on-surface">
+            {user.name ?? "Account"}
+          </span>
+          <span className="truncate text-label-sm font-normal text-on-surface-variant">
+            {user.email}
+          </span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => navigate({ to: "/profile" })}>
+          My profile
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate({ to: "/onboarding" })}>
+          Continue onboarding
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={() => {
+            auth.signOut();
+            window.location.href = "/";
+          }}
+          className="text-error focus:bg-error-container/40 focus:text-on-error-container"
+        >
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
