@@ -56,6 +56,6 @@ export function OptionCard({
           {children}
         </span>
       </button>
-    </motion.div>
+    </div>
   );
 }
