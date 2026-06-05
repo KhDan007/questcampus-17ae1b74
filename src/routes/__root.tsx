@@ -87,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "QuestCampus — Find universities that want someone like you" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "QuestCampus — Find universities that want someone like you" },
+      { name: "description", content: "QuestCampus front is a web application for user onboarding and authentication." },
+      { property: "og:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
+      { name: "twitter:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aec448e7-0839-42f5-8bbb-53aae96b8cc6/id-preview-608e99aa--a2be596c-1a32-48dd-b3dc-34e3242da808.lovable.app-1780666475149.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aec448e7-0839-42f5-8bbb-53aae96b8cc6/id-preview-608e99aa--a2be596c-1a32-48dd-b3dc-34e3242da808.lovable.app-1780666475149.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
