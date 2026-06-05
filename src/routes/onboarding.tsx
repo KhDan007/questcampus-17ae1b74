@@ -17,7 +17,7 @@ export const Route = createFileRoute("/onboarding")({
 function OnboardingPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
-  const { token } = useAuth();
+  const token = auth.getSession()?.token;
 
   useEffect(() => {
     setSessionId(getSessionId());
