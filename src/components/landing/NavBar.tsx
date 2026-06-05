@@ -4,11 +4,10 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { CTAButton } from "./CTAButton";
 import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
+import logoAsset from "@/assets/questcampus-logo.png.asset.json";
 
-export function NavBar() {
+export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
-  // Glass bar is always visible (incl. on load). After 60px scroll we deepen
-  // the blur/shadow slightly so the bar still reads as it overlaps content.
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -32,21 +31,37 @@ export function NavBar() {
       <nav className="mx-auto flex h-16 max-w-(--container-content) items-center justify-between px-4 sm:px-8 lg:px-16">
         <a
           href="/"
-          className="font-display text-xl font-bold text-primary tracking-tight"
+          className="flex items-center gap-2 font-display text-xl font-bold text-primary tracking-tight"
         >
+          <img
+            src={logoAsset.url}
+            alt="QuestCampus logo"
+            className="h-8 w-8 object-contain"
+          />
           QuestCampus
         </a>
 
         <div className="flex items-center gap-3 sm:gap-5">
-          <a
-            href={SIGNIN_PATH}
-            className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
-          >
-            Sign in
-          </a>
-          <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
-            Get started →
-          </CTAButton>
+          {variant === "landing" ? (
+            <>
+              <a
+                href={SIGNIN_PATH}
+                className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
+              >
+                Sign in
+              </a>
+              <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
+                Get started →
+              </CTAButton>
+            </>
+          ) : (
+            <a
+              href={SIGNIN_PATH}
+              className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+            >
+              Sign in
+            </a>
+          )}
         </div>
       </nav>
     </motion.header>
