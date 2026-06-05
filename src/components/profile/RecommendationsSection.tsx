@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { UniversityCard, type RecCard } from "./UniversityCard";
+import { WAITLIST_PATH } from "@/lib/routes";
+import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
 
 type FreePayload = {
   plan: "free";
@@ -101,9 +103,46 @@ export function RecommendationsSection({
 
           {/* Paid upsell — locked buckets */}
           <PaidUpsell reduce={reduce} />
+
+          {/* Waitlist prompt — shown after free recommendations (MVP_SPEC §5) */}
+          <WaitlistPrompt reduce={reduce} />
         </>
       )}
     </section>
+  );
+}
+
+// ── Waitlist prompt (amber, distinct from the paid CTA) ──────────────────────
+function WaitlistPrompt({ reduce }: { reduce: boolean }) {
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="mt-6 rounded-xl border-l-[3px] border-secondary-container p-5 sm:p-6"
+      style={{ background: "rgba(254,166,25,0.12)" }}
+    >
+      <h3 className="text-headline-sm text-on-background">
+        Not ready to pay? Join the waitlist 🎓
+      </h3>
+      <p className="mt-2 max-w-xl text-body-md text-on-surface">
+        Lock in{" "}
+        <strong className="text-secondary">{WAITLIST_BASE_DISCOUNT}% off</strong> at
+        launch — plus an extra{" "}
+        <strong className="text-secondary">
+          {REFERRAL_EXTRA_DISCOUNT}% off per friend you refer
+        </strong>
+        . Founding Member badge and early access to every new tool included.
+      </p>
+      <a
+        href={WAITLIST_PATH}
+        className="mt-5 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-secondary-container px-7 text-label-md font-semibold text-on-secondary-container shadow-[0_8px_24px_-6px_rgba(254,166,25,0.45)] transition-[filter,transform] hover:scale-[1.03] hover:brightness-95"
+      >
+        Join the waitlist
+        <span aria-hidden>→</span>
+      </a>
+    </motion.div>
   );
 }
 
