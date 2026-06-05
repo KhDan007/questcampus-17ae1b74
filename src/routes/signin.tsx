@@ -2,8 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { NavBar } from "@/components/landing/NavBar";
 import { auth } from "@/lib/auth/client";
+import { getSessionId } from "@/lib/onboarding/session";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
