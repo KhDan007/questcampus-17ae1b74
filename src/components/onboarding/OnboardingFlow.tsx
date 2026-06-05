@@ -29,6 +29,7 @@ export function OnboardingFlow({
 }) {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
+  const { token } = useAuth();
   const save = useMutation(api.onboarding.saveProgress);
   const complete = useMutation(api.onboarding.complete);
 
