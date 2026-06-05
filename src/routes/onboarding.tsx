@@ -25,7 +25,7 @@ function OnboardingPage() {
 
   const profile = useQuery(
     api.onboarding.getActive,
-    sessionId ? { sessionId, token: token ?? undefined } : "skip",
+    sessionId ? { sessionId, token } : "skip",
   );
 
   if (!sessionId || profile === undefined) {
