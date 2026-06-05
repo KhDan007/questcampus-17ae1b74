@@ -8,7 +8,6 @@ import { api } from "@/convex/_generated/api";
 import { ChapterProgress } from "./ChapterProgress";
 import { StepRenderer } from "./StepRenderer";
 import { saveProfileToLocal } from "@/lib/onboarding/storage";
-import { useAuth } from "@/lib/auth/useAuth";
 import {
   TOTAL_STEPS,
   getStep,
