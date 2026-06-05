@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "@tanstack/react-router";
+import { LogOut, Sparkles, UserRound } from "lucide-react";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
