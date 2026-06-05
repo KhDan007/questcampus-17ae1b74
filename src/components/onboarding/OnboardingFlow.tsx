@@ -19,16 +19,17 @@ import { personalize } from "@/lib/onboarding/personalize";
 
 export function OnboardingFlow({
   sessionId,
+  token,
   initialAnswers,
   initialStep,
 }: {
   sessionId: string;
+  token?: string;
   initialAnswers: Answers;
   initialStep: number;
 }) {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
-  const { token } = useAuth();
   const save = useMutation(api.onboarding.saveProgress);
   const complete = useMutation(api.onboarding.complete);
 
