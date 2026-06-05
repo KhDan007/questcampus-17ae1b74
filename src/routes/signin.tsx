@@ -42,6 +42,10 @@ function SignInPage() {
     } catch {
       /* non-fatal — fall through to onboarding */
     }
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("qc_profile");
+      window.localStorage.removeItem("qc_resume_step");
+    }
     if (doc?.completed) {
       navigate({ to: "/profile", replace: true });
     } else {

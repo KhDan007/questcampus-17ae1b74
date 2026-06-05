@@ -34,8 +34,9 @@ function ProfilePage() {
 
   const localProfile = useMemo(() => {
     if (typeof window === "undefined") return null;
+    if (token) return null; // logged-in users rely solely on their Convex doc — never the shared browser mirror
     return loadProfileFromLocal();
-  }, []);
+  }, [token]);
 
   const answers: Answers | null =
     (convexProfile?.answers as Answers) || localProfile?.answers || null;
@@ -83,7 +84,7 @@ function ProfilePage() {
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
           {sessionId && (
-            <RecommendationsSection sessionId={sessionId} reduce={reduce} firstName={firstName} />
+            <RecommendationsSection sessionId={sessionId} token={token} reduce={reduce} firstName={firstName} />
           )}
 
           <ProfileChapters answers={answers} reduce={reduce} />

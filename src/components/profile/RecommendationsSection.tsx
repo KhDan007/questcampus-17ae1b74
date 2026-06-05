@@ -22,10 +22,12 @@ const TEASER: Pick<RecCard, "bucket" | "name">[] = [
 
 export function RecommendationsSection({
   sessionId,
+  token,
   reduce,
   firstName,
 }: {
   sessionId: string;
+  token?: string;
   reduce: boolean;
   firstName?: string;
 }) {
@@ -37,7 +39,7 @@ export function RecommendationsSection({
     async (force = false) => {
       setStatus("loading");
       try {
-        const res = (await recommend({ sessionId, plan: "free", force })) as
+        const res = (await recommend({ sessionId, token, plan: "free", force })) as
           | FreePayload
           | { error: string; results: never[] };
         if ("error" in res && res.error) {
@@ -50,7 +52,7 @@ export function RecommendationsSection({
         setStatus("error");
       }
     },
-    [recommend, sessionId],
+    [recommend, sessionId, token],
   );
 
   useEffect(() => {

@@ -119,6 +119,9 @@ export const auth = {
     if (typeof window === "undefined") return;
     window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
+    window.localStorage.removeItem("qc_profile");
+    window.localStorage.removeItem("qc_resume_step");
+    window.localStorage.removeItem("qc_session_id");
     emit();
   },
 
