@@ -52,7 +52,7 @@ export function OnboardingFlow({
   }
 
   function persist(nextStep: number, merged: Answers) {
-    void save({ sessionId, answers: merged, currentStep: nextStep }).catch(() => {});
+    void save({ sessionId, answers: merged, currentStep: nextStep, token: token ?? undefined }).catch(() => {});
     saveProfileToLocal(merged, nextStep);
   }
 
