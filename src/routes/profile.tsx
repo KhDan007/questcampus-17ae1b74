@@ -34,8 +34,9 @@ function ProfilePage() {
 
   const localProfile = useMemo(() => {
     if (typeof window === "undefined") return null;
+    if (token) return null; // logged-in users rely solely on their Convex doc — never the shared browser mirror
     return loadProfileFromLocal();
-  }, []);
+  }, [token]);
 
   const answers: Answers | null =
     (convexProfile?.answers as Answers) || localProfile?.answers || null;
