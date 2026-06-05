@@ -10,7 +10,7 @@ import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
 import { NavBar } from "@/components/landing/NavBar";
-import { useAuth } from "@/lib/auth/useAuth";
+import { auth } from "@/lib/auth/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "QuestCampus — Your Profile" }] }),
@@ -21,7 +21,7 @@ function ProfilePage() {
   const reduce = !!useReducedMotion();
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { token } = useAuth();
+  const token = auth.getSession()?.token;
 
   useEffect(() => {
     setSessionId(getSessionId());
@@ -29,7 +29,7 @@ function ProfilePage() {
 
   const convexProfile = useQuery(
     api.onboarding.getActive,
-    sessionId ? { sessionId, token: token ?? undefined } : "skip",
+    sessionId ? { sessionId, token } : "skip",
   );
 
   const localProfile = useMemo(() => {
@@ -72,7 +72,14 @@ function ProfilePage() {
     <>
       <NavBar variant="minimal" />
       <div className="min-h-screen bg-surface">
-        <ProfileHero firstName={firstName} answers={answers} completed={completed} />
+        <ProfileHero
+          firstName={firstName}
+          answers={answers}
+          completed={completed}
+          sessionId={sessionId ?? undefined}
+          token={token}
+          cachedSummary={(convexProfile as { aiSummary?: string } | null | undefined)?.aiSummary}
+        />
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
           {sessionId && (
@@ -100,23 +107,35 @@ function ProfileHero({
   firstName,
   answers,
   completed,
+  sessionId,
+  token,
+  cachedSummary,
 }: {
   firstName?: string;
   answers: Answers;
   completed: boolean;
+  sessionId?: string;
+  token?: string;
+  cachedSummary?: string;
 }) {
   const stage = (answers.lifeStage as { choice?: string } | undefined)?.choice;
   const home = answers.home as { country: string; city?: string; eduSystem?: string } | undefined;
 
-  const [summary, setSummary] = useState<string | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summary, setSummary] = useState<string | null>(cachedSummary ?? null);
+  const [summaryLoading, setSummaryLoading] = useState(!cachedSummary);
   const generateSummary = useAction(api.profileSummary.generate);
 
   useEffect(() => {
+    if (cachedSummary && cachedSummary.trim().length > 0) {
+      setSummary(cachedSummary);
+      setSummaryLoading(false);
+      return;
+    }
     let cancelled = false;
+    setSummaryLoading(true);
     (async () => {
       try {
-        const result = await generateSummary({ answers });
+        const result = await generateSummary({ answers, sessionId, token });
         if (!cancelled) setSummary((result as string)?.trim() || null);
       } catch {
         if (!cancelled) setSummary(null);
@@ -127,7 +146,7 @@ function ProfileHero({
     return () => {
       cancelled = true;
     };
-  }, [answers, generateSummary]);
+  }, [answers, generateSummary, cachedSummary, sessionId, token]);
 
   const STAGE_LABELS: Record<string, string> = {
     high_school: "High school student",

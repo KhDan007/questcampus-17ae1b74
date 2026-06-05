@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { getSessionId } from "@/lib/onboarding/session";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { NavBar } from "@/components/landing/NavBar";
-import { useAuth } from "@/lib/auth/useAuth";
+import { auth } from "@/lib/auth/client";
 import type { Answers } from "@/lib/onboarding/types";
 
 export const Route = createFileRoute("/onboarding")({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/onboarding")({
 function OnboardingPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
-  const { token } = useAuth();
+  const token = auth.getSession()?.token;
 
   useEffect(() => {
     setSessionId(getSessionId());
@@ -25,7 +25,7 @@ function OnboardingPage() {
 
   const profile = useQuery(
     api.onboarding.getActive,
-    sessionId ? { sessionId, token: token ?? undefined } : "skip",
+    sessionId ? { sessionId, token } : "skip",
   );
 
   if (!sessionId || profile === undefined) {
@@ -62,6 +62,7 @@ function OnboardingPage() {
       <NavBar variant="minimal" />
       <OnboardingFlow
         sessionId={sessionId}
+        token={token}
         initialAnswers={answers}
         initialStep={inProgress ? resumeStep : 1}
       />
