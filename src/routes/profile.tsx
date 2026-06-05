@@ -72,7 +72,14 @@ function ProfilePage() {
     <>
       <NavBar variant="minimal" />
       <div className="min-h-screen bg-surface">
-        <ProfileHero firstName={firstName} answers={answers} completed={completed} />
+        <ProfileHero
+          firstName={firstName}
+          answers={answers}
+          completed={completed}
+          sessionId={sessionId ?? undefined}
+          token={token}
+          cachedSummary={(convexProfile as { aiSummary?: string } | null | undefined)?.aiSummary}
+        />
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
           {sessionId && (
