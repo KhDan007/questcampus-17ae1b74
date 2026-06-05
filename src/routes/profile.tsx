@@ -51,35 +51,48 @@ function ProfilePage() {
   }, [sessionId, convexProfile, localProfile, navigate]);
 
   if (!sessionId || convexProfile === undefined) {
-    return <Splash />;
+    return (
+      <>
+        <NavBar variant="minimal" />
+        <Splash />
+      </>
+    );
   }
 
   if (!answers) {
-    return <EmptyState />;
+    return (
+      <>
+        <NavBar variant="minimal" />
+        <EmptyState />
+      </>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-surface">
-      <ProfileHero firstName={firstName} answers={answers} completed={completed} />
+    <>
+      <NavBar variant="minimal" />
+      <div className="min-h-screen bg-surface">
+        <ProfileHero firstName={firstName} answers={answers} completed={completed} />
 
-      <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
-        {sessionId && (
-          <RecommendationsSection sessionId={sessionId} reduce={reduce} firstName={firstName} />
-        )}
+        <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
+          {sessionId && (
+            <RecommendationsSection sessionId={sessionId} reduce={reduce} firstName={firstName} />
+          )}
 
-        <ProfileChapters answers={answers} reduce={reduce} />
+          <ProfileChapters answers={answers} reduce={reduce} />
 
-        <div className="mt-16 text-center">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/onboarding" })}
-            className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
-          >
-            ← Edit your profile
-          </button>
+          <div className="mt-16 text-center">
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/onboarding" })}
+              className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
+            >
+              ← Edit your profile
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
