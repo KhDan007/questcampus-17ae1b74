@@ -27,7 +27,12 @@ function OnboardingPage() {
   );
 
   if (!sessionId || profile === undefined) {
-    return <Splash />;
+    return (
+      <>
+        <NavBar variant="minimal" />
+        <Splash />
+      </>
+    );
   }
 
   const resumeStep = profile?.currentStep ?? 1;
@@ -38,21 +43,27 @@ function OnboardingPage() {
 
   if (inProgress && !started) {
     return (
-      <WelcomeBack
-        name={firstName}
-        step={resumeStep}
-        onResume={() => setStarted(true)}
-        onRestart={() => setStarted(true)}
-      />
+      <>
+        <NavBar variant="minimal" />
+        <WelcomeBack
+          name={firstName}
+          step={resumeStep}
+          onResume={() => setStarted(true)}
+          onRestart={() => setStarted(true)}
+        />
+      </>
     );
   }
 
   return (
-    <OnboardingFlow
-      sessionId={sessionId}
-      initialAnswers={answers}
-      initialStep={inProgress ? resumeStep : 1}
-    />
+    <>
+      <NavBar variant="minimal" />
+      <OnboardingFlow
+        sessionId={sessionId}
+        initialAnswers={answers}
+        initialStep={inProgress ? resumeStep : 1}
+      />
+    </>
   );
 }
 
