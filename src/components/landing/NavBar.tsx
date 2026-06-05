@@ -55,23 +55,20 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </a>
 
         <div className="flex items-center gap-3 sm:gap-5">
-          {variant === "landing" ? (
+          {isAuthenticated && user ? (
+            <UserMenu user={user} />
+          ) : variant === "landing" ? (
             <>
-              {!isAuthenticated && (
-                <a
-                  href={SIGNIN_PATH}
-                  className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
-                >
-                  Sign in
-                </a>
-              )}
+              <a
+                href={SIGNIN_PATH}
+                className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
+              >
+                Sign in
+              </a>
               <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
                 Get started →
               </CTAButton>
-              {isAuthenticated && user && <UserMenu user={user} />}
             </>
-          ) : isAuthenticated && user ? (
-            <UserMenu user={user} />
           ) : (
             <a
               href={SIGNIN_PATH}
