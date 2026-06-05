@@ -9,6 +9,7 @@ import { CHAPTERS, STEPS, getStep, type ChapterId } from "@/lib/onboarding/steps
 import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
+import { NavBar } from "@/components/landing/NavBar";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/profile")({
