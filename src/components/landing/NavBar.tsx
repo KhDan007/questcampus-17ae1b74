@@ -116,7 +116,7 @@ function UserMenu({ user }: { user: AuthUser }) {
       <DropdownMenuContent
         align="end"
         sideOffset={10}
-        className="w-64 rounded-xl border border-outline-variant/60 bg-surface-container-lowest p-1.5 text-on-surface shadow-[0_16px_40px_-12px_rgba(53,37,205,0.22)]"
+        className="w-64 rounded-none border border-outline-variant/60 bg-surface-container-lowest p-1.5 text-on-surface shadow-[0_16px_40px_-12px_rgba(53,37,205,0.22)]"
       >
         <DropdownMenuLabel className="flex items-center gap-3 px-2.5 py-2.5">
           <Avatar className="h-10 w-10 shrink-0">
@@ -137,14 +137,14 @@ function UserMenu({ user }: { user: AuthUser }) {
         <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
         <DropdownMenuItem
           onSelect={() => navigate({ to: "/profile" })}
-          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
         >
           <UserRound className="h-4 w-4 text-on-surface-variant" />
           My profile
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => navigate({ to: "/onboarding" })}
-          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
         >
           <Sparkles className="h-4 w-4 text-on-surface-variant" />
           Continue onboarding
@@ -155,7 +155,7 @@ function UserMenu({ user }: { user: AuthUser }) {
             auth.signOut();
             window.location.href = "/";
           }}
-          className="cursor-pointer rounded-lg px-2.5 py-2 text-label-md text-error focus:bg-error-container/60 focus:text-on-error-container"
+          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-error focus:bg-error-container/60 focus:text-on-error-container"
         >
           <LogOut className="h-4 w-4" />
           Sign out
