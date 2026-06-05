@@ -10,7 +10,7 @@ import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
 import { NavBar } from "@/components/landing/NavBar";
-import { useAuth } from "@/lib/auth/useAuth";
+import { auth } from "@/lib/auth/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "QuestCampus — Your Profile" }] }),
