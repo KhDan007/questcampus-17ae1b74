@@ -1,16 +1,18 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 // Selectable option card — single + multi choice workhorse. Uses inset box-shadow
 // for the selection ring (instead of ring-2) so the box model never shifts.
+// No per-card entry animation: the parent step container already fades in,
+// and re-running a y-translate on every selection re-render caused a visible
+// upward shift of the option list.
 export function OptionCard({
   label,
   selected,
   onSelect,
   multi = false,
-  index = 0,
+  index: _index = 0,
   badge,
   children,
 }: {
@@ -22,14 +24,8 @@ export function OptionCard({
   badge?: string;
   children?: ReactNode;
 }) {
-  const reduce = useReducedMotion();
-
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut", delay: Math.min(index * 0.03, 0.3) }}
-    >
+    <div>
       <button
         type="button"
         onClick={onSelect}
