@@ -72,9 +72,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
-  '/unlock': typeof UnlockIndexRoute
-  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/cancel': typeof UnlockCancelRoute
+  '/unlock/success': typeof UnlockSuccessRoute
+  '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,9 +83,9 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
-  '/unlock': typeof UnlockIndexRoute
-  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/cancel': typeof UnlockCancelRoute
+  '/unlock/success': typeof UnlockSuccessRoute
+  '/unlock': typeof UnlockIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,9 +95,9 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
-  '/unlock/': typeof UnlockIndexRoute
-  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/cancel': typeof UnlockCancelRoute
+  '/unlock/success': typeof UnlockSuccessRoute
+  '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,9 +108,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
-    | '/unlock'
-    | '/unlock/success'
     | '/unlock/cancel'
+    | '/unlock/success'
+    | '/unlock/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -119,9 +119,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
-    | '/unlock'
-    | '/unlock/success'
     | '/unlock/cancel'
+    | '/unlock/success'
+    | '/unlock'
   id:
     | '__root__'
     | '/'
@@ -130,9 +130,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
-    | '/unlock/'
-    | '/unlock/success'
     | '/unlock/cancel'
+    | '/unlock/success'
+    | '/unlock/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,9 +142,9 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
   WaitlistRoute: typeof WaitlistRoute
-  UnlockIndexRoute: typeof UnlockIndexRoute
-  UnlockSuccessRoute: typeof UnlockSuccessRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
+  UnlockSuccessRoute: typeof UnlockSuccessRoute
+  UnlockIndexRoute: typeof UnlockIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -194,7 +194,7 @@ declare module '@tanstack/react-router' {
     '/unlock/': {
       id: '/unlock/'
       path: '/unlock'
-      fullPath: '/unlock'
+      fullPath: '/unlock/'
       preLoaderRoute: typeof UnlockIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -222,20 +222,10 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
   WaitlistRoute: WaitlistRoute,
-  UnlockIndexRoute: UnlockIndexRoute,
-  UnlockSuccessRoute: UnlockSuccessRoute,
   UnlockCancelRoute: UnlockCancelRoute,
+  UnlockSuccessRoute: UnlockSuccessRoute,
+  UnlockIndexRoute: UnlockIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
