@@ -1,18 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { UniversityCard, type RecCard } from "./UniversityCard";
 import { WAITLIST_PATH } from "@/lib/routes";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
+import { UnlockButton } from "@/components/payments/UnlockButton";
 
 type FreePayload = {
   plan: "free";
   firstName?: string;
   results: RecCard[];
 };
+
+type PaidPayload = {
+  plan: "paid";
+  firstName?: string;
+  buckets?: { safety: RecCard[]; target: RecCard[]; reach: RecCard[] };
+  results: RecCard[];
+};
+
+type PaymentRequired = { error: "payment_required"; results: never[] };
 
 // Locked teaser cards behind the paywall — synthetic, blurred. We don't expose
 // real paid results client-side until purchase.
@@ -34,32 +44,78 @@ export function RecommendationsSection({
   firstName?: string;
 }) {
   const recommend = useAction(api.rag.recommend.recommend);
-  const [data, setData] = useState<FreePayload | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [free, setFree] = useState<FreePayload | null>(null);
+  const [paid, setPaid] = useState<PaidPayload | null>(null);
+  const [freeStatus, setFreeStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [paidStatus, setPaidStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
 
-  const load = useCallback(
+  // Live entitlement — flips to {paid:true} ~instantly once the webhook lands.
+  const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
+    | { paid: boolean }
+    | undefined;
+  const isPaid = entitlement?.paid === true;
+
+  const loadFree = useCallback(
     async (force = false) => {
-      setStatus("loading");
+      setFreeStatus("loading");
       try {
         const res = (await recommend({ sessionId, token, plan: "free", force })) as
           | FreePayload
           | { error: string; results: never[] };
         if ("error" in res && res.error) {
-          setStatus("error");
+          setFreeStatus("error");
           return;
         }
-        setData(res as FreePayload);
-        setStatus("ready");
+        setFree(res as FreePayload);
+        setFreeStatus("ready");
       } catch {
-        setStatus("error");
+        setFreeStatus("error");
+      }
+    },
+    [recommend, sessionId, token],
+  );
+
+  const loadPaid = useCallback(
+    async (force = false) => {
+      if (!token) return;
+      setPaidStatus("loading");
+      try {
+        const res = (await recommend({ sessionId, token, plan: "paid", force })) as
+          | PaidPayload
+          | PaymentRequired;
+        if ("error" in res && res.error === "payment_required") {
+          setPaid(null);
+          setPaidStatus("ready"); // ready, but no entitlement
+          return;
+        }
+        setPaid(res as PaidPayload);
+        setPaidStatus("ready");
+      } catch {
+        setPaidStatus("error");
       }
     },
     [recommend, sessionId, token],
   );
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void loadFree();
+  }, [loadFree]);
+
+  // When entitlement flips to paid, fetch the full list (force=true to bypass cache).
+  useEffect(() => {
+    if (isPaid && !paid && paidStatus !== "loading") {
+      void loadPaid(true);
+    }
+  }, [isPaid, paid, paidStatus, loadPaid]);
+
+  const paidBuckets = useMemo(() => {
+    if (!paid) return null;
+    if (paid.buckets) return paid.buckets;
+    // Fallback: group flat results by bucket.
+    const grouped = { safety: [] as RecCard[], target: [] as RecCard[], reach: [] as RecCard[] };
+    for (const r of paid.results ?? []) grouped[r.bucket]?.push(r);
+    return grouped;
+  }, [paid]);
 
   return (
     <section className="mt-14">
@@ -73,10 +129,13 @@ export function RecommendationsSection({
             profile.
           </p>
         </div>
-        {status === "ready" && (
+        {freeStatus === "ready" && (
           <button
             type="button"
-            onClick={() => load(true)}
+            onClick={() => {
+              void loadFree(true);
+              if (isPaid) void loadPaid(true);
+            }}
             className="shrink-0 text-label-md text-on-surface-variant transition-colors hover:text-primary"
           >
             ↻ Refresh
@@ -84,14 +143,14 @@ export function RecommendationsSection({
         )}
       </div>
 
-      {status === "loading" && <MatchesLoading firstName={firstName} />}
-      {status === "error" && <MatchesError onRetry={() => load(true)} />}
+      {freeStatus === "loading" && <MatchesLoading firstName={firstName} />}
+      {freeStatus === "error" && <MatchesError onRetry={() => loadFree(true)} />}
 
-      {status === "ready" && data && (
+      {freeStatus === "ready" && free && (
         <>
-          {/* Free: top 3 full cards */}
+          {/* Free: top 3 full cards (always shown). */}
           <div className="mt-8 grid gap-5">
-            {data.results.map((card, i) => (
+            {free.results.map((card, i) => (
               <UniversityCard
                 key={card.externalId}
                 card={card}
@@ -101,14 +160,96 @@ export function RecommendationsSection({
             ))}
           </div>
 
-          {/* Paid upsell — locked buckets */}
-          <PaidUpsell reduce={reduce} />
+          {isPaid ? (
+            <PaidResults
+              buckets={paidBuckets}
+              status={paidStatus}
+              onRetry={() => loadPaid(true)}
+              reduce={reduce}
+            />
+          ) : (
+            <PaidUpsell token={token} reduce={reduce} />
+          )}
 
           {/* Waitlist prompt — shown after free recommendations (MVP_SPEC §5) */}
           <WaitlistPrompt reduce={reduce} />
         </>
       )}
     </section>
+  );
+}
+
+// ── Paid results (safety / target / reach) ───────────────────────────────────
+function PaidResults({
+  buckets,
+  status,
+  onRetry,
+  reduce,
+}: {
+  buckets: { safety: RecCard[]; target: RecCard[]; reach: RecCard[] } | null;
+  status: "idle" | "loading" | "ready" | "error";
+  onRetry: () => void;
+  reduce: boolean;
+}) {
+  if (status === "loading" || status === "idle") {
+    return (
+      <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
+        <motion.span
+          className="mx-auto block h-6 w-6 rounded-full border-2 border-primary/30 border-t-primary"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+        />
+        <p className="mt-4 text-body-md text-on-surface-variant">
+          Loading your full safety, target & reach list…
+        </p>
+      </div>
+    );
+  }
+  if (status === "error" || !buckets) {
+    return (
+      <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
+        <p className="text-body-md text-on-surface-variant">
+          We couldn&apos;t load your full list right now.
+        </p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  const sections: { key: keyof typeof buckets; title: string; emoji: string }[] = [
+    { key: "safety", title: "Safety schools", emoji: "🛟" },
+    { key: "target", title: "Target schools", emoji: "🎯" },
+    { key: "reach", title: "Reach schools", emoji: "🚀" },
+  ];
+
+  return (
+    <div className="mt-10 space-y-12">
+      {sections.map((s) => {
+        const list = buckets[s.key] ?? [];
+        if (list.length === 0) return null;
+        return (
+          <div key={s.key}>
+            <h3 className="text-headline-sm text-on-background">
+              {s.emoji} {s.title}
+              <span className="ml-2 text-label-md font-normal text-on-surface-variant">
+                ({list.length})
+              </span>
+            </h3>
+            <div className="mt-5 grid gap-5">
+              {list.map((card, i) => (
+                <UniversityCard key={card.externalId} card={card} index={i} reduce={reduce} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -147,7 +288,7 @@ function WaitlistPrompt({ reduce }: { reduce: boolean }) {
 }
 
 // ── Paid upsell (blurred teaser + CTA) ───────────────────────────────────────
-function PaidUpsell({ reduce }: { reduce: boolean }) {
+function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: boolean }) {
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -187,13 +328,9 @@ function PaidUpsell({ reduce }: { reduce: boolean }) {
           Unlock every match sorted into safety, target, and reach schools, with
           full requirements, deadlines, and filters.
         </p>
-        <button
-          type="button"
-          className="mt-6 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
-        >
-          Unlock full list — $5
-          <span aria-hidden>→</span>
-        </button>
+        <div className="mt-6">
+          <UnlockButton token={token} />
+        </div>
         <p className="mt-3 text-label-sm text-on-surface-variant">
           One-time payment · 30% off for waitlist members
         </p>

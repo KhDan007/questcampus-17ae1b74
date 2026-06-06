@@ -10,6 +10,7 @@ export type AuthUser = {
   email: string;
   name?: string | null;
   avatarUrl?: string | null;
+  paid?: boolean;
 };
 
 export type AuthSession = {
