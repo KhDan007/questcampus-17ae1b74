@@ -15,6 +15,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as BlankRouteImport } from './routes/blank'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
 
 const WaitlistRoute = WaitlistRouteImport.update({
   id: '/waitlist',
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnlockIndexRoute = UnlockIndexRouteImport.update({
+  id: '/unlock/',
+  path: '/unlock/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock': typeof UnlockIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +90,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
+    | '/unlock/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/blank' | '/onboarding' | '/profile' | '/signin' | '/waitlist'
+  to:
+    | '/'
+    | '/blank'
+    | '/onboarding'
+    | '/profile'
+    | '/signin'
+    | '/waitlist'
+    | '/unlock'
   id:
     | '__root__'
     | '/'
@@ -91,6 +108,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
+    | '/unlock/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +118,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
   WaitlistRoute: typeof WaitlistRoute
+  UnlockIndexRoute: typeof UnlockIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unlock/': {
+      id: '/unlock/'
+      path: '/unlock'
+      fullPath: '/unlock/'
+      preLoaderRoute: typeof UnlockIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,7 +182,18 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
   WaitlistRoute: WaitlistRoute,
+  UnlockIndexRoute: UnlockIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
