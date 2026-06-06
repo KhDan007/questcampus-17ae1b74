@@ -16,6 +16,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as BlankRouteImport } from './routes/blank'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
+import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 
 const WaitlistRoute = WaitlistRouteImport.update({
   id: '/waitlist',
@@ -52,6 +53,11 @@ const UnlockIndexRoute = UnlockIndexRouteImport.update({
   path: '/unlock/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnlockSuccessRoute = UnlockSuccessRouteImport.update({
+  id: '/unlock/success',
+  path: '/unlock/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock': typeof UnlockIndexRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/waitlist': typeof WaitlistRoute
+  '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
+    | '/unlock/success'
     | '/unlock/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
+    | '/unlock/success'
     | '/unlock'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signin'
     | '/waitlist'
+    | '/unlock/success'
     | '/unlock/'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
   WaitlistRoute: typeof WaitlistRoute
+  UnlockSuccessRoute: typeof UnlockSuccessRoute
   UnlockIndexRoute: typeof UnlockIndexRoute
 }
 
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnlockIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unlock/success': {
+      id: '/unlock/success'
+      path: '/unlock/success'
+      fullPath: '/unlock/success'
+      preLoaderRoute: typeof UnlockSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
   WaitlistRoute: WaitlistRoute,
+  UnlockSuccessRoute: UnlockSuccessRoute,
   UnlockIndexRoute: UnlockIndexRoute,
 }
 export const routeTree = rootRouteImport
