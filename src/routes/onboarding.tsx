@@ -110,6 +110,7 @@ function WelcomeBack({
   onResume: () => void;
   onRestart: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex min-h-screen max-w-[560px] flex-col items-center justify-center px-6 text-center">
       <motion.div
@@ -118,20 +119,22 @@ function WelcomeBack({
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <span className="inline-block rounded-full bg-primary-fixed px-3 py-1 text-label-sm font-medium uppercase text-primary">
-          Welcome back
+          {t("ob.welcomeBack.badge")}
         </span>
         <h1 className="mt-6 text-display-lg-mobile text-on-background">
-          Welcome back{name ? `, ${name}` : ""} 👋
+          {name
+            ? t("ob.welcomeBack.titleNamed", { name })
+            : t("ob.welcomeBack.title")}
         </h1>
         <p className="mt-3 text-body-lg text-on-surface-variant">
-          Pick up right where you left off — you were on step {step} of 22.
+          {t("ob.welcomeBack.subtitle", { step, total: TOTAL_STEPS })}
         </p>
         <button
           type="button"
           onClick={onResume}
           className="mt-8 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-colors hover:bg-primary"
         >
-          Continue where I left off →
+          {t("ob.welcomeBack.resume")}
         </button>
       </motion.div>
     </div>
