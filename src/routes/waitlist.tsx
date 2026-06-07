@@ -18,7 +18,7 @@ export const Route = createFileRoute("/waitlist")({
       {
         name: "description",
         content:
-          "Join the QuestCampus waitlist for 30% off at launch, +10% per referral, a Founding Member badge, and early access to every new tool.",
+          "Join the QuestCampus waitlist for 30% off at launch, +5% per referral, a Founding Member badge, and early access to every new tool.",
       },
     ],
   }),

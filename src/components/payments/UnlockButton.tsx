@@ -16,7 +16,7 @@ type Props = {
 // inline paywall in the profile and on the dedicated /unlock route.
 export function UnlockButton({
   token,
-  label = "Unlock full list — $5",
+  label = "Unlock full list — $9",
   className,
   onAlreadyPaid,
 }: Props) {
