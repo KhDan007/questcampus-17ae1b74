@@ -11,7 +11,7 @@ function siteBase(): string {
 }
 
 export type CheckoutResult =
-  | { kind: "redirect"; url: string }
+  | { kind: "redirect"; url: string; discountPercent?: number }
   | { kind: "already_paid" }
   | { kind: "unauthorized" }
   | { kind: "not_configured" }
@@ -36,7 +36,7 @@ export async function startCheckout(token: string | undefined): Promise<Checkout
   if (res.status === 401) return { kind: "unauthorized" };
   if (res.status === 503) return { kind: "not_configured" };
 
-  let body: { url?: string; alreadyPaid?: boolean; error?: string } = {};
+  let body: { url?: string; alreadyPaid?: boolean; error?: string; discountPercent?: number } = {};
   try {
     body = await res.json();
   } catch {
@@ -47,6 +47,6 @@ export async function startCheckout(token: string | undefined): Promise<Checkout
     return { kind: "error", message: body.error ?? `Checkout failed (${res.status})` };
   }
   if (body.alreadyPaid) return { kind: "already_paid" };
-  if (body.url) return { kind: "redirect", url: body.url };
+  if (body.url) return { kind: "redirect", url: body.url, discountPercent: body.discountPercent };
   return { kind: "error", message: "Unexpected response from checkout." };
 }
