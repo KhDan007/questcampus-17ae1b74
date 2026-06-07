@@ -8,11 +8,10 @@ import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { NavBar } from "@/components/landing/NavBar";
 import { getSessionId } from "@/lib/onboarding/session";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/unlock/success")({
   head: () => ({ meta: [{ title: "QuestCampus — Unlocking your matches" }] }),
-  // `session_id` is informational only — never grants access. The webhook
-  // is the only path that flips entitlement on the backend.
   validateSearch: (s: Record<string, unknown>) => ({
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
@@ -25,15 +24,13 @@ function UnlockSuccessPage() {
   const recommend = useAction(api.rag.recommend.recommend);
   const [primed, setPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
-  // Live, reactive — flips to {paid:true} as soon as the Stripe webhook lands.
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
   const isPaid = entitlement?.paid === true;
 
-  // Once entitlement flips, force-refresh the paid recommendation cache so
-  // /profile renders the full list immediately when the user lands there.
   useEffect(() => {
     if (!isPaid || primed) return;
     let cancelled = false;
@@ -44,7 +41,6 @@ function UnlockSuccessPage() {
         await recommend({ sessionId, token, plan: "paid", force: true });
         if (!cancelled) {
           setPrimed(true);
-          // Brief moment so the user sees the success state, then redirect.
           setTimeout(() => navigate({ to: "/profile" }), 800);
         }
       } catch (e) {
@@ -73,21 +69,17 @@ function UnlockSuccessPage() {
                 🎉
               </span>
               <h1 className="mt-6 text-display-lg-mobile text-on-background">
-                You&apos;re unlocked!
+                {t("unlockOk.title")}
               </h1>
               <p className="mt-3 text-body-lg text-on-surface-variant">
-                {primed
-                  ? "Taking you to your full match list…"
-                  : "Loading your full safety, target & reach list…"}
+                {primed ? t("unlockOk.taking") : t("unlockOk.loading")}
               </p>
-              {error && (
-                <p className="mt-3 text-label-sm text-error">{error}</p>
-              )}
+              {error && <p className="mt-3 text-label-sm text-error">{error}</p>}
               <Link
                 to="/profile"
                 className="mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
               >
-                Go to my matches →
+                {t("unlockOk.go")}
               </Link>
             </motion.div>
           ) : (
@@ -100,6 +92,7 @@ function UnlockSuccessPage() {
 }
 
 function WaitingState() {
+  const { t } = useI18n();
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -111,30 +104,23 @@ function WaitingState() {
         animate={{ rotate: 360 }}
         transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
       />
-      <h1 className="mt-6 text-headline-md text-on-background">
-        Finalizing your payment…
-      </h1>
-      <p className="mt-3 text-body-md text-on-surface-variant">
-        This usually takes just a couple of seconds. Stripe confirms your
-        payment, then your full list unlocks automatically — no refresh needed.
-      </p>
+      <h1 className="mt-6 text-headline-md text-on-background">{t("unlockOk.waiting")}</h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.waitingBody")}</p>
     </motion.div>
   );
 }
 
 function SignedOutState() {
+  const { t } = useI18n();
   return (
     <div>
-      <h1 className="text-headline-md text-on-background">Sign in to continue</h1>
-      <p className="mt-3 text-body-md text-on-surface-variant">
-        Sign in with the same account you used at checkout and your full list
-        will unlock automatically.
-      </p>
+      <h1 className="text-headline-md text-on-background">{t("unlockOk.signedOutTitle")}</h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.signedOutBody")}</p>
       <Link
         to="/signin"
         className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
       >
-        Sign in →
+        {t("unlockOk.signin")}
       </Link>
     </div>
   );
