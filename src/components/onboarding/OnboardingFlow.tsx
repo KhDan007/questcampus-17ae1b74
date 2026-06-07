@@ -182,9 +182,9 @@ export function OnboardingFlow({
             exit={reduce ? undefined : { opacity: 0, y: -12 }}
             transition={{ duration: 0.28, ease: "easeOut" }}
           >
-            <StepHeader step={step} name={firstName} />
+            <StepHeader step={localizedStep} name={firstName} />
             <div className="mt-7">
-              <StepRenderer step={step} value={value} onChange={setValue} />
+              <StepRenderer step={localizedStep} value={value} onChange={setValue} />
             </div>
           </motion.div>
         </AnimatePresence>
