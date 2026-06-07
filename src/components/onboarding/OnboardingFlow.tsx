@@ -241,6 +241,7 @@ function Footer({
   onBack,
   onSkip,
   onNext,
+  t,
 }: {
   stepNum: number;
   canAdvance: boolean;
@@ -249,6 +250,7 @@ function Footer({
   onBack: () => void;
   onSkip: () => void;
   onNext: () => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }) {
   return (
     <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-4 bg-gradient-to-t from-surface via-surface/95 to-transparent pb-4 pt-6">
@@ -258,7 +260,7 @@ function Footer({
         disabled={stepNum === 1}
         className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-0"
       >
-        ← Back
+        {t("ob.flow.back")}
       </button>
 
       <div className="flex items-center gap-4">
@@ -268,7 +270,7 @@ function Footer({
             onClick={onSkip}
             className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
           >
-            Skip for now →
+            {t("ob.flow.skip")}
           </button>
         )}
         <button
@@ -277,7 +279,7 @@ function Footer({
           disabled={!canAdvance}
           className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-all duration-200 hover:bg-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
         >
-          {isLast ? "See my matches →" : "Continue →"}
+          {isLast ? t("ob.flow.see") : t("ob.flow.continue")}
         </button>
       </div>
     </div>
