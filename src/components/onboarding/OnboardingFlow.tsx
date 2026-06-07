@@ -32,6 +32,7 @@ export function OnboardingFlow({
 }) {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const save = useMutation(api.onboarding.saveProgress);
   const complete = useMutation(api.onboarding.complete);
 
@@ -42,6 +43,7 @@ export function OnboardingFlow({
   const [finishing, setFinishing] = useState(false);
 
   const step = getStep(stepNum)!;
+  const localizedStep = useLocalizedStep(step);
   const firstName = typeof answers.firstName === "string" ? answers.firstName : undefined;
 
   const value = answers[step.field];
