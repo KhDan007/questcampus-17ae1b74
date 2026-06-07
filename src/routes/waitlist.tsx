@@ -57,16 +57,13 @@ function WaitlistPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [firstName, setFirstName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setSessionId(getSessionId());
-  }, []);
-
-  const firstName = useMemo(() => {
-    if (typeof window === "undefined") return undefined;
     const local = loadProfileFromLocal();
     const n = local?.answers?.firstName;
-    return typeof n === "string" && n.trim() ? n.trim() : undefined;
+    setFirstName(typeof n === "string" && n.trim() ? n.trim() : undefined);
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
