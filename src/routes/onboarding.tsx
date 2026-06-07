@@ -7,6 +7,8 @@ import { getSessionId } from "@/lib/onboarding/session";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { NavBar } from "@/components/landing/NavBar";
 import { auth } from "@/lib/auth/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { TOTAL_STEPS } from "@/lib/onboarding/steps";
 import type { Answers } from "@/lib/onboarding/types";
 
 export const Route = createFileRoute("/onboarding")({
