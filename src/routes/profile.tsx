@@ -99,17 +99,24 @@ function ProfilePage() {
           <ProfileChapters answers={answers} reduce={reduce} />
 
           <div className="mt-16 text-center">
-            <button
-              type="button"
-              onClick={() => navigate({ to: "/onboarding" })}
-              className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
-            >
-              ← Edit your profile
-            </button>
+            <EditProfileLink onClick={() => navigate({ to: "/onboarding" })} />
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+function EditProfileLink({ onClick }: { onClick: () => void }) {
+  const { t } = useI18n();
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
+    >
+      {t("profile.edit")}
+    </button>
   );
 }
 
