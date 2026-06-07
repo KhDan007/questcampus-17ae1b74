@@ -1,7 +1,7 @@
 "use client";
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -10,6 +10,7 @@ import { getSessionId } from "@/lib/onboarding/session";
 import { loadProfileFromLocal } from "@/lib/onboarding/storage";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
 import { ONBOARDING_PATH } from "@/lib/routes";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/waitlist")({
   head: () => ({
@@ -29,26 +30,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type JoinResult = { ok: boolean; alreadyJoined: boolean; emailSent: boolean };
 
-const PERKS: { icon: string; text: string }[] = [
-  { icon: "🎟️", text: `${WAITLIST_BASE_DISCOUNT}% off the full product at launch` },
-  {
-    icon: "🤝",
-    text: `+${REFERRAL_EXTRA_DISCOUNT}% off for every friend you refer (stackable — all the way to free)`,
-  },
-  { icon: "🏅", text: "A Founding Member badge on your profile" },
-  { icon: "⚡", text: "Early access to every new tool before it goes public" },
-];
-
-const FEATURES: { title: string; blurb: string }[] = [
-  { title: "Essay Writing Assistant", blurb: "AI-guided personal statements and supplementals." },
-  { title: "Extracurricular Management", blurb: "Track and present your activities strategically." },
-  { title: "Document Helper", blurb: "Checklists, templates & AI review for your docs." },
-  { title: "Application Tracker", blurb: "Deadlines and status for every school in one place." },
-  { title: "Auto-Apply Agent", blurb: "Fills and submits your applications for you." },
-];
-
 function WaitlistPage() {
   const reduce = !!useReducedMotion();
+  const { t } = useI18n();
   const join = useAction(api.waitlist.join);
 
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -66,11 +50,26 @@ function WaitlistPage() {
     setFirstName(typeof n === "string" && n.trim() ? n.trim() : undefined);
   }, []);
 
+  const PERKS: { icon: string; text: string }[] = [
+    { icon: "🎟️", text: t("wait.perk1", { discount: WAITLIST_BASE_DISCOUNT }) },
+    { icon: "🤝", text: t("wait.perk2", { refDiscount: REFERRAL_EXTRA_DISCOUNT }) },
+    { icon: "🏅", text: t("wait.perk3") },
+    { icon: "⚡", text: t("wait.perk4") },
+  ];
+
+  const FEATURES = [
+    { title: t("wait.f1.title"), blurb: t("wait.f1.blurb") },
+    { title: t("wait.f2.title"), blurb: t("wait.f2.blurb") },
+    { title: t("wait.f3.title"), blurb: t("wait.f3.blurb") },
+    { title: t("wait.f4.title"), blurb: t("wait.f4.blurb") },
+    { title: t("wait.f5.title"), blurb: t("wait.f5.blurb") },
+  ];
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const normEmail = email.trim().toLowerCase();
     if (!EMAIL_RE.test(normEmail)) {
-      setError("Please enter a valid email.");
+      setError(t("wait.errInvalid"));
       return;
     }
     setError(null);
@@ -85,9 +84,7 @@ function WaitlistPage() {
       setAlreadyJoined(res.alreadyJoined);
       setStatus("done");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again.",
-      );
+      setError(err instanceof Error ? err.message : t("wait.errGeneric"));
       setStatus("idle");
     }
   }
@@ -110,15 +107,14 @@ function WaitlistPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <span className="inline-block rounded-full bg-secondary-container px-3 py-1 text-label-sm font-medium uppercase text-on-secondary-container">
-              Founding Member
+              {t("wait.badge")}
             </span>
             <h1 className="mt-6 text-display-lg-mobile text-on-background sm:text-display-lg">
-              {firstName ? `${firstName}, get in early` : "Get in early"}
+              {firstName ? t("wait.title.named", { name: firstName }) : t("wait.title.anon")}
               <span className="ml-2 inline-block">🎓</span>
             </h1>
             <p className="mx-auto mt-4 max-w-[480px] text-body-lg text-on-surface-variant">
-              Join the waitlist and lock in founding-member perks — plus first access to
-              every tool we ship next.
+              {t("wait.subtitle")}
             </p>
           </motion.div>
         </div>
@@ -143,11 +139,7 @@ function WaitlistPage() {
         </ul>
 
         {status === "done" ? (
-          <SuccessCard
-            reduce={reduce}
-            alreadyJoined={alreadyJoined}
-            firstName={firstName}
-          />
+          <SuccessCard reduce={reduce} alreadyJoined={alreadyJoined} firstName={firstName} />
         ) : (
           <motion.form
             onSubmit={onSubmit}
@@ -156,11 +148,8 @@ function WaitlistPage() {
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
             className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-6 sm:p-8"
           >
-            <label
-              htmlFor="wl-email"
-              className="block text-label-md font-medium text-on-surface"
-            >
-              Email address
+            <label htmlFor="wl-email" className="block text-label-md font-medium text-on-surface">
+              {t("wait.emailLabel")}
             </label>
             <input
               id="wl-email"
@@ -170,23 +159,20 @@ function WaitlistPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t("wait.emailPh")}
               className="mt-2 h-12 w-full rounded-full border border-outline-variant bg-surface px-5 text-body-md text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/60 focus:border-secondary focus:ring-2 focus:ring-secondary/30"
             />
 
-            <label
-              htmlFor="wl-why"
-              className="mt-5 block text-label-md font-medium text-on-surface"
-            >
-              Why are you joining?{" "}
-              <span className="font-normal text-on-surface-variant">(optional)</span>
+            <label htmlFor="wl-why" className="mt-5 block text-label-md font-medium text-on-surface">
+              {t("wait.whyLabel")}{" "}
+              <span className="font-normal text-on-surface-variant">{t("wait.whyOptional")}</span>
             </label>
             <textarea
               id="wl-why"
               value={why}
               onChange={(e) => setWhy(e.target.value)}
               rows={3}
-              placeholder="Helps us prioritize what to build first…"
+              placeholder={t("wait.whyPh")}
               className="mt-2 w-full resize-none rounded-2xl border border-outline-variant bg-surface px-5 py-3 text-body-md text-on-surface outline-none transition-colors placeholder:text-on-surface-variant/60 focus:border-secondary focus:ring-2 focus:ring-secondary/30"
             />
 
@@ -207,29 +193,25 @@ function WaitlistPage() {
                     aria-hidden
                     className="inline-block h-5 w-5 rounded-full border-2 border-on-secondary-container/40 border-t-on-secondary-container motion-safe:animate-spin"
                   />
-                  Joining…
+                  {t("wait.submitting")}
                 </>
               ) : (
                 <>
-                  Join the waitlist
+                  {t("wait.submit")}
                   <span aria-hidden>→</span>
                 </>
               )}
             </button>
 
             <p className="mt-3 text-center text-label-sm text-on-surface-variant">
-              No spam — just one welcome email and a note when early access opens.
+              {t("wait.spamNote")}
             </p>
           </motion.form>
         )}
 
         <section className="mt-16">
-          <h2 className="text-headline-sm text-on-background">
-            What you&apos;ll get first
-          </h2>
-          <p className="mt-2 text-body-md text-on-surface-variant">
-            Waitlist members unlock each of these before anyone else.
-          </p>
+          <h2 className="text-headline-sm text-on-background">{t("wait.features.title")}</h2>
+          <p className="mt-2 text-body-md text-on-surface-variant">{t("wait.features.subtitle")}</p>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2">
             {FEATURES.map((f, i) => (
               <motion.li
@@ -260,6 +242,15 @@ function SuccessCard({
   alreadyJoined: boolean;
   firstName?: string;
 }) {
+  const { t } = useI18n();
+  const title = alreadyJoined
+    ? firstName
+      ? t("wait.success.alreadyNamed", { name: firstName })
+      : t("wait.success.already")
+    : firstName
+      ? t("wait.success.newNamed", { name: firstName })
+      : t("wait.success.new");
+  const body = alreadyJoined ? t("wait.success.bodyAlready") : t("wait.success.bodyNew");
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, scale: 0.97 }}
@@ -271,25 +262,13 @@ function SuccessCard({
       <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-2xl text-on-secondary-container shadow-[0_8px_24px_-6px_rgba(254,166,25,0.45)]">
         🎉
       </span>
-      <h2 className="mt-5 text-headline-sm text-on-background">
-        {alreadyJoined
-          ? firstName
-            ? `You're already on the list, ${firstName}!`
-            : "You're already on the list!"
-          : firstName
-            ? `You're in, ${firstName}!`
-            : "You're in!"}
-      </h2>
-      <p className="mx-auto mt-3 max-w-md text-body-md text-on-surface-variant">
-        {alreadyJoined
-          ? "Your founding-member perks are locked in. We'll email you the moment early access opens."
-          : "Check your inbox — we just sent a welcome email with everything you unlocked. We'll be in touch the moment early access opens."}
-      </p>
+      <h2 className="mt-5 text-headline-sm text-on-background">{title}</h2>
+      <p className="mx-auto mt-3 max-w-md text-body-md text-on-surface-variant">{body}</p>
       <a
         href={ONBOARDING_PATH}
         className="mt-7 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-7 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
       >
-        Start your profile
+        {t("wait.success.cta")}
         <span aria-hidden>→</span>
       </a>
     </motion.div>
