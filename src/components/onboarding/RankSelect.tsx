@@ -1,11 +1,10 @@
 "use client";
 
 import { OptionCard } from "./OptionCard";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { Option } from "@/lib/onboarding/steps";
 
-// Rank top-N picker (Step 18). Click to assign rank in order; click again to
-// remove and resequence. Assigned rank shown as amber badge. At max, remaining
-// options dim until one is freed.
+// Rank top-N picker (Step 18).
 export function RankSelect({
   options,
   ranked,
@@ -17,6 +16,7 @@ export function RankSelect({
   rankCount: number;
   onChange: (ranked: string[]) => void;
 }) {
+  const { t } = useI18n();
   function toggle(value: string) {
     const idx = ranked.indexOf(value);
     if (idx >= 0) {
@@ -48,8 +48,8 @@ export function RankSelect({
         );
       })}
       <p className="pt-1 text-label-sm text-on-surface-variant">
-        {ranked.length} of {rankCount} ranked
-        {full ? " — tap a card to swap." : "."}
+        {t("ob.rank.count", { selected: ranked.length, total: rankCount })}
+        {full ? t("ob.rank.fullHint") : t("ob.rank.endDot")}
       </p>
     </div>
   );
