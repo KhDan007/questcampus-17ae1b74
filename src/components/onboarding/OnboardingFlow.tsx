@@ -212,6 +212,7 @@ export function OnboardingFlow({
         onBack={goBack}
         onSkip={skip}
         onNext={goNext}
+        t={t}
       />
     </div>
   );
