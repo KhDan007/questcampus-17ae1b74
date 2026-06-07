@@ -106,20 +106,54 @@ function Reveal({
 
   if (spec.kind === "select")
     return (
-      <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-        <SelectField value={detail ?? ""} onChange={(e) => onDetail(e.target.value)}>
-          <option value="" disabled>
-            {spec.placeholder ?? "Select…"}
-          </option>
-          {spec.options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </SelectField>
-      </div>
+      <SelectRevealInner spec={spec} detail={detail} onDetail={onDetail} />
     );
 
+  return (
+    <ScaleRevealInner spec={spec} detail={detail} scale={scale} onDetail={onDetail} onScale={onScale} />
+  );
+}
+
+function SelectRevealInner({
+  spec,
+  detail,
+  onDetail,
+}: {
+  spec: Extract<RevealSpec, { kind: "select" }>;
+  detail?: string;
+  onDetail: (s: string) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+      <SelectField value={detail ?? ""} onChange={(e) => onDetail(e.target.value)}>
+        <option value="" disabled>
+          {spec.placeholder ?? t("ob.reveal.selectPlaceholder")}
+        </option>
+        {spec.options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </SelectField>
+    </div>
+  );
+}
+
+function ScaleRevealInner({
+  spec,
+  detail,
+  scale,
+  onDetail,
+  onScale,
+}: {
+  spec: Extract<RevealSpec, { kind: "scale-number" }>;
+  detail?: string;
+  scale?: string;
+  onDetail: (s: string) => void;
+  onScale?: (s: string) => void;
+}) {
+  const { t } = useI18n();
   return (
     <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
       <NumberField
@@ -135,7 +169,7 @@ function Reveal({
         onChange={(e) => onScale?.(e.target.value)}
       >
         <option value="" disabled>
-          Scale
+          {t("ob.reveal.scalePlaceholder")}
         </option>
         {spec.scales.map((s) => (
           <option key={s.value} value={s.value}>
