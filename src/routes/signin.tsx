@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { NavBar } from "@/components/landing/NavBar";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
@@ -25,6 +26,7 @@ type Mode = "signin" | "signup";
 
 function SignInPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +55,6 @@ function SignInPage() {
     }
   }
 
-  // Handle Google OAuth callback: backend redirects to /signin?code=...&state=...
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
@@ -84,15 +85,15 @@ function SignInPage() {
 
     const trimmedEmail = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setError("Enter a valid email address.");
+      setError(t("signin.err.email"));
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t("signin.err.password"));
       return;
     }
     if (mode === "signup" && name.trim().length === 0) {
-      setError("Please tell us your name.");
+      setError(t("signin.err.name"));
       return;
     }
 
@@ -104,7 +105,7 @@ function SignInPage() {
           : await auth.signUp(trimmedEmail, password, name.trim());
       await afterLogin(session.token);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t("signin.err.generic"));
     } finally {
       setSubmitting(false);
     }
@@ -119,7 +120,7 @@ function SignInPage() {
       );
       window.location.href = authorizationUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Google sign-in is unavailable.");
+      setError(err instanceof Error ? err.message : t("signin.err.google"));
       setGoogleLoading(false);
     }
   }
@@ -134,12 +135,10 @@ function SignInPage() {
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
           <h1 className="text-display-lg-mobile text-on-background">
-            {mode === "signin" ? "Welcome back" : "Create your account"}
+            {mode === "signin" ? t("signin.title.signin") : t("signin.title.signup")}
           </h1>
           <p className="mt-3 text-body-md text-on-surface-variant">
-            {mode === "signin"
-              ? "Sign in to see your matches and continue where you left off."
-              : "Save your profile so you can come back anytime."}
+            {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
           </p>
 
           <button
@@ -153,18 +152,18 @@ function SignInPage() {
             ) : (
               <GoogleIcon />
             )}
-            Continue with Google
+            {t("signin.google")}
           </button>
 
           <div className="my-6 flex items-center gap-4">
             <div className="h-px flex-1 bg-outline-variant" />
-            <span className="text-label-sm uppercase text-on-surface-variant">or</span>
+            <span className="text-label-sm uppercase text-on-surface-variant">{t("signin.or")}</span>
             <div className="h-px flex-1 bg-outline-variant" />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
             {mode === "signup" && (
-              <Field label="Name">
+              <Field label={t("signin.field.name")}>
                 <input
                   type="text"
                   autoComplete="name"
@@ -173,12 +172,12 @@ function SignInPage() {
                   required
                   maxLength={120}
                   className={inputCls}
-                  placeholder="Jane Doe"
+                  placeholder={t("signin.placeholder.name")}
                 />
               </Field>
             )}
 
-            <Field label="Email">
+            <Field label={t("signin.field.email")}>
               <input
                 type="email"
                 autoComplete="email"
@@ -187,11 +186,11 @@ function SignInPage() {
                 required
                 maxLength={254}
                 className={inputCls}
-                placeholder="you@school.edu"
+                placeholder={t("signin.placeholder.email")}
               />
             </Field>
 
-            <Field label="Password">
+            <Field label={t("signin.field.password")}>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -202,12 +201,12 @@ function SignInPage() {
                   minLength={8}
                   maxLength={128}
                   className={`${inputCls} pr-12`}
-                  placeholder="At least 8 characters"
+                  placeholder={t("signin.placeholder.password")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("signin.hide") : t("signin.show")}
                   className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-on-surface-variant hover:text-on-surface"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -232,15 +231,15 @@ function SignInPage() {
               {submitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : mode === "signin" ? (
-                "Sign in"
+                t("signin.cta.signin")
               ) : (
-                "Create account"
+                t("signin.cta.signup")
               )}
             </button>
           </form>
 
           <p className="mt-6 text-center text-body-sm text-on-surface-variant">
-            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
+            {mode === "signin" ? t("signin.toggle.toSignup") : t("signin.toggle.toSignin")}{" "}
             <button
               type="button"
               onClick={() => {
@@ -249,7 +248,7 @@ function SignInPage() {
               }}
               className="font-medium text-primary hover:underline"
             >
-              {mode === "signin" ? "Create an account" : "Sign in"}
+              {mode === "signin" ? t("signin.toggle.createAccount") : t("signin.toggle.signinLink")}
             </button>
           </p>
         </motion.div>
