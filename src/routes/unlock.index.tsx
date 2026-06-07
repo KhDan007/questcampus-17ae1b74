@@ -10,6 +10,7 @@ import { UnlockButton } from "@/components/payments/UnlockButton";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { SIGNIN_PATH } from "@/lib/routes";
 import { PRICE_MVP } from "@/lib/config";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/unlock/")({
   head: () => ({
@@ -25,41 +26,35 @@ export const Route = createFileRoute("/unlock/")({
   component: UnlockPage,
 });
 
-const PERKS = [
-  { icon: "🛟", text: "Every safety school where you're a likely admit" },
-  { icon: "🎯", text: "Target schools matched to your grades and goals" },
-  { icon: "🚀", text: "Reach schools worth aiming for — with the why" },
-  { icon: "💰", text: "Scholarship & cost details on every match" },
-];
-
 function UnlockPage() {
+  const { t } = useI18n();
   const token = auth.getSession()?.token;
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
   const alreadyPaid = entitlement?.paid === true;
 
-  const referral = useQuery(
-    api.referrals.summary,
-    token ? { token } : "skip",
-  ) as
-    | {
-        discountPercent: number;
-        maxPercent: number;
-        perReferralPercent: number;
-      }
+  const referral = useQuery(api.referrals.summary, token ? { token } : "skip") as
+    | { discountPercent: number; maxPercent: number; perReferralPercent: number }
     | null
     | undefined;
   const discountPct = Math.min(
     referral?.discountPercent ?? 0,
     referral?.maxPercent ?? 50,
   );
-  const discountedPrice = discountPct > 0
-    ? (PRICE_MVP * (100 - discountPct)) / 100
-    : null;
-  const formattedDiscounted = discountedPrice !== null
-    ? `$${discountedPrice.toFixed(discountedPrice % 1 === 0 ? 0 : 2)}`
-    : null;
+  const discountedPrice =
+    discountPct > 0 ? (PRICE_MVP * (100 - discountPct)) / 100 : null;
+  const formattedDiscounted =
+    discountedPrice !== null
+      ? `$${discountedPrice.toFixed(discountedPrice % 1 === 0 ? 0 : 2)}`
+      : null;
+
+  const perks = [
+    { icon: "🛟", text: t("unlock.perk1") },
+    { icon: "🎯", text: t("unlock.perk2") },
+    { icon: "🚀", text: t("unlock.perk3") },
+    { icon: "💰", text: t("unlock.perk4") },
+  ];
 
   return (
     <>
@@ -76,11 +71,10 @@ function UnlockPage() {
               🔓
             </span>
             <h1 className="mt-6 text-display-lg-mobile text-on-background sm:text-display-lg">
-              Unlock your full match list
+              {t("unlock.title")}
             </h1>
             <p className="mt-4 text-body-lg text-on-surface-variant">
-              One $9 payment. Every match sorted into safety, target, and reach —
-              with the why behind each one.
+              {t("unlock.subtitle", { price: PRICE_MVP })}
             </p>
           </motion.div>
 
@@ -90,7 +84,7 @@ function UnlockPage() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             className="mt-10 space-y-3 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-6"
           >
-            {PERKS.map((p) => (
+            {perks.map((p) => (
               <li key={p.text} className="flex items-start gap-3">
                 <span aria-hidden className="text-xl leading-none">
                   {p.icon}
@@ -103,14 +97,12 @@ function UnlockPage() {
           <div className="mt-10 flex flex-col items-center gap-4">
             {alreadyPaid ? (
               <>
-                <p className="text-body-md text-on-surface">
-                  ✅ You already have full access.
-                </p>
+                <p className="text-body-md text-on-surface">{t("unlock.already")}</p>
                 <Link
                   to="/profile"
                   className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
                 >
-                  See my full list →
+                  {t("unlock.seeList")}
                 </Link>
               </>
             ) : (
@@ -121,21 +113,25 @@ function UnlockPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-full bg-secondary-container px-4 py-1.5 text-label-md font-semibold text-on-secondary-container"
                   >
-                    🎉 {discountPct}% off applied — pay {formattedDiscounted} instead of ${PRICE_MVP}
+                    {t("unlock.discount", {
+                      pct: discountPct,
+                      discounted: formattedDiscounted,
+                      price: PRICE_MVP,
+                    })}
                   </motion.p>
                 )}
                 <UnlockButton token={token} />
                 {!token && (
                   <p className="text-label-sm text-on-surface-variant">
-                    Need an account?{" "}
+                    {t("unlock.needAccount")}{" "}
                     <Link to={SIGNIN_PATH} className="underline hover:text-primary">
-                      Sign in or sign up
+                      {t("unlock.signinLink")}
                     </Link>
                     .
                   </p>
                 )}
                 <p className="text-label-sm text-on-surface-variant">
-                  Secure checkout via Stripe · Referral discount applied automatically
+                  {t("unlock.secureNote")}
                 </p>
               </>
             )}
@@ -152,7 +148,7 @@ function UnlockPage() {
               to="/profile"
               className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
             >
-              ← Back to your profile
+              {t("unlock.back")}
             </Link>
           </div>
         </div>

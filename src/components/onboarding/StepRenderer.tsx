@@ -5,6 +5,7 @@ import { RankSelect } from "./RankSelect";
 import { TextField, NumberField, SelectField } from "./Fields";
 import { CountryCombobox } from "./CountryCombobox";
 import { suggestEducationSystem } from "@/lib/onboarding/countries";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { ChoiceStep, Option, RevealSpec, Step, TestsStep } from "@/lib/onboarding/steps";
 import type {
   AnswerValue,
@@ -105,20 +106,54 @@ function Reveal({
 
   if (spec.kind === "select")
     return (
-      <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-        <SelectField value={detail ?? ""} onChange={(e) => onDetail(e.target.value)}>
-          <option value="" disabled>
-            {spec.placeholder ?? "Select…"}
-          </option>
-          {spec.options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </SelectField>
-      </div>
+      <SelectRevealInner spec={spec} detail={detail} onDetail={onDetail} />
     );
 
+  return (
+    <ScaleRevealInner spec={spec} detail={detail} scale={scale} onDetail={onDetail} onScale={onScale} />
+  );
+}
+
+function SelectRevealInner({
+  spec,
+  detail,
+  onDetail,
+}: {
+  spec: Extract<RevealSpec, { kind: "select" }>;
+  detail?: string;
+  onDetail: (s: string) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+      <SelectField value={detail ?? ""} onChange={(e) => onDetail(e.target.value)}>
+        <option value="" disabled>
+          {spec.placeholder ?? t("ob.reveal.selectPlaceholder")}
+        </option>
+        {spec.options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </SelectField>
+    </div>
+  );
+}
+
+function ScaleRevealInner({
+  spec,
+  detail,
+  scale,
+  onDetail,
+  onScale,
+}: {
+  spec: Extract<RevealSpec, { kind: "scale-number" }>;
+  detail?: string;
+  scale?: string;
+  onDetail: (s: string) => void;
+  onScale?: (s: string) => void;
+}) {
+  const { t } = useI18n();
   return (
     <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
       <NumberField
@@ -134,7 +169,7 @@ function Reveal({
         onChange={(e) => onScale?.(e.target.value)}
       >
         <option value="" disabled>
-          Scale
+          {t("ob.reveal.scalePlaceholder")}
         </option>
         {spec.scales.map((s) => (
           <option key={s.value} value={s.value}>
@@ -248,9 +283,7 @@ function MultiChoice({
       })}
 
       {step.maxSelections && (
-        <p className="pt-1 text-label-sm text-on-surface-variant">
-          {selected.length} of {step.maxSelections} selected.
-        </p>
+        <MultiCount selected={selected.length} max={step.maxSelections} />
       )}
 
       {step.optionalDetail && selected.length > 0 && (
@@ -325,6 +358,7 @@ function CountryStep({
   value: CountryValue | undefined;
   onChange: (v: CountryValue) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="space-y-4">
       <CountryCombobox
@@ -341,19 +375,28 @@ function CountryStep({
       {value?.country && (
         <>
           <TextField
-            label="City (optional)"
-            placeholder="Used for timezone & regional scholarships"
+            label={t("ob.country.cityLabel")}
+            placeholder={t("ob.country.cityPlaceholder")}
             value={value.city ?? ""}
             onChange={(e) => onChange({ ...value, city: e.target.value })}
           />
           <TextField
-            label="Education system"
-            placeholder="e.g. A-Levels, Abitur, IB…"
+            label={t("ob.country.eduLabel")}
+            placeholder={t("ob.country.eduPlaceholder")}
             value={value.eduSystem ?? ""}
             onChange={(e) => onChange({ ...value, eduSystem: e.target.value })}
           />
         </>
       )}
     </div>
+  );
+}
+
+function MultiCount({ selected, max }: { selected: number; max: number }) {
+  const { t } = useI18n();
+  return (
+    <p className="pt-1 text-label-sm text-on-surface-variant">
+      {t("ob.multi.count", { selected, max })}
+    </p>
   );
 }

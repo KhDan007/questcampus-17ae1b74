@@ -3,6 +3,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { NavBar } from "@/components/landing/NavBar";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/unlock/cancel")({
   head: () => ({ meta: [{ title: "QuestCampus — Checkout cancelled" }] }),
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/unlock/cancel")({
 });
 
 function UnlockCancelPage() {
+  const { t } = useI18n();
   return (
     <>
       <NavBar variant="minimal" />
@@ -24,24 +26,23 @@ function UnlockCancelPage() {
             🙃
           </span>
           <h1 className="mt-6 text-display-lg-mobile text-on-background">
-            Checkout cancelled
+            {t("unlockX.title")}
           </h1>
           <p className="mt-3 text-body-lg text-on-surface-variant">
-            No worries — no charge was made. Your free matches are still here
-            whenever you want them.
+            {t("unlockX.body")}
           </p>
           <div className="mt-8 flex flex-col items-center gap-3">
             <Link
               to="/unlock"
               className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
             >
-              Try again →
+              {t("unlockX.tryAgain")}
             </Link>
             <Link
               to="/profile"
               className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
             >
-              ← Back to your profile
+              {t("unlockX.back")}
             </Link>
           </div>
         </motion.div>
