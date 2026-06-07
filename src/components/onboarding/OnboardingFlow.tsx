@@ -98,7 +98,8 @@ export function OnboardingFlow({
     const merged = answers;
 
     if (step.affirmation && answered) {
-      setAffirmation(personalize(step.affirmation, firstName));
+      const aff = t(`step.${step.step}.affirmation`);
+      setAffirmation(personalize(aff, firstName));
       setTimeout(() => setAffirmation(null), 2600);
     }
 
