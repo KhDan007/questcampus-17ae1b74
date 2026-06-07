@@ -5,6 +5,7 @@ import { RankSelect } from "./RankSelect";
 import { TextField, NumberField, SelectField } from "./Fields";
 import { CountryCombobox } from "./CountryCombobox";
 import { suggestEducationSystem } from "@/lib/onboarding/countries";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { ChoiceStep, Option, RevealSpec, Step, TestsStep } from "@/lib/onboarding/steps";
 import type {
   AnswerValue,
