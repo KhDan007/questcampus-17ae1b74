@@ -1,3 +1,5 @@
+"use client";
+
 import { AmberUnderline } from "./AmberUnderline";
 import { CTAButton } from "./CTAButton";
 import { Reveal } from "./Reveal";
@@ -9,45 +11,49 @@ import {
   REFERRAL_EXTRA_DISCOUNT,
   fmtUsd,
 } from "@/lib/config";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
-const FREE_FEATURES = [
-  "Full 7-chapter onboarding",
-  "2–3 personalized university matches",
-  "AI explanation for each match",
-  "Scholarship type highlighted",
-];
-
-const PAID_FEATURES = [
-  "Everything in Free",
-  "Full safety / target / reach list",
-  "Filters by country, scholarship type, deadline",
-  "Direct application links",
-  "Priority support",
+const FREE_KEYS = ["pricing.free.f1", "pricing.free.f2", "pricing.free.f3", "pricing.free.f4"];
+const PAID_KEYS = [
+  "pricing.paid.f1",
+  "pricing.paid.f2",
+  "pricing.paid.f3",
+  "pricing.paid.f4",
+  "pricing.paid.f5",
 ];
 
 function Check() {
   return (
-    <span aria-hidden className="mt-0.5 shrink-0 text-primary">
-      ✓
-    </span>
+    <span aria-hidden className="mt-0.5 shrink-0 text-primary">✓</span>
   );
 }
 
 export function PricingSection() {
+  const { t } = useI18n();
+  const anchor = fmtUsd(PRICE_COUNSELOR_ANCHOR);
+
+  // The pricing.waitlist.text template includes inline <strong> styling. We
+  // split it at the placeholders so we can still highlight the discount values
+  // without per-language HTML strings.
+  const waitlistTemplate = t("pricing.waitlist.text", {
+    discount: `__D__`,
+    refDiscount: `__R__`,
+  });
+  const parts = waitlistTemplate.split(/(__D__|__R__)/g);
+
   return (
     <section id="pricing" className="bg-surface px-4 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[960px]">
         <Reveal>
           <p className="text-label-md font-semibold uppercase text-primary">
-            Pricing
+            {t("pricing.eyebrow")}
           </p>
           <h2 className="mt-3 text-display-lg-mobile text-on-background">
-            The best college counseling advice
-            <br className="hidden sm:block" /> used to cost{" "}
-            {fmtUsd(PRICE_COUNSELOR_ANCHOR)}.
+            {t("pricing.heading1", { anchor })}
           </h2>
           <p className="mt-3 text-display-lg-mobile text-primary">
-            We think that&apos;s <AmberUnderline>wrong</AmberUnderline>.
+            {t("pricing.heading2")}{" "}
+            <AmberUnderline>{t("pricing.wrong")}</AmberUnderline>.
           </p>
         </Reveal>
 
@@ -56,65 +62,60 @@ export function PricingSection() {
           <Reveal y={30}>
             <div className="flex h-full flex-col rounded-lg bg-surface-container-low p-6 ring-1 ring-outline-variant/50">
               <span className="self-start rounded-full bg-surface-container-high px-3 py-1 text-label-sm font-semibold uppercase text-on-surface-variant">
-                Free
+                {t("pricing.free.badge")}
               </span>
               <h3 className="mt-4 text-headline-sm text-on-surface">
-                See if it&apos;s for you
+                {t("pricing.free.title")}
               </h3>
-              <p className="mt-2 text-display-lg-mobile font-bold text-on-surface">
-                $0
-              </p>
+              <p className="mt-2 text-display-lg-mobile font-bold text-on-surface">$0</p>
               <ul className="mt-5 flex-1 space-y-3">
-                {FREE_FEATURES.map((f) => (
-                  <li key={f} className="flex gap-2 text-body-md text-on-surface-variant">
+                {FREE_KEYS.map((k) => (
+                  <li key={k} className="flex gap-2 text-body-md text-on-surface-variant">
                     <Check />
-                    {f}
+                    {t(k)}
                   </li>
                 ))}
               </ul>
               <div className="mt-6">
                 <CTAButton href={ONBOARDING_PATH} variant="ghost" className="w-full">
-                  Start for free →
+                  {t("pricing.free.cta")}
                 </CTAButton>
               </div>
             </div>
           </Reveal>
 
-          {/* Paid — featured */}
+          {/* Paid */}
           <Reveal y={30} delay={0.06} scaleFrom={0.97}>
             <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-container-high p-6 shadow-[0_12px_32px_-8px_rgba(79,70,229,0.25)] ring-1 ring-primary/20">
-              <span
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-[3px] bg-primary"
-              />
+              <span aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-primary" />
               <span className="self-start rounded-full bg-secondary-container px-3 py-1 text-label-sm font-semibold uppercase text-on-secondary-container">
-                Most popular
+                {t("pricing.paid.badge")}
               </span>
               <h3 className="mt-4 text-headline-sm text-on-surface">
-                Get the full picture
+                {t("pricing.paid.title")}
               </h3>
               <div className="mt-2">
                 <span className="text-display-lg font-bold text-primary">
                   {fmtUsd(PRICE_MVP)}
                 </span>
                 <p className="mt-1 text-label-sm text-on-surface-variant">
-                  one-time payment · not a subscription
+                  {t("pricing.paid.subtitle")}
                 </p>
                 <p className="mt-1 text-label-sm text-on-surface-variant">
-                  <s>{fmtUsd(PRICE_COUNSELOR_ANCHOR)}+ with a private counselor</s>
+                  <s>{t("pricing.paid.compare", { anchor })}</s>
                 </p>
               </div>
               <ul className="mt-5 flex-1 space-y-3">
-                {PAID_FEATURES.map((f) => (
-                  <li key={f} className="flex gap-2 text-body-md text-on-surface-variant">
+                {PAID_KEYS.map((k) => (
+                  <li key={k} className="flex gap-2 text-body-md text-on-surface-variant">
                     <Check />
-                    {f}
+                    {t(k)}
                   </li>
                 ))}
               </ul>
               <div className="mt-6">
                 <CTAButton href="/unlock" className="w-full">
-                  Get full access →
+                  {t("pricing.paid.cta")}
                 </CTAButton>
               </div>
             </div>
@@ -128,21 +129,29 @@ export function PricingSection() {
             style={{ background: "rgba(254,166,25,0.15)" }}
           >
             <p className="text-body-md text-on-surface">
-              Joining the waitlist? Get{" "}
-              <strong className="text-secondary">
-                {WAITLIST_BASE_DISCOUNT}% off
-              </strong>{" "}
-              at launch — plus an extra{" "}
-              <strong className="text-secondary">
-                {REFERRAL_EXTRA_DISCOUNT}% off per friend you refer
-              </strong>
-              . Founding Member badge included.
+              {parts.map((p, i) => {
+                if (p === "__D__") {
+                  return (
+                    <strong key={i} className="text-secondary">
+                      {WAITLIST_BASE_DISCOUNT}%
+                    </strong>
+                  );
+                }
+                if (p === "__R__") {
+                  return (
+                    <strong key={i} className="text-secondary">
+                      {REFERRAL_EXTRA_DISCOUNT}%
+                    </strong>
+                  );
+                }
+                return <span key={i}>{p}</span>;
+              })}
             </p>
             <a
               href={WAITLIST_PATH}
               className="mt-2 inline-block text-label-md font-semibold text-secondary hover:underline"
             >
-              Join the waitlist →
+              {t("pricing.waitlist.link")}
             </a>
           </div>
         </Reveal>
