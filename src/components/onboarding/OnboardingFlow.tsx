@@ -16,6 +16,8 @@ import {
 } from "@/lib/onboarding/steps";
 import type { Answers, AnswerValue } from "@/lib/onboarding/types";
 import { personalize } from "@/lib/onboarding/personalize";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { useLocalizedStep } from "@/lib/i18n/steps";
 
 export function OnboardingFlow({
   sessionId,
