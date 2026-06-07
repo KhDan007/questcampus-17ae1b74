@@ -1,13 +1,17 @@
-import { ONBOARDING_PATH, SIGNIN_PATH, WAITLIST_PATH } from "@/lib/routes";
+"use client";
 
-const LINKS = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Waitlist", href: WAITLIST_PATH },
-  { label: "Sign in", href: SIGNIN_PATH },
-];
+import { ONBOARDING_PATH, SIGNIN_PATH, WAITLIST_PATH } from "@/lib/routes";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function Footer() {
+  const { t } = useI18n();
+  const links = [
+    { key: "footer.link.how", href: "#how-it-works" },
+    { key: "footer.link.pricing", href: "#pricing" },
+    { key: "footer.link.waitlist", href: WAITLIST_PATH },
+    { key: "footer.link.signin", href: SIGNIN_PATH },
+  ];
+
   return (
     <footer className="bg-surface px-4 py-14 sm:px-8">
       <div className="mx-auto max-w-(--container-content)">
@@ -20,30 +24,30 @@ export function Footer() {
               QuestCampus
             </a>
             <p className="mt-3 max-w-[280px] text-body-md text-on-surface-variant">
-              The university search tool you deserved from the start.
+              {t("footer.tagline")}
             </p>
           </div>
 
           <nav aria-label="Footer" className="flex flex-col gap-2">
-            {LINKS.map((l) => (
+            {links.map((l) => (
               <a
-                key={l.label}
+                key={l.key}
                 href={l.href}
                 className="text-body-md text-on-surface-variant transition-colors hover:text-on-surface"
               >
-                {l.label}
+                {t(l.key)}
               </a>
             ))}
           </nav>
 
           <p className="text-body-md text-on-surface-variant md:text-right">
-            Made for international students everywhere.
+            {t("footer.made")}
           </p>
         </div>
 
         <div className="mt-10 border-t border-outline-variant pt-6">
           <p className="text-label-sm text-on-surface-variant">
-            © 2026 QuestCampus · Privacy · Terms
+            {t("footer.copyright")}
           </p>
         </div>
       </div>

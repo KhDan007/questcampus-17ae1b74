@@ -18,11 +18,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "@tanstack/react-router";
 import { LogOut, Sparkles, UserRound } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const { t } = useI18n();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -55,7 +58,8 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
           QuestCampus
         </a>
 
-        <div className="flex items-center gap-3 sm:gap-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher compact />
           {isAuthenticated && user ? (
             <UserMenu user={user} />
           ) : variant === "landing" ? (
@@ -64,10 +68,10 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
                 href={SIGNIN_PATH}
                 className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
               >
-                Sign in
+                {t("nav.signin")}
               </a>
               <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
-                Get started →
+                {t("nav.getStarted")}
               </CTAButton>
             </>
           ) : (
@@ -75,7 +79,7 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
               href={SIGNIN_PATH}
               className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
             >
-              Sign in
+              {t("nav.signin")}
             </a>
           )}
         </div>
@@ -97,12 +101,13 @@ function initialsOf(user: AuthUser): string {
 
 function UserMenu({ user }: { user: AuthUser }) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Account menu"
+          aria-label={t("nav.menu.account")}
           className="rounded-full outline-none ring-offset-2 ring-offset-surface-container-low transition-transform hover:scale-[1.04] focus-visible:ring-2 focus-visible:ring-primary"
         >
           <Avatar className="h-9 w-9 ring-1 ring-outline-variant/60">
@@ -140,14 +145,14 @@ function UserMenu({ user }: { user: AuthUser }) {
           className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
         >
           <UserRound className="h-4 w-4 text-on-surface-variant" />
-          My profile
+          {t("nav.menu.profile")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => navigate({ to: "/onboarding" })}
           className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
         >
           <Sparkles className="h-4 w-4 text-on-surface-variant" />
-          Continue onboarding
+          {t("nav.menu.onboarding")}
         </DropdownMenuItem>
         <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
         <DropdownMenuItem
@@ -158,7 +163,7 @@ function UserMenu({ user }: { user: AuthUser }) {
           className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-error focus:bg-error-container/60 focus:text-on-error-container"
         >
           <LogOut className="h-4 w-4" />
-          Sign out
+          {t("nav.menu.signout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

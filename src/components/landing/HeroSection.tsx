@@ -1,9 +1,13 @@
+"use client";
+
 import { CTAButton } from "./CTAButton";
 import { Reveal } from "./Reveal";
 import { ONBOARDING_PATH } from "@/lib/routes";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 // Above the fold. Centered single column, pure typographic impact, no imagery.
 export function HeroSection() {
+  const { t } = useI18n();
   return (
     <section className="relative isolate overflow-hidden bg-surface px-4 pb-20 pt-32 sm:px-8 sm:pt-40">
       {/* Ambient blobs — CSS keyframes only, play once on load. */}
@@ -25,33 +29,32 @@ export function HeroSection() {
       <div className="mx-auto flex max-w-[740px] flex-col items-center text-center">
         <Reveal onMount delay={0} duration={0.4} y={16}>
           <span className="inline-block rounded-full bg-primary-fixed px-3 py-1 text-label-sm font-medium uppercase text-primary">
-            AI-Powered University Matching
+            {t("hero.badge")}
           </span>
         </Reveal>
 
         <Reveal onMount delay={0.08} y={16}>
           <h1 className="mt-6 text-display-lg-mobile text-on-background sm:text-display-lg">
-            Find universities that{" "}
+            {t("hero.titleA")}{" "}
             <span className="bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">
-              want someone like you.
+              {t("hero.titleB")}
             </span>
           </h1>
         </Reveal>
 
         <Reveal onMount delay={0.16} y={16}>
           <p className="mx-auto mt-5 max-w-[560px] text-body-lg leading-relaxed text-on-surface-variant">
-            Answer a few questions. Get a personalized list of universities that
-            match your grades, goals, and scholarship needs — in minutes.
+            {t("hero.subtitle")}
           </p>
         </Reveal>
 
         <Reveal onMount delay={0.24} y={16}>
           <div className="mt-9 flex flex-col items-center gap-3">
             <CTAButton href={ONBOARDING_PATH} hoverScale={1.03}>
-              Find my universities →
+              {t("hero.cta")}
             </CTAButton>
             <p className="text-label-sm text-on-surface-variant">
-              Takes 4–6 minutes · No account required to start
+              {t("hero.note")}
             </p>
           </div>
         </Reveal>
