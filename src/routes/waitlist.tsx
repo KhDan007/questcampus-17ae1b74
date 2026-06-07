@@ -94,6 +94,7 @@ function WaitlistPage() {
 
   return (
     <div className="min-h-screen bg-surface">
+      <NavBar variant="landing" />
       <section className="relative isolate overflow-hidden bg-surface-container-low px-4 pb-12 pt-24 sm:px-8 sm:pt-32">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div
