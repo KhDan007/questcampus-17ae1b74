@@ -12,6 +12,8 @@ import { RecommendationsSection } from "@/components/profile/RecommendationsSect
 import { NavBar } from "@/components/landing/NavBar";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { auth } from "@/lib/auth/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { localizeStepWith } from "@/lib/i18n/steps";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "QuestCampus — Your Profile" }] }),
