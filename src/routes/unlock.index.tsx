@@ -55,7 +55,7 @@ function UnlockPage() {
               Unlock your full match list
             </h1>
             <p className="mt-4 text-body-lg text-on-surface-variant">
-              One $5 payment. Every match sorted into safety, target, and reach —
+              One $9 payment. Every match sorted into safety, target, and reach —
               with the why behind each one.
             </p>
           </motion.div>
