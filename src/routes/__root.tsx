@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { I18nProvider } from "@/lib/i18n/I18nProvider";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -139,7 +140,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
-        <Outlet />
+        <I18nProvider>
+          <Outlet />
+        </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
   );
