@@ -2,6 +2,8 @@
 // All endpoints are relative to VITE_CONVEX_URL. The contract is documented
 // at the bottom of this file and mirrored in src/routes/signin.tsx.
 
+import { getRef, clearRef } from "@/lib/referral/client";
+
 const TOKEN_KEY = "qc.auth.token";
 const USER_KEY = "qc.auth.user";
 
@@ -95,12 +97,20 @@ if (typeof window !== "undefined") {
 
 export const auth = {
   async signUp(email: string, password: string, name?: string): Promise<AuthSession> {
-    const session = await post<AuthSession>("/api/auth/sign-up", { email, password, name });
+    const referralCode = getRef();
+    const session = await post<AuthSession>("/api/auth/sign-up", {
+      email,
+      password,
+      name,
+      referralCode,
+    });
     saveSession(session);
+    clearRef();
     return session;
   },
 
   async signIn(email: string, password: string): Promise<AuthSession> {
+    // Attribution is first-signup only — do NOT forward the ref code here.
     const session = await post<AuthSession>("/api/auth/sign-in", { email, password });
     saveSession(session);
     return session;
@@ -111,8 +121,14 @@ export const auth = {
   },
 
   async exchangeGoogleCode(code: string, state: string): Promise<AuthSession> {
-    const session = await post<AuthSession>("/api/auth/google/callback", { code, state });
+    const referralCode = getRef();
+    const session = await post<AuthSession>("/api/auth/google/callback", {
+      code,
+      state,
+      referralCode,
+    });
     saveSession(session);
+    clearRef();
     return session;
   },
 

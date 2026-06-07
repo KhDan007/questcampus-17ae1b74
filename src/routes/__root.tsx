@@ -130,6 +130,12 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Capture ?ref=... into localStorage so it survives the OAuth round-trip.
+    // Lazy import keeps SSR clean — the helper is a no-op on the server anyway.
+    import("@/lib/referral/client").then(({ captureRef }) => captureRef());
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>

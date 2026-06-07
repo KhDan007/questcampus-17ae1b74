@@ -7,7 +7,9 @@ import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { NavBar } from "@/components/landing/NavBar";
 import { UnlockButton } from "@/components/payments/UnlockButton";
+import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { SIGNIN_PATH } from "@/lib/routes";
+import { PRICE_MVP } from "@/lib/config";
 
 export const Route = createFileRoute("/unlock/")({
   head: () => ({
@@ -36,6 +38,28 @@ function UnlockPage() {
     | { paid: boolean }
     | undefined;
   const alreadyPaid = entitlement?.paid === true;
+
+  const referral = useQuery(
+    api.referrals.summary,
+    token ? { token } : "skip",
+  ) as
+    | {
+        discountPercent: number;
+        maxPercent: number;
+        perReferralPercent: number;
+      }
+    | null
+    | undefined;
+  const discountPct = Math.min(
+    referral?.discountPercent ?? 0,
+    referral?.maxPercent ?? 50,
+  );
+  const discountedPrice = discountPct > 0
+    ? (PRICE_MVP * (100 - discountPct)) / 100
+    : null;
+  const formattedDiscounted = discountedPrice !== null
+    ? `$${discountedPrice.toFixed(discountedPrice % 1 === 0 ? 0 : 2)}`
+    : null;
 
   return (
     <>
@@ -91,6 +115,15 @@ function UnlockPage() {
               </>
             ) : (
               <>
+                {discountPct > 0 && formattedDiscounted && (
+                  <motion.p
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-full bg-secondary-container px-4 py-1.5 text-label-md font-semibold text-on-secondary-container"
+                  >
+                    🎉 {discountPct}% off applied — pay {formattedDiscounted} instead of ${PRICE_MVP}
+                  </motion.p>
+                )}
                 <UnlockButton token={token} />
                 {!token && (
                   <p className="text-label-sm text-on-surface-variant">
@@ -102,11 +135,17 @@ function UnlockPage() {
                   </p>
                 )}
                 <p className="text-label-sm text-on-surface-variant">
-                  Secure checkout via Stripe · 30% off for waitlist members
+                  Secure checkout via Stripe · Referral discount applied automatically
                 </p>
               </>
             )}
           </div>
+
+          {token && !alreadyPaid && (
+            <div className="mt-12">
+              <InviteFriendsPanel token={token} variant="inline" />
+            </div>
+          )}
 
           <div className="mt-12 text-center">
             <Link

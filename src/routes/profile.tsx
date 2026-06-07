@@ -10,6 +10,7 @@ import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
 import { NavBar } from "@/components/landing/NavBar";
+import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { auth } from "@/lib/auth/client";
 
 export const Route = createFileRoute("/profile")({
@@ -85,6 +86,12 @@ function ProfilePage() {
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
           {sessionId && (
             <RecommendationsSection sessionId={sessionId} token={token} reduce={reduce} firstName={firstName} />
+          )}
+
+          {token && (
+            <div className="mt-12">
+              <InviteFriendsPanel token={token} />
+            </div>
           )}
 
           <ProfileChapters answers={answers} reduce={reduce} />
