@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Check, Copy, Share2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { shareLinkFor } from "@/lib/referral/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Summary = {
   referralCode: string | null;
@@ -23,6 +24,7 @@ export function InviteFriendsPanel({
   token: string | undefined;
   variant?: "card" | "inline";
 }) {
+  const { t } = useI18n();
   const summary = useQuery(
     api.referrals.summary,
     token ? { token } : "skip",
@@ -39,23 +41,25 @@ export function InviteFriendsPanel({
   const link = shareLinkFor(summary.referralCode);
   const pct = Math.min(summary.discountPercent, summary.maxPercent);
   const progress = Math.min(100, (pct / summary.maxPercent) * 100);
+  const qualified = summary.counts.qualified;
+  const pending = summary.counts.pending;
+
+  const baseBody = t("inv.body", { max: summary.maxPercent });
+  const body = summary.referredBy && pct > 0
+    ? t("inv.body.bonus", { base: baseBody })
+    : t("inv.body.plain", { base: baseBody });
 
   return (
     <PanelShell variant={variant}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-label-md font-semibold uppercase text-primary">
-            Invite friends
+            {t("inv.eyebrow")}
           </p>
           <h3 className="mt-1 text-headline-sm text-on-surface">
-            {pct > 0
-              ? `You've earned ${pct}% off`
-              : "Earn 5% off for every friend"}
+            {pct > 0 ? t("inv.earnedPct", { pct }) : t("inv.earn")}
           </h3>
-          <p className="mt-1 text-body-sm text-on-surface-variant">
-            +5% per friend who finishes onboarding · up to {summary.maxPercent}% off
-            {summary.referredBy && pct > 0 ? " · includes your join bonus" : ""}.
-          </p>
+          <p className="mt-1 text-body-sm text-on-surface-variant">{body}</p>
         </div>
         <span aria-hidden className="text-2xl">🎁</span>
       </div>
@@ -65,8 +69,9 @@ export function InviteFriendsPanel({
       <div className="mt-5">
         <div className="flex items-end justify-between text-label-sm text-on-surface-variant">
           <span>
-            <strong className="text-on-surface">{summary.counts.qualified}</strong> friend
-            {summary.counts.qualified === 1 ? "" : "s"} joined
+            {qualified === 1
+              ? t("inv.joined.one", { n: qualified })
+              : t("inv.joined.many", { n: qualified })}
           </span>
           <span>{pct}% / {summary.maxPercent}%</span>
         </div>
@@ -78,10 +83,11 @@ export function InviteFriendsPanel({
             className="h-full rounded-full bg-primary"
           />
         </div>
-        {summary.counts.pending > 0 && (
+        {pending > 0 && (
           <p className="mt-2 text-label-sm text-on-surface-variant">
-            {summary.counts.pending} friend{summary.counts.pending === 1 ? "" : "s"}{" "}
-            signed up — they unlock your 5% once they finish onboarding.
+            {pending === 1
+              ? t("inv.pending.one", { n: pending })
+              : t("inv.pending.many", { n: pending })}
           </p>
         )}
       </div>
@@ -121,6 +127,7 @@ function LoadingState() {
 }
 
 function ShareRow({ link, code }: { link: string; code: string }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -141,7 +148,7 @@ function ShareRow({ link, code }: { link: string; code: string }) {
       try {
         await nav.share({
           title: "QuestCampus",
-          text: "Find universities that want someone like you — use my link for 5% off:",
+          text: t("inv.shareText"),
           url: link,
         });
         return;
@@ -167,12 +174,12 @@ function ShareRow({ link, code }: { link: string; code: string }) {
           className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary transition-transform hover:scale-[1.02]"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          {copied ? "Copied!" : "Copy"}
+          {copied ? t("inv.copied") : t("inv.copy")}
         </button>
         <button
           type="button"
           onClick={share}
-          aria-label="Share link"
+          aria-label={t("inv.share")}
           className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-outline-variant px-4 text-on-surface transition-colors hover:bg-surface-container"
         >
           <Share2 className="h-4 w-4" />

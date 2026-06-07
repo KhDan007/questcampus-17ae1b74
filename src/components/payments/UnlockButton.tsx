@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { startCheckout } from "@/lib/payments/client";
 import { SIGNIN_PATH } from "@/lib/routes";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { PRICE_MVP } from "@/lib/config";
 
 type Props = {
   token: string | undefined;
@@ -12,17 +14,13 @@ type Props = {
   onAlreadyPaid?: () => void;
 };
 
-// Single source of truth for the "Unlock full matches" CTA. Used both on the
-// inline paywall in the profile and on the dedicated /unlock route.
-export function UnlockButton({
-  token,
-  label = "Unlock full list — $9",
-  className,
-  onAlreadyPaid,
-}: Props) {
+export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  const resolvedLabel = label ?? t("unlock.button", { price: PRICE_MVP });
 
   async function handleClick() {
     setMessage(null);
@@ -34,7 +32,7 @@ export function UnlockButton({
           window.location.href = res.url;
           return;
         case "already_paid":
-          setMessage("You already have full access — refreshing…");
+          setMessage(t("unlock.alreadyHave"));
           onAlreadyPaid?.();
           return;
         case "unauthorized":
@@ -44,10 +42,10 @@ export function UnlockButton({
           });
           return;
         case "not_configured":
-          setMessage("Payments aren't live yet — check back soon.");
+          setMessage(t("unlock.notLive"));
           return;
         case "error":
-          setMessage(res.message || "Something went wrong. Try again.");
+          setMessage(res.message || t("unlock.genericError"));
           return;
       }
     } finally {
@@ -67,15 +65,15 @@ export function UnlockButton({
           "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         }
       >
-        {loading ? "Redirecting…" : label}
+        {loading ? t("unlock.redirecting") : resolvedLabel}
         {!loading && <span aria-hidden>→</span>}
       </button>
       {!token && (
         <p className="text-label-sm text-on-surface-variant">
           <a href={SIGNIN_PATH} className="underline hover:text-primary">
-            Sign in
+            {t("unlock.signinPrompt")}
           </a>{" "}
-          to unlock.
+          {t("unlock.signinSuffix")}
         </p>
       )}
       {message && (
