@@ -283,9 +283,7 @@ function MultiChoice({
       })}
 
       {step.maxSelections && (
-        <p className="pt-1 text-label-sm text-on-surface-variant">
-          {selected.length} of {step.maxSelections} selected.
-        </p>
+        <MultiCount selected={selected.length} max={step.maxSelections} />
       )}
 
       {step.optionalDetail && selected.length > 0 && (
