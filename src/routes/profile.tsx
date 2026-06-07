@@ -14,6 +14,7 @@ import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { auth } from "@/lib/auth/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { localizeStepWith } from "@/lib/i18n/steps";
+import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "QuestCampus — Your Profile" }] }),
@@ -135,6 +136,7 @@ function ProfileHero({
   token?: string;
   cachedSummary?: string;
 }) {
+  const { t } = useI18n();
   const stage = (answers.lifeStage as { choice?: string } | undefined)?.choice;
   const home = answers.home as { country: string; city?: string; eduSystem?: string } | undefined;
 
@@ -165,14 +167,10 @@ function ProfileHero({
     };
   }, [answers, generateSummary, cachedSummary, sessionId, token]);
 
-  const STAGE_LABELS: Record<string, string> = {
-    high_school: "High school student",
-    graduated: "Recent graduate",
-    gap_year: "Taking a gap year",
-    transfer: "Transfer student",
-    grad: "Graduate school applicant",
-    other: "Exploring options",
-  };
+  // Translate the AI-written summary on the fly into the user's language.
+  const translatedSummary = useAutoTranslate(summary);
+
+  const stageLabel = stage ? t(`profile.stage.${stage}`) : null;
 
   return (
     <section className="relative isolate overflow-hidden bg-surface-container-low px-4 pb-14 pt-24 sm:px-8 sm:pt-32">
@@ -190,11 +188,13 @@ function ProfileHero({
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <span className="inline-block rounded-full bg-primary-fixed px-3 py-1 text-label-sm font-medium uppercase text-primary">
-            {completed ? "Profile complete" : "Profile in progress"}
+            {completed ? t("profile.complete") : t("profile.inprogress")}
           </span>
 
           <h1 className="mt-6 text-display-lg-mobile text-on-background sm:text-display-lg">
-            {firstName ? `Hey, ${firstName}!` : "Your Profile"}
+            {firstName
+              ? t("profile.hello.named", { name: firstName })
+              : t("profile.hello.anon")}
             <span className="ml-2 inline-block">🎓</span>
           </h1>
 
@@ -213,15 +213,14 @@ function ProfileHero({
             </div>
           ) : (
             <p className="mt-4 text-body-lg text-on-surface-variant">
-              {summary ??
-                "Here&apos;s a snapshot of your academic journey and your best-fit universities."}
+              {translatedSummary ?? summary ?? t("profile.subtitle.fallback")}
             </p>
           )}
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            {stage && STAGE_LABELS[stage] && (
+            {stageLabel && (
               <span className="rounded-full bg-surface-container-high px-4 py-1.5 text-label-md text-on-surface-variant">
-                {STAGE_LABELS[stage]}
+                {stageLabel}
               </span>
             )}
             {home?.country && (
@@ -242,6 +241,7 @@ function ProfileHero({
 }
 
 function ProfileChapters({ answers, reduce }: { answers: Answers; reduce: boolean }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const firstName = typeof answers.firstName === "string" ? answers.firstName : undefined;
 
@@ -254,9 +254,9 @@ function ProfileChapters({ answers, reduce }: { answers: Answers; reduce: boolea
         className="flex w-full items-center justify-between gap-4 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-5 py-4 text-left transition-colors hover:bg-surface-container-low"
       >
         <div>
-          <h2 className="text-headline-sm text-on-background">Your profile breakdown</h2>
+          <h2 className="text-headline-sm text-on-background">{t("profile.breakdown.title")}</h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            Every answer you gave, chapter by chapter.
+            {t("profile.breakdown.body")}
           </p>
         </div>
         <motion.span
@@ -280,18 +280,19 @@ function ProfileChapters({ answers, reduce }: { answers: Answers; reduce: boolea
               className="rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-5"
             >
               <h3 className="text-label-md font-semibold text-primary">
-                {ch.emoji} Chapter {ch.id} — {ch.title}
+                {ch.emoji} {t("profile.breakdown.chapter")} {ch.id} — {t(`chapter.${ch.id}.title`)}
               </h3>
 
               <ul className="mt-3 space-y-2.5">
                 {getChapterFields(ch.id).map((field) => {
                   const step = STEPS.find((s) => s.field === field);
-                  const display = formatAnswer(field, answers[field], step);
+                  const localStep = step ? localizeStepWith(t, step) : undefined;
+                  const display = formatAnswer(field, answers[field], localStep);
                   if (!display) return null;
 
                   const isKey = ["firstName", "lifeStage", "grades", "financialNeed", "home"].includes(field);
-                  const label = step?.title
-                    ? personalize(step.title, firstName).split("—")[0].split("?")[0].trim()
+                  const label = localStep?.title
+                    ? personalize(localStep.title, firstName).split("—")[0].split("?")[0].trim()
                     : field;
                   return (
                     <li key={field} className="flex items-start gap-2.5">
@@ -334,6 +335,7 @@ function Splash() {
 
 function EmptyState() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex min-h-screen max-w-[560px] flex-col items-center justify-center px-6 text-center">
       <motion.div
@@ -344,16 +346,16 @@ function EmptyState() {
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-fixed text-2xl">
           📝
         </span>
-        <h1 className="mt-6 text-display-lg-mobile text-on-background">No profile yet</h1>
+        <h1 className="mt-6 text-display-lg-mobile text-on-background">{t("profile.empty.title")}</h1>
         <p className="mt-3 text-body-lg text-on-surface-variant">
-          Complete the onboarding questionnaire to see your personalized profile and university matches.
+          {t("profile.empty.body")}
         </p>
         <button
           type="button"
           onClick={() => navigate({ to: "/onboarding" })}
           className="mt-8 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)]"
         >
-          Start onboarding →
+          {t("profile.empty.cta")}
         </button>
       </motion.div>
     </div>

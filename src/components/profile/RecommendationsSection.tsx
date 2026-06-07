@@ -8,6 +8,8 @@ import { UniversityCard, type RecCard } from "./UniversityCard";
 import { WAITLIST_PATH } from "@/lib/routes";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
 import { UnlockButton } from "@/components/payments/UnlockButton";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+
 
 type FreePayload = {
   plan: "free";
@@ -43,6 +45,7 @@ export function RecommendationsSection({
   reduce: boolean;
   firstName?: string;
 }) {
+  const { t } = useI18n();
   const recommend = useAction(api.rag.recommend.recommend);
   const [free, setFree] = useState<FreePayload | null>(null);
   const [paid, setPaid] = useState<PaidPayload | null>(null);
@@ -122,11 +125,10 @@ export function RecommendationsSection({
       <div className="flex items-end justify-between gap-4">
         <div>
           <h2 className="text-headline-md text-on-background">
-            Your university matches 🎯
+            {t("rec.title")}
           </h2>
           <p className="mt-2 text-body-md text-on-surface-variant">
-            Ranked by scholarship fit, then how well each school matches your
-            profile.
+            {t("rec.subtitle")}
           </p>
         </div>
         {freeStatus === "ready" && (
@@ -138,7 +140,7 @@ export function RecommendationsSection({
             }}
             className="shrink-0 text-label-md text-on-surface-variant transition-colors hover:text-primary"
           >
-            ↻ Refresh
+            {t("rec.refresh")}
           </button>
         )}
       </div>
@@ -191,6 +193,7 @@ function PaidResults({
   onRetry: () => void;
   reduce: boolean;
 }) {
+  const { t } = useI18n();
   if (status === "loading" || status === "idle") {
     return (
       <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
@@ -200,7 +203,7 @@ function PaidResults({
           transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
         />
         <p className="mt-4 text-body-md text-on-surface-variant">
-          Loading your full safety, target & reach list…
+          {t("rec.paid.loading")}
         </p>
       </div>
     );
@@ -209,23 +212,23 @@ function PaidResults({
     return (
       <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
         <p className="text-body-md text-on-surface-variant">
-          We couldn&apos;t load your full list right now.
+          {t("rec.paid.error")}
         </p>
         <button
           type="button"
           onClick={onRetry}
           className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
         >
-          Try again
+          {t("rec.tryAgain")}
         </button>
       </div>
     );
   }
 
-  const sections: { key: keyof typeof buckets; title: string; emoji: string }[] = [
-    { key: "safety", title: "Safety schools", emoji: "🛟" },
-    { key: "target", title: "Target schools", emoji: "🎯" },
-    { key: "reach", title: "Reach schools", emoji: "🚀" },
+  const sections: { key: keyof typeof buckets; titleKey: string; emoji: string }[] = [
+    { key: "safety", titleKey: "rec.section.safety", emoji: "🛟" },
+    { key: "target", titleKey: "rec.section.target", emoji: "🎯" },
+    { key: "reach", titleKey: "rec.section.reach", emoji: "🚀" },
   ];
 
   return (
@@ -236,7 +239,7 @@ function PaidResults({
         return (
           <div key={s.key}>
             <h3 className="text-headline-sm text-on-background">
-              {s.emoji} {s.title}
+              {s.emoji} {t(s.titleKey)}
               <span className="ml-2 text-label-md font-normal text-on-surface-variant">
                 ({list.length})
               </span>
@@ -255,6 +258,7 @@ function PaidResults({
 
 // ── Waitlist prompt (amber, distinct from the paid CTA) ──────────────────────
 function WaitlistPrompt({ reduce }: { reduce: boolean }) {
+  const { t } = useI18n();
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -265,22 +269,19 @@ function WaitlistPrompt({ reduce }: { reduce: boolean }) {
       style={{ background: "rgba(254,166,25,0.12)" }}
     >
       <h3 className="text-headline-sm text-on-background">
-        Not ready to pay? Join the waitlist 🎓
+        {t("rec.waitlist.title")}
       </h3>
       <p className="mt-2 max-w-xl text-body-md text-on-surface">
-        Lock in{" "}
-        <strong className="text-secondary">{WAITLIST_BASE_DISCOUNT}% off</strong> at
-        launch — plus an extra{" "}
-        <strong className="text-secondary">
-          {REFERRAL_EXTRA_DISCOUNT}% off per friend you refer
-        </strong>
-        . Founding Member badge and early access to every new tool included.
+        {t("rec.waitlist.body", {
+          discount: WAITLIST_BASE_DISCOUNT,
+          refDiscount: REFERRAL_EXTRA_DISCOUNT,
+        })}
       </p>
       <a
         href={WAITLIST_PATH}
         className="mt-5 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-secondary-container px-7 text-label-md font-semibold text-on-secondary-container shadow-[0_8px_24px_-6px_rgba(254,166,25,0.45)] transition-[filter,transform] hover:scale-[1.03] hover:brightness-95"
       >
-        Join the waitlist
+        {t("rec.waitlist.cta")}
         <span aria-hidden>→</span>
       </a>
     </motion.div>
@@ -289,6 +290,7 @@ function WaitlistPrompt({ reduce }: { reduce: boolean }) {
 
 // ── Paid upsell (blurred teaser + CTA) ───────────────────────────────────────
 function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: boolean }) {
+  const { t } = useI18n();
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -301,7 +303,7 @@ function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: bool
         aria-hidden
         className="pointer-events-none grid select-none gap-4 opacity-50 blur-[6px] sm:grid-cols-3"
       >
-        {TEASER.map((t, i) => (
+        {TEASER.map((_, i) => (
           <div
             key={i}
             className="rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-4"
@@ -322,17 +324,16 @@ function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: bool
           🔓
         </span>
         <h3 className="mt-4 text-headline-sm text-on-background">
-          See your full list — safety, target & reach
+          {t("rec.upsell.title")}
         </h3>
         <p className="mt-2 max-w-md text-body-md text-on-surface-variant">
-          Unlock every match sorted into safety, target, and reach schools, with
-          full requirements, deadlines, and filters.
+          {t("rec.upsell.body")}
         </p>
         <div className="mt-6">
           <UnlockButton token={token} />
         </div>
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          One-time payment · 30% off for waitlist members
+          {t("rec.upsell.note")}
         </p>
       </div>
     </motion.div>
@@ -341,6 +342,7 @@ function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: bool
 
 // ── Loading / error states ───────────────────────────────────────────────────
 function MatchesLoading({ firstName }: { firstName?: string }) {
+  const { t } = useI18n();
   return (
     <div className="mt-8">
       <div className="flex items-center gap-3 text-body-md text-on-surface-variant">
@@ -350,8 +352,8 @@ function MatchesLoading({ firstName }: { firstName?: string }) {
           transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
         />
         {firstName
-          ? `Matching ${firstName}'s profile against thousands of universities…`
-          : "Matching your profile against thousands of universities…"}
+          ? t("rec.matching.named", { name: firstName })
+          : t("rec.matching.anon")}
       </div>
       <div className="mt-6 grid gap-5">
         {[0, 1, 2].map((i) => (
@@ -375,17 +377,18 @@ function MatchesLoading({ firstName }: { firstName?: string }) {
 }
 
 function MatchesError({ onRetry }: { onRetry: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
       <p className="text-body-md text-on-surface-variant">
-        We couldn&apos;t load your matches just now.
+        {t("rec.error")}
       </p>
       <button
         type="button"
         onClick={onRetry}
         className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
       >
-        Try again
+        {t("rec.tryAgain")}
       </button>
     </div>
   );

@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 
 // Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
@@ -22,31 +24,10 @@ export type RecCard = {
   why: string;
 };
 
-const BUCKET_STYLE: Record<
-  RecCard["bucket"],
-  { label: string; chip: string; dot: string }
-> = {
-  safety: {
-    label: "Safety",
-    chip: "bg-tertiary-container/15 text-tertiary",
-    dot: "bg-tertiary-container",
-  },
-  target: {
-    label: "Target",
-    chip: "bg-primary-fixed text-primary",
-    dot: "bg-primary-container",
-  },
-  reach: {
-    label: "Reach",
-    chip: "bg-secondary-container/20 text-secondary",
-    dot: "bg-secondary-container",
-  },
-};
-
-const SIZE_LABEL: Record<string, string> = {
-  small: "Small (<5k)",
-  medium: "Medium (5k–20k)",
-  large: "Large (20k+)",
+const BUCKET_CHIP: Record<RecCard["bucket"], string> = {
+  safety: "bg-tertiary-container/15 text-tertiary",
+  target: "bg-primary-fixed text-primary",
+  reach: "bg-secondary-container/20 text-secondary",
 };
 
 function pct(n?: number): string | null {
@@ -78,17 +59,25 @@ export function UniversityCard({
   locked?: boolean;
   reduce?: boolean;
 }) {
-  const b = BUCKET_STYLE[card.bucket];
+  const { t } = useI18n();
   const location = [card.city, card.state].filter(Boolean).join(", ");
+  const translatedWhy = useAutoTranslate(card.why || null);
 
-  const aid =
+  const aidKey =
     card.pellRate != null
       ? card.pellRate > 0.4
-        ? "Strong"
+        ? "card.aid.strong"
         : card.pellRate > 0.2
-          ? "Moderate"
-          : "Limited"
+          ? "card.aid.moderate"
+          : "card.aid.limited"
       : null;
+  const aid = aidKey ? t(aidKey) : null;
+
+  const sizeKey =
+    card.sizeBucket && ["small", "medium", "large"].includes(card.sizeBucket)
+      ? `card.size.${card.sizeBucket}`
+      : null;
+  const sizeLabel = sizeKey ? t(sizeKey) : null;
 
   return (
     <motion.article
@@ -99,7 +88,7 @@ export function UniversityCard({
         locked ? "select-none" : "hover:shadow-[0_8px_28px_-10px_rgba(53,37,205,0.18)]"
       }`}
     >
-      {/* Header: name + bucket chip */}
+      {/* Header: name + bucket chip — name is a proper noun, kept untranslated */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-headline-sm text-on-background">
@@ -112,35 +101,32 @@ export function UniversityCard({
           )}
         </div>
         <span
-          className={`shrink-0 rounded-full px-3 py-1 text-label-sm font-semibold uppercase tracking-wide ${b.chip}`}
+          className={`shrink-0 rounded-full px-3 py-1 text-label-sm font-semibold uppercase tracking-wide ${BUCKET_CHIP[card.bucket]}`}
         >
-          {b.label}
+          {t(`card.bucket.${card.bucket}`)}
         </span>
       </div>
 
-      {/* Why this matches */}
+      {/* Why this matches (auto-translated AI copy) */}
       {card.why && (
         <p className="mt-4 rounded-lg bg-primary-fixed/40 p-3.5 text-body-md leading-relaxed text-on-surface">
           <span className="mr-1.5">✨</span>
-          {card.why}
+          {translatedWhy ?? card.why}
         </p>
       )}
 
       {/* Requirements / stats grid */}
       <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
-        <Stat label="Acceptance rate" value={pct(card.acceptanceRate)} />
-        <Stat label="Avg SAT" value={card.satAvg ? String(card.satAvg) : null} />
+        <Stat label={t("card.stat.acceptance")} value={pct(card.acceptanceRate)} />
+        <Stat label={t("card.stat.sat")} value={card.satAvg ? String(card.satAvg) : null} />
         <Stat
-          label="Mid ACT"
+          label={t("card.stat.act")}
           value={card.actMidpoint ? String(card.actMidpoint) : null}
         />
-        <Stat label="Annual cost" value={money(card.costAttendance)} />
-        <Stat label="Out-of-state tuition" value={money(card.tuitionOutState)} />
-        <Stat
-          label="Size"
-          value={card.sizeBucket ? SIZE_LABEL[card.sizeBucket] ?? null : null}
-        />
-        <Stat label="Financial aid" value={aid} />
+        <Stat label={t("card.stat.cost")} value={money(card.costAttendance)} />
+        <Stat label={t("card.stat.tuition")} value={money(card.tuitionOutState)} />
+        <Stat label={t("card.stat.size")} value={sizeLabel} />
+        <Stat label={t("card.stat.aid")} value={aid} />
       </dl>
 
       {/* Apply link */}
@@ -151,7 +137,7 @@ export function UniversityCard({
           rel="noopener noreferrer"
           className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary-container px-5 text-label-md font-medium text-on-primary transition-transform hover:scale-[1.02]"
         >
-          Visit & apply
+          {t("card.visit")}
           <span aria-hidden>→</span>
         </a>
       )}
