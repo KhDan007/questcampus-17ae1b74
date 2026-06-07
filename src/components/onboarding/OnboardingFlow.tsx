@@ -143,10 +143,12 @@ export function OnboardingFlow({
           🎓
         </motion.div>
         <h1 className="mt-6 text-display-lg-mobile text-on-background">
-          That&apos;s everything{firstName ? `, ${firstName}` : ""}.
+          {firstName
+            ? t("ob.flow.finished.titleNamed", { name: firstName })
+            : t("ob.flow.finished.title")}
         </h1>
         <p className="mt-3 text-body-lg text-on-surface-variant">
-          We&apos;ve built your profile — redirecting to your results…
+          {t("ob.flow.finished.subtitle")}
         </p>
         <div className="mt-8 flex items-center gap-2">
           {[0, 1, 2].map((d) => (
