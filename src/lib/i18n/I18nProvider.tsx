@@ -18,6 +18,25 @@ import {
 } from "./languages";
 import { TRANSLATIONS } from "./translations";
 
+// Build-time generated dictionaries (one JSON per language). These cover
+// onboarding, profile, signin, waitlist, unlock, referrals, etc. — everything
+// outside the static landing strings in translations.ts. Re-generate with
+// `bun run scripts/translate-i18n.mjs`.
+import en from "./generated/en.json";
+import es from "./generated/es.json";
+import zh from "./generated/zh.json";
+import hi from "./generated/hi.json";
+import ar from "./generated/ar.json";
+import pt from "./generated/pt.json";
+import ru from "./generated/ru.json";
+import fr from "./generated/fr.json";
+import de from "./generated/de.json";
+import kk from "./generated/kk.json";
+
+const GENERATED: Record<LangCode, Record<string, string>> = {
+  en, es, zh, hi, ar, pt, ru, fr, de, kk,
+};
+
 const STORAGE_KEY = "qc.lang";
 
 type Vars = Record<string, string | number>;
@@ -50,6 +69,13 @@ function detectInitialLang(): LangCode {
   return DEFAULT_LANG;
 }
 
+function lookup(lang: LangCode, key: string): string | undefined {
+  return (
+    TRANSLATIONS[lang]?.[key] ??
+    GENERATED[lang]?.[key]
+  );
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   // SSR-safe: render English on the server, then hydrate to the user's pick.
   const [lang, setLangState] = useState<LangCode>(DEFAULT_LANG);
@@ -75,9 +101,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: string, vars?: Vars) => {
-      const dict = TRANSLATIONS[lang] ?? TRANSLATIONS[DEFAULT_LANG];
       const raw =
-        dict[key] ?? TRANSLATIONS[DEFAULT_LANG][key] ?? key;
+        lookup(lang, key) ??
+        lookup(DEFAULT_LANG, key) ??
+        key;
       return interpolate(raw, vars);
     },
     [lang],
@@ -96,7 +123,10 @@ export function useI18n(): I18nCtx {
       lang: DEFAULT_LANG,
       setLang: () => {},
       t: (key: string, vars?: Vars) =>
-        interpolate(TRANSLATIONS[DEFAULT_LANG][key] ?? key, vars),
+        interpolate(
+          lookup(DEFAULT_LANG, key) ?? key,
+          vars,
+        ),
     };
   }
   return ctx;
