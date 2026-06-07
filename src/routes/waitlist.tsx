@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { NavBar } from "@/components/landing/NavBar";
 import { getSessionId } from "@/lib/onboarding/session";
 import { loadProfileFromLocal } from "@/lib/onboarding/storage";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
