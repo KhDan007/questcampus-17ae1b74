@@ -358,6 +358,7 @@ function CountryStep({
   value: CountryValue | undefined;
   onChange: (v: CountryValue) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="space-y-4">
       <CountryCombobox
@@ -374,19 +375,28 @@ function CountryStep({
       {value?.country && (
         <>
           <TextField
-            label="City (optional)"
-            placeholder="Used for timezone & regional scholarships"
+            label={t("ob.country.cityLabel")}
+            placeholder={t("ob.country.cityPlaceholder")}
             value={value.city ?? ""}
             onChange={(e) => onChange({ ...value, city: e.target.value })}
           />
           <TextField
-            label="Education system"
-            placeholder="e.g. A-Levels, Abitur, IB…"
+            label={t("ob.country.eduLabel")}
+            placeholder={t("ob.country.eduPlaceholder")}
             value={value.eduSystem ?? ""}
             onChange={(e) => onChange({ ...value, eduSystem: e.target.value })}
           />
         </>
       )}
     </div>
+  );
+}
+
+function MultiCount({ selected, max }: { selected: number; max: number }) {
+  const { t } = useI18n();
+  return (
+    <p className="pt-1 text-label-sm text-on-surface-variant">
+      {t("ob.multi.count", { selected, max })}
+    </p>
   );
 }
