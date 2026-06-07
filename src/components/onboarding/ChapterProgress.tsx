@@ -1,10 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { CHAPTERS, getChapter, type ChapterId } from "@/lib/onboarding/steps";
+import { CHAPTERS, type ChapterId } from "@/lib/onboarding/steps";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 // Chapter-aware progress (MVP_SPEC: shows chapter name, not step number).
-// e.g. "Chapter 2 of 7 — Your Academic Story" with a smooth indigo fill.
 export function ChapterProgress({
   chapter,
   step,
@@ -15,20 +15,22 @@ export function ChapterProgress({
   totalSteps: number;
 }) {
   const reduce = useReducedMotion();
-  const current = getChapter(chapter);
+  const { t } = useI18n();
   const pct = Math.round((step / totalSteps) * 100);
+  const emoji = CHAPTERS.find((c) => c.id === chapter)?.emoji ?? "";
+  const title = t(`chapter.${chapter}.title`);
 
   return (
     <div className="w-full">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-label-md font-semibold text-primary">
-          Chapter {chapter} of {CHAPTERS.length}
+          {t("ob.progress.label", { chapter, total: CHAPTERS.length })}
           <span className="ml-2 font-medium text-on-surface-variant">
-            {current.emoji} {current.title}
+            {emoji} {title}
           </span>
         </p>
         <span className="shrink-0 text-label-sm text-on-surface-variant">
-          {step} / {totalSteps}
+          {t("ob.progress.count", { step, total: totalSteps })}
         </span>
       </div>
 
