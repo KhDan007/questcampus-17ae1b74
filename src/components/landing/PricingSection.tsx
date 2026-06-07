@@ -113,7 +113,7 @@ export function PricingSection() {
                 ))}
               </ul>
               <div className="mt-6">
-                <CTAButton href={ONBOARDING_PATH} className="w-full">
+                <CTAButton href="/unlock" className="w-full">
                   Get full access →
                 </CTAButton>
               </div>
