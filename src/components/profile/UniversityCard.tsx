@@ -165,7 +165,18 @@ export function UniversityCard({
             {translatedWhy ?? card.why}
           </p>
           {!locked && (
-            <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+            showEnrich ? (
+              <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowEnrich(true)}
+                className="mt-4 inline-block bc-btn"
+                style={{ height: 44, fontSize: 14 }}
+              >
+                {t("enrich.show")}
+              </button>
+            )
           )}
           {card.website && (
             <a
