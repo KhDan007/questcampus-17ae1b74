@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
+import { ONBOARDING_PATH, SIGNIN_PATH, WAITLIST_PATH } from "@/lib/routes";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth, type AuthUser } from "@/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
