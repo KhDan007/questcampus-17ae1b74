@@ -143,6 +143,8 @@ function RootComponent() {
       <ConvexClientProvider>
         <I18nProvider>
           <Outlet />
+          <WaitlistTab />
+          <WaitlistTabMobile />
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
