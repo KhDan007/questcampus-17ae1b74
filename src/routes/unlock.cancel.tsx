@@ -1,7 +1,6 @@
 "use client";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { NavBar } from "@/components/landing/NavBar";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
@@ -15,37 +14,23 @@ function UnlockCancelPage() {
   return (
     <>
       <NavBar variant="minimal" />
-      <main className="flex min-h-screen items-center justify-center bg-surface px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mx-auto max-w-[480px] text-center"
-        >
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-surface-container-high text-2xl">
-            🙃
-          </span>
-          <h1 className="mt-6 text-display-lg-mobile text-on-background">
+      <main className="flex min-h-screen items-center justify-center bg-cream px-6" style={{ paddingTop: 64 }}>
+        <div className="mx-auto max-w-[520px] text-center">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" stroke="#111111" strokeWidth="3" className="mx-auto" aria-hidden>
+            <circle cx="60" cy="60" r="48" />
+            <polygon points="60,22 70,60 60,98 50,60" fill="#111111" />
+          </svg>
+          <h1 className="mt-6 font-display text-ink" style={{ fontWeight: 700, fontSize: 36, lineHeight: 1.1 }}>
             {t("unlockX.title")}
           </h1>
-          <p className="mt-3 text-body-lg text-on-surface-variant">
+          <p className="mt-3 font-body text-ink-muted" style={{ fontSize: 16 }}>
             {t("unlockX.body")}
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              to="/unlock"
-              className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
-            >
-              {t("unlockX.tryAgain")}
-            </Link>
-            <Link
-              to="/profile"
-              className="text-label-md text-on-surface-variant transition-colors hover:text-primary"
-            >
-              {t("unlockX.back")}
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link to="/profile" className="bc-btn bc-btn-outline">← {t("unlockX.back")}</Link>
+            <Link to="/unlock" className="bc-btn">{t("unlockX.tryAgain")} →</Link>
           </div>
-        </motion.div>
+        </div>
       </main>
     </>
   );
