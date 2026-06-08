@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
+import { EnrichmentDetails } from "./EnrichmentDetails";
 
 // Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
+  _id?: string;
   externalId: string;
   name: string;
   city?: string;
@@ -60,6 +63,7 @@ export function UniversityCard({
   reduce?: boolean;
 }) {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
   const location = [card.city, card.state].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
 
@@ -129,17 +133,37 @@ export function UniversityCard({
         <Stat label={t("card.stat.aid")} value={aid} />
       </dl>
 
-      {/* Apply link */}
-      {card.website && !locked && (
-        <a
-          href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary-container px-5 text-label-md font-medium text-on-primary transition-transform hover:scale-[1.02]"
-        >
-          {t("card.visit")}
-          <span aria-hidden>→</span>
-        </a>
+      {!locked && (
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          {card.website && (
+            <a
+              href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary-container px-5 text-label-md font-medium text-on-primary transition-transform hover:scale-[1.02]"
+            >
+              {t("card.visit")}
+              <span aria-hidden>→</span>
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-5 text-label-md font-medium text-on-surface transition-colors hover:bg-surface-container"
+          >
+            {open ? t("enrich.hide") : t("enrich.show")}
+            <span aria-hidden>{open ? "▲" : "▼"}</span>
+          </button>
+        </div>
+      )}
+
+      {open && !locked && (
+        <EnrichmentDetails
+          schoolId={card._id}
+          externalId={card.externalId}
+          website={card.website}
+        />
       )}
     </motion.article>
   );

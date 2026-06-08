@@ -126,6 +126,19 @@ export const UI_EN: Record<string, string> = {
   "card.size.large": "Large (20k+)",
   "card.visit": "Visit & apply",
 
+  // On-open enrichment details
+  "enrich.show": "Show official details",
+  "enrich.hide": "Hide official details",
+  "enrich.loading": "Fetching official details…",
+  "enrich.error": "Couldn't fetch official details right now.",
+  "enrich.notListed": "Not listed",
+  "enrich.checkSite": "check official site",
+  "enrich.source": "source",
+  "enrich.fees": "Tuition fees",
+  "enrich.english": "English requirement",
+  "enrich.entry": "Entry requirement",
+  "enrich.deadlines": "Application deadlines",
+
   // Unlock
   "unlock.title": "Unlock your full match list",
   "unlock.subtitle": "One ${price} payment. Every match sorted into safety, target, and reach — with the why behind each one.",
