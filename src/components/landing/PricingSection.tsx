@@ -1,16 +1,8 @@
 "use client";
 
-import { AmberUnderline } from "./AmberUnderline";
-import { CTAButton } from "./CTAButton";
-import { Reveal } from "./Reveal";
-import { ONBOARDING_PATH, WAITLIST_PATH } from "@/lib/routes";
-import {
-  PRICE_MVP,
-  PRICE_COUNSELOR_ANCHOR,
-  WAITLIST_BASE_DISCOUNT,
-  REFERRAL_EXTRA_DISCOUNT,
-  fmtUsd,
-} from "@/lib/config";
+import { Link } from "@tanstack/react-router";
+import { ONBOARDING_PATH } from "@/lib/routes";
+import { PRICE_MVP, PRICE_COUNSELOR_ANCHOR, fmtUsd } from "@/lib/config";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 const FREE_KEYS = ["pricing.free.f1", "pricing.free.f2", "pricing.free.f3", "pricing.free.f4"];
@@ -22,139 +14,63 @@ const PAID_KEYS = [
   "pricing.paid.f5",
 ];
 
-function Check() {
-  return (
-    <span aria-hidden className="mt-0.5 shrink-0 text-primary">✓</span>
-  );
-}
-
 export function PricingSection() {
   const { t } = useI18n();
   const anchor = fmtUsd(PRICE_COUNSELOR_ANCHOR);
 
-  // The pricing.waitlist.text template includes inline <strong> styling. We
-  // split it at the placeholders so we can still highlight the discount values
-  // without per-language HTML strings.
-  const waitlistTemplate = t("pricing.waitlist.text", {
-    discount: `__D__`,
-    refDiscount: `__R__`,
-  });
-  const parts = waitlistTemplate.split(/(__D__|__R__)/g);
-
   return (
-    <section id="pricing" className="bg-surface px-4 py-20 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[960px]">
-        <Reveal>
-          <p className="text-label-md font-semibold uppercase text-primary">
-            {t("pricing.eyebrow")}
-          </p>
-          <h2 className="mt-3 text-display-lg-mobile text-on-background">
-            {t("pricing.heading1", { anchor })}
-          </h2>
-          <p className="mt-3 text-display-lg-mobile text-primary">
-            {t("pricing.heading2")}{" "}
-            <AmberUnderline>{t("pricing.wrong")}</AmberUnderline>.
-          </p>
-        </Reveal>
+    <section id="pricing" className="bg-cream px-6 sm:px-12" style={{ paddingTop: 100, paddingBottom: 100 }}>
+      <div className="mx-auto max-w-[1100px]">
+        <span className="bc-chip">{t("pricing.eyebrow") || "PRICING"}</span>
+        <h2 className="mt-6 font-display text-ink" style={{ fontWeight: 800, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.05 }}>
+          {t("pricing.heading1", { anchor })}
+        </h2>
+        <h2 className="font-display" style={{ fontWeight: 800, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.05, color: "#E63022" }}>
+          {t("pricing.heading2")} {t("pricing.wrong")}.
+        </h2>
 
-        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-2">
-          {/* Free */}
-          <Reveal y={30}>
-            <div className="flex h-full flex-col rounded-lg bg-surface-container-low p-6 ring-1 ring-outline-variant/50">
-              <span className="self-start rounded-full bg-surface-container-high px-3 py-1 text-label-sm font-semibold uppercase text-on-surface-variant">
-                {t("pricing.free.badge")}
-              </span>
-              <h3 className="mt-4 text-headline-sm text-on-surface">
-                {t("pricing.free.title")}
-              </h3>
-              <p className="mt-2 text-display-lg-mobile font-bold text-on-surface">$0</p>
-              <ul className="mt-5 flex-1 space-y-3">
-                {FREE_KEYS.map((k) => (
-                  <li key={k} className="flex gap-2 text-body-md text-on-surface-variant">
-                    <Check />
-                    {t(k)}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6">
-                <CTAButton href={ONBOARDING_PATH} variant="ghost" className="w-full">
-                  {t("pricing.free.cta")}
-                </CTAButton>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Paid */}
-          <Reveal y={30} delay={0.06} scaleFrom={0.97}>
-            <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-container-high p-6 shadow-[0_12px_32px_-8px_rgba(79,70,229,0.25)] ring-1 ring-primary/20">
-              <span aria-hidden className="absolute inset-x-0 top-0 h-[3px] bg-primary" />
-              <span className="self-start rounded-full bg-secondary-container px-3 py-1 text-label-sm font-semibold uppercase text-on-secondary-container">
-                {t("pricing.paid.badge")}
-              </span>
-              <h3 className="mt-4 text-headline-sm text-on-surface">
-                {t("pricing.paid.title")}
-              </h3>
-              <div className="mt-2">
-                <span className="text-display-lg font-bold text-primary">
-                  {fmtUsd(PRICE_MVP)}
-                </span>
-                <p className="mt-1 text-label-sm text-on-surface-variant">
-                  {t("pricing.paid.subtitle")}
-                </p>
-                <p className="mt-1 text-label-sm text-on-surface-variant">
-                  <s>{t("pricing.paid.compare", { anchor })}</s>
-                </p>
-              </div>
-              <ul className="mt-5 flex-1 space-y-3">
-                {PAID_KEYS.map((k) => (
-                  <li key={k} className="flex gap-2 text-body-md text-on-surface-variant">
-                    <Check />
-                    {t(k)}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6">
-                <CTAButton href="/unlock" className="w-full">
-                  {t("pricing.paid.cta")}
-                </CTAButton>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-
-        {/* Waitlist callout */}
-        <Reveal delay={0.1}>
-          <div
-            className="mt-6 rounded-lg border-l-[3px] border-secondary-container p-5"
-            style={{ background: "rgba(254,166,25,0.15)" }}
-          >
-            <p className="text-body-md text-on-surface">
-              {parts.map((p, i) => {
-                if (p === "__D__") {
-                  return (
-                    <strong key={i} className="text-secondary">
-                      {WAITLIST_BASE_DISCOUNT}%
-                    </strong>
-                  );
-                }
-                if (p === "__R__") {
-                  return (
-                    <strong key={i} className="text-secondary">
-                      {REFERRAL_EXTRA_DISCOUNT}%
-                    </strong>
-                  );
-                }
-                return <span key={i}>{p}</span>;
-              })}
-            </p>
-            <a
-              href={WAITLIST_PATH}
-              className="mt-2 inline-block text-label-md font-semibold text-secondary hover:underline"
-            >
-              {t("pricing.waitlist.link")}
-            </a>
+        <div className="mt-14 grid items-stretch gap-8 lg:grid-cols-2">
+          {/* Free card */}
+          <div className="flex flex-col p-8 bg-cream" style={{ border: "2px solid #111111", boxShadow: "4px 4px 0 #111111" }}>
+            <span className="bc-chip self-start">{t("pricing.free.badge") || "FREE"}</span>
+            <p className="mt-6 font-display text-ink" style={{ fontWeight: 800, fontSize: 56, lineHeight: 1 }}>$0</p>
+            <p className="mt-2 font-body text-ink" style={{ fontSize: 16 }}>{t("pricing.free.title")}</p>
+            <ul className="mt-6 flex-1 space-y-3">
+              {FREE_KEYS.map((k) => (
+                <li key={k} className="flex gap-3 font-body text-ink-muted" style={{ fontSize: 15 }}>
+                  <span className="text-ink" style={{ fontWeight: 700 }}>✓</span>
+                  {t(k)}
+                </li>
+              ))}
+            </ul>
+            <Link to={ONBOARDING_PATH} className="bc-btn bc-btn-outline mt-8 w-full">
+              {t("pricing.free.cta")} →
+            </Link>
           </div>
-        </Reveal>
+
+          {/* Paid card */}
+          <div className="flex flex-col p-8" style={{ background: "#1B4FD8", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111" }}>
+            <span className="bc-chip self-start">{t("pricing.paid.badge") || "MOST POPULAR"}</span>
+            <p className="mt-6 font-display text-white" style={{ fontWeight: 800, fontSize: 56, lineHeight: 1 }}>
+              {fmtUsd(PRICE_MVP)}
+            </p>
+            <p className="mt-2 font-body text-white" style={{ fontSize: 14 }}>{t("pricing.paid.subtitle")}</p>
+            <p className="mt-1 font-body" style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
+              <s>{t("pricing.paid.compare", { anchor })}</s>
+            </p>
+            <ul className="mt-6 flex-1 space-y-3">
+              {PAID_KEYS.map((k) => (
+                <li key={k} className="flex gap-3 font-body text-white" style={{ fontSize: 15 }}>
+                  <span style={{ fontWeight: 700 }}>✓</span>
+                  {t(k)}
+                </li>
+              ))}
+            </ul>
+            <Link to="/unlock" className="bc-btn mt-8 w-full">
+              {t("pricing.paid.cta")} →
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
