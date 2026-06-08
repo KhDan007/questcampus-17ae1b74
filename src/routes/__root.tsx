@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
-import { WaitlistTab, WaitlistTabMobile } from "@/components/WaitlistTab";
+
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
