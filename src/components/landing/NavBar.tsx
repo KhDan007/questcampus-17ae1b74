@@ -50,7 +50,9 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageSwitcher compact />
+          <div className="hidden sm:block">
+            <LanguageSwitcher compact />
+          </div>
           <Link
             to={WAITLIST_PATH}
             className="bc-btn"

@@ -87,6 +87,10 @@ function ProfilePage() {
         />
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
+          <div className="mt-6 flex justify-end sm:hidden">
+            <LanguageSwitcher />
+          </div>
+
           {sessionId && (
             <RecommendationsSection sessionId={sessionId} token={token} reduce={reduce} firstName={firstName} />
           )}
