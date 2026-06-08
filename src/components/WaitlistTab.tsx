@@ -5,6 +5,7 @@ import { WAITLIST_PATH } from "@/lib/routes";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function WaitlistTab() {
+  const { t } = useI18n();
   const raw = t("waitlistTab.label");
   const label = !raw || raw === "waitlistTab.label" ? "JOIN WAITLIST" : raw;
 
