@@ -69,6 +69,7 @@ export function UniversityCard({
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [showEnrich, setShowEnrich] = useState(false);
   const location = [card.city, card.state].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
   const bucket = BUCKET_STYLE[card.bucket];
