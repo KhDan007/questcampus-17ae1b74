@@ -4,28 +4,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
+/* ============================================================
+   Bauhaus Campus — design tokens
+   Flat color blocks, hard offset shadows, Syne + DM Sans.
+   Fonts loaded via Google Fonts <link> in __root.tsx.
+   ============================================================ */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -46,11 +39,6 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -62,178 +50,136 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
-
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --radius: 0px;
+  --background: #FFF8F0;
+  --foreground: #111111;
+  --card: #FFFFFF;
+  --card-foreground: #111111;
+  --popover: #FFFFFF;
+  --popover-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFCF00;
+  --secondary-foreground: #111111;
+  --muted: #FFF8F0;
+  --muted-foreground: #444444;
+  --accent: #FFCF00;
+  --accent-foreground: #111111;
+  --destructive: #E63022;
+  --destructive-foreground: #FFFFFF;
+  --border: #111111;
+  --input: #111111;
+  --ring: #111111;
+  --sidebar: #FFF8F0;
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #E63022;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFCF00;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: #111111;
+  --sidebar-ring: #111111;
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
+  * { border-color: #111111; }
+  body { background-color: var(--color-background); color: var(--color-foreground); }
 }
 
-
 /* ============================================================
-   QuestCampus design tokens — merged from globals.css
-   Fonts loaded via Google Fonts <link> in __root.tsx.
+   Bauhaus tokens — Tailwind utility extensions
    ============================================================ */
 @theme {
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-surface: #f8f9ff;
-  --color-surface-dim: #d0dbed;
-  --color-surface-bright: #f8f9ff;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container: #e6eeff;
-  --color-surface-container-high: #dee9fc;
-  --color-surface-container-highest: #d9e3f6;
-  --color-surface-variant: #d9e3f6;
-  --color-surface-tint: #4d44e3;
+  /* Brand palette */
+  --color-cream: #FFF8F0;
+  --color-ink: #111111;
+  --color-ink-muted: #444444;
+  --color-bc-red: #E63022;
+  --color-bc-blue: #1B4FD8;
+  --color-bc-yellow: #FFCF00;
+  --color-bc-white: #FFFFFF;
+  --color-bc-green: #16A34A;
 
-  --color-on-surface: #121c2a;
-  --color-on-surface-variant: #464555;
-  --color-background: #f8f9ff;
-  --color-on-background: #121c2a;
+  /* Legacy QC token aliases mapped onto Bauhaus palette so existing
+     components inherit the new look without per-file rewrites. */
+  --color-surface: #FFF8F0;
+  --color-surface-dim: #F0E8D8;
+  --color-surface-bright: #FFFFFF;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-low: #FFF8F0;
+  --color-surface-container: #FFFFFF;
+  --color-surface-container-high: #FFFFFF;
+  --color-surface-container-highest: #FFFFFF;
+  --color-surface-variant: #FFFFFF;
+  --color-surface-tint: #111111;
 
-  --color-inverse-surface: #27313f;
-  --color-inverse-on-surface: #eaf1ff;
-  --color-inverse-primary: #c3c0ff;
+  --color-on-surface: #111111;
+  --color-on-surface-variant: #444444;
+  --color-on-background: #111111;
 
-  --color-outline: #777587;
-  --color-outline-variant: #c7c4d8;
+  --color-inverse-surface: #1B4FD8;
+  --color-inverse-on-surface: #FFFFFF;
+  --color-inverse-primary: #FFCF00;
 
-  --color-primary: #3525cd;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #4f46e5;
-  --color-on-primary-container: #dad7ff;
+  --color-outline: #111111;
+  --color-outline-variant: #111111;
 
-  --color-secondary: #855300;
-  --color-on-secondary: #ffffff;
-  --color-secondary-container: #fea619;
-  --color-on-secondary-container: #684000;
+  --color-primary: #111111;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #E63022;
+  --color-on-primary-container: #FFFFFF;
 
-  --color-tertiary: #00534a;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #006d62;
-  --color-on-tertiary-container: #69f1de;
+  --color-secondary: #1B4FD8;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #FFCF00;
+  --color-on-secondary-container: #111111;
 
-  --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-tertiary: #1B4FD8;
+  --color-on-tertiary: #FFFFFF;
+  --color-tertiary-container: #1B4FD8;
+  --color-on-tertiary-container: #FFFFFF;
 
-  --color-primary-fixed: #e2dfff;
-  --color-primary-fixed-dim: #c3c0ff;
-  --color-on-primary-fixed: #0f0069;
-  --color-on-primary-fixed-variant: #3323cc;
-  --color-secondary-fixed: #ffddb8;
-  --color-secondary-fixed-dim: #ffb95f;
-  --color-on-secondary-fixed: #2a1700;
-  --color-on-secondary-fixed-variant: #653e00;
-  --color-tertiary-fixed: #71f8e4;
-  --color-tertiary-fixed-dim: #4fdbc8;
-  --color-on-tertiary-fixed: #00201c;
-  --color-on-tertiary-fixed-variant: #005048;
+  --color-error: #E63022;
+  --color-on-error: #FFFFFF;
+  --color-error-container: #FFCF00;
+  --color-on-error-container: #111111;
 
-  --radius-sm: 0.25rem;
-  --radius-DEFAULT: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --color-primary-fixed: #FFCF00;
+  --color-primary-fixed-dim: #FFCF00;
+  --color-on-primary-fixed: #111111;
+  --color-on-primary-fixed-variant: #111111;
+  --color-secondary-fixed: #FFCF00;
+  --color-secondary-fixed-dim: #FFCF00;
+  --color-on-secondary-fixed: #111111;
+  --color-on-secondary-fixed-variant: #111111;
+  --color-tertiary-fixed: #1B4FD8;
+  --color-tertiary-fixed-dim: #1B4FD8;
+  --color-on-tertiary-fixed: #FFFFFF;
+  --color-on-tertiary-fixed-variant: #FFFFFF;
 
-  --text-display-lg: 3rem;
-  --text-display-lg--line-height: 3.5rem;
+  /* Type scale */
+  --text-display-lg: 4.5rem;
+  --text-display-lg--line-height: 1.0;
   --text-display-lg--letter-spacing: -0.02em;
-  --text-display-lg--font-weight: 700;
+  --text-display-lg--font-weight: 800;
 
-  --text-display-lg-mobile: 2rem;
-  --text-display-lg-mobile--line-height: 2.5rem;
+  --text-display-lg-mobile: 2.5rem;
+  --text-display-lg-mobile--line-height: 1.05;
   --text-display-lg-mobile--letter-spacing: -0.01em;
-  --text-display-lg-mobile--font-weight: 700;
+  --text-display-lg-mobile--font-weight: 800;
 
-  --text-headline-md: 1.5rem;
-  --text-headline-md--line-height: 2rem;
-  --text-headline-md--font-weight: 600;
+  --text-headline-md: 1.75rem;
+  --text-headline-md--line-height: 2.125rem;
+  --text-headline-md--font-weight: 700;
 
-  --text-headline-sm: 1.25rem;
+  --text-headline-sm: 1.375rem;
   --text-headline-sm--line-height: 1.75rem;
-  --text-headline-sm--font-weight: 600;
+  --text-headline-sm--font-weight: 700;
 
   --text-body-lg: 1.125rem;
-  --text-body-lg--line-height: 1.75rem;
+  --text-body-lg--line-height: 1.6rem;
 
   --text-body-md: 1rem;
   --text-body-md--line-height: 1.5rem;
@@ -241,36 +187,35 @@
   --text-label-md: 0.875rem;
   --text-label-md--line-height: 1.25rem;
   --text-label-md--letter-spacing: 0.01em;
-  --text-label-md--font-weight: 600;
+  --text-label-md--font-weight: 700;
 
   --text-label-sm: 0.75rem;
   --text-label-sm--line-height: 1rem;
-  --text-label-sm--letter-spacing: 0.02em;
-  --text-label-sm--font-weight: 500;
+  --text-label-sm--letter-spacing: 0.04em;
+  --text-label-sm--font-weight: 700;
 
   --container-content: 1200px;
 }
 
-html {
-  scroll-behavior: smooth;
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
-}
+html { scroll-behavior: smooth; overflow-y: scroll; scrollbar-gutter: stable; }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-on-background);
-  font-family: var(--font-body);
+  background-color: #FFF8F0;
+  color: #111111;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
 
-h1, h2, h3 { font-family: var(--font-display); }
+h1, h2, h3, h4 {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
 
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid #111111;
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
 .skip-link {
@@ -278,33 +223,101 @@ h1, h2, h3 { font-family: var(--font-display); }
   left: 1rem;
   top: -3rem;
   z-index: 100;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  background: #FFCF00;
+  color: #111111;
   padding: 0.5rem 1rem;
-  border-radius: var(--radius-DEFAULT);
+  border: 2px solid #111111;
+  box-shadow: 4px 4px 0 #111111;
   transition: top 150ms ease-out;
 }
 .skip-link:focus { top: 1rem; }
 
-@keyframes blob-in {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+/* ============================================================
+   Bauhaus utilities — hard offset shadows, no blur, no radius
+   ============================================================ */
+.bc-shadow { box-shadow: 4px 4px 0 #111111; }
+.bc-shadow-hover { transition: box-shadow 150ms ease-out, transform 150ms ease-out; }
+.bc-shadow-hover:hover { box-shadow: 6px 6px 0 #111111; transform: translate(-1px, -1px); }
+.bc-shadow-white { box-shadow: 4px 4px 0 #FFFFFF; }
+.bc-card {
+  background: #FFFFFF;
+  border: 2px solid #111111;
+  box-shadow: 4px 4px 0 #111111;
+  padding: 1.5rem;
 }
-@keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.bc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 52px;
+  padding: 0 1.5rem;
+  background: #FFCF00;
+  color: #111111;
+  border: 2px solid #111111;
+  box-shadow: 4px 4px 0 #111111;
+  font-family: "Syne", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
 }
-@keyframes underline-grow {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+.bc-btn:hover { box-shadow: 6px 6px 0 #111111; transform: translate(-1px, -1px); }
+.bc-btn:disabled { opacity: 0.4; box-shadow: none; transform: none; pointer-events: none; }
+.bc-btn-outline { background: #FFFFFF; }
+.bc-btn-blue { background: #1B4FD8; color: #FFFFFF; }
+.bc-btn-red { background: #E63022; color: #FFFFFF; }
+
+.bc-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 0.75rem;
+  background: #FFCF00;
+  color: #111111;
+  border: 2px solid #111111;
+  border-radius: 9999px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.animate-blob-in { animation: blob-in 1200ms ease-out forwards; }
-.animate-shimmer { background-size: 200% 200%; animation: shimmer 4s ease-in-out infinite; }
+.bc-input {
+  display: block;
+  width: 100%;
+  height: 52px;
+  padding: 0 1rem;
+  background: #FFFFFF;
+  color: #111111;
+  border: 2px solid #111111;
+  border-radius: 0;
+  font-family: "DM Sans", sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 120ms ease-out;
+}
+.bc-input:focus { box-shadow: 4px 4px 0 #111111; }
+textarea.bc-input { height: auto; min-height: 120px; padding: 0.75rem 1rem; }
+
+@keyframes chapter-flash {
+  0% { transform: scaleX(0); transform-origin: left; }
+  40% { transform: scaleX(1); transform-origin: left; }
+  60% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+.bc-chapter-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  animation: chapter-flash 500ms ease-in-out forwards;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .animate-blob-in, .animate-shimmer { animation: none; }
-  .animate-blob-in { opacity: 1; transform: none; }
+  .bc-shadow-hover { transition: none; }
+  .bc-chapter-flash { animation: none; display: none; }
 }
