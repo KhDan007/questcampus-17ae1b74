@@ -1,106 +1,63 @@
 "use client";
 
-import { Link } from "@tanstack/react-router";
+import { CTAButton } from "./CTAButton";
+import { Reveal } from "./Reveal";
 import { ONBOARDING_PATH } from "@/lib/routes";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
+// Above the fold. Centered single column, pure typographic impact, no imagery.
 export function HeroSection() {
   const { t } = useI18n();
   return (
-    <section
-      className="relative grid w-full"
-      style={{
-        minHeight: "calc(100vh - 64px)",
-        marginTop: 64,
-        gridTemplateColumns: "1fr",
-      }}
-    >
-      <div className="grid w-full lg:grid-cols-[55%_45%]">
-        {/* LEFT — cream panel */}
-        <div className="flex flex-col justify-center px-6 py-16 sm:px-12 lg:px-20 bg-cream">
-          <span className="bc-chip self-start">{t("hero.badge") || "AI UNIVERSITY MATCHING"}</span>
+    <section className="relative isolate overflow-hidden bg-surface px-4 pb-20 pt-32 sm:px-8 sm:pt-40">
+      {/* Ambient blobs — CSS keyframes only, play once on load. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          className="animate-blob-in absolute left-1/2 top-1/3 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
+          style={{ background: "rgba(79,70,229,0.06)" }}
+        />
+        <div
+          className="animate-blob-in absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full blur-[120px]"
+          style={{ background: "rgba(254,166,25,0.04)", animationDelay: "120ms" }}
+        />
+        <div
+          className="animate-blob-in absolute right-0 top-0 h-[360px] w-[360px] rounded-full blur-[120px]"
+          style={{ background: "rgba(254,166,25,0.04)", animationDelay: "120ms" }}
+        />
+      </div>
 
-          <h1
-            className="mt-8 font-display text-ink"
-            style={{
-              fontWeight: 800,
-              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
-              lineHeight: 1.0,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {t("hero.titleA")}
-            <br />
-            {t("hero.titleB")}
+      <div className="mx-auto flex max-w-[740px] flex-col items-center text-center">
+        <Reveal onMount delay={0} duration={0.4} y={16}>
+          <span className="inline-block rounded-full bg-primary-fixed px-3 py-1 text-label-sm font-medium uppercase text-primary">
+            {t("hero.badge")}
+          </span>
+        </Reveal>
+
+        <Reveal onMount delay={0.08} y={16}>
+          <h1 className="mt-6 text-display-lg-mobile text-on-background sm:text-display-lg">
+            {t("hero.titleA")}{" "}
+            <span className="bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">
+              {t("hero.titleB")}
+            </span>
           </h1>
+        </Reveal>
 
-          <p className="mt-6 max-w-[520px] font-body text-ink-muted" style={{ fontSize: 16, lineHeight: 1.55 }}>
+        <Reveal onMount delay={0.16} y={16}>
+          <p className="mx-auto mt-5 max-w-[560px] text-body-lg leading-relaxed text-on-surface-variant">
             {t("hero.subtitle")}
           </p>
+        </Reveal>
 
-          <div className="mt-9 flex flex-col items-start gap-3">
-            <Link to={ONBOARDING_PATH} className="bc-btn">
+        <Reveal onMount delay={0.24} y={16}>
+          <div className="mt-9 flex flex-col items-center gap-3">
+            <CTAButton href={ONBOARDING_PATH} hoverScale={1.03}>
               {t("hero.cta")}
-            </Link>
-            <p className="font-body text-ink-muted" style={{ fontSize: 13 }}>{t("hero.note")}</p>
+            </CTAButton>
+            <p className="text-label-sm text-on-surface-variant">
+              {t("hero.note")}
+            </p>
           </div>
-        </div>
-
-        {/* RIGHT — red panel */}
-        <div
-          className="relative flex items-center justify-center overflow-hidden"
-          style={{ background: "#E63022", minHeight: 320 }}
-        >
-          {/* Compass SVG */}
-          <svg
-            width="240"
-            height="240"
-            viewBox="0 0 240 240"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="3"
-            aria-hidden
-          >
-            <circle cx="120" cy="120" r="100" />
-            <circle cx="120" cy="120" r="70" />
-            <polygon points="120,40 135,120 120,200 105,120" fill="#FFFFFF" stroke="#FFFFFF" />
-            <polygon points="40,120 120,105 200,120 120,135" fill="none" />
-            <circle cx="120" cy="120" r="6" fill="#FFFFFF" />
-          </svg>
-
-          {/* Floating card — top right */}
-          <div
-            className="absolute bg-white"
-            style={{
-              top: "12%",
-              right: "8%",
-              border: "2px solid #111111",
-              boxShadow: "4px 4px 0 #111111",
-              padding: 16,
-              minWidth: 140,
-            }}
-          >
-            <div className="font-display text-ink" style={{ fontWeight: 800, fontSize: 36, lineHeight: 1 }}>94</div>
-            <div className="font-body text-ink" style={{ fontWeight: 700, fontSize: 11, letterSpacing: "0.08em", marginTop: 4 }}>MATCH</div>
-            <div className="font-body text-ink" style={{ fontWeight: 500, fontSize: 14, marginTop: 6 }}>MIT</div>
-          </div>
-
-          {/* Floating card — bottom left */}
-          <div
-            className="absolute bg-white"
-            style={{
-              bottom: "14%",
-              left: "8%",
-              border: "2px solid #111111",
-              boxShadow: "4px 4px 0 #111111",
-              padding: 16,
-              minWidth: 160,
-            }}
-          >
-            <div className="font-display text-ink" style={{ fontWeight: 800, fontSize: 28, lineHeight: 1 }}>$18k</div>
-            <div className="font-body text-ink-muted" style={{ fontSize: 14, marginTop: 4 }}>scholarship fit</div>
-          </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

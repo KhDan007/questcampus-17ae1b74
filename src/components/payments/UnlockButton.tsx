@@ -60,8 +60,10 @@ export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) 
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        className={className ?? "bc-btn"}
-        style={{ width: "100%", maxWidth: 360 }}
+        className={
+          className ??
+          "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+        }
       >
         {loading ? t("unlock.redirecting") : resolvedLabel}
         {!loading && <span aria-hidden>→</span>}

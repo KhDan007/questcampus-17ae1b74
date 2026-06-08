@@ -11,7 +11,6 @@ import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
 import { NavBar } from "@/components/landing/NavBar";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { auth } from "@/lib/auth/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { localizeStepWith } from "@/lib/i18n/steps";
@@ -88,10 +87,6 @@ function ProfilePage() {
         />
 
         <div className="mx-auto max-w-[960px] px-4 pb-24 sm:px-6">
-          <div className="mt-6 flex justify-end sm:hidden">
-            <LanguageSwitcher />
-          </div>
-
           {sessionId && (
             <RecommendationsSection sessionId={sessionId} token={token} reduce={reduce} firstName={firstName} />
           )}

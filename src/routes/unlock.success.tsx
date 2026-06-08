@@ -2,9 +2,11 @@
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
+import { NavBar } from "@/components/landing/NavBar";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
@@ -16,17 +18,6 @@ export const Route = createFileRoute("/unlock/success")({
   component: UnlockSuccessPage,
 });
 
-function GradCap() {
-  return (
-    <svg width="160" height="160" viewBox="0 0 120 120" fill="none" stroke="#111111" strokeWidth="3" aria-hidden>
-      <polygon points="60,20 110,42 60,64 10,42" />
-      <path d="M30 52 V72 Q60 88 90 72 V52" />
-      <line x1="110" y1="42" x2="110" y2="78" />
-      <circle cx="110" cy="82" r="4" fill="#111111" />
-    </svg>
-  );
-}
-
 function UnlockSuccessPage() {
   const navigate = useNavigate();
   const token = auth.getSession()?.token;
@@ -36,7 +27,8 @@ function UnlockSuccessPage() {
   const { t } = useI18n();
 
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
-    | { paid: boolean } | undefined;
+    | { paid: boolean }
+    | undefined;
   const isPaid = entitlement?.paid === true;
 
   useEffect(() => {
@@ -55,54 +47,81 @@ function UnlockSuccessPage() {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load matches.");
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [isPaid, primed, recommend, token, navigate]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 text-center" style={{ background: "#FFCF00" }}>
-      <div className="mx-auto max-w-[520px]">
-        {!token ? (
-          <div>
-            <h1 className="font-display text-ink" style={{ fontWeight: 800, fontSize: 36 }}>{t("unlockOk.signedOutTitle")}</h1>
-            <p className="mt-3 font-body text-ink" style={{ fontSize: 16 }}>{t("unlockOk.signedOutBody")}</p>
-            <Link to="/signin" className="bc-btn bc-btn-blue mt-6">{t("unlockOk.signin")}</Link>
-          </div>
-        ) : isPaid ? (
-          <div>
-            <div className="flex justify-center"><GradCap /></div>
-            <h1 className="mt-6 font-display text-ink" style={{ fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 4rem)", lineHeight: 1 }}>
-              {t("unlockOk.title")}
-            </h1>
-            <p className="mt-4 font-body text-ink" style={{ fontSize: 18 }}>
-              {primed ? t("unlockOk.taking") : t("unlockOk.loading")}
-            </p>
-            {error && <p className="mt-3 font-body" style={{ fontSize: 13, color: "#E63022" }}>{error}</p>}
-            <Link
-              to="/profile"
-              className="mt-8 inline-flex h-[52px] items-center justify-center px-6 font-display"
-              style={{ background: "#1B4FD8", color: "#FFFFFF", border: "2px solid #111111", boxShadow: "4px 4px 0 #FFFFFF", fontWeight: 700, fontSize: 18 }}
+    <>
+      <NavBar variant="minimal" />
+      <main className="flex min-h-screen items-center justify-center bg-surface px-4">
+        <div className="mx-auto max-w-[520px] text-center">
+          {!token ? (
+            <SignedOutState />
+          ) : isPaid ? (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              {t("unlockOk.go")} →
-            </Link>
-            <p className="mt-6 font-body text-ink" style={{ fontSize: 12 }}>
-              Invite a friend and both of you get a discount.
-            </p>
-          </div>
-        ) : (
-          <div>
-            <div
-              className="mx-auto"
-              style={{
-                width: 40, height: 40, border: "4px solid #111111", borderTopColor: "transparent",
-                borderRadius: "50%", animation: "spin 0.9s linear infinite",
-              }}
-            />
-            <h1 className="mt-6 font-display text-ink" style={{ fontWeight: 800, fontSize: 28 }}>{t("unlockOk.waiting")}</h1>
-            <p className="mt-3 font-body text-ink" style={{ fontSize: 16 }}>{t("unlockOk.waitingBody")}</p>
-            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-          </div>
-        )}
-      </div>
-    </main>
+              <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-container text-3xl text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)]">
+                🎉
+              </span>
+              <h1 className="mt-6 text-display-lg-mobile text-on-background">
+                {t("unlockOk.title")}
+              </h1>
+              <p className="mt-3 text-body-lg text-on-surface-variant">
+                {primed ? t("unlockOk.taking") : t("unlockOk.loading")}
+              </p>
+              {error && <p className="mt-3 text-label-sm text-error">{error}</p>}
+              <Link
+                to="/profile"
+                className="mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
+              >
+                {t("unlockOk.go")}
+              </Link>
+            </motion.div>
+          ) : (
+            <WaitingState />
+          )}
+        </div>
+      </main>
+    </>
+  );
+}
+
+function WaitingState() {
+  const { t } = useI18n();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <motion.span
+        className="mx-auto block h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+      />
+      <h1 className="mt-6 text-headline-md text-on-background">{t("unlockOk.waiting")}</h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.waitingBody")}</p>
+    </motion.div>
+  );
+}
+
+function SignedOutState() {
+  const { t } = useI18n();
+  return (
+    <div>
+      <h1 className="text-headline-md text-on-background">{t("unlockOk.signedOutTitle")}</h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.signedOutBody")}</p>
+      <Link
+        to="/signin"
+        className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
+      >
+        {t("unlockOk.signin")}
+      </Link>
+    </div>
   );
 }

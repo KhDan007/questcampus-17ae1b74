@@ -1,109 +1,120 @@
 "use client";
 
-import { Link } from "@tanstack/react-router";
+import { CTAButton } from "./CTAButton";
+import { Reveal } from "./Reveal";
 import { ONBOARDING_PATH } from "@/lib/routes";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
-function StepIcon({ kind, color }: { kind: "book" | "compass" | "star"; color: string }) {
-  const stroke = color;
-  if (kind === "book") {
-    return (
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke={stroke} strokeWidth="3" aria-hidden>
-        <path d="M10 18 L40 24 L70 18 L70 62 L40 68 L10 62 Z" />
-        <path d="M40 24 L40 68" />
-      </svg>
-    );
-  }
-  if (kind === "compass") {
-    return (
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke={stroke} strokeWidth="3" aria-hidden>
-        <circle cx="40" cy="40" r="32" />
-        <polygon points="40,14 48,40 40,66 32,40" fill={stroke} />
-      </svg>
-    );
-  }
+function ProgressTeaser() {
+  const { t } = useI18n();
   return (
-    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke={stroke} strokeWidth="3" aria-hidden strokeLinejoin="round">
-      <polygon points="40,8 50,32 76,32 55,48 63,72 40,57 17,72 25,48 4,32 30,32" />
-    </svg>
+    <div className="rounded-md bg-surface-container-lowest p-4 ring-1 ring-outline-variant/60">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+        <div className="h-full w-[42%] rounded-full bg-primary-container" />
+      </div>
+      <p className="mt-2 text-label-sm text-on-surface-variant">
+        {t("howit.teaser.progress")}
+      </p>
+    </div>
   );
 }
+
+function MatchingTeaser() {
+  const { t } = useI18n();
+  return (
+    <div className="rounded-md bg-surface-container-lowest p-4 ring-1 ring-outline-variant/60">
+      <p className="text-label-sm text-on-surface-variant">
+        {t("howit.teaser.matching")}
+      </p>
+      <div className="mt-3 space-y-2">
+        {[100, 80, 60].map((w) => (
+          <div
+            key={w}
+            className="h-3 rounded-full bg-surface-container-high"
+            style={{ width: `${w}%` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CardTeaser() {
+  const { t } = useI18n();
+  return (
+    <div className="rounded-md bg-surface-container-lowest p-4 ring-1 ring-outline-variant/60">
+      <div className="flex items-center justify-between">
+        <span className="text-label-md font-semibold text-on-surface">TU Delft</span>
+        <span className="rounded-full bg-secondary-container px-2 py-0.5 text-label-sm font-semibold text-primary">
+          {t("howit.teaser.match", { percent: 92 })}
+        </span>
+      </div>
+      <p className="mt-1 text-label-sm text-on-surface-variant">Delft, Netherlands</p>
+      <span className="mt-3 inline-block rounded-full bg-tertiary-container/15 px-2 py-0.5 text-label-sm text-tertiary">
+        {t("howit.teaser.scholarship")}
+      </span>
+    </div>
+  );
+}
+
+const STEPS = [
+  { n: "1", titleKey: "howit.s1.title", bodyKey: "howit.s1.body", Teaser: ProgressTeaser },
+  { n: "2", titleKey: "howit.s2.title", bodyKey: "howit.s2.body", Teaser: MatchingTeaser },
+  { n: "3", titleKey: "howit.s3.title", bodyKey: "howit.s3.body", Teaser: CardTeaser },
+];
 
 export function HowItWorks() {
   const { t } = useI18n();
   return (
-    <section id="how-it-works" className="bg-cream px-6 sm:px-12" style={{ paddingTop: 100, paddingBottom: 100 }}>
-      <div className="mx-auto max-w-[1200px]">
-        <span className="bc-chip">{t("howit.eyebrow") || "HOW IT WORKS"}</span>
-        <h2
-          className="mt-6 font-display text-ink max-w-[760px]"
-          style={{ fontWeight: 800, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.05, letterSpacing: "-0.02em" }}
-        >
-          {t("howit.heading")}
-        </h2>
+    <section
+      id="how-it-works"
+      className="bg-surface-container-low px-4 py-20 sm:px-8 sm:py-28"
+    >
+      <div className="mx-auto max-w-[1100px]">
+        <Reveal>
+          <p className="text-label-md font-semibold uppercase text-primary">
+            {t("howit.eyebrow")}
+          </p>
+          <h2 className="mt-3 max-w-[640px] text-display-lg-mobile text-on-background">
+            {t("howit.heading")}
+          </h2>
+        </Reveal>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-3">
-          {/* Card 1 — Red */}
-          <div className="relative p-8 overflow-hidden" style={{ background: "#E63022", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", minHeight: 320 }}>
-            <span
-              className="absolute font-display"
-              style={{ fontWeight: 800, fontSize: 96, lineHeight: 1, color: "rgba(255,255,255,0.18)", top: 8, right: 16 }}
-              aria-hidden
-            >
-              1
-            </span>
-            <StepIcon kind="book" color="#FFFFFF" />
-            <h3 className="mt-6 font-display text-white" style={{ fontWeight: 700, fontSize: 24, lineHeight: 1.2 }}>
-              {t("howit.s1.title")}
-            </h3>
-            <p className="mt-3 font-body" style={{ fontSize: 15, color: "rgba(255,255,255,0.85)" }}>
-              {t("howit.s1.body")}
-            </p>
-          </div>
-
-          {/* Card 2 — White */}
-          <div className="relative p-8 overflow-hidden bg-white" style={{ border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", minHeight: 320 }}>
-            <span
-              className="absolute font-display"
-              style={{ fontWeight: 800, fontSize: 96, lineHeight: 1, color: "rgba(17,17,17,0.10)", top: 8, right: 16 }}
-              aria-hidden
-            >
-              2
-            </span>
-            <StepIcon kind="compass" color="#111111" />
-            <h3 className="mt-6 font-display text-ink" style={{ fontWeight: 700, fontSize: 24, lineHeight: 1.2 }}>
-              {t("howit.s2.title")}
-            </h3>
-            <p className="mt-3 font-body text-ink-muted" style={{ fontSize: 15 }}>
-              {t("howit.s2.body")}
-            </p>
-          </div>
-
-          {/* Card 3 — Yellow */}
-          <div className="relative p-8 overflow-hidden" style={{ background: "#FFCF00", border: "2px solid #111111", boxShadow: "4px 4px 0 #111111", minHeight: 320 }}>
-            <span
-              className="absolute font-display"
-              style={{ fontWeight: 800, fontSize: 96, lineHeight: 1, color: "rgba(17,17,17,0.12)", top: 8, right: 16 }}
-              aria-hidden
-            >
-              3
-            </span>
-            <StepIcon kind="star" color="#111111" />
-            <h3 className="mt-6 font-display text-ink" style={{ fontWeight: 700, fontSize: 24, lineHeight: 1.2 }}>
-              {t("howit.s3.title")}
-            </h3>
-            <p className="mt-3 font-body text-ink-muted" style={{ fontSize: 15 }}>
-              {t("howit.s3.body")}
-            </p>
-          </div>
+        <div className="relative mt-14">
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 top-4 hidden border-t border-dashed border-outline-variant md:block"
+          />
+          <ol className="grid gap-10 md:grid-cols-3 md:gap-8">
+            {STEPS.map((s, i) => (
+              <Reveal as="li" key={s.n} delay={i * 0.15} y={40}>
+                <div className="relative flex flex-col">
+                  <span className="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-container text-label-md font-bold text-on-secondary-container">
+                    {s.n}
+                  </span>
+                  <h3 className="mt-5 text-headline-sm text-on-surface">
+                    {t(s.titleKey)}
+                  </h3>
+                  <p className="mt-2 text-body-md text-on-surface-variant">
+                    {t(s.bodyKey)}
+                  </p>
+                  <div className="mt-5"><s.Teaser /></div>
+                </div>
+              </Reveal>
+            ))}
+          </ol>
         </div>
 
-        <div className="mt-14 flex flex-col items-start gap-3">
-          <Link to={ONBOARDING_PATH} className="bc-btn">
-            {t("howit.cta")}
-          </Link>
-          <p className="font-body text-ink-muted" style={{ fontSize: 13 }}>{t("howit.note")}</p>
-        </div>
+        <Reveal delay={0.1}>
+          <div className="mt-14 flex flex-col items-center gap-3">
+            <CTAButton href={ONBOARDING_PATH} hoverScale={1.03}>
+              {t("howit.cta")}
+            </CTAButton>
+            <p className="text-label-sm text-on-surface-variant">
+              {t("howit.note")}
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

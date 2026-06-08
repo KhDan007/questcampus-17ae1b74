@@ -2,6 +2,13 @@
 
 import type { InputHTMLAttributes, SelectHTMLAttributes, ReactNode } from "react";
 
+// Input fields per DESIGN.md: soft surface, 1px border → 2px indigo on focus,
+// Manrope 16px text for clarity.
+const fieldBase =
+  "w-full rounded-md border border-outline-variant bg-surface-container-low px-4 py-3 " +
+  "text-body-md text-on-surface placeholder:text-on-surface-variant/60 " +
+  "transition-colors outline-none focus:border-primary focus:ring-2 focus:ring-primary/30";
+
 export function TextField({
   label,
   className = "",
@@ -10,11 +17,11 @@ export function TextField({
   return (
     <label className="block">
       {label && (
-        <span className="mb-2 block font-body text-ink" style={{ fontWeight: 700, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <span className="mb-1.5 block text-label-md font-semibold text-on-surface-variant">
           {label}
         </span>
       )}
-      <input className={`bc-input ${className}`} {...props} />
+      <input className={`${fieldBase} ${className}`} {...props} />
     </label>
   );
 }
@@ -27,11 +34,16 @@ export function NumberField({
   return (
     <label className="block">
       {label && (
-        <span className="mb-2 block font-body text-ink" style={{ fontWeight: 700, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <span className="mb-1.5 block text-label-md font-semibold text-on-surface-variant">
           {label}
         </span>
       )}
-      <input type="number" inputMode="decimal" className={`bc-input ${className}`} {...props} />
+      <input
+        type="number"
+        inputMode="decimal"
+        className={`${fieldBase} ${className}`}
+        {...props}
+      />
     </label>
   );
 }
@@ -45,11 +57,11 @@ export function SelectField({
   return (
     <label className="block">
       {label && (
-        <span className="mb-2 block font-body text-ink" style={{ fontWeight: 700, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <span className="mb-1.5 block text-label-md font-semibold text-on-surface-variant">
           {label}
         </span>
       )}
-      <select className={`bc-input cursor-pointer ${className}`} {...props}>
+      <select className={`${fieldBase} cursor-pointer ${className}`} {...props}>
         {children}
       </select>
     </label>
