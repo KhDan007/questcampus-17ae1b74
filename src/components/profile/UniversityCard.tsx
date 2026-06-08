@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
+import { EnrichmentDetails } from "./EnrichmentDetails";
 
 // Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
+  _id?: string;
   externalId: string;
   name: string;
   city?: string;
@@ -60,6 +63,7 @@ export function UniversityCard({
   reduce?: boolean;
 }) {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
   const location = [card.city, card.state].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
 
