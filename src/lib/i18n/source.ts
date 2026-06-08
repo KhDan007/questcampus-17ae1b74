@@ -184,7 +184,7 @@ export const UI_EN: Record<string, string> = {
   "wait.title.named": "{name}, get in early",
   "wait.subtitle": "Join the waitlist and lock in founding-member perks — plus first access to every tool we ship next.",
   "wait.perk1": "{discount}% off the full product at launch",
-  "wait.perk2": "+{refDiscount}% off for every friend you refer (stackable — all the way to free)",
+  "wait.perk2": "+{refDiscount}% off for every friend you refer (stackable — all the way to 50% off!)",
   "wait.perk3": "A Founding Member badge on your profile",
   "wait.perk4": "Early access to every new tool before it goes public",
   "wait.emailLabel": "Email address",
