@@ -1,42 +1,23 @@
 "use client";
 
-import { CTAButton } from "./CTAButton";
-import { Reveal } from "./Reveal";
+import { Link } from "@tanstack/react-router";
 import { ONBOARDING_PATH } from "@/lib/routes";
-import { STUDENTS_STARTED } from "@/lib/config";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function FinalCTA() {
   const { t } = useI18n();
   return (
-    <section className="relative isolate overflow-hidden px-4 py-20 sm:px-8">
-      <div
-        aria-hidden
-        className="animate-shimmer absolute inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(115deg, #3525cd 0%, #4f46e5 50%, #3525cd 100%)",
-        }}
-      />
-      <div className="mx-auto flex min-h-[240px] max-w-[740px] flex-col items-center justify-center text-center">
-        <Reveal y={24}>
-          <h2 className="text-display-lg-mobile text-white sm:text-display-lg">
-            {t("final.heading")}
-          </h2>
-          <p className="mt-3 text-body-lg text-white/80">
-            {t("final.subtitle")}
-          </p>
-        </Reveal>
-        <Reveal delay={0.12} y={24}>
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <CTAButton href={ONBOARDING_PATH} variant="white" hoverScale={1.03}>
-              {t("final.cta")}
-            </CTAButton>
-            <p className="text-label-sm text-white/60">
-              {t("final.note", { students: STUDENTS_STARTED })}
-            </p>
-          </div>
-        </Reveal>
+    <section className="flex w-full items-center justify-center px-6 sm:px-12" style={{ background: "#E63022", minHeight: 280, paddingTop: 64, paddingBottom: 64 }}>
+      <div className="mx-auto flex max-w-[820px] flex-col items-center text-center">
+        <h2 className="font-display text-white" style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.05, letterSpacing: "-0.02em" }}>
+          {t("final.heading")}
+        </h2>
+        <p className="mt-4 font-body" style={{ fontSize: 16, color: "rgba(255,255,255,0.85)" }}>
+          {t("final.subtitle")}
+        </p>
+        <Link to={ONBOARDING_PATH} className="bc-btn mt-8">
+          {t("final.cta")}
+        </Link>
       </div>
     </section>
   );

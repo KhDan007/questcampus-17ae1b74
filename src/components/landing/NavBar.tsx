@@ -1,10 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { CTAButton } from "./CTAButton";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
-import logoAsset from "@/assets/questcampus-logo.png.asset.json";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth, type AuthUser } from "@/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,13 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useNavigate } from "@tanstack/react-router";
 import { LogOut, Sparkles, UserRound } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
-  const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { t } = useI18n();
@@ -35,28 +31,23 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
   }, []);
 
   return (
-    <motion.header
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`fixed inset-x-0 top-0 z-50 border-b bg-surface-container-low/80 backdrop-blur-md transition-shadow duration-300 ${
-        scrolled
-          ? "border-outline-variant shadow-[0_4px_20px_-8px_rgba(53,37,205,0.18)]"
-          : "border-outline-variant/60"
-      }`}
+    <header
+      className="fixed inset-x-0 top-0 z-50"
+      style={{
+        height: 64,
+        background: scrolled ? "#FFF8F0" : "transparent",
+        borderBottom: scrolled ? "2px solid #111111" : "2px solid transparent",
+        transition: "background 120ms ease-out, border-color 120ms ease-out",
+      }}
     >
-      <nav className="mx-auto flex h-16 max-w-(--container-content) items-center justify-between px-4 sm:px-8 lg:px-16">
-        <a
-          href="/"
-          className="flex items-center gap-2 font-display text-xl font-bold text-primary tracking-tight"
+      <nav className="mx-auto flex h-full max-w-(--container-content) items-center justify-between px-4 sm:px-8">
+        <Link
+          to="/"
+          className="font-display tracking-tight"
+          style={{ fontWeight: 700, fontSize: 20, color: "#111111", letterSpacing: "-0.01em" }}
         >
-          <img
-            src={logoAsset.url}
-            alt="QuestCampus logo"
-            className="h-8 w-8 object-contain"
-          />
-          QuestCampus
-        </a>
+          QUESTCAMPUS
+        </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher compact />
@@ -64,27 +55,29 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
             <UserMenu user={user} />
           ) : variant === "landing" ? (
             <>
-              <a
-                href={SIGNIN_PATH}
-                className="hidden text-label-md text-on-surface-variant transition-colors hover:text-on-surface sm:inline"
+              <Link
+                to={SIGNIN_PATH}
+                className="hidden sm:inline text-ink font-body"
+                style={{ fontWeight: 500, fontSize: 14 }}
               >
                 {t("nav.signin")}
-              </a>
-              <CTAButton href={ONBOARDING_PATH} className="!min-h-11 !px-5 text-label-md">
-                {t("nav.getStarted")}
-              </CTAButton>
+              </Link>
+              <Link to={ONBOARDING_PATH} className="bc-btn" style={{ height: 44, fontSize: 14 }}>
+                {t("nav.getStarted")} →
+              </Link>
             </>
           ) : (
-            <a
-              href={SIGNIN_PATH}
-              className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+            <Link
+              to={SIGNIN_PATH}
+              className="text-ink font-body"
+              style={{ fontWeight: 500, fontSize: 14 }}
             >
               {t("nav.signin")}
-            </a>
+            </Link>
           )}
         </div>
       </nav>
-    </motion.header>
+    </header>
   );
 }
 
@@ -92,9 +85,7 @@ function initialsOf(user: AuthUser): string {
   const name = (user.name ?? "").trim();
   if (name) {
     const parts = name.split(/\s+/);
-    const first = parts[0]?.[0] ?? "";
-    const second = parts[1]?.[0] ?? "";
-    return (first + second).toUpperCase() || first.toUpperCase();
+    return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || (parts[0]?.[0] ?? "").toUpperCase();
   }
   return (user.email[0] ?? "?").toUpperCase();
 }
@@ -108,11 +99,12 @@ function UserMenu({ user }: { user: AuthUser }) {
         <button
           type="button"
           aria-label={t("nav.menu.account")}
-          className="rounded-full outline-none ring-offset-2 ring-offset-surface-container-low transition-transform hover:scale-[1.04] focus-visible:ring-2 focus-visible:ring-primary"
+          className="outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          style={{ border: "2px solid #111111", background: "#FFCF00", width: 36, height: 36 }}
         >
-          <Avatar className="h-9 w-9 ring-1 ring-outline-variant/60">
+          <Avatar className="h-full w-full rounded-none">
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name ?? user.email} />}
-            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-on-primary-fixed-variant">
+            <AvatarFallback className="rounded-none bg-bc-yellow text-ink" style={{ fontWeight: 700 }}>
               {initialsOf(user)}
             </AvatarFallback>
           </Avatar>
@@ -121,49 +113,47 @@ function UserMenu({ user }: { user: AuthUser }) {
       <DropdownMenuContent
         align="end"
         sideOffset={10}
-        className="w-64 rounded-none border border-outline-variant/60 bg-surface-container-lowest p-1.5 text-on-surface shadow-[0_16px_40px_-12px_rgba(53,37,205,0.22)]"
+        className="w-64 p-0 text-ink"
+        style={{
+          background: "#FFFFFF",
+          border: "2px solid #111111",
+          borderRadius: 0,
+          boxShadow: "4px 4px 0 #111111",
+        }}
       >
-        <DropdownMenuLabel className="flex items-center gap-3 px-2.5 py-2.5">
-          <Avatar className="h-10 w-10 shrink-0">
+        <DropdownMenuLabel className="flex items-center gap-3 px-3 py-3" style={{ borderBottom: "2px solid #111111" }}>
+          <Avatar className="h-10 w-10 rounded-none" style={{ border: "2px solid #111111" }}>
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name ?? user.email} />}
-            <AvatarFallback className="bg-primary-fixed text-label-sm font-semibold text-on-primary-fixed-variant">
+            <AvatarFallback className="rounded-none bg-bc-yellow text-ink" style={{ fontWeight: 700 }}>
               {initialsOf(user)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-label-md font-semibold text-on-surface">
-              {user.name ?? "Account"}
-            </p>
-            <p className="truncate text-label-sm font-normal text-on-surface-variant">
-              {user.email}
-            </p>
+            <p className="truncate font-display" style={{ fontWeight: 700, fontSize: 14 }}>{user.name ?? "Account"}</p>
+            <p className="truncate text-ink-muted" style={{ fontSize: 12 }}>{user.email}</p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
         <DropdownMenuItem
           onSelect={() => navigate({ to: "/profile" })}
-          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+          className="cursor-pointer rounded-none px-3 py-2.5 focus:bg-bc-yellow"
         >
-          <UserRound className="h-4 w-4 text-on-surface-variant" />
-          {t("nav.menu.profile")}
+          <UserRound className="h-4 w-4" /> {t("nav.menu.profile")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => navigate({ to: "/onboarding" })}
-          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-on-surface focus:bg-surface-container-low focus:text-on-surface"
+          className="cursor-pointer rounded-none px-3 py-2.5 focus:bg-bc-yellow"
         >
-          <Sparkles className="h-4 w-4 text-on-surface-variant" />
-          {t("nav.menu.onboarding")}
+          <Sparkles className="h-4 w-4" /> {t("nav.menu.onboarding")}
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="-mx-1.5 my-1 bg-outline-variant/50" />
+        <DropdownMenuSeparator className="my-0" style={{ background: "#111111", height: 2 }} />
         <DropdownMenuItem
           onSelect={() => {
             auth.signOut();
             window.location.href = "/";
           }}
-          className="cursor-pointer rounded-none px-2.5 py-2 text-label-md text-error focus:bg-error-container/60 focus:text-on-error-container"
+          className="cursor-pointer rounded-none px-3 py-2.5 text-bc-red focus:bg-bc-red focus:text-white"
         >
-          <LogOut className="h-4 w-4" />
-          {t("nav.menu.signout")}
+          <LogOut className="h-4 w-4" /> {t("nav.menu.signout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

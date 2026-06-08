@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
+import { WaitlistTab, WaitlistTabMobile } from "@/components/WaitlistTab";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -101,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Manrope:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap",
       },
     ],
   }),
@@ -142,6 +143,8 @@ function RootComponent() {
       <ConvexClientProvider>
         <I18nProvider>
           <Outlet />
+          <WaitlistTab />
+          <WaitlistTabMobile />
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>

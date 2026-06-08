@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { ChapterProgress } from "./ChapterProgress";
@@ -10,14 +9,84 @@ import { StepRenderer } from "./StepRenderer";
 import { saveProfileToLocal } from "@/lib/onboarding/storage";
 import {
   TOTAL_STEPS,
+  CHAPTERS,
   getStep,
   isStepAnswered,
+  type ChapterId,
   type Step,
 } from "@/lib/onboarding/steps";
 import type { Answers, AnswerValue } from "@/lib/onboarding/types";
 import { personalize } from "@/lib/onboarding/personalize";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useLocalizedStep } from "@/lib/i18n/steps";
+
+// Chapter color rotation per brief.
+const CHAPTER_COLORS: Record<ChapterId, { bg: string; fg: string }> = {
+  1: { bg: "#E63022", fg: "#FFFFFF" },
+  2: { bg: "#1B4FD8", fg: "#FFFFFF" },
+  3: { bg: "#FFCF00", fg: "#111111" },
+  4: { bg: "#E63022", fg: "#FFFFFF" },
+  5: { bg: "#1B4FD8", fg: "#FFFFFF" },
+  6: { bg: "#FFCF00", fg: "#111111" },
+  7: { bg: "#E63022", fg: "#FFFFFF" },
+};
+
+function ChapterIcon({ chapter, color }: { chapter: ChapterId; color: string }) {
+  const s = { stroke: color, strokeWidth: 3, fill: "none" } as const;
+  switch (chapter) {
+    case 1: // grad cap
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <polygon points="60,20 110,42 60,64 10,42" />
+          <path d="M30 52 V72 Q60 88 90 72 V52" />
+          <line x1="110" y1="42" x2="110" y2="72" />
+        </svg>
+      );
+    case 2: // open book
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <path d="M10 30 Q40 22 60 32 Q80 22 110 30 V92 Q80 84 60 94 Q40 84 10 92 Z" />
+          <line x1="60" y1="32" x2="60" y2="94" />
+        </svg>
+      );
+    case 3: // compass
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <circle cx="60" cy="60" r="48" />
+          <polygon points="60,22 70,60 60,98 50,60" fill={color} />
+        </svg>
+      );
+    case 4: // globe
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <circle cx="60" cy="60" r="48" />
+          <ellipse cx="60" cy="60" rx="24" ry="48" />
+          <line x1="12" y1="60" x2="108" y2="60" />
+        </svg>
+      );
+    case 5: // map pin
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <path d="M60 16 C36 16 22 34 22 54 C22 80 60 108 60 108 C60 108 98 80 98 54 C98 34 84 16 60 16 Z" />
+          <circle cx="60" cy="52" r="14" />
+        </svg>
+      );
+    case 6: // star
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} strokeLinejoin="round" aria-hidden>
+          <polygon points="60,10 75,46 114,46 82,68 95,108 60,84 25,108 38,68 6,46 45,46" />
+        </svg>
+      );
+    case 7: // telescope
+      return (
+        <svg width="120" height="120" viewBox="0 0 120 120" {...s} aria-hidden>
+          <polygon points="20,38 90,18 100,42 30,62" />
+          <line x1="60" y1="50" x2="60" y2="100" />
+          <line x1="40" y1="100" x2="80" y2="100" />
+        </svg>
+      );
+  }
+}
 
 export function OnboardingFlow({
   sessionId,
@@ -30,7 +99,6 @@ export function OnboardingFlow({
   initialAnswers: Answers;
   initialStep: number;
 }) {
-  const reduce = useReducedMotion();
   const navigate = useNavigate();
   const { t } = useI18n();
   const save = useMutation(api.onboarding.saveProgress);
@@ -38,9 +106,8 @@ export function OnboardingFlow({
 
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [stepNum, setStepNum] = useState(Math.min(Math.max(initialStep, 1), TOTAL_STEPS));
-  const [direction, setDirection] = useState(1);
-  const [affirmation, setAffirmation] = useState<string | null>(null);
   const [finishing, setFinishing] = useState(false);
+  const [flashColor, setFlashColor] = useState<string | null>(null);
 
   const step = getStep(stepNum)!;
   const localizedStep = useLocalizedStep(step);
@@ -51,6 +118,8 @@ export function OnboardingFlow({
   const canAdvance = !step.required || answered;
   const isLast = stepNum === TOTAL_STEPS;
 
+  const chapterColor = CHAPTER_COLORS[step.chapter];
+
   function setValue(v: AnswerValue) {
     setAnswers((prev) => ({ ...prev, [step.field]: v }));
   }
@@ -60,27 +129,17 @@ export function OnboardingFlow({
     saveProfileToLocal(merged, nextStep);
   }
 
-  // ── Global keyboard shortcuts ──────────────────────────────────────────────
-  // Enter or → advances. ← or Esc goes back. No up/down selection.
-  // Enter advances even from inside text/number inputs.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const el = e.target as HTMLElement;
-      const tag = el.tagName;
-
-      // If a dropdown/combobox is open, let it handle its own keys.
       if (el.closest('[role="combobox"],[role="listbox"]')) return;
-
       if (e.key === "Enter") {
         e.preventDefault();
         if (canAdvance && !finishing) goNext();
         return;
       }
-
-      // Arrow nav — but not while typing in an input (cursor movement).
-      const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+      const typing = el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT";
       if (typing) return;
-
       if (e.key === "ArrowLeft" || e.key === "Escape") {
         e.preventDefault();
         goBack();
@@ -96,33 +155,25 @@ export function OnboardingFlow({
 
   function goNext() {
     const merged = answers;
-
-    if (step.affirmation && answered) {
-      const aff = t(`step.${step.step}.affirmation`);
-      setAffirmation(personalize(aff, firstName));
-      setTimeout(() => setAffirmation(null), 2600);
-    }
-
     if (isLast) {
       setFinishing(true);
-      // Persist locally first so /profile always has data, then redirect
-      // immediately. The Convex write is fire-and-forget — we never block the
-      // redirect on the network (it would hang if functions aren't deployed).
       saveProfileToLocal(merged, TOTAL_STEPS);
       void complete({ sessionId, answers: merged, completedAt: Date.now(), token }).catch(() => {});
       navigate({ to: "/profile" });
       return;
     }
-
     const next = stepNum + 1;
+    const nextChapter = getStep(next)!.chapter;
+    if (nextChapter !== step.chapter) {
+      setFlashColor(CHAPTER_COLORS[nextChapter].bg);
+      setTimeout(() => setFlashColor(null), 500);
+    }
     persist(next, merged);
-    setDirection(1);
     setStepNum(next);
   }
 
   function goBack() {
     if (stepNum === 1) return;
-    setDirection(-1);
     setStepNum((s) => s - 1);
   }
 
@@ -133,87 +184,101 @@ export function OnboardingFlow({
 
   if (finishing) {
     return (
-      <div className="mx-auto flex min-h-screen max-w-[560px] flex-col items-center justify-center px-6 text-center">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-fixed text-2xl"
-        >
-          🎓
-        </motion.div>
-        <h1 className="mt-6 text-display-lg-mobile text-on-background">
-          {firstName
-            ? t("ob.flow.finished.titleNamed", { name: firstName })
-            : t("ob.flow.finished.title")}
-        </h1>
-        <p className="mt-3 text-body-lg text-on-surface-variant">
-          {t("ob.flow.finished.subtitle")}
-        </p>
-        <div className="mt-8 flex items-center gap-2">
-          {[0, 1, 2].map((d) => (
-            <motion.span
-              key={d}
-              className="h-2.5 w-2.5 rounded-full bg-primary-container"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.2, repeat: Infinity, delay: d * 0.2 }}
-            />
-          ))}
+      <div className="flex min-h-screen items-center justify-center bg-cream px-6 text-center">
+        <div>
+          <div className="font-display text-ink" style={{ fontWeight: 800, fontSize: 56, lineHeight: 1 }}>
+            {firstName
+              ? t("ob.flow.finished.titleNamed", { name: firstName })
+              : t("ob.flow.finished.title")}
+          </div>
+          <p className="mt-4 font-body text-ink-muted" style={{ fontSize: 16 }}>
+            {t("ob.flow.finished.subtitle")}
+          </p>
         </div>
       </div>
     );
   }
 
+  const chapterTitle = t(`chapter.${step.chapter}.title`);
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-[680px] flex-col px-4 pb-12 pt-24 sm:px-6">
-      <ChapterProgress chapter={step.chapter} step={stepNum} totalSteps={TOTAL_STEPS} />
+    <div className="min-h-screen w-full" style={{ background: "#FFF8F0" }}>
+      {flashColor && (
+        <div className="bc-chapter-flash" style={{ background: flashColor }} />
+      )}
 
-      <div className="relative mt-10 flex-1">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={stepNum}
-            custom={direction}
-            // Vertical + fade only — never translate on X. A horizontal slide
-            // leaves the step offset (e.g. translateX(24px)) until it settles,
-            // and any re-render (selecting an option) snaps it back, shifting the
-            // whole centered column sideways. Y/opacity keeps it put horizontally.
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0, y: -12 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-          >
-            <StepHeader step={localizedStep} name={firstName} />
-            <div className="mt-7">
-              <StepRenderer step={localizedStep} value={value} onChange={setValue} />
+      <div className="flex min-h-screen w-full flex-col lg:flex-row">
+        {/* LEFT — chapter sidebar */}
+        <aside
+          className="flex w-full flex-col justify-between lg:w-[320px] lg:fixed lg:left-0 lg:top-0 lg:h-screen"
+          style={{ background: chapterColor.bg, color: chapterColor.fg, padding: "32px 24px", borderRight: "2px solid #111111" }}
+        >
+          <div>
+            <div className="font-display" style={{ fontWeight: 800, fontSize: 80, lineHeight: 0.9, color: chapterColor.fg }}>
+              {String(step.chapter).padStart(2, "0")}
             </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Affirmation toast */}
-      <AnimatePresence>
-        {affirmation && (
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            className="pointer-events-none fixed inset-x-0 bottom-24 z-20 mx-auto w-fit rounded-full bg-tertiary-container px-4 py-2 text-label-md text-on-tertiary shadow-lg"
+            <div className="mt-3 font-display" style={{ fontWeight: 700, fontSize: 22, lineHeight: 1.15, color: chapterColor.fg }}>
+              {chapterTitle}
+            </div>
+          </div>
+          <div className="my-8 hidden lg:flex items-center justify-center">
+            <ChapterIcon chapter={step.chapter} color={chapterColor.fg} />
+          </div>
+          <div
+            className="font-body"
+            style={{ fontSize: 12, letterSpacing: "0.06em", textTransform: "uppercase", color: chapterColor.fg, opacity: 0.7 }}
           >
-            {affirmation}
-          </motion.p>
-        )}
-      </AnimatePresence>
+            {t("ob.progress.label", { chapter: step.chapter, total: CHAPTERS.length })}
+          </div>
+        </aside>
 
-      <Footer
-        stepNum={stepNum}
-        canAdvance={canAdvance}
-        isRequired={!!step.required}
-        isLast={isLast}
-        onBack={goBack}
-        onSkip={skip}
-        onNext={goNext}
-        t={t}
-      />
+        {/* RIGHT — content panel */}
+        <main className="flex flex-1 flex-col lg:ml-[320px]" style={{ background: "#FFF8F0", minHeight: "100vh" }}>
+          <div className="sticky top-0 z-10 px-6 pt-6 pb-3" style={{ background: "#FFF8F0", borderBottom: "2px solid #111111" }}>
+            <div className="mx-auto max-w-[560px]">
+              <ChapterProgress chapter={step.chapter} step={stepNum} totalSteps={TOTAL_STEPS} />
+            </div>
+          </div>
+
+          <div className="flex-1 px-6 py-10">
+            <div className="mx-auto max-w-[560px]">
+              <StepHeader step={localizedStep} name={firstName} />
+              <div className="mt-7">
+                <StepRenderer step={localizedStep} value={value} onChange={setValue} />
+              </div>
+            </div>
+          </div>
+
+          <div className="sticky bottom-0 px-6 py-5" style={{ background: "#FFF8F0", borderTop: "2px solid #111111" }}>
+            <div className="mx-auto flex max-w-[560px] items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={goBack}
+                disabled={stepNum === 1}
+                className="font-body text-ink"
+                style={{ fontWeight: 500, fontSize: 14, opacity: stepNum === 1 ? 0 : 1 }}
+              >
+                ← {t("ob.flow.back")}
+              </button>
+              <div className="flex items-center gap-4">
+                {!step.required && (
+                  <button
+                    type="button"
+                    onClick={skip}
+                    className="font-body text-ink-muted"
+                    style={{ fontWeight: 500, fontSize: 14 }}
+                  >
+                    {t("ob.flow.skip")}
+                  </button>
+                )}
+                <button type="button" onClick={goNext} disabled={!canAdvance} className="bc-btn">
+                  {isLast ? t("ob.flow.see") : t("ob.flow.continue")} →
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
@@ -221,67 +286,14 @@ export function OnboardingFlow({
 function StepHeader({ step, name }: { step: Step; name?: string }) {
   return (
     <div>
-      <h1 className="text-display-lg-mobile text-on-background">
+      <h1 className="font-display text-ink" style={{ fontWeight: 700, fontSize: 28, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
         {personalize(step.title, name)}
       </h1>
       {step.helper && (
-        <p className="mt-3 text-body-lg text-on-surface-variant">
+        <p className="mt-3 font-body text-ink-muted" style={{ fontSize: 14 }}>
           {personalize(step.helper, name)}
         </p>
       )}
-    </div>
-  );
-}
-
-function Footer({
-  stepNum,
-  canAdvance,
-  isRequired,
-  isLast,
-  onBack,
-  onSkip,
-  onNext,
-  t,
-}: {
-  stepNum: number;
-  canAdvance: boolean;
-  isRequired: boolean;
-  isLast: boolean;
-  onBack: () => void;
-  onSkip: () => void;
-  onNext: () => void;
-  t: (key: string, vars?: Record<string, string | number>) => string;
-}) {
-  return (
-    <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-4 bg-gradient-to-t from-surface via-surface/95 to-transparent pb-4 pt-6">
-      <button
-        type="button"
-        onClick={onBack}
-        disabled={stepNum === 1}
-        className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-0"
-      >
-        {t("ob.flow.back")}
-      </button>
-
-      <div className="flex items-center gap-4">
-        {!isRequired && (
-          <button
-            type="button"
-            onClick={onSkip}
-            className="text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
-          >
-            {t("ob.flow.skip")}
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!canAdvance}
-          className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-all duration-200 hover:bg-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-        >
-          {isLast ? t("ob.flow.see") : t("ob.flow.continue")}
-        </button>
-      </div>
     </div>
   );
 }

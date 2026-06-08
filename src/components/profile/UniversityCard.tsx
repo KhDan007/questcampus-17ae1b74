@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 import { EnrichmentDetails } from "./EnrichmentDetails";
 
-// Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
   _id?: string;
   externalId: string;
@@ -27,35 +25,42 @@ export type RecCard = {
   why: string;
 };
 
-const BUCKET_CHIP: Record<RecCard["bucket"], string> = {
-  safety: "bg-tertiary-container/15 text-tertiary",
-  target: "bg-primary-fixed text-primary",
-  reach: "bg-secondary-container/20 text-secondary",
+const BUCKET_STYLE: Record<RecCard["bucket"], { bg: string; fg: string }> = {
+  safety: { bg: "#16A34A", fg: "#111111" },
+  target: { bg: "#1B4FD8", fg: "#FFFFFF" },
+  reach: { bg: "#E63022", fg: "#FFFFFF" },
 };
 
-function pct(n?: number): string | null {
-  return n == null ? null : `${Math.round(n * 100)}%`;
-}
-function money(n?: number): string | null {
-  return n == null ? null : `$${Math.round(n).toLocaleString()}`;
-}
+function pct(n?: number) { return n == null ? null : `${Math.round(n * 100)}%`; }
+function money(n?: number) { return n == null ? null : `$${Math.round(n).toLocaleString()}`; }
 
-// One stat cell. Renders nothing when value missing (omit, no N/A).
-function Stat({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
+function DataPill({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-label-sm text-on-surface-variant">{label}</dt>
-      <dd className="text-body-lg font-semibold text-on-surface">{value}</dd>
-    </div>
+    <span
+      className="font-body text-ink"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        height: 26,
+        padding: "0 10px",
+        background: "#FFF8F0",
+        border: "2px solid #111111",
+        borderRadius: 9999,
+        fontWeight: 700,
+        fontSize: 11,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+      }}
+    >
+      {children}
+    </span>
   );
 }
 
 export function UniversityCard({
   card,
-  index,
+  index: _index,
   locked = false,
-  reduce = false,
 }: {
   card: RecCard;
   index: number;
@@ -66,105 +71,114 @@ export function UniversityCard({
   const [open, setOpen] = useState(false);
   const location = [card.city, card.state].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
+  const bucket = BUCKET_STYLE[card.bucket];
 
   const aidKey =
     card.pellRate != null
-      ? card.pellRate > 0.4
-        ? "card.aid.strong"
-        : card.pellRate > 0.2
-          ? "card.aid.moderate"
-          : "card.aid.limited"
+      ? card.pellRate > 0.4 ? "card.aid.strong"
+        : card.pellRate > 0.2 ? "card.aid.moderate"
+        : "card.aid.limited"
       : null;
   const aid = aidKey ? t(aidKey) : null;
 
-  const sizeKey =
-    card.sizeBucket && ["small", "medium", "large"].includes(card.sizeBucket)
-      ? `card.size.${card.sizeBucket}`
-      : null;
-  const sizeLabel = sizeKey ? t(sizeKey) : null;
+  const pills: string[] = [];
+  if (card.acceptanceRate != null) pills.push(`${pct(card.acceptanceRate)} ACCEPT`);
+  if (card.satAvg) pills.push(`SAT ${card.satAvg}`);
+  if (card.costAttendance) pills.push(`${money(card.costAttendance)}/YR`);
+  if (aid) pills.push(aid.toUpperCase());
 
   return (
-    <motion.article
-      initial={reduce ? false : { opacity: 0, y: 18 }}
-      animate={reduce ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.06 }}
-      className={`group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-5 transition-shadow sm:p-6 ${
-        locked ? "select-none" : "hover:shadow-[0_8px_28px_-10px_rgba(53,37,205,0.18)]"
-      }`}
+    <article
+      className="relative bg-white p-6 bc-shadow-hover"
+      style={{
+        border: "2px solid #111111",
+        boxShadow: "4px 4px 0 #111111",
+        filter: locked ? "blur(6px)" : "none",
+        pointerEvents: locked ? "none" : "auto",
+      }}
     >
-      {/* Header: name + bucket chip — name is a proper noun, kept untranslated */}
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="truncate text-headline-sm text-on-background">
-            {card.name}
-          </h3>
-          {location && (
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              📍 {location}
-            </p>
-          )}
+        {/* Match score chip */}
+        <div
+          className="flex items-center gap-2"
+          style={{
+            background: "#FFCF00",
+            border: "2px solid #111111",
+            borderRadius: 9999,
+            padding: "4px 12px",
+          }}
+        >
+          <span className="font-display text-ink" style={{ fontWeight: 800, fontSize: 22, lineHeight: 1 }}>
+            {Math.round(card.score * 100)}
+          </span>
+          <span className="font-body text-ink" style={{ fontWeight: 700, fontSize: 10, letterSpacing: "0.08em" }}>MATCH</span>
         </div>
+
         <span
-          className={`shrink-0 rounded-full px-3 py-1 text-label-sm font-semibold uppercase tracking-wide ${BUCKET_CHIP[card.bucket]}`}
+          className="font-body"
+          style={{
+            background: bucket.bg,
+            color: bucket.fg,
+            border: "2px solid #111111",
+            borderRadius: 9999,
+            padding: "4px 12px",
+            fontWeight: 700,
+            fontSize: 11,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
         >
           {t(`card.bucket.${card.bucket}`)}
         </span>
       </div>
 
-      {/* Why this matches (auto-translated AI copy) */}
-      {card.why && (
-        <p className="mt-4 rounded-lg bg-primary-fixed/40 p-3.5 text-body-md leading-relaxed text-on-surface">
-          <span className="mr-1.5">✨</span>
-          {translatedWhy ?? card.why}
+      <h3 className="mt-5 font-display text-ink" style={{ fontWeight: 700, fontSize: 22, lineHeight: 1.2 }}>
+        {card.name}
+      </h3>
+      {location && (
+        <p className="mt-1 font-body text-ink-muted" style={{ fontSize: 14 }}>
+          <span aria-hidden>📍 </span>{location}
         </p>
       )}
 
-      {/* Requirements / stats grid */}
-      <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
-        <Stat label={t("card.stat.acceptance")} value={pct(card.acceptanceRate)} />
-        <Stat label={t("card.stat.sat")} value={card.satAvg ? String(card.satAvg) : null} />
-        <Stat
-          label={t("card.stat.act")}
-          value={card.actMidpoint ? String(card.actMidpoint) : null}
-        />
-        <Stat label={t("card.stat.cost")} value={money(card.costAttendance)} />
-        <Stat label={t("card.stat.tuition")} value={money(card.tuitionOutState)} />
-        <Stat label={t("card.stat.size")} value={sizeLabel} />
-        <Stat label={t("card.stat.aid")} value={aid} />
-      </dl>
+      {pills.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {pills.map((p) => <DataPill key={p}>{p}</DataPill>)}
+        </div>
+      )}
 
-      {!locked && (
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+      {card.why && (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="mt-5 font-body text-ink underline-offset-4 hover:underline"
+          style={{ fontWeight: 500, fontSize: 14 }}
+        >
+          {open ? t("enrich.hide") : `${t("card.visit") || "Why this fits you"} →`}
+        </button>
+      )}
+
+      {open && card.why && (
+        <div className="mt-4" style={{ borderLeft: "4px solid #1B4FD8", paddingLeft: 16 }}>
+          <p className="font-body text-ink-muted" style={{ fontSize: 16, lineHeight: 1.5 }}>
+            {translatedWhy ?? card.why}
+          </p>
+          {!locked && (
+            <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+          )}
           {card.website && (
             <a
               href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary-container px-5 text-label-md font-medium text-on-primary transition-transform hover:scale-[1.02]"
+              className="mt-4 inline-block bc-btn"
+              style={{ height: 44, fontSize: 14 }}
             >
-              {t("card.visit")}
-              <span aria-hidden>→</span>
+              {t("card.visit")} →
             </a>
           )}
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-5 text-label-md font-medium text-on-surface transition-colors hover:bg-surface-container"
-          >
-            {open ? t("enrich.hide") : t("enrich.show")}
-            <span aria-hidden>{open ? "▲" : "▼"}</span>
-          </button>
         </div>
       )}
-
-      {open && !locked && (
-        <EnrichmentDetails
-          schoolId={card._id}
-          externalId={card.externalId}
-          website={card.website}
-        />
-      )}
-    </motion.article>
+    </article>
   );
 }

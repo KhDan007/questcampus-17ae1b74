@@ -2,11 +2,6 @@
 
 import type { ReactNode } from "react";
 
-// Selectable option card — single + multi choice workhorse. Uses inset box-shadow
-// for the selection ring (instead of ring-2) so the box model never shifts.
-// No per-card entry animation: the parent step container already fades in,
-// and re-running a y-translate on every selection re-render caused a visible
-// upward shift of the option list.
 export function OptionCard({
   label,
   selected,
@@ -30,29 +25,32 @@ export function OptionCard({
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        className={`group flex w-full items-start gap-3 rounded-md border p-4 text-left
-          transition-[background-color,border-color,box-shadow] duration-150
-          ${
-            selected
-              ? "border-primary bg-primary-fixed/60 shadow-[inset_0_0_0_2px_#3525cd]"
-              : "border-outline-variant/60 bg-surface-container-lowest shadow-[inset_0_0_0_2px_transparent] hover:border-primary/40 hover:bg-surface-container-low"
-          }`}
+        className="group flex w-full items-start gap-3 p-4 text-left transition-[box-shadow,transform] duration-150"
+        style={{
+          background: selected ? "#FFCF00" : "#FFFFFF",
+          border: "2px solid #111111",
+          borderRadius: 9999,
+          boxShadow: selected ? "2px 2px 0 #111111" : "none",
+          color: "#111111",
+        }}
       >
         <span
           aria-hidden
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-label-sm font-bold transition-colors ${
-            multi ? "rounded-[5px]" : "rounded-full"
-          } ${
-            selected
-              ? "bg-primary text-on-primary"
-              : "border-2 border-outline-variant bg-transparent text-transparent group-hover:border-primary/50"
-          }`}
+          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center"
+          style={{
+            border: "2px solid #111111",
+            background: selected ? "#111111" : "transparent",
+            color: selected ? "#FFCF00" : "transparent",
+            borderRadius: multi ? 2 : 9999,
+            fontSize: 11,
+            fontWeight: 700,
+          }}
         >
           {badge ?? (selected ? "✓" : "")}
         </span>
 
         <span className="flex-1">
-          <span className="block text-body-md text-on-surface">{label}</span>
+          <span className="block font-body" style={{ fontSize: 15, fontWeight: 500 }}>{label}</span>
           {children}
         </span>
       </button>
