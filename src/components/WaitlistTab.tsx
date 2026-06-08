@@ -48,7 +48,8 @@ export function WaitlistTab() {
 
 export function WaitlistTabMobile() {
   const { t } = useI18n();
-  const label = t("waitlistTab.label") || "JOIN WAITLIST";
+  const raw = t("waitlistTab.label");
+  const label = !raw || raw === "waitlistTab.label" ? "JOIN WAITLIST" : raw;
   return (
     <Link
       to={WAITLIST_PATH}
