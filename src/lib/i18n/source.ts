@@ -9,7 +9,8 @@
 import { CHAPTERS, STEPS } from "@/lib/onboarding/steps";
 
 export const UI_EN: Record<string, string> = {
-  // NavBar profile menu (top bar, authenticated)
+  // NavBar
+  "nav.waitlist": "JOIN WAITLIST",
   "nav.menu.welcome": "Welcome back",
 
   // Onboarding shell
