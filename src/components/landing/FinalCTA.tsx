@@ -16,7 +16,7 @@ export function FinalCTA() {
           {t("final.subtitle")}
         </p>
         <Link to={ONBOARDING_PATH} className="bc-btn mt-8">
-          {t("final.cta")} →
+          {t("final.cta")}
         </Link>
       </div>
     </section>

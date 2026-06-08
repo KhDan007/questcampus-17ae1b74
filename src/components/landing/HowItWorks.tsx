@@ -100,7 +100,7 @@ export function HowItWorks() {
 
         <div className="mt-14 flex flex-col items-start gap-3">
           <Link to={ONBOARDING_PATH} className="bc-btn">
-            {t("howit.cta")} →
+            {t("howit.cta")}
           </Link>
           <p className="font-body text-ink-muted" style={{ fontSize: 13 }}>{t("howit.note")}</p>
         </div>

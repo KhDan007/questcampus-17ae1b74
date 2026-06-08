@@ -44,7 +44,7 @@ export function PricingSection() {
               ))}
             </ul>
             <Link to={ONBOARDING_PATH} className="bc-btn bc-btn-outline mt-8 w-full">
-              {t("pricing.free.cta")} →
+              {t("pricing.free.cta")}
             </Link>
           </div>
 
@@ -67,7 +67,7 @@ export function PricingSection() {
               ))}
             </ul>
             <Link to="/unlock" className="bc-btn mt-8 w-full">
-              {t("pricing.paid.cta")} →
+              {t("pricing.paid.cta")}
             </Link>
           </div>
         </div>

@@ -40,7 +40,7 @@ export function HeroSection() {
 
           <div className="mt-9 flex flex-col items-start gap-3">
             <Link to={ONBOARDING_PATH} className="bc-btn">
-              {t("hero.cta")} →
+              {t("hero.cta")}
             </Link>
             <p className="font-body text-ink-muted" style={{ fontSize: 13 }}>{t("hero.note")}</p>
           </div>
