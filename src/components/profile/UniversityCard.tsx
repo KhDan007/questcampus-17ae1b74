@@ -69,6 +69,7 @@ export function UniversityCard({
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [showEnrich, setShowEnrich] = useState(false);
   const location = [card.city, card.state].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
   const bucket = BUCKET_STYLE[card.bucket];
@@ -164,7 +165,18 @@ export function UniversityCard({
             {translatedWhy ?? card.why}
           </p>
           {!locked && (
-            <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+            showEnrich ? (
+              <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowEnrich(true)}
+                className="mt-4 inline-block bc-btn"
+                style={{ height: 44, fontSize: 14 }}
+              >
+                {t("enrich.show")}
+              </button>
+            )
           )}
           {card.website && (
             <a
