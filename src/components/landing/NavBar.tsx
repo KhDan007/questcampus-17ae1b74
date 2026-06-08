@@ -51,6 +51,13 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher compact />
+          <Link
+            to={WAITLIST_PATH}
+            className="bc-btn"
+            style={{ height: 52, fontSize: 15, padding: "0 1.25rem" }}
+          >
+            {t("nav.waitlist")}
+          </Link>
           {isAuthenticated && user ? (
             <UserMenu user={user} />
           ) : variant === "landing" ? (
@@ -62,7 +69,7 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
               >
                 {t("nav.signin")}
               </Link>
-              <Link to={ONBOARDING_PATH} className="bc-btn" style={{ height: 44, fontSize: 14 }}>
+              <Link to={ONBOARDING_PATH} className="bc-btn hidden sm:inline-flex" style={{ height: 44, fontSize: 14 }}>
                 {t("nav.getStarted")} →
               </Link>
             </>
