@@ -5,9 +5,8 @@ import { WAITLIST_PATH } from "@/lib/routes";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function WaitlistTab() {
-  const { t } = useI18n();
-  // Translation key, with a hard fallback so the tab is never empty.
-  const label = t("waitlistTab.label") || "JOIN WAITLIST";
+  const raw = t("waitlistTab.label");
+  const label = !raw || raw === "waitlistTab.label" ? "JOIN WAITLIST" : raw;
 
   return (
     <Link
