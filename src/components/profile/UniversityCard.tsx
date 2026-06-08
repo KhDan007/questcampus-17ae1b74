@@ -148,48 +148,51 @@ export function UniversityCard({
         </div>
       )}
 
-      {card.why && (
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="mt-5 font-body text-ink underline-offset-4 hover:underline"
-          style={{ fontWeight: 500, fontSize: 14 }}
-        >
-          {open ? t("enrich.hide") : `${t("card.visit") || "Why this fits you"} →`}
-        </button>
-      )}
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        {card.why && (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="font-body text-ink underline-offset-4 hover:underline"
+            style={{ fontWeight: 500, fontSize: 14 }}
+          >
+            {open ? t("enrich.hide") : `${t("card.visit") || "Why this fits you"} →`}
+          </button>
+        )}
+        {!locked && !showEnrich && (
+          <button
+            type="button"
+            onClick={() => setShowEnrich(true)}
+            className="bc-btn"
+            style={{ height: 40, fontSize: 13 }}
+          >
+            {t("enrich.show")}
+          </button>
+        )}
+      </div>
 
       {open && card.why && (
         <div className="mt-4" style={{ borderLeft: "4px solid #1B4FD8", paddingLeft: 16 }}>
           <p className="font-body text-ink-muted" style={{ fontSize: 16, lineHeight: 1.5 }}>
             {translatedWhy ?? card.why}
           </p>
-          {!locked && (
-            showEnrich ? (
-              <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowEnrich(true)}
-                className="mt-4 inline-block bc-btn"
-                style={{ height: 44, fontSize: 14 }}
-              >
-                {t("enrich.show")}
-              </button>
-            )
-          )}
-          {card.website && (
-            <a
-              href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-block bc-btn"
-              style={{ height: 44, fontSize: 14 }}
-            >
-              {t("card.visit")} →
-            </a>
-          )}
         </div>
+      )}
+
+      {!locked && showEnrich && (
+        <EnrichmentDetails schoolId={card._id} externalId={card.externalId} website={card.website} />
+      )}
+
+      {card.website && (
+        <a
+          href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-block bc-btn"
+          style={{ height: 44, fontSize: 14 }}
+        >
+          {t("card.visit")} →
+        </a>
       )}
     </article>
   );
