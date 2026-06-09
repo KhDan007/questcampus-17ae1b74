@@ -783,7 +783,7 @@ function QuestionsForm({
       </div>
       {!canSubmit && (
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          Answer at least 3 questions to generate a grounded essay.
+          Fill in the three required story questions (a sentence or two each) to generate.
         </p>
       )}
     </div>
