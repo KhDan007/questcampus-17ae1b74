@@ -171,7 +171,7 @@ type FreeRec = { plan: "free"; results: RecCard[] };
 function EssayPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
-  const { isAuthenticated, isPending } = useAuth();
+  const { isAuthenticated } = useAuth();
   const token = auth.getSession()?.token;
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -180,10 +180,10 @@ function EssayPage() {
   }, []);
 
   useEffect(() => {
-    if (!isPending && !isAuthenticated) {
+    if (sessionId && !isAuthenticated) {
       navigate({ to: "/signin", search: { mode: "signup" } as Record<string, string> });
     }
-  }, [isPending, isAuthenticated, navigate]);
+  }, [sessionId, isAuthenticated, navigate]);
 
   // ---- Pull the user's free recommendations to populate the target picker.
   const recommend = useAction(api.rag.recommend.recommend);
