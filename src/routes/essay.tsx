@@ -69,7 +69,7 @@ const QUESTIONS: EssayQ[] = [
     textPlaceholder: "The first time I…",
     microcopy:
       "Name the real thing. \u201cMy grandmother\u2019s stuck metronome\u201d beats \u201ca musical experience.\u201d",
-    minChars: 80,
+    minChars: 50,
   },
   {
     key: "whyField",
