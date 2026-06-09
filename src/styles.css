@@ -145,84 +145,98 @@
 
 
 /* ============================================================
-   QuestCampus design tokens — merged from globals.css
+   QuestCampus design tokens — Illuminated Path (Electric Coral)
    Fonts loaded via Google Fonts <link> in __root.tsx.
    ============================================================ */
 @theme {
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Epilogue", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Geist", ui-sans-serif, system-ui, sans-serif;
 
-  --color-surface: #f8f9ff;
-  --color-surface-dim: #d0dbed;
-  --color-surface-bright: #f8f9ff;
+  --color-surface: #fdf9f5;
+  --color-surface-dim: #ddd9d6;
+  --color-surface-bright: #fdf9f5;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container: #e6eeff;
-  --color-surface-container-high: #dee9fc;
-  --color-surface-container-highest: #d9e3f6;
-  --color-surface-variant: #d9e3f6;
-  --color-surface-tint: #4d44e3;
+  --color-surface-container-low: #f7f3ef;
+  --color-surface-container: #f1ede9;
+  --color-surface-container-high: #ebe7e4;
+  --color-surface-container-highest: #e5e2de;
+  --color-surface-variant: #e5e2de;
+  --color-surface-tint: #b3272c;
 
-  --color-on-surface: #121c2a;
-  --color-on-surface-variant: #464555;
-  --color-background: #f8f9ff;
-  --color-on-background: #121c2a;
+  --color-on-surface: #1c1c19;
+  --color-on-surface-variant: #5a413f;
+  --color-background: #fdf9f5;
+  --color-on-background: #1c1c19;
 
-  --color-inverse-surface: #27313f;
-  --color-inverse-on-surface: #eaf1ff;
-  --color-inverse-primary: #c3c0ff;
+  --color-inverse-surface: #31302e;
+  --color-inverse-on-surface: #f4f0ec;
+  --color-inverse-primary: #ffb3ae;
 
-  --color-outline: #777587;
-  --color-outline-variant: #c7c4d8;
+  --color-outline: #8d706e;
+  --color-outline-variant: #e2bebc;
 
-  --color-primary: #3525cd;
+  --color-primary: #b3272c;
   --color-on-primary: #ffffff;
-  --color-primary-container: #4f46e5;
-  --color-on-primary-container: #dad7ff;
+  --color-primary-container: #ff5f5d;
+  --color-on-primary-container: #64000b;
 
-  --color-secondary: #855300;
+  --color-secondary: #7c5800;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #fea619;
-  --color-on-secondary-container: #684000;
+  --color-secondary-container: #feb700;
+  --color-on-secondary-container: #6b4b00;
 
-  --color-tertiary: #00534a;
+  --color-tertiary: #3b6934;
   --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #006d62;
-  --color-on-tertiary-container: #69f1de;
+  --color-tertiary-container: #71a267;
+  --color-on-tertiary-container: #073707;
 
   --color-error: #ba1a1a;
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
-  --color-primary-fixed: #e2dfff;
-  --color-primary-fixed-dim: #c3c0ff;
-  --color-on-primary-fixed: #0f0069;
-  --color-on-primary-fixed-variant: #3323cc;
-  --color-secondary-fixed: #ffddb8;
-  --color-secondary-fixed-dim: #ffb95f;
-  --color-on-secondary-fixed: #2a1700;
-  --color-on-secondary-fixed-variant: #653e00;
-  --color-tertiary-fixed: #71f8e4;
-  --color-tertiary-fixed-dim: #4fdbc8;
-  --color-on-tertiary-fixed: #00201c;
-  --color-on-tertiary-fixed-variant: #005048;
+  --color-primary-fixed: #ffdad7;
+  --color-primary-fixed-dim: #ffb3ae;
+  --color-on-primary-fixed: #410005;
+  --color-on-primary-fixed-variant: #910818;
+  --color-secondary-fixed: #ffdea8;
+  --color-secondary-fixed-dim: #ffba20;
+  --color-on-secondary-fixed: #271900;
+  --color-on-secondary-fixed-variant: #5e4200;
+  --color-tertiary-fixed: #bcf0ae;
+  --color-tertiary-fixed-dim: #a1d494;
+  --color-on-tertiary-fixed: #002201;
+  --color-on-tertiary-fixed-variant: #23501e;
+
+  --color-bucket-safety: #3b6934;
+  --color-bucket-target: #2e4a7a;
+  --color-bucket-reach: #5e2150;
 
   --radius-sm: 0.25rem;
   --radius-DEFAULT: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  --text-display-xl: 4.5rem;
+  --text-display-xl--line-height: 4.75rem;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl--font-weight: 700;
 
   --text-display-lg: 3rem;
-  --text-display-lg--line-height: 3.5rem;
+  --text-display-lg--line-height: 3.25rem;
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-lg--font-weight: 700;
 
-  --text-display-lg-mobile: 2rem;
+  --text-display-lg-mobile: 2.25rem;
   --text-display-lg-mobile--line-height: 2.5rem;
-  --text-display-lg-mobile--letter-spacing: -0.01em;
+  --text-display-lg-mobile--letter-spacing: -0.02em;
   --text-display-lg-mobile--font-weight: 700;
+
+  --text-headline-lg: 2rem;
+  --text-headline-lg--line-height: 2.5rem;
+  --text-headline-lg--font-weight: 700;
 
   --text-headline-md: 1.5rem;
   --text-headline-md--line-height: 2rem;
@@ -240,15 +254,15 @@
 
   --text-label-md: 0.875rem;
   --text-label-md--line-height: 1.25rem;
-  --text-label-md--letter-spacing: 0.01em;
-  --text-label-md--font-weight: 600;
+  --text-label-md--letter-spacing: 0.02em;
+  --text-label-md--font-weight: 500;
 
   --text-label-sm: 0.75rem;
   --text-label-sm--line-height: 1rem;
-  --text-label-sm--letter-spacing: 0.02em;
-  --text-label-sm--font-weight: 500;
+  --text-label-sm--letter-spacing: 0.04em;
+  --text-label-sm--font-weight: 600;
 
-  --container-content: 1200px;
+  --container-content: 1280px;
 }
 
 html {
@@ -265,7 +279,7 @@ body {
   overflow-x: clip;
 }
 
-h1, h2, h3 { font-family: var(--font-display); }
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
 
 :focus-visible {
   outline: 2px solid var(--color-primary);
@@ -286,25 +300,75 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .skip-link:focus { top: 1rem; }
 
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  50%  { transform: translate3d(-4%, 3%, 0) scale(1.08); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+@keyframes aurora-drift-2 {
+  0%   { transform: translate3d(0,0,0) scale(1.05); }
+  50%  { transform: translate3d(5%, -4%, 0) scale(1); }
+  100% { transform: translate3d(0,0,0) scale(1.05); }
+}
+@keyframes aurora-drift-3 {
+  0%   { transform: translate3d(0,0,0) rotate(0deg); }
+  50%  { transform: translate3d(3%, 4%, 0) rotate(8deg); }
+  100% { transform: translate3d(0,0,0) rotate(0deg); }
+}
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  50%      { transform: translateY(-14px) rotate(calc(var(--rot, 0deg) + 1.5deg)); }
+}
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(179, 39, 44, 0.35); }
+  50%      { box-shadow: 0 0 36px 10px rgba(179, 39, 44, 0.22); }
+}
 @keyframes blob-in {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
-@keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes underline-grow {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
+@keyframes shimmer { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes underline-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
+.animate-aurora-1 { animation: aurora-drift 22s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-drift-2 28s ease-in-out infinite; }
+.animate-aurora-3 { animation: aurora-drift-3 34s ease-in-out infinite; }
+.animate-float-bob { animation: float-bob var(--bob-dur, 9s) ease-in-out infinite; }
+.animate-shimmer-sweep {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.8s linear infinite;
+}
+.animate-pulse-glow { animation: pulse-glow 3.4s ease-in-out infinite; }
 .animate-blob-in { animation: blob-in 1200ms ease-out forwards; }
 .animate-shimmer { background-size: 200% 200%; animation: shimmer 4s ease-in-out infinite; }
 
+.qc-grain {
+  background-image: radial-gradient(rgba(28,28,25,0.07) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.qc-hard-shadow { box-shadow: 4px 4px 0 0 var(--color-on-surface); }
+.qc-hard-shadow-primary { box-shadow: 5px 5px 0 0 var(--color-primary); }
+.qc-hard-shadow-sm { box-shadow: 2px 2px 0 0 var(--color-on-surface); }
+
+.qc-text-gradient {
+  background: linear-gradient(110deg, #b3272c 0%, #ff5f5d 45%, #feb700 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .animate-blob-in, .animate-shimmer { animation: none; }
+  .animate-aurora-1, .animate-aurora-2, .animate-aurora-3,
+  .animate-float-bob, .animate-shimmer-sweep, .animate-pulse-glow,
+  .animate-blob-in, .animate-shimmer {
+    animation: none !important;
+  }
   .animate-blob-in { opacity: 1; transform: none; }
 }
