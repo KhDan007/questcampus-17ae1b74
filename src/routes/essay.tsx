@@ -280,7 +280,7 @@ function EssayPage() {
         sessionId,
         token,
         essayAnswers: buildPayload(answers),
-        questionLabels: buildLabels(),
+        questionLabels: buildLabels(answers),
         targetSource: target?.externalId ? "scorecard" : undefined,
         targetExternalId: target?.externalId,
         lang: "en",
@@ -300,14 +300,13 @@ function EssayPage() {
   }, [sessionId, token, generate, answers, target]);
 
   const canSubmitQuestions = useMemo(() => {
-    // Require at least 3 of the 7 questions to have something meaningful.
-    let filled = 0;
+    // Require all ⭐ story questions to have meaningful free-text.
     for (const q of QUESTIONS) {
-      const a = answers[q.key];
-      if (!a) continue;
-      if ((a.text && a.text.trim().length > 0) || a.choice) filled++;
+      if (!q.required) continue;
+      const t = answers[q.key]?.text?.trim() ?? "";
+      if (t.length < 20) return false;
     }
-    return filled >= 3;
+    return true;
   }, [answers]);
 
   // Past essays list (logged-in)
