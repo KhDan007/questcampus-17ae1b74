@@ -30,97 +30,111 @@ export const Route = createFileRoute("/essay")({
 });
 
 // -----------------------------------------------------------------------------
-// Essay questions (provisional set from ESSAY_FRONTEND.md §5)
+// Essay questions — Essay Intake v2 (see ESSAY_INTAKE_V2_FRONTEND.md)
+// Principle: specific free-text beats choices. Chips are "primes" that seed
+// the textarea; the textarea is the actual saved answer.
 // -----------------------------------------------------------------------------
 
-type ChoiceOpt = { value: string; label: string };
+type Prime = { value: string; label: string; seed: string };
 type EssayQ = {
   key: string;
   label: string;
   helper?: string;
-  choices?: ChoiceOpt[];
-  hasText: boolean;
+  required?: boolean;
+  optional?: boolean;
+  // Choice-to-prime story field: textarea is the payload.
+  primes?: Prime[];
   textPlaceholder?: string;
+  microcopy?: string;
+  // Short text-only field.
+  shortText?: boolean;
+  // Choice-only field (e.g. voice).
+  choices?: { value: string; label: string }[];
+  minChars?: number;
 };
 
 const QUESTIONS: EssayQ[] = [
   {
-    key: "definingMoment",
-    label: "A specific moment that changed how you see yourself or the world",
-    helper: "A scene we could film — when, where, what happened.",
-    choices: [
-      { value: "loss", label: "A loss or setback" },
-      { value: "discovery", label: "A discovery / 'aha' moment" },
-      { value: "responsibility", label: "Sudden responsibility" },
-      { value: "perspective", label: "Meeting someone different" },
+    key: "anchorStory",
+    label:
+      "Tell us about one specific moment — a day, a scene, a thing that happened — that says something true about you. Where were you? What happened?",
+    required: true,
+    primes: [
+      { value: "place", label: "a place that mattered", seed: "The place I keep coming back to is " },
+      { value: "wrong", label: "a time I was wrong", seed: "I was completely wrong about " },
+      { value: "couldnt-fix", label: "something I couldn't fix", seed: "There was one thing I couldn't fix: " },
+      { value: "small-win", label: "a small win nobody saw", seed: "A small win nobody saw — " },
+      { value: "changed-mind", label: "a moment I changed my mind", seed: "I changed my mind the day " },
     ],
-    hasText: true,
-    textPlaceholder: "e.g. the week my dad's shop almost closed",
+    textPlaceholder: "The first time I…",
+    microcopy:
+      "Name the real thing. \u201cMy grandmother\u2019s stuck metronome\u201d beats \u201ca musical experience.\u201d",
+    minChars: 80,
   },
   {
     key: "whyField",
-    label: "When did you first get pulled toward what you want to study?",
-    choices: [
-      { value: "building", label: "Building / making things" },
-      { value: "people", label: "Working with people" },
-      { value: "ideas", label: "Big ideas / theory" },
-      { value: "fixing", label: "Fixing what's broken" },
+    label:
+      "When did you first get pulled toward what you want to study? Describe the actual moment, not the subject.",
+    required: true,
+    primes: [
+      { value: "building", label: "Building / making things", seed: "Building / making things — " },
+      { value: "people", label: "Working with people", seed: "Working with people — " },
+      { value: "ideas", label: "Big ideas / theory", seed: "Big ideas / theory — " },
+      { value: "fixing", label: "Fixing what's broken", seed: "Fixing what\u2019s broken — " },
     ],
-    hasText: true,
-    textPlaceholder: "e.g. fixing the broken POS system myself",
+    textPlaceholder: "I realized I liked …",
+    microcopy:
+      "We never invent facts — anything you don\u2019t tell us shows up as a [fill-this-in] marker.",
+    minChars: 60,
   },
   {
-    key: "challenge",
-    label: "A real difficulty you faced — and what you actually did",
-    choices: [
-      { value: "family", label: "Family situation" },
-      { value: "academic", label: "Academic struggle" },
-      { value: "social", label: "Social / belonging" },
-      { value: "health", label: "Health" },
+    key: "turningPoint",
+    label:
+      "A real difficulty, failure, or change you went through — and what you actually did, step by step.",
+    required: true,
+    primes: [
+      { value: "failure", label: "a thing that failed first", seed: "My first attempt failed because " },
+      { value: "family", label: "a family situation", seed: "At home, " },
+      { value: "academic", label: "an academic wall", seed: "I hit a wall in " },
+      { value: "belonging", label: "not belonging", seed: "I didn\u2019t belong when " },
+      { value: "health", label: "a health setback", seed: "After " },
     ],
-    hasText: true,
-    textPlaceholder: "Concrete actions, not feelings.",
+    textPlaceholder: "What I actually did, step by step…",
+    microcopy: "Concrete actions, not feelings. What did you try first? What changed?",
+    minChars: 80,
   },
   {
     key: "signatureThing",
-    label: "One thing you've made, built, led, or kept going",
-    choices: [
-      { value: "project", label: "A project / product" },
-      { value: "club", label: "A club or team" },
-      { value: "practice", label: "A daily practice" },
-      { value: "work", label: "A job / business" },
-    ],
-    hasText: true,
+    label: "One thing you've made, built, led, fixed, or kept going. What was it, and what was hard about it?",
+    optional: true,
     textPlaceholder: "What does it look like up close?",
   },
   {
-    key: "influence",
-    label: "A person, place, or object that shaped you",
-    hasText: true,
-    textPlaceholder: "e.g. my grandmother's stubbornness",
+    key: "sensoryDetail",
+    label:
+      "Give us one small concrete detail from that moment — a sound, a smell, an object, a thing someone said. The kind of detail only you would know.",
+    optional: true,
+    shortText: true,
+    textPlaceholder: "e.g. the smell of WD-40 and the bell that stuck every winter",
+  },
+  {
+    key: "person",
+    label: "A person who shaped you — and one specific thing they did or said (not just who they are).",
+    optional: true,
+    shortText: true,
+    textPlaceholder: "e.g. my grandmother, who told me to \u201cfinish the row before you stop\u201d",
   },
   {
     key: "voice",
-    label: "Pick the tone that feels like you",
+    label: "Pick the tone that feels like you.",
+    optional: true,
     choices: [
       { value: "reflective", label: "Reflective" },
       { value: "wry", label: "Wry" },
       { value: "earnest", label: "Earnest" },
       { value: "bold", label: "Bold" },
+      { value: "quiet", label: "Quiet" },
     ],
-    hasText: false,
-  },
-  {
-    key: "tenYears",
-    label: "Where do you hope this leads?",
-    choices: [
-      { value: "research", label: "Research / academia" },
-      { value: "industry", label: "Build something in industry" },
-      { value: "impact", label: "Public / social impact" },
-      { value: "unsure", label: "Honestly, still figuring it out" },
-    ],
-    hasText: true,
-    textPlaceholder: "Optional — a sentence is plenty.",
   },
 ];
 
@@ -133,15 +147,30 @@ function buildPayload(answers: AnswerMap): Record<string, unknown> {
     const a = answers[q.key];
     if (!a) continue;
     const text = a.text?.trim();
-    if (q.choices && a.choice && text) out[q.key] = { choice: a.choice, text };
-    else if (q.choices && a.choice) out[q.key] = { choice: a.choice };
-    else if (text) out[q.key] = q.hasText && !q.choices ? text : { text };
+    // Choice-only field (voice): send { choice }.
+    if (q.choices && !q.primes && !q.shortText) {
+      if (a.choice) out[q.key] = { choice: a.choice };
+      continue;
+    }
+    // Story / short-text fields: send { text } only. Never { choice, text }.
+    if (text) out[q.key] = { text };
   }
   return out;
 }
 
-function buildLabels(): Record<string, string> {
-  return Object.fromEntries(QUESTIONS.map((q) => [q.key, q.label]));
+function buildLabels(answers: AnswerMap): Record<string, string> {
+  // Only label keys we actually sent, so the Fact Pack stays clean.
+  const labels: Record<string, string> = {};
+  for (const q of QUESTIONS) {
+    const a = answers[q.key];
+    if (!a) continue;
+    if (q.choices && !q.primes && !q.shortText) {
+      if (a.choice) labels[q.key] = q.label;
+    } else if (a.text?.trim()) {
+      labels[q.key] = q.label;
+    }
+  }
+  return labels;
 }
 
 // -----------------------------------------------------------------------------
@@ -251,7 +280,7 @@ function EssayPage() {
         sessionId,
         token,
         essayAnswers: buildPayload(answers),
-        questionLabels: buildLabels(),
+        questionLabels: buildLabels(answers),
         targetSource: target?.externalId ? "scorecard" : undefined,
         targetExternalId: target?.externalId,
         lang: "en",
@@ -271,14 +300,13 @@ function EssayPage() {
   }, [sessionId, token, generate, answers, target]);
 
   const canSubmitQuestions = useMemo(() => {
-    // Require at least 3 of the 7 questions to have something meaningful.
-    let filled = 0;
+    // Require all ⭐ story questions to have meaningful free-text.
     for (const q of QUESTIONS) {
-      const a = answers[q.key];
-      if (!a) continue;
-      if ((a.text && a.text.trim().length > 0) || a.choice) filled++;
+      if (!q.required) continue;
+      const t = answers[q.key]?.text?.trim() ?? "";
+      if (t.length < 20) return false;
     }
-    return filled >= 3;
+    return true;
   }, [answers]);
 
   // Past essays list (logged-in)
@@ -614,18 +642,33 @@ function QuestionsForm({
       <div className="mt-8 grid gap-7">
         {QUESTIONS.map((q) => {
           const v = answers[q.key] ?? {};
+          const text = v.text ?? "";
+          const isStory = !!q.primes;
+          const isChoiceOnly = !!q.choices && !q.primes && !q.shortText;
+          const charCount = text.trim().length;
+          const goodLength = q.minChars ? charCount >= Math.min(120, q.minChars + 40) : false;
           return (
             <div key={q.key}>
-              <label className="block font-display text-label-lg font-bold text-on-surface">
-                {q.label}
-              </label>
-              {q.helper && (
-                <p className="mt-1 text-body-sm text-on-surface-variant">{q.helper}</p>
-              )}
+              <div className="flex items-baseline gap-2">
+                <label className="block font-display text-label-lg font-bold text-on-surface">
+                  {q.label}
+                </label>
+                {q.required && (
+                  <span className="font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                    Required
+                  </span>
+                )}
+                {q.optional && (
+                  <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                    Optional
+                  </span>
+                )}
+              </div>
 
-              {q.choices && (
+              {/* Choice-only field (voice) */}
+              {isChoiceOnly && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {q.choices.map((c) => {
+                  {q.choices!.map((c) => {
                     const active = v.choice === c.value;
                     return (
                       <button
@@ -648,14 +691,57 @@ function QuestionsForm({
                 </div>
               )}
 
-              {q.hasText && (
-                <textarea
-                  value={v.text ?? ""}
+              {/* Story field: chips seed the textarea, are NOT the saved answer. */}
+              {isStory && (
+                <>
+                  <p className="mt-2 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                    Tap an angle to start — then rewrite in your own words.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {q.primes!.map((p) => (
+                      <button
+                        key={p.value}
+                        type="button"
+                        onClick={() => {
+                          // Seed only if the textarea is empty — never overwrite real writing.
+                          if (!text.trim()) setField(q.key, { text: p.seed });
+                        }}
+                        className="rounded-full border-2 border-on-surface/40 bg-surface/80 px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface transition-all hover:-translate-y-0.5 hover:border-on-surface hover:bg-secondary-container"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={text}
+                    onChange={(e) => setField(q.key, { text: e.target.value })}
+                    rows={4}
+                    placeholder={q.textPlaceholder}
+                    maxLength={800}
+                    className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                  />
+                  <div className="mt-1.5 flex items-start justify-between gap-3">
+                    <p className="text-label-sm text-on-surface-variant">
+                      {goodLength
+                        ? "Nice — that\u2019s exactly the kind of detail that works."
+                        : (q.microcopy ?? "A sentence or two is plenty.")}
+                    </p>
+                    <span className="shrink-0 font-[var(--font-label)] text-label-sm text-on-surface/50">
+                      {charCount}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* Short text (optional) */}
+              {q.shortText && (
+                <input
+                  type="text"
+                  value={text}
                   onChange={(e) => setField(q.key, { text: e.target.value })}
-                  rows={2}
                   placeholder={q.textPlaceholder}
-                  maxLength={400}
-                  className="mt-3 w-full resize-none rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                  maxLength={220}
+                  className="mt-3 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
                 />
               )}
             </div>
@@ -697,7 +783,7 @@ function QuestionsForm({
       </div>
       {!canSubmit && (
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          Answer at least 3 questions to generate a grounded essay.
+          Fill in the three required story questions (a sentence or two each) to generate.
         </p>
       )}
     </div>
