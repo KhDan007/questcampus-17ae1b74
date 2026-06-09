@@ -58,6 +58,8 @@ function SignInPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "signup") setMode("signup");
+    const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const state = params.get("state");
     const err = params.get("error");
