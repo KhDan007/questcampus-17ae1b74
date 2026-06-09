@@ -153,7 +153,19 @@ export function ResultsReveal({
     quickMatch({ quiz: answers, lang })
       .then((res: { results: RawResult[] }) => {
         if (cancelled) return;
-        setResults((res.results ?? []).slice(0, 3).map(toMatch));
+        const matches = (res.results ?? []).slice(0, 3).map(toMatch);
+        setResults(matches);
+        // Persist for the dashboard — survives signup/sign-in.
+        try {
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(
+              "qc.landing.matches",
+              JSON.stringify({ matches, answers, at: Date.now() }),
+            );
+          }
+        } catch {
+          /* localStorage may be unavailable */
+        }
       })
       .catch((e: unknown) => {
         if (cancelled) return;
