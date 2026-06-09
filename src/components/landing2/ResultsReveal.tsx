@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Lock, Sparkles, Award, GraduationCap, AlertCircle } from "lucide-react";
+import { Sparkles, Award, GraduationCap, AlertCircle } from "lucide-react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -398,32 +398,38 @@ function UnlockOverlay() {
     >
       <div className="relative w-full max-w-[520px] overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-6 text-center qc-hard-shadow-primary backdrop-blur-xl sm:p-8">
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
-          <Lock className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" />
         </div>
         <h3 className="text-headline-md text-on-surface">
-          Unlock your full ranked list — 20+ matches.
+          Create a free account to see all your matches
         </h3>
         <p className="mt-2 text-body-md text-on-surface-variant">
-          See every Safety, Target & Reach with scholarship paths, deadlines, and
-          a personalized "why this fits you" for each.
+          You already have 3 personalized matches. Sign up to unlock the full list.
         </p>
 
-        <div className="mt-5 flex items-center justify-center gap-3 font-[var(--font-label)]">
-          <span className="text-headline-md text-on-surface/40 line-through">$9</span>
-          <span className="font-display text-display-lg font-bold text-primary">$5</span>
-          <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">
-            one-time
-          </span>
-        </div>
+        <ul className="mt-5 space-y-2 text-left">
+          <li className="flex items-start gap-2 text-body-sm text-on-surface">
+            <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>20+ ranked Safety, Target & Reach universities</span>
+          </li>
+          <li className="flex items-start gap-2 text-body-sm text-on-surface">
+            <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>Scholarship paths and application deadlines</span>
+          </li>
+          <li className="flex items-start gap-2 text-body-sm text-on-surface">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>Save your matches and compare anytime</span>
+          </li>
+        </ul>
 
         <a
-          href="/unlock"
-          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
+          href="/signin"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
         >
-          Unlock everything — $5
+          Create free account
         </a>
         <p className="mt-3 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-          Pay once. No subscription. Most students unlock within 60 seconds.
+          Takes 30 seconds. No credit card required.
         </p>
       </div>
     </motion.div>
