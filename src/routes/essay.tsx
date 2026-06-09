@@ -369,6 +369,10 @@ function EssayPage() {
                 value={target}
                 onChange={setTarget}
                 onNext={() => setStep("questions")}
+                onSkip={() => {
+                  setTarget({ name: "No specific school" });
+                  setStep("questions");
+                }}
               />
             </StepWrap>
           )}
@@ -383,6 +387,7 @@ function EssayPage() {
                 canSubmit={canSubmitQuestions && !!token}
                 loading={genStatus === "loading"}
                 error={genError}
+                token={token}
               />
             </StepWrap>
           )}
@@ -503,12 +508,14 @@ function TargetPicker({
   value,
   onChange,
   onNext,
+  onSkip,
 }: {
   matches: RecCard[] | null;
   matchesErr: boolean;
   value: { externalId?: string; name: string } | null;
   onChange: (v: { externalId?: string; name: string } | null) => void;
   onNext: () => void;
+  onSkip: () => void;
 }) {
   const loading = matches === null && !matchesErr;
   return (
@@ -590,12 +597,19 @@ function TargetPicker({
         </p>
       )}
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+        <button
+          type="button"
+          onClick={onSkip}
+          className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/40 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-all hover:border-on-surface hover:text-on-surface"
+        >
+          Skip — write a generic essay
+        </button>
         <button
           type="button"
           disabled={!value}
           onClick={onNext}
-          className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[var(--qc-hard-shadow)]"
+          className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[var(--qc-hard-shadow)]"
         >
           Next: your story
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -617,6 +631,7 @@ function QuestionsForm({
   canSubmit,
   loading,
   error,
+  token,
 }: {
   answers: AnswerMap;
   setAnswers: (next: AnswerMap | ((prev: AnswerMap) => AnswerMap)) => void;
@@ -625,6 +640,7 @@ function QuestionsForm({
   canSubmit: boolean;
   loading: boolean;
   error: EssayError["error"] | null;
+  token: string | undefined;
 }) {
   const setField = (key: string, patch: Partial<AnswerVal>) =>
     setAnswers((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
@@ -750,9 +766,20 @@ function QuestionsForm({
       </div>
 
       {error && (
-        <div className="mt-6 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-on-surface" />
-          <span className="text-on-surface">{errorMessage(error)}</span>
+        <div className="mt-6 rounded-lg border-2 border-on-surface bg-error-container/40 p-4">
+          <div className="flex items-start gap-2 text-body-sm">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-on-surface" />
+            <span className="text-on-surface">{errorMessage(error)}</span>
+          </div>
+          {(error === "no_profile" || error === "trial_used") && (
+            <div className="mt-4">
+              <UnlockButton
+                token={token}
+                label={`Unlock for $${PRICE_MVP} & generate`}
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-md font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -795,7 +822,7 @@ function errorMessage(e: EssayError["error"]): string {
     case "not_logged_in":
       return "Your session expired. Please sign in again.";
     case "no_profile":
-      return "We'll write a general personal statement from your answers alone — no quiz required. Try generating again, or take the 60-second quiz on the home page for a more tailored draft.";
+      return `Generating a personal statement is a paid feature ($${PRICE_MVP} one-time). Unlock once and your essay generates instantly from your answers — no quiz required.`;
     case "trial_used":
       return `You've used your free generation. Unlock the full essay for $${PRICE_MVP} to generate again.`;
     case "generation_failed":
