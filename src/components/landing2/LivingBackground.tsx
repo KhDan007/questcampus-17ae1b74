@@ -166,7 +166,7 @@ function FloatLayer({
   opacity,
 }: {
   tiles: Tile[];
-  y: ReturnType<typeof useTransform<number, string>>;
+  y: MotionValue<string>;
   pointer: { x: number; y: number };
   depthMultiplier: number;
   opacity: number;
