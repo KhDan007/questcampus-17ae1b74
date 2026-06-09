@@ -286,7 +286,7 @@ function EssayPage() {
     | { essayId: string; targetName?: string; wordCount: number; preview: string; createdAt: number }[]
     | undefined;
 
-  if (!sessionId || isPending) {
+  if (!sessionId) {
     return (
       <>
         <LivingBackground />
