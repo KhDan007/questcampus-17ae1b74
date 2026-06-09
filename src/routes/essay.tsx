@@ -759,9 +759,20 @@ function QuestionsForm({
       </div>
 
       {error && (
-        <div className="mt-6 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-on-surface" />
-          <span className="text-on-surface">{errorMessage(error)}</span>
+        <div className="mt-6 rounded-lg border-2 border-on-surface bg-error-container/40 p-4">
+          <div className="flex items-start gap-2 text-body-sm">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-on-surface" />
+            <span className="text-on-surface">{errorMessage(error)}</span>
+          </div>
+          {(error === "no_profile" || error === "trial_used") && (
+            <div className="mt-4">
+              <UnlockButton
+                token={token}
+                label={`Unlock for $${PRICE_MVP} & generate`}
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-md font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              />
+            </div>
+          )}
         </div>
       )}
 
