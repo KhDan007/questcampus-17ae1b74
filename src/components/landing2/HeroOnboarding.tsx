@@ -85,7 +85,7 @@ export function HeroOnboarding() {
       </section>
 
       <div id="results" />
-      <ResultsReveal visible={done} />
+      <ResultsReveal visible={!!answers} answers={answers} />
     </>
   );
 }
