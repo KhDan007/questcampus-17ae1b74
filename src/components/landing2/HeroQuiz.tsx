@@ -10,7 +10,31 @@ export type QuizAnswers = {
   interests: string;
   budget: string;
   country: string;
+  countries?: string[];
 };
+
+const COUNTRY_OPTIONS = [
+  { value: "US", label: "United States" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Canada", label: "Canada" },
+  { value: "Australia", label: "Australia" },
+  { value: "Germany", label: "Germany" },
+  { value: "France", label: "France" },
+  { value: "Netherlands", label: "Netherlands" },
+  { value: "Ireland", label: "Ireland" },
+  { value: "Switzerland", label: "Switzerland" },
+  { value: "Sweden", label: "Sweden" },
+  { value: "Italy", label: "Italy" },
+  { value: "Spain", label: "Spain" },
+  { value: "Denmark", label: "Denmark" },
+  { value: "Finland", label: "Finland" },
+  { value: "Belgium", label: "Belgium" },
+  { value: "Austria", label: "Austria" },
+  { value: "Japan", label: "Japan" },
+  { value: "China", label: "China" },
+  { value: "Malaysia", label: "Malaysia" },
+  { value: "United Arab Emirates", label: "United Arab Emirates" },
+];
 
 const QUESTIONS: {
   key: keyof QuizAnswers;
@@ -67,10 +91,10 @@ const QUESTIONS: {
     prompt: "Where do you call home?",
     helper: "Affects visa, fees, and country quotas.",
     options: [
-      { value: "us", label: "United States" },
-      { value: "intl-en", label: "International (English-speaking)" },
-      { value: "intl-eu", label: "International (Europe)" },
-      { value: "intl-other", label: "International (other region)" },
+      { value: "us", label: "United States", sub: "US schools only" },
+      { value: "intl-en", label: "English-speaking", sub: "UK, Canada, Australia, Ireland" },
+      { value: "intl-eu", label: "Europe", sub: "Top European universities" },
+      { value: "custom", label: "Pick specific countries", sub: "Choose your own list" },
     ],
   },
 ];
@@ -84,7 +108,22 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const isLast = step === total - 1;
   const progress = useMemo(() => ((step + 1) / total) * 100, [step, total]);
 
+  const isCountryStep = q.key === "country";
+  const countryChoice = answers.country;
+  const selectedCountries = answers.countries ?? [];
+  const customSelected = isCountryStep && countryChoice === "custom";
+
   function choose(value: string) {
+    if (q.key === "country") {
+      if (value === "custom") {
+        setAnswers((a) => ({ ...a, country: "custom" }));
+        return;
+      }
+      const next = { ...answers, country: value, countries: undefined } as Partial<QuizAnswers>;
+      setAnswers(next);
+      onComplete(next as QuizAnswers);
+      return;
+    }
     const next = { ...answers, [q.key]: value } as Partial<QuizAnswers>;
     setAnswers(next);
     if (isLast) {
@@ -94,11 +133,19 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
     }
   }
 
+  function toggleCountry(value: string) {
+    setAnswers((a) => {
+      const cur = a.countries ?? [];
+      const next = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
+      return { ...a, country: "custom", countries: next };
+    });
+  }
+
+  const canSubmitCustom = customSelected && selectedCountries.length > 0;
+
   return (
     <div className="relative w-full max-w-[640px]">
-      {/* Glass card */}
       <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest/85 p-5 sm:p-8 qc-hard-shadow-primary backdrop-blur-xl">
-        {/* progress */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2 font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
@@ -138,7 +185,8 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
 
             <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {q.options.map((opt) => {
-                const selected = answers[q.key] === opt.value;
+                const selected =
+                  isCountryStep ? countryChoice === opt.value : answers[q.key] === opt.value;
                 return (
                   <button
                     key={opt.value}
@@ -172,7 +220,41 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
               })}
             </div>
 
-            {isLast && answers[q.key] && (
+            {customSelected && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6"
+              >
+                <div className="max-h-[260px] overflow-y-auto rounded-lg border-2 border-on-surface/15 bg-surface-container-low p-3">
+                  <div className="flex flex-wrap gap-2">
+                    {COUNTRY_OPTIONS.map((c) => {
+                      const sel = selectedCountries.includes(c.value);
+                      return (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => toggleCountry(c.value)}
+                          className={`inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-label-sm font-semibold transition-all ${
+                            sel
+                              ? "border-primary bg-primary-fixed text-on-primary-fixed"
+                              : "border-on-surface/15 bg-surface-container-lowest text-on-surface hover:border-on-surface hover:-translate-y-0.5"
+                          }`}
+                        >
+                          {sel && <Check className="h-3 w-3" />}
+                          {c.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <p className="mt-2 text-label-sm text-on-surface-variant">
+                  Pick one or more — we'll match only within these countries.
+                </p>
+              </motion.div>
+            )}
+
+            {isLast && canSubmitCustom && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -180,7 +262,13 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
               >
                 <button
                   type="button"
-                  onClick={() => onComplete(answers as QuizAnswers)}
+                  onClick={() =>
+                    onComplete({
+                      ...(answers as QuizAnswers),
+                      country: "custom",
+                      countries: selectedCountries,
+                    })
+                  }
                   className="group inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-4 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
                 >
                   Show me my matches
