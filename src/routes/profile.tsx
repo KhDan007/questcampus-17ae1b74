@@ -9,7 +9,8 @@ import { CHAPTERS, STEPS, getStep, type ChapterId } from "@/lib/onboarding/steps
 import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
-import { NavBar } from "@/components/landing/NavBar";
+import { NavV2 } from "@/components/landing2/NavV2";
+import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { auth } from "@/lib/auth/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
