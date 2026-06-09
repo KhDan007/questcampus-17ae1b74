@@ -245,12 +245,27 @@ function ProfilePage() {
               body="Save your favourite schools side-by-side with deadlines and costs."
               onClick={() => setWaitlistOpen(true)}
             />
-            <UpcomingTile
-              Icon={Sparkles}
-              title="Refined recommendations"
-              body="Answer a few more questions and we'll re-rank your matches with more precision."
-              onClick={() => setWaitlistOpen(true)}
-            />
+            <Link
+              to={isAuthenticated ? "/onboarding" : "/signin"}
+              search={isAuthenticated ? undefined : ({ redirect: "/onboarding" } as never)}
+              className="group flex w-full items-start gap-4 rounded-2xl border-2 border-on-surface bg-primary p-5 text-left text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[5px_5px_0_0_var(--color-on-surface)]"
+            >
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-white text-primary">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-display text-headline-sm font-bold">Refined recommendations</h3>
+                  <span className="rounded-full bg-white px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-primary">
+                    Live
+                  </span>
+                </div>
+                <p className="mt-1 text-body-md text-white/85">
+                  Answer a few more questions and we'll re-rank your matches with much more precision.
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
         </section>
 

@@ -9,11 +9,14 @@ import { EnrichmentDetails } from "./EnrichmentDetails";
 // Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
   _id?: string;
+  id?: string;            // preferred handle for enrichOnOpen({ id })
+  source?: string;        // "scorecard" | "directory"
   externalId: string;
   name: string;
   city?: string;
   state?: string;
   country: string;
+  region?: string;
   website?: string;
   acceptanceRate?: number;
   satAvg?: number;
@@ -22,6 +25,13 @@ export type RecCard = {
   tuitionOutState?: number;
   pellRate?: number;
   sizeBucket?: string;
+  fields?: string[];
+  globalRank?: number;
+  languageOfInstruction?: string[];
+  intlTuition?: number;
+  intlTuitionCurrency?: string;
+  ieltsOverall?: number;
+  toeflIbt?: number;
   bucket: "safety" | "target" | "reach";
   score: number;
   why: string;
@@ -160,7 +170,7 @@ export function UniversityCard({
 
       {open && !locked && (
         <EnrichmentDetails
-          schoolId={card._id}
+          schoolId={card.id ?? card._id}
           externalId={card.externalId}
           website={card.website}
         />

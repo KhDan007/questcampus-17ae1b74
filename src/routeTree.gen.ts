@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
@@ -27,6 +28,11 @@ const SigninRoute = SigninRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EssayRoute = EssayRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
+  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
+  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
+  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
+    | '/onboarding'
     | '/profile'
     | '/signin'
     | '/unlock/cancel'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
+    | '/onboarding'
     | '/profile'
     | '/signin'
     | '/unlock/cancel'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
+    | '/onboarding'
     | '/profile'
     | '/signin'
     | '/unlock/cancel'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   BlankRoute: typeof BlankRoute
   DashboardRoute: typeof DashboardRoute
   EssayRoute: typeof EssayRoute
+  OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/essay': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlankRoute: BlankRoute,
   DashboardRoute: DashboardRoute,
   EssayRoute: EssayRoute,
+  OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
   UnlockCancelRoute: UnlockCancelRoute,
