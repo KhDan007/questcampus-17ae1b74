@@ -289,18 +289,13 @@ function DashboardPage() {
         )}
       </main>
 
-      <AnimatePresence>
-        {modal && (
-          <ComingSoonModal
-            title={modal.title}
-            onClose={() => setModal(null)}
-            onJoin={() => {
-              setModal(null);
-              navigate({ to: "/waitlist" });
-            }}
-          />
-        )}
-      </AnimatePresence>
+      <WaitlistPopup
+        open={!!modal}
+        onClose={() => setModal(null)}
+        title={modal ? `${modal.title} — coming soon` : "Coming soon"}
+        body="Join the waitlist to be first in line and lock in 30% off for life."
+        feature={modal?.title}
+      />
     </>
   );
 }
