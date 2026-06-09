@@ -624,6 +624,7 @@ function QuestionsForm({
   canSubmit,
   loading,
   error,
+  token,
 }: {
   answers: AnswerMap;
   setAnswers: (next: AnswerMap | ((prev: AnswerMap) => AnswerMap)) => void;
@@ -632,6 +633,7 @@ function QuestionsForm({
   canSubmit: boolean;
   loading: boolean;
   error: EssayError["error"] | null;
+  token: string | undefined;
 }) {
   const setField = (key: string, patch: Partial<AnswerVal>) =>
     setAnswers((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
