@@ -228,12 +228,25 @@ function EssayPage() {
           | { error: string; results?: never[] };
         if (cancelled) return;
         if ("error" in res && res.error) {
-          setMatchesErr(true);
+          // Fall back to whatever was saved on the landing quiz.
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb);
+          if (fb.length === 0) setMatchesErr(true);
           return;
         }
-        setMatches((res as FreeRec).results ?? []);
+        const list = (res as FreeRec).results ?? [];
+        if (list.length === 0) {
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb.length > 0 ? fb : []);
+          return;
+        }
+        setMatches(list);
       } catch {
-        if (!cancelled) setMatchesErr(true);
+        if (!cancelled) {
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb);
+          if (fb.length === 0) setMatchesErr(true);
+        }
       }
     })();
     return () => {
