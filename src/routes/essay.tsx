@@ -75,7 +75,7 @@ const QUESTIONS: EssayQ[] = [
     key: "whyField",
     label:
       "When did you first get pulled toward what you want to study? Describe the actual moment, not the subject.",
-    required: true,
+    optional: true,
     primes: [
       { value: "building", label: "Building / making things", seed: "Building / making things — " },
       { value: "people", label: "Working with people", seed: "Working with people — " },
@@ -85,13 +85,13 @@ const QUESTIONS: EssayQ[] = [
     textPlaceholder: "I realized I liked …",
     microcopy:
       "We never invent facts — anything you don\u2019t tell us shows up as a [fill-this-in] marker.",
-    minChars: 60,
+    minChars: 40,
   },
   {
     key: "turningPoint",
     label:
       "A real difficulty, failure, or change you went through — and what you actually did, step by step.",
-    required: true,
+    optional: true,
     primes: [
       { value: "failure", label: "a thing that failed first", seed: "My first attempt failed because " },
       { value: "family", label: "a family situation", seed: "At home, " },
@@ -101,7 +101,7 @@ const QUESTIONS: EssayQ[] = [
     ],
     textPlaceholder: "What I actually did, step by step…",
     microcopy: "Concrete actions, not feelings. What did you try first? What changed?",
-    minChars: 80,
+    minChars: 50,
   },
   {
     key: "signatureThing",
