@@ -97,7 +97,7 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   return (
     <div className="relative w-full max-w-[640px]">
       {/* Glass card */}
-      <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest/85 p-6 sm:p-8 qc-hard-shadow-primary backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest/85 p-5 sm:p-8 qc-hard-shadow-primary backdrop-blur-xl">
         {/* progress */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2 font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
