@@ -244,7 +244,26 @@ function EssayPage() {
   // ---- Form state
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
-  const [answers, setAnswers] = useState<AnswerMap>({});
+  const [answers, setAnswers] = useState<AnswerMap>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem("qc.essay.answers");
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? (parsed as AnswerMap) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("qc.essay.answers", JSON.stringify(answers));
+    } catch {
+      /* quota: ignore */
+    }
+  }, [answers]);
 
   // ---- Generation
   const generate = useAction(api.essays.generate);
