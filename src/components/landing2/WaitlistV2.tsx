@@ -109,7 +109,7 @@ export function WaitlistV2() {
                   </div>
                   <p className="text-headline-sm text-on-surface">You're on the list.</p>
                   <p className="mt-1 text-body-md text-on-surface-variant">
-                    Redirecting you to confirm your spot…
+                    We'll email you the moment each feature ships — 30% off locked in.
                   </p>
                 </motion.div>
               )}
