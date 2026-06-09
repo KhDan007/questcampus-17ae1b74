@@ -9,10 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
@@ -21,11 +19,6 @@ import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
 import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 
-const WaitlistRoute = WaitlistRouteImport.update({
-  id: '/waitlist',
-  path: '/waitlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
@@ -34,11 +27,6 @@ const SigninRoute = SigninRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EssayRoute = EssayRouteImport.update({
@@ -82,10 +70,8 @@ export interface FileRoutesByFullPath {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
-  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
-  '/waitlist': typeof WaitlistRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
@@ -95,10 +81,8 @@ export interface FileRoutesByTo {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
-  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
-  '/waitlist': typeof WaitlistRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock': typeof UnlockIndexRoute
@@ -109,10 +93,8 @@ export interface FileRoutesById {
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
-  '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
-  '/waitlist': typeof WaitlistRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
@@ -124,10 +106,8 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
-    | '/onboarding'
     | '/profile'
     | '/signin'
-    | '/waitlist'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
@@ -137,10 +117,8 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
-    | '/onboarding'
     | '/profile'
     | '/signin'
-    | '/waitlist'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock'
@@ -150,10 +128,8 @@ export interface FileRouteTypes {
     | '/blank'
     | '/dashboard'
     | '/essay'
-    | '/onboarding'
     | '/profile'
     | '/signin'
-    | '/waitlist'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
@@ -164,10 +140,8 @@ export interface RootRouteChildren {
   BlankRoute: typeof BlankRoute
   DashboardRoute: typeof DashboardRoute
   EssayRoute: typeof EssayRoute
-  OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
-  WaitlistRoute: typeof WaitlistRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
   UnlockIndexRoute: typeof UnlockIndexRoute
@@ -175,13 +149,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/waitlist': {
-      id: '/waitlist'
-      path: '/waitlist'
-      fullPath: '/waitlist'
-      preLoaderRoute: typeof WaitlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signin': {
       id: '/signin'
       path: '/signin'
@@ -194,13 +161,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/essay': {
@@ -260,10 +220,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlankRoute: BlankRoute,
   DashboardRoute: DashboardRoute,
   EssayRoute: EssayRoute,
-  OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
-  WaitlistRoute: WaitlistRoute,
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,
   UnlockIndexRoute: UnlockIndexRoute,

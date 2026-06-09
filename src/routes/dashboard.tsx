@@ -1,22 +1,21 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   Award,
   GraduationCap,
   ArrowRight,
-  X,
   PenLine,
   CalendarClock,
   Send,
   TrendingUp,
-  Mail,
   Lock,
   Compass,
 } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
+import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/dashboard")({
@@ -89,7 +88,7 @@ function loadSaved(): SavedPayload | null {
 
 function DashboardPage() {
   const reduce = useReducedMotion();
-  const navigate = useNavigate();
+  
   const { user, isAuthenticated } = useAuth();
   const [saved, setSaved] = useState<SavedPayload | null>(null);
   const [modal, setModal] = useState<null | { title: string }>(null);
@@ -289,18 +288,13 @@ function DashboardPage() {
         )}
       </main>
 
-      <AnimatePresence>
-        {modal && (
-          <ComingSoonModal
-            title={modal.title}
-            onClose={() => setModal(null)}
-            onJoin={() => {
-              setModal(null);
-              navigate({ to: "/waitlist" });
-            }}
-          />
-        )}
-      </AnimatePresence>
+      <WaitlistPopup
+        open={!!modal}
+        onClose={() => setModal(null)}
+        title={modal ? `${modal.title} — coming soon` : "Coming soon"}
+        body="Join the waitlist to be first in line and lock in 30% off for life."
+        feature={modal?.title}
+      />
     </>
   );
 }
@@ -387,77 +381,5 @@ function ToolTile({
   );
 }
 
-function ComingSoonModal({
-  title,
-  onClose,
-  onJoin,
-}: {
-  title: string;
-  onClose: () => void;
-  onJoin: () => void;
-}) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+// (ComingSoonModal removed — replaced by WaitlistPopup.)
 
-  return (
-    <motion.div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cs-title"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 12, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 8, scale: 0.98 }}
-        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-[380px] rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-on-surface/10 hover:text-on-surface"
-        >
-          <X className="h-4 w-4" />
-        </button>
-        <div className="grid h-11 w-11 place-items-center rounded-full bg-primary text-white">
-          <Mail className="h-5 w-5" />
-        </div>
-        <h3 id="cs-title" className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-          {title} — coming soon
-        </h3>
-        <p className="mt-2 text-body-md text-on-surface-variant">
-          Join the waitlist to be first in line and lock in 30% off for life.
-        </p>
-        <div className="mt-5 flex gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            Not now
-          </button>
-          <button
-            type="button"
-            onClick={onJoin}
-            className="flex-1 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            Join waitlist
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// Silence unused export warnings.
