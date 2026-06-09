@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck, Bookmark } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { NavBar } from "@/components/landing/NavBar";
+import { LivingBackground } from "@/components/landing2/LivingBackground";
+import { NavV2 } from "@/components/landing2/NavV2";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
