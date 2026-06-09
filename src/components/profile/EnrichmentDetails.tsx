@@ -38,6 +38,12 @@ type EnrichResult = {
     sourceUrl: string;
     category?: "admission" | "other";
   }>;
+  insights?: Array<{
+    category: "academic" | "campus" | "requirements";
+    text: string;
+    sourceUrl: string;
+  }>;
+  website?: string;
 };
 
 export function EnrichmentDetails({
@@ -201,6 +207,30 @@ export function EnrichmentDetails({
           </ul>
         )}
       </div>
+
+      {data.insights && data.insights.length > 0 && (
+        <div>
+          <div className="text-label-sm text-on-surface-variant">More from the official site</div>
+          <ul className="mt-1 space-y-1.5">
+            {data.insights.map((it, i) => (
+              <li key={i} className="text-body-sm text-on-surface">
+                <span className="mr-1.5 inline-flex items-center rounded-full bg-secondary-container/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-secondary-container">
+                  {it.category}
+                </span>
+                {it.text}{" "}
+                <a
+                  href={it.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-label-sm text-primary underline underline-offset-2"
+                >
+                  {t("enrich.source")}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
