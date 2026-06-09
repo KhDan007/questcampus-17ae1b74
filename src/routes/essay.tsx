@@ -642,18 +642,33 @@ function QuestionsForm({
       <div className="mt-8 grid gap-7">
         {QUESTIONS.map((q) => {
           const v = answers[q.key] ?? {};
+          const text = v.text ?? "";
+          const isStory = !!q.primes;
+          const isChoiceOnly = !!q.choices && !q.primes && !q.shortText;
+          const charCount = text.trim().length;
+          const goodLength = q.minChars ? charCount >= Math.min(120, q.minChars + 40) : false;
           return (
             <div key={q.key}>
-              <label className="block font-display text-label-lg font-bold text-on-surface">
-                {q.label}
-              </label>
-              {q.helper && (
-                <p className="mt-1 text-body-sm text-on-surface-variant">{q.helper}</p>
-              )}
+              <div className="flex items-baseline gap-2">
+                <label className="block font-display text-label-lg font-bold text-on-surface">
+                  {q.label}
+                </label>
+                {q.required && (
+                  <span className="font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                    Required
+                  </span>
+                )}
+                {q.optional && (
+                  <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                    Optional
+                  </span>
+                )}
+              </div>
 
-              {q.choices && (
+              {/* Choice-only field (voice) */}
+              {isChoiceOnly && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {q.choices.map((c) => {
+                  {q.choices!.map((c) => {
                     const active = v.choice === c.value;
                     return (
                       <button
@@ -676,14 +691,57 @@ function QuestionsForm({
                 </div>
               )}
 
-              {q.hasText && (
-                <textarea
-                  value={v.text ?? ""}
+              {/* Story field: chips seed the textarea, are NOT the saved answer. */}
+              {isStory && (
+                <>
+                  <p className="mt-2 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                    Tap an angle to start — then rewrite in your own words.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {q.primes!.map((p) => (
+                      <button
+                        key={p.value}
+                        type="button"
+                        onClick={() => {
+                          // Seed only if the textarea is empty — never overwrite real writing.
+                          if (!text.trim()) setField(q.key, { text: p.seed });
+                        }}
+                        className="rounded-full border-2 border-on-surface/40 bg-surface/80 px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface transition-all hover:-translate-y-0.5 hover:border-on-surface hover:bg-secondary-container"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={text}
+                    onChange={(e) => setField(q.key, { text: e.target.value })}
+                    rows={4}
+                    placeholder={q.textPlaceholder}
+                    maxLength={800}
+                    className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                  />
+                  <div className="mt-1.5 flex items-start justify-between gap-3">
+                    <p className="text-label-sm text-on-surface-variant">
+                      {goodLength
+                        ? "Nice — that\u2019s exactly the kind of detail that works."
+                        : (q.microcopy ?? "A sentence or two is plenty.")}
+                    </p>
+                    <span className="shrink-0 font-[var(--font-label)] text-label-sm text-on-surface/50">
+                      {charCount}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* Short text (optional) */}
+              {q.shortText && (
+                <input
+                  type="text"
+                  value={text}
                   onChange={(e) => setField(q.key, { text: e.target.value })}
-                  rows={2}
                   placeholder={q.textPlaceholder}
-                  maxLength={400}
-                  className="mt-3 w-full resize-none rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                  maxLength={220}
+                  className="mt-3 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
                 />
               )}
             </div>
