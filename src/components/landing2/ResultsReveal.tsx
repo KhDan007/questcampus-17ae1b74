@@ -2,7 +2,8 @@
 
 import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Award, GraduationCap, AlertCircle } from "lucide-react";
+import { Sparkles, Award, GraduationCap, AlertCircle, LayoutDashboard, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth/useAuth";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -401,6 +402,8 @@ function MatchScore({ value, delay }: { value: number; delay: number }) {
 }
 
 function UnlockOverlay() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -409,40 +412,79 @@ function UnlockOverlay() {
       className="absolute inset-0 flex items-center justify-center px-4"
     >
       <div className="relative w-full max-w-[520px] overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-6 text-center qc-hard-shadow-primary backdrop-blur-xl sm:p-8">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <h3 className="text-headline-md text-on-surface">
-          Create a free account to see all your matches
-        </h3>
-        <p className="mt-2 text-body-md text-on-surface-variant">
-          You already have 3 personalized matches. Sign up to unlock the full list.
-        </p>
+        {isAuthenticated ? (
+          <>
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
+              <LayoutDashboard className="h-5 w-5" />
+            </div>
+            <h3 className="text-headline-md text-on-surface">
+              Unlock the rest of your matches
+            </h3>
+            <p className="mt-2 text-body-md text-on-surface-variant">
+              Your top 3 matches are saved. Head to your dashboard to see the full list, write your personal statement, and more.
+            </p>
 
-        <ul className="mt-5 space-y-2 text-left">
-          <li className="flex items-start gap-2 text-body-sm text-on-surface">
-            <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span>20+ ranked Safety, Target & Reach universities</span>
-          </li>
-          <li className="flex items-start gap-2 text-body-sm text-on-surface">
-            <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span>Scholarship paths and application deadlines</span>
-          </li>
-          <li className="flex items-start gap-2 text-body-sm text-on-surface">
-            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span>Save your matches and compare anytime</span>
-          </li>
-        </ul>
+            <ul className="mt-5 space-y-2 text-left">
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>20+ ranked Safety, Target & Reach universities</span>
+              </li>
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>Personal statement assistant — grounded in your real profile</span>
+              </li>
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>Scholarship paths and application deadlines</span>
+              </li>
+            </ul>
 
-        <a
-          href="/signin?mode=signup"
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
-        >
-          Create free account
-        </a>
-        <p className="mt-3 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-          Takes 30 seconds. No credit card required.
-        </p>
+            <a
+              href="/dashboard"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
+            >
+              Go to dashboard
+              <ArrowRight className="h-5 w-5" />
+            </a>
+          </>
+        ) : (
+          <>
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <h3 className="text-headline-md text-on-surface">
+              Create a free account to see all your matches
+            </h3>
+            <p className="mt-2 text-body-md text-on-surface-variant">
+              You already have 3 personalized matches. Sign up to unlock the full list.
+            </p>
+
+            <ul className="mt-5 space-y-2 text-left">
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>20+ ranked Safety, Target & Reach universities</span>
+              </li>
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>Scholarship paths and application deadlines</span>
+              </li>
+              <li className="flex items-start gap-2 text-body-sm text-on-surface">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>Save your matches and compare anytime</span>
+              </li>
+            </ul>
+
+            <a
+              href="/signin?mode=signup"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
+            >
+              Create free account
+            </a>
+            <p className="mt-3 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              Takes 30 seconds. No credit card required.
+            </p>
+          </>
+        )}
       </div>
     </motion.div>
   );
