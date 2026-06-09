@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import logoAsset from "@/assets/questcampus-logo.png.asset.json";
+import { ProfileMenu } from "./ProfileMenu";
 
 export function NavV2() {
   const reduce = useReducedMotion();
