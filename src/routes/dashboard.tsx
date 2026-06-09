@@ -228,7 +228,7 @@ function DashboardPage() {
                 key={t.key}
                 title={t.title}
                 desc={t.desc}
-                price={t.price}
+                
                 Icon={t.icon}
                 delay={i * 0.05}
                 onClick={() => setModal({ title: t.title })}
