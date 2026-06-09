@@ -69,13 +69,13 @@ const QUESTIONS: EssayQ[] = [
     textPlaceholder: "The first time I…",
     microcopy:
       "Name the real thing. \u201cMy grandmother\u2019s stuck metronome\u201d beats \u201ca musical experience.\u201d",
-    minChars: 80,
+    minChars: 50,
   },
   {
     key: "whyField",
     label:
       "When did you first get pulled toward what you want to study? Describe the actual moment, not the subject.",
-    required: true,
+    optional: true,
     primes: [
       { value: "building", label: "Building / making things", seed: "Building / making things — " },
       { value: "people", label: "Working with people", seed: "Working with people — " },
@@ -85,13 +85,13 @@ const QUESTIONS: EssayQ[] = [
     textPlaceholder: "I realized I liked …",
     microcopy:
       "We never invent facts — anything you don\u2019t tell us shows up as a [fill-this-in] marker.",
-    minChars: 60,
+    minChars: 40,
   },
   {
     key: "turningPoint",
     label:
       "A real difficulty, failure, or change you went through — and what you actually did, step by step.",
-    required: true,
+    optional: true,
     primes: [
       { value: "failure", label: "a thing that failed first", seed: "My first attempt failed because " },
       { value: "family", label: "a family situation", seed: "At home, " },
@@ -101,7 +101,7 @@ const QUESTIONS: EssayQ[] = [
     ],
     textPlaceholder: "What I actually did, step by step…",
     microcopy: "Concrete actions, not feelings. What did you try first? What changed?",
-    minChars: 80,
+    minChars: 50,
   },
   {
     key: "signatureThing",
@@ -193,6 +193,33 @@ type EssayError = { error: "not_logged_in" | "no_profile" | "trial_used" | "gene
 
 type FreeRec = { plan: "free"; results: RecCard[] };
 
+// Pull landing-quiz matches stashed in localStorage and shape them as RecCards
+// so the target picker has *something* to show even if the backend list is empty.
+function readLandingMatchesAsRecCards(): RecCard[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem("qc.landing.matches");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as { matches?: { name: string; location?: string }[] };
+    const list = parsed?.matches ?? [];
+    return list.map((m, i) => {
+      const [city, state, country] = (m.location ?? "").split(",").map((s) => s.trim());
+      return {
+        externalId: `local-${i}-${m.name}`,
+        name: m.name,
+        city: city || undefined,
+        state: state || undefined,
+        country: country || state || city || "",
+        bucket: "target" as const,
+        score: 0.7,
+        why: "",
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -228,12 +255,25 @@ function EssayPage() {
           | { error: string; results?: never[] };
         if (cancelled) return;
         if ("error" in res && res.error) {
-          setMatchesErr(true);
+          // Fall back to whatever was saved on the landing quiz.
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb);
+          if (fb.length === 0) setMatchesErr(true);
           return;
         }
-        setMatches((res as FreeRec).results ?? []);
+        const list = (res as FreeRec).results ?? [];
+        if (list.length === 0) {
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb.length > 0 ? fb : []);
+          return;
+        }
+        setMatches(list);
       } catch {
-        if (!cancelled) setMatchesErr(true);
+        if (!cancelled) {
+          const fb = readLandingMatchesAsRecCards();
+          setMatches(fb);
+          if (fb.length === 0) setMatchesErr(true);
+        }
       }
     })();
     return () => {
@@ -319,13 +359,9 @@ function EssayPage() {
   }, [sessionId, token, generate, answers, target]);
 
   const canSubmitQuestions = useMemo(() => {
-    // Require all ⭐ story questions to have meaningful free-text.
-    for (const q of QUESTIONS) {
-      if (!q.required) continue;
-      const t = answers[q.key]?.text?.trim() ?? "";
-      if (t.length < 20) return false;
-    }
-    return true;
+    // Only the anchor story is required; everything else is optional.
+    const anchor = answers["anchorStory"]?.text?.trim() ?? "";
+    return anchor.length >= 20;
   }, [answers]);
 
   // Past essays list (logged-in)
@@ -616,6 +652,27 @@ function TargetPicker({
         </p>
       )}
 
+      {/* Free-text fallback — type any school name. */}
+      <div className="mt-4 rounded-xl border-2 border-on-surface/30 bg-surface/80 p-4">
+        <label className="block font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+          Or type a school name
+        </label>
+        <p className="mt-0.5 text-label-sm text-on-surface-variant">
+          Anything works — we'll tune the essay around it.
+        </p>
+        <input
+          type="text"
+          value={value?.externalId ? "" : value && value.name !== "No specific school" ? value.name : ""}
+          onChange={(e) => {
+            const name = e.target.value;
+            if (!name.trim()) onChange(null);
+            else onChange({ name });
+          }}
+          placeholder="e.g. Northwestern University"
+          className="mt-2 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+        />
+      </div>
+
       <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <button
           type="button"
@@ -829,7 +886,7 @@ function QuestionsForm({
       </div>
       {!canSubmit && (
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          Fill in the three required story questions (a sentence or two each) to generate.
+          Write at least a sentence or two for the anchor story to generate. The rest is optional — but more detail makes a better essay.
         </p>
       )}
     </div>
