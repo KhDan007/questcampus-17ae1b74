@@ -22,9 +22,9 @@ export function WaitlistV2() {
   }
 
   return (
-    <section id="waitlist" className="relative px-5 py-24 sm:px-8 sm:py-32">
+    <section id="waitlist" className="relative px-4 py-20 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-(--container-content)">
-        <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest p-8 qc-hard-shadow-primary sm:p-14">
+        <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow-primary sm:p-14">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
             <div
               className="animate-aurora-1 absolute -left-20 -top-20 h-[50vh] w-[50vh] rounded-full blur-[120px]"
@@ -41,9 +41,8 @@ export function WaitlistV2() {
               <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
                 Founding access
               </p>
-              <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
-                Be first when the rest of <br />
-                QuestCampus opens.
+              <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
+                Be first when the rest of QuestCampus opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
                 Essay Assistant, Application Tracker, Auto-Apply — waitlist members get
@@ -62,7 +61,7 @@ export function WaitlistV2() {
 
             <form
               onSubmit={onSubmit}
-              className="relative rounded-lg border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+              className="relative rounded-lg border-2 border-on-surface bg-surface p-5 sm:p-6 qc-hard-shadow"
             >
               {!done ? (
                 <>
@@ -143,7 +142,7 @@ function AnimatedCounter({ target }: { target: number }) {
   return (
     <span
       ref={ref}
-      className="font-display text-display-lg font-bold text-primary tabular-nums"
+      className="font-display text-display-lg-mobile sm:text-display-lg font-bold text-primary tabular-nums"
     >
       {n.toLocaleString("en-US")}+
     </span>
