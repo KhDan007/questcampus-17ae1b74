@@ -825,7 +825,7 @@ function QuestionsForm({
       </div>
       {!canSubmit && (
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          Fill in the three required story questions (a sentence or two each) to generate.
+          Write at least a sentence or two for the anchor story to generate. The rest is optional — but more detail makes a better essay.
         </p>
       )}
     </div>
