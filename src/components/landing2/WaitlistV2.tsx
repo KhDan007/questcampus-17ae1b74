@@ -142,7 +142,7 @@ function AnimatedCounter({ target }: { target: number }) {
   return (
     <span
       ref={ref}
-      className="font-display text-display-lg font-bold text-primary tabular-nums"
+      className="font-display text-display-lg-mobile sm:text-display-lg font-bold text-primary tabular-nums"
     >
       {n.toLocaleString("en-US")}+
     </span>
