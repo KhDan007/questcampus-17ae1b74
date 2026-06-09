@@ -7,6 +7,9 @@ import yale from "./yale.png.asset.json";
 import princeton from "./princeton.png.asset.json";
 import nyu from "./nyu.png.asset.json";
 import columbia from "./columbia.png.asset.json";
+import imperial from "./imperial.webp.asset.json";
+import berkeley from "./berkeley.svg.asset.json";
+import eth from "./eth.png.asset.json";
 
 export const UNI_LOGOS: Record<string, string> = {
   Harvard: harvard.url,
@@ -18,4 +21,8 @@ export const UNI_LOGOS: Record<string, string> = {
   Princeton: princeton.url,
   NYU: nyu.url,
   Columbia: columbia.url,
+  Imperial: imperial.url,
+  "UC Berkeley": berkeley.url,
+  "ETH Zürich": eth.url,
 };
+
