@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useAction } from "convex/react";
 import {
   Sparkles,
   Award,
@@ -12,14 +13,21 @@ import {
   TrendingUp,
   Lock,
   Compass,
+  Loader2,
 } from "lucide-react";
+import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
+import { getSessionId } from "@/lib/onboarding/session";
+import type { RecCard } from "@/components/profile/UniversityCard";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
+  validateSearch: (s: Record<string, unknown>): { refresh?: number } => ({
+    refresh: typeof s.refresh === "string" ? Number(s.refresh) || undefined : (s.refresh as number | undefined),
+  }),
   component: DashboardPage,
 });
 
@@ -86,21 +94,92 @@ function loadSaved(): SavedPayload | null {
   }
 }
 
+function bucketCap(b: RecCard["bucket"]): Bucket {
+  return (b.charAt(0).toUpperCase() + b.slice(1)) as Bucket;
+}
+
+function recsToSaved(recs: RecCard[]): SavedPayload {
+  return {
+    at: Date.now(),
+    matches: recs.map((r) => ({
+      name: r.name,
+      location: [r.city, r.state, r.country].filter(Boolean).join(", "),
+      match: Math.round((r.score ?? 0.7) * 100),
+      bucket: bucketCap(r.bucket),
+      why: r.why || "",
+      tag: r.fields?.[0] ?? r.region ?? r.country ?? "",
+    })),
+  };
+}
+
 function DashboardPage() {
   const reduce = useReducedMotion();
-  
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
+  const { refresh } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [saved, setSaved] = useState<SavedPayload | null>(null);
+  const [serverStatus, setServerStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [modal, setModal] = useState<null | { title: string }>(null);
+  const [justRefreshed, setJustRefreshed] = useState(false);
+
+  const recommend = useAction(api.rag.recommend.recommend);
 
   useEffect(() => {
+    setSessionId(getSessionId());
     setSaved(loadSaved());
   }, []);
+
+  // For signed-in users, always pull server-side matches; force when ?refresh=1.
+  useEffect(() => {
+    if (!sessionId) return;
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    setServerStatus("loading");
+    const force = refresh === 1;
+    (async () => {
+      try {
+        const res = (await recommend({
+          sessionId,
+          token: token ?? undefined,
+          plan: "free",
+          force,
+        })) as { results?: RecCard[]; error?: string };
+        if (cancelled) return;
+        if (res?.error || !res?.results) {
+          setServerStatus("error");
+          return;
+        }
+        const payload = recsToSaved(res.results);
+        setSaved(payload);
+        try {
+          window.localStorage.setItem("qc.landing.matches", JSON.stringify(payload));
+        } catch {}
+        setServerStatus("ready");
+        if (force) {
+          setJustRefreshed(true);
+          // Clear the ?refresh flag from the URL after a moment.
+          window.setTimeout(() => {
+            navigate({ search: {} as never, replace: true });
+          }, 100);
+          window.setTimeout(() => setJustRefreshed(false), 4500);
+        }
+      } catch {
+        if (!cancelled) setServerStatus("error");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, isAuthenticated, token, recommend, refresh, navigate]);
 
   const firstName = useMemo(() => {
     const n = user?.name?.trim();
     return n ? n.split(/\s+/)[0] : null;
   }, [user]);
+
+  const loading = isAuthenticated && serverStatus === "loading" && !saved;
 
   return (
     <>
@@ -110,6 +189,29 @@ function DashboardPage() {
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
       >
+        {/* Re-ranked celebration banner */}
+        <AnimatePresence>
+          {justRefreshed && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary px-5 py-4 text-white qc-hard-shadow"
+            >
+              <motion.span
+                animate={{ rotate: [0, 14, -8, 0] }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              >
+                <Sparkles className="h-5 w-5" />
+              </motion.span>
+              <p className="font-display text-label-lg font-bold">
+                Re-ranked with your new answers — here are your fresh matches.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Hero */}
         <motion.section
           initial={reduce ? false : { opacity: 0, y: 16 }}
@@ -125,7 +227,7 @@ function DashboardPage() {
             <span className="qc-text-gradient">Let's build your shortlist.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
-            Your matches from the quiz are saved here. Everything else is on the way —
+            Your matches are saved here. Everything else is on the way —
             and you'll get 30% off for life as a waitlist member.
           </p>
         </motion.section>
@@ -176,12 +278,14 @@ function DashboardPage() {
                 Your university matches
               </h2>
               <p className="mt-1 text-body-md text-on-surface-variant">
-                {saved
-                  ? `Saved from your quiz · ${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
-                  : "We'll save your quiz matches here automatically."}
+                {loading
+                  ? "Loading your matches…"
+                  : saved
+                    ? `${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
+                    : "We'll save your quiz matches here automatically."}
               </p>
             </div>
-            {!saved && (
+            {!saved && !loading && (
               <Link
                 to="/"
                 className="hidden shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
@@ -191,12 +295,33 @@ function DashboardPage() {
             )}
           </div>
 
-          {saved && saved.matches.length > 0 ? (
+          {loading ? (
             <div className="mt-6 grid gap-5 lg:grid-cols-3">
-              {saved.matches.map((m, i) => (
-                <MatchCard key={`${m.name}-${i}`} match={m} delay={i * 0.08} />
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-64 animate-pulse rounded-lg border-2 border-on-surface/20 bg-surface/60"
+                />
               ))}
+              <div className="col-span-full mt-2 flex items-center justify-center gap-2 text-body-sm text-on-surface-variant">
+                <Loader2 className="h-4 w-4 animate-spin" /> Re-ranking from your latest answers…
+              </div>
             </div>
+          ) : saved && saved.matches.length > 0 ? (
+            <motion.div
+              key={saved.at}
+              initial="hidden"
+              animate="show"
+              variants={{
+                hidden: {},
+                show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+              }}
+              className="mt-6 grid gap-5 lg:grid-cols-3"
+            >
+              {saved.matches.map((m, i) => (
+                <MatchCard key={`${saved.at}-${m.name}-${i}`} match={m} celebrate={justRefreshed} />
+              ))}
+            </motion.div>
           ) : (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
               <p className="text-body-lg text-on-surface-variant">
@@ -268,7 +393,6 @@ function DashboardPage() {
                 key={t.key}
                 title={t.title}
                 desc={t.desc}
-                
                 Icon={t.icon}
                 delay={i * 0.05}
                 onClick={() => setModal({ title: t.title })}
@@ -299,14 +423,21 @@ function DashboardPage() {
   );
 }
 
-function MatchCard({ match, delay = 0 }: { match: SavedMatch; delay?: number }) {
+function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?: boolean }) {
   const style = BUCKET_STYLES[match.bucket] ?? BUCKET_STYLES.Target;
   const Icon = style.icon;
   return (
     <motion.article
-      initial={{ opacity: 0, y: 24, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay }}
+      variants={{
+        hidden: { opacity: 0, y: 24, scale: 0.95, rotate: celebrate ? -1.5 : 0 },
+        show: {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+        },
+      }}
       whileHover={{ y: -4 }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
     >
@@ -321,15 +452,21 @@ function MatchCard({ match, delay = 0 }: { match: SavedMatch; delay?: number }) 
         </div>
       </div>
       <h3 className="mt-4 text-headline-sm text-on-surface">{match.name}</h3>
-      <p className="mt-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-        {match.location}
-      </p>
-      <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
-      <div className="mt-5 flex items-center gap-2 border-t border-on-surface/10 pt-4">
-        <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
-          {match.tag}
-        </span>
-      </div>
+      {match.location && (
+        <p className="mt-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+          {match.location}
+        </p>
+      )}
+      {match.why && (
+        <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
+      )}
+      {match.tag && (
+        <div className="mt-5 flex items-center gap-2 border-t border-on-surface/10 pt-4">
+          <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
+            {match.tag}
+          </span>
+        </div>
+      )}
     </motion.article>
   );
 }
@@ -380,6 +517,3 @@ function ToolTile({
     </motion.button>
   );
 }
-
-// (ComingSoonModal removed — replaced by WaitlistPopup.)
-
