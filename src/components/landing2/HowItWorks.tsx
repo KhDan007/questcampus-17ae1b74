@@ -23,7 +23,7 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how" className="relative px-5 py-24 sm:px-8 sm:py-32">
+    <section id="how" className="relative px-4 py-20 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-(--container-content)">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
