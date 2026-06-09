@@ -46,9 +46,11 @@ export function WaitlistV2() {
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
                 Essay Assistant, Application Tracker, Auto-Apply — waitlist members get
-                them first, at the founding price. The Essay Assistant is{" "}
-                <strong className="text-primary">free for life</strong> for everyone on
-                the list today.
+                them first with{" "}
+                <strong className="text-primary">30% off for life</strong>. The Essay
+                Assistant launches at{" "}
+                <strong className="text-on-surface">$5</strong> — waitlist price{" "}
+                <strong className="text-primary">$3.50</strong>.
               </p>
 
               <div className="mt-6 flex items-center gap-4">
