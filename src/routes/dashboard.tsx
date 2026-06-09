@@ -55,13 +55,6 @@ const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof
 
 const COMING_SOON = [
   {
-    key: "essay",
-    title: "Personal statement assistant",
-    desc: "Draft, refine, and polish essays with AI tuned to each university.",
-    icon: PenLine,
-    price: "$5 · 30% off waitlist",
-  },
-  {
     key: "tracker",
     title: "Deadline tracker",
     desc: "Every requirement, fee, and deadline auto-synced to your calendar.",
