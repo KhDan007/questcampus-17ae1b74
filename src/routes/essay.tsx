@@ -271,7 +271,7 @@ function EssayPage() {
   const [genError, setGenError] = useState<EssayError["error"] | null>(null);
   const [result, setResult] = useState<EssayResult | null>(null);
 
-  // Live entitlement — flips to paid:true after Stripe webhook lands.
+  // Live entitlement — flips to paid:true after payment webhook lands.
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
