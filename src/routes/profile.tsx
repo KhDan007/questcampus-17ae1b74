@@ -9,7 +9,8 @@ import { CHAPTERS, STEPS, getStep, type ChapterId } from "@/lib/onboarding/steps
 import { personalize } from "@/lib/onboarding/personalize";
 import type { Answers } from "@/lib/onboarding/types";
 import { RecommendationsSection } from "@/components/profile/RecommendationsSection";
-import { NavBar } from "@/components/landing/NavBar";
+import { NavV2 } from "@/components/landing2/NavV2";
+import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { auth } from "@/lib/auth/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -58,7 +59,7 @@ function ProfilePage() {
   if (!sessionId || convexProfile === undefined) {
     return (
       <>
-        <NavBar variant="minimal" />
+        <><LivingBackground /><NavV2 /></>
         <Splash />
       </>
     );
@@ -67,7 +68,7 @@ function ProfilePage() {
   if (!answers) {
     return (
       <>
-        <NavBar variant="minimal" />
+        <><LivingBackground /><NavV2 /></>
         <EmptyState />
       </>
     );
@@ -75,8 +76,8 @@ function ProfilePage() {
 
   return (
     <>
-      <NavBar variant="minimal" />
-      <div className="min-h-screen bg-surface">
+      <><LivingBackground /><NavV2 /></>
+      <div className="relative min-h-screen pt-20">
         <ProfileHero
           firstName={firstName}
           answers={answers}
@@ -173,7 +174,7 @@ function ProfileHero({
   const stageLabel = stage ? t(`profile.stage.${stage}`) : null;
 
   return (
-    <section className="relative isolate overflow-hidden bg-surface-container-low px-4 pb-14 pt-24 sm:px-8 sm:pt-32">
+    <section className="relative isolate overflow-hidden px-4 pb-14 pt-12 sm:px-8">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div
           className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]"

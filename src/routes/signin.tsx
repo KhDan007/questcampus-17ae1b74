@@ -50,9 +50,9 @@ function SignInPage() {
       window.localStorage.removeItem("qc_resume_step");
     }
     if (doc?.completed) {
-      navigate({ to: "/profile", replace: true });
+      navigate({ to: "/dashboard", replace: true });
     } else {
-      navigate({ to: "/onboarding", replace: true });
+      navigate({ to: "/dashboard", replace: true });
     }
   }
 

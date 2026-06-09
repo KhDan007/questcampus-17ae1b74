@@ -13,6 +13,7 @@ import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
@@ -37,6 +38,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlankRoute = BlankRouteImport.update({
@@ -68,6 +74,7 @@ const UnlockCancelRoute = UnlockCancelRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
+  '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
+  '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
+  '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/blank'
+    | '/dashboard'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/blank'
+    | '/dashboard'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/blank'
+    | '/dashboard'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlankRoute: typeof BlankRoute
+  DashboardRoute: typeof DashboardRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blank': {
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlankRoute: BlankRoute,
+  DashboardRoute: DashboardRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
