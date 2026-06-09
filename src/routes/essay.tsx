@@ -369,6 +369,10 @@ function EssayPage() {
                 value={target}
                 onChange={setTarget}
                 onNext={() => setStep("questions")}
+                onSkip={() => {
+                  setTarget({ name: "No specific school" });
+                  setStep("questions");
+                }}
               />
             </StepWrap>
           )}
@@ -383,6 +387,7 @@ function EssayPage() {
                 canSubmit={canSubmitQuestions && !!token}
                 loading={genStatus === "loading"}
                 error={genError}
+                token={token}
               />
             </StepWrap>
           )}
