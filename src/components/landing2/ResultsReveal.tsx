@@ -2,7 +2,8 @@
 
 import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Award, GraduationCap, AlertCircle } from "lucide-react";
+import { Sparkles, Award, GraduationCap, AlertCircle, LayoutDashboard, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth/useAuth";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useI18n } from "@/lib/i18n/I18nProvider";
