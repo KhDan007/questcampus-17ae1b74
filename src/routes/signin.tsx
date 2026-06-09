@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck, Bookmark } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { NavBar } from "@/components/landing/NavBar";
+import { LivingBackground } from "@/components/landing2/LivingBackground";
+import { NavV2 } from "@/components/landing2/NavV2";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -57,6 +58,7 @@ function SignInPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "signup") setMode("signup");
     const code = params.get("code");
     const state = params.get("state");
     const err = params.get("error");
@@ -127,19 +129,56 @@ function SignInPage() {
 
   return (
     <>
-      <NavBar variant="minimal" />
-      <main className="mx-auto flex min-h-screen max-w-[440px] flex-col justify-center px-6 pb-12 pt-24">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-        >
-          <h1 className="text-display-lg-mobile text-on-background">
-            {mode === "signin" ? t("signin.title.signin") : t("signin.title.signup")}
-          </h1>
-          <p className="mt-3 text-body-md text-on-surface-variant">
-            {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
-          </p>
+      <LivingBackground />
+      <NavV2 />
+      <main
+        id="main-content"
+        className="relative mx-auto flex min-h-screen w-full max-w-(--container-content) items-center justify-center px-5 pb-16 pt-28 sm:px-8 lg:px-12"
+      >
+        <div className="grid w-full gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+          {/* Brand / pitch column */}
+          <motion.aside
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="hidden lg:block"
+          >
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              QuestCampus account
+            </p>
+            <h2 className="mt-3 text-display-lg text-on-surface text-balance">
+              {mode === "signin" ? "Welcome back." : "One account.\nEvery match, saved."}
+            </h2>
+            <p className="mt-5 max-w-md text-body-lg text-on-surface-variant">
+              Pick up where you left off across devices, save universities you love,
+              and unlock waitlist pricing on everything coming next.
+            </p>
+            <ul className="mt-8 space-y-4">
+              <Perk icon={<Sparkles className="h-4 w-4" />} title="20+ ranked matches">
+                Safety, Target, and Reach universities tuned to your profile.
+              </Perk>
+              <Perk icon={<Bookmark className="h-4 w-4" />} title="Save & compare">
+                Bookmark schools, track deadlines, and never re-do your answers.
+              </Perk>
+              <Perk icon={<ShieldCheck className="h-4 w-4" />} title="Waitlist pricing">
+                30% off for life on the Essay Assistant, Tracker, and Auto-Apply.
+              </Perk>
+            </ul>
+          </motion.aside>
+
+          {/* Auth card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+            className="mx-auto w-full max-w-[460px] rounded-3xl border-2 border-on-surface bg-surface/85 p-7 backdrop-blur-xl qc-hard-shadow sm:p-9"
+          >
+            <h1 className="font-display text-display-md text-on-surface text-balance">
+              {mode === "signin" ? t("signin.title.signin") : t("signin.title.signup")}
+            </h1>
+            <p className="mt-2 text-body-md text-on-surface-variant">
+              {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
+            </p>
 
           <button
             type="button"
@@ -251,9 +290,34 @@ function SignInPage() {
               {mode === "signin" ? t("signin.toggle.createAccount") : t("signin.toggle.signinLink")}
             </button>
           </p>
-        </motion.div>
+          </motion.div>
+        </div>
       </main>
     </>
+  );
+}
+
+function Perk({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-primary-container text-on-primary-container qc-hard-shadow-sm">
+        {icon}
+      </span>
+      <div>
+        <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+          {title}
+        </p>
+        <p className="text-body-sm text-on-surface-variant">{children}</p>
+      </div>
+    </li>
   );
 }
 
