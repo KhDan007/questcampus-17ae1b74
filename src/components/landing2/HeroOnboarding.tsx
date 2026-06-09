@@ -1,27 +1,38 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useRef, useState } from "react";
+import { AlertTriangle, ArrowRight, Sparkles, X } from "lucide-react";
 import { HeroQuiz, type QuizAnswers } from "./HeroQuiz";
 import { ResultsReveal } from "./ResultsReveal";
+import { useAuth } from "@/lib/auth/useAuth";
 
 export function HeroOnboarding() {
   const reduce = useReducedMotion();
   const [answers, setAnswers] = useState<QuizAnswers | null>(null);
+  const { isAuthenticated } = useAuth();
+  const [warnOpen, setWarnOpen] = useState(false);
+  const [ack, setAck] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   function onComplete(a: QuizAnswers) {
     setAnswers(a);
-    // Smooth scroll to the results section.
     setTimeout(() => {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
+  }
+
+  function gate(e: React.SyntheticEvent) {
+    if (!isAuthenticated || ack) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setWarnOpen(true);
   }
 
   return (
     <>
       <section className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
         <div className="mx-auto grid max-w-(--container-content) gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-          {/* Headline column */}
           <div>
             <motion.span
               initial={reduce ? false : { opacity: 0, y: 10 }}
@@ -72,20 +83,98 @@ export function HeroOnboarding() {
             </motion.div>
           </div>
 
-          {/* Quiz column */}
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="flex justify-center lg:justify-end"
           >
-            <HeroQuiz onComplete={onComplete} />
+            <div
+              ref={wrapRef}
+              onPointerDownCapture={gate}
+              onKeyDownCapture={gate}
+              className="w-full max-w-[640px]"
+            >
+              <HeroQuiz onComplete={onComplete} />
+            </div>
           </motion.div>
         </div>
       </section>
 
       <div id="results" />
       <ResultsReveal visible={!!answers} answers={answers} />
+
+      <AnimatePresence>
+        {warnOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setWarnOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              role="dialog"
+              aria-modal="true"
+              className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow"
+            >
+              <button
+                type="button"
+                onClick={() => setWarnOpen(false)}
+                aria-label="Close"
+                className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="p-6 sm:p-7">
+                <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-container">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Heads up
+                </div>
+                <h3 className="mt-4 font-display text-headline-md font-bold text-on-surface">
+                  This will erase your current matches
+                </h3>
+                <p className="mt-2 text-body-md text-on-surface-variant">
+                  Re-taking the quick quiz overwrites the recommendations saved to your
+                  account. For sharper results, complete the detailed onboarding instead —
+                  it asks a few more questions and tunes your matches much better.
+                </p>
+
+                <a
+                  href="/dashboard"
+                  className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Refine with detailed onboarding
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAck(true);
+                    setWarnOpen(false);
+                  }}
+                  className="mt-3 w-full rounded-md border-2 border-on-surface/15 bg-surface-container-low px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:border-on-surface"
+                >
+                  Continue and overwrite my matches
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
