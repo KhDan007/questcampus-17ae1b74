@@ -435,7 +435,7 @@ function UnlockOverlay() {
         </ul>
 
         <a
-          href="/signin"
+          href="/signin?mode=signup"
           className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
         >
           Create free account
