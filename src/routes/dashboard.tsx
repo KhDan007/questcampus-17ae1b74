@@ -427,4 +427,3 @@ function ComingSoonModal({
 }
 
 // Silence unused export warnings.
-void auth;
