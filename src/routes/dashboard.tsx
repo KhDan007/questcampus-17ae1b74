@@ -1,22 +1,21 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   Award,
   GraduationCap,
   ArrowRight,
-  X,
   PenLine,
   CalendarClock,
   Send,
   TrendingUp,
-  Mail,
   Lock,
   Compass,
 } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
+import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/dashboard")({
