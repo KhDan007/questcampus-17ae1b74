@@ -41,9 +41,8 @@ export function WaitlistV2() {
               <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
                 Founding access
               </p>
-              <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
-                Be first when the rest of <br />
-                QuestCampus opens.
+              <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
+                Be first when the rest of QuestCampus opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
                 Essay Assistant, Application Tracker, Auto-Apply — waitlist members get
