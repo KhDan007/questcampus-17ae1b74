@@ -597,12 +597,19 @@ function TargetPicker({
         </p>
       )}
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+        <button
+          type="button"
+          onClick={onSkip}
+          className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/40 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-all hover:border-on-surface hover:text-on-surface"
+        >
+          Skip — write a generic essay
+        </button>
         <button
           type="button"
           disabled={!value}
           onClick={onNext}
-          className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[var(--qc-hard-shadow)]"
+          className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[var(--qc-hard-shadow)]"
         >
           Next: your story
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
