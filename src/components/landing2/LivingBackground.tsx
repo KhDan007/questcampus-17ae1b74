@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { UNI_LOGOS } from "@/assets/unis";
 
 const UNIVERSITIES = [
   { name: "Harvard", hue: "#b3272c" },
@@ -199,23 +200,35 @@ function FloatLayer({
 }
 
 function UniTile({ uni, size }: { uni: { name: string; hue: string }; size: number }) {
+  const logo = UNI_LOGOS[uni.name];
   return (
     <div
       className="relative h-full w-full overflow-hidden rounded-xl ring-1 ring-on-surface/10 backdrop-blur-[2px]"
       style={{
-        background: `linear-gradient(135deg, ${uni.hue}cc 0%, ${uni.hue}66 60%, transparent 100%)`,
+        background: logo
+          ? `linear-gradient(135deg, #ffffff 0%, #ffffffcc 100%)`
+          : `linear-gradient(135deg, ${uni.hue}cc 0%, ${uni.hue}66 60%, transparent 100%)`,
         boxShadow: "0 12px 32px -12px rgba(28,28,25,0.18)",
       }}
     >
-      <div className="absolute inset-0 opacity-30 mix-blend-soft-light">
-        <svg viewBox="0 0 100 100" className="h-full w-full">
-          <path
-            d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
-            fill="white"
-            opacity="0.55"
-          />
-        </svg>
-      </div>
+      {logo ? (
+        <img
+          src={logo}
+          alt={uni.name}
+          className="absolute inset-0 h-full w-full object-contain p-3"
+          loading="lazy"
+        />
+      ) : (
+        <div className="absolute inset-0 opacity-30 mix-blend-soft-light">
+          <svg viewBox="0 0 100 100" className="h-full w-full">
+            <path
+              d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
+              fill="white"
+              opacity="0.55"
+            />
+          </svg>
+        </div>
+      )}
       <div className="absolute inset-x-2 bottom-2">
         <div className="rounded-md bg-surface/85 px-2 py-1 text-center font-[var(--font-label)] text-[10px] font-semibold tracking-wide text-on-surface backdrop-blur">
           {uni.name}

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { UNI_LOGOS } from "@/assets/unis";
 
 const ROW_A = ["Harvard", "Stanford", "MIT", "Oxford", "Cambridge", "Yale"];
 const ROW_B = ["Princeton", "UC Berkeley", "NYU", "Columbia", "Imperial", "ETH Zürich"];
@@ -178,6 +179,7 @@ function ShowcaseTile({
   highlight: boolean;
 }) {
   const hue = HUES[name] ?? "#b3272c";
+  const logo = UNI_LOGOS[name];
   return (
     <div
       className="relative shrink-0 overflow-hidden rounded-xl ring-1 ring-white/15"
@@ -185,20 +187,31 @@ function ShowcaseTile({
         width: size,
         height: size,
         transform: `rotate(${rot}deg)`,
-        background: `linear-gradient(135deg, ${hue}ee 0%, ${hue}88 60%, ${hue}33 100%)`,
+        background: logo
+          ? "#ffffff"
+          : `linear-gradient(135deg, ${hue}ee 0%, ${hue}88 60%, ${hue}33 100%)`,
         boxShadow: highlight
           ? "0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)"
           : "0 20px 40px -20px rgba(0,0,0,0.5)",
       }}
     >
-      <div className="absolute inset-0 opacity-25 mix-blend-soft-light">
-        <svg viewBox="0 0 100 100" className="h-full w-full">
-          <path
-            d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
-            fill="white"
-          />
-        </svg>
-      </div>
+      {logo ? (
+        <img
+          src={logo}
+          alt={name}
+          className="absolute inset-0 h-full w-full object-contain p-3"
+          loading="lazy"
+        />
+      ) : (
+        <div className="absolute inset-0 opacity-25 mix-blend-soft-light">
+          <svg viewBox="0 0 100 100" className="h-full w-full">
+            <path
+              d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+      )}
       <div className="absolute inset-x-1.5 bottom-1.5 sm:inset-x-2 sm:bottom-2">
         <div className="rounded-md bg-black/55 px-1.5 py-0.5 sm:px-2 sm:py-1 text-center font-[var(--font-label)] text-[9px] sm:text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm truncate">
           {name}
