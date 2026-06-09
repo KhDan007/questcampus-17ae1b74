@@ -248,9 +248,9 @@ function DashboardPage() {
         {!isAuthenticated && (
           <p className="mt-10 text-center text-body-sm text-on-surface-variant">
             You're browsing as a guest.{" "}
-            <Link to="/signin" search={{ mode: "signup" } as never} className="text-primary hover:underline">
+            <a href="/signin?mode=signup" className="text-primary hover:underline">
               Create a free account
-            </Link>{" "}
+            </a>{" "}
             to save this across devices.
           </p>
         )}
