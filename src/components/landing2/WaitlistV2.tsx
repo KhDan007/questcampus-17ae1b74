@@ -11,14 +11,14 @@ export function WaitlistV2() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
-    // Hand-off to the dedicated waitlist route for the real signup.
     try {
       window.localStorage.setItem("qc.waitlist.email", email);
+      const raw = window.localStorage.getItem("qc.waitlist.list");
+      const list: { email: string; at: number }[] = raw ? JSON.parse(raw) : [];
+      list.push({ email, at: Date.now() });
+      window.localStorage.setItem("qc.waitlist.list", JSON.stringify(list));
     } catch {}
     setDone(true);
-    setTimeout(() => {
-      window.location.href = "/waitlist";
-    }, 1100);
   }
 
   return (
