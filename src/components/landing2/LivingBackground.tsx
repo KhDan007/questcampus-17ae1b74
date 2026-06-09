@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { UNI_LOGOS } from "@/assets/unis";
 
 const UNIVERSITIES = [
   { name: "Harvard", hue: "#b3272c" },
