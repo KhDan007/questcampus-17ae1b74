@@ -22,9 +22,9 @@ export function WaitlistV2() {
   }
 
   return (
-    <section id="waitlist" className="relative px-5 py-24 sm:px-8 sm:py-32">
+    <section id="waitlist" className="relative px-4 py-20 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-(--container-content)">
-        <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest p-8 qc-hard-shadow-primary sm:p-14">
+        <div className="relative overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow-primary sm:p-14">
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
             <div
               className="animate-aurora-1 absolute -left-20 -top-20 h-[50vh] w-[50vh] rounded-full blur-[120px]"
