@@ -193,6 +193,33 @@ type EssayError = { error: "not_logged_in" | "no_profile" | "trial_used" | "gene
 
 type FreeRec = { plan: "free"; results: RecCard[] };
 
+// Pull landing-quiz matches stashed in localStorage and shape them as RecCards
+// so the target picker has *something* to show even if the backend list is empty.
+function readLandingMatchesAsRecCards(): RecCard[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem("qc.landing.matches");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as { matches?: { name: string; location?: string }[] };
+    const list = parsed?.matches ?? [];
+    return list.map((m, i) => {
+      const [city, state, country] = (m.location ?? "").split(",").map((s) => s.trim());
+      return {
+        externalId: `local-${i}-${m.name}`,
+        name: m.name,
+        city: city || undefined,
+        state: state || undefined,
+        country: country || state || city || "",
+        bucket: "target" as const,
+        score: 0.7,
+        why: "",
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
