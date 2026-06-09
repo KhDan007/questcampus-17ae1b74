@@ -319,13 +319,9 @@ function EssayPage() {
   }, [sessionId, token, generate, answers, target]);
 
   const canSubmitQuestions = useMemo(() => {
-    // Require all ⭐ story questions to have meaningful free-text.
-    for (const q of QUESTIONS) {
-      if (!q.required) continue;
-      const t = answers[q.key]?.text?.trim() ?? "";
-      if (t.length < 20) return false;
-    }
-    return true;
+    // Only the anchor story is required; everything else is optional.
+    const anchor = answers["anchorStory"]?.text?.trim() ?? "";
+    return anchor.length >= 20;
   }, [answers]);
 
   // Past essays list (logged-in)
