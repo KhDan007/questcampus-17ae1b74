@@ -55,13 +55,6 @@ const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof
 
 const COMING_SOON = [
   {
-    key: "essay",
-    title: "Personal statement assistant",
-    desc: "Draft, refine, and polish essays with AI tuned to each university.",
-    icon: PenLine,
-    price: "$5 · 30% off waitlist",
-  },
-  {
     key: "tracker",
     title: "Deadline tracker",
     desc: "Every requirement, fee, and deadline auto-synced to your calendar.",
@@ -220,6 +213,47 @@ function DashboardPage() {
           )}
         </section>
 
+        {/* Personal statement — live feature, logged-in only */}
+        {isAuthenticated && (
+          <motion.section
+            initial={reduce ? false : { opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-16"
+          >
+            <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow sm:p-8">
+              <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+                    <PenLine className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+                      <Sparkles className="h-3 w-3" /> New · live
+                    </span>
+                    <h2 className="mt-2 font-display text-headline-lg font-bold text-on-surface">
+                      Write your Common App personal statement
+                    </h2>
+                    <p className="mt-1.5 max-w-2xl text-body-md text-on-surface/80">
+                      Grounded in what you told us — zero invented facts. First
+                      generation is free; unlock the full essay for $5 (also
+                      reveals all your matches).
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/essay"
+                  className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  Start writing
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
         {/* Coming soon tiles */}
         <section className="mt-16">
           <h2 className="font-display text-headline-lg font-bold text-on-surface">
@@ -235,7 +269,7 @@ function DashboardPage() {
                 key={t.key}
                 title={t.title}
                 desc={t.desc}
-                price={t.price}
+                
                 Icon={t.icon}
                 delay={i * 0.05}
                 onClick={() => setModal({ title: t.title })}
