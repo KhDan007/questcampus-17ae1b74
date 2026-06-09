@@ -37,7 +37,7 @@ export const translateTexts = createServerFn({ method: "POST" })
     const system = `You are a professional translator. Translate every string in the provided JSON array into ${langName}.
 - Return ONLY a JSON object: {"items":[...]} — same order, same length, translated values.
 - Preserve placeholders like {name}, emoji, punctuation, arrows, percent signs.
-- Keep brand and acronym tokens untranslated: QuestCampus, Stripe, Google, SAT, ACT, IELTS, TOEFL, Duolingo, IB, A-Levels, Gaokao, CBSE, Abitur.
+- Keep brand and acronym tokens untranslated: QuestCampus, Polar, Google, SAT, ACT, IELTS, TOEFL, Duolingo, IB, A-Levels, Gaokao, CBSE, Abitur.
 - Keep dollar amounts (e.g. $9, $1,500) intact.
 - Tone: warm, friendly, concise, second-person.`;
 
