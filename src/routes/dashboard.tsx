@@ -88,7 +88,7 @@ function loadSaved(): SavedPayload | null {
 
 function DashboardPage() {
   const reduce = useReducedMotion();
-  const navigate = useNavigate();
+  const _reduce = reduce;
   const { user, isAuthenticated } = useAuth();
   const [saved, setSaved] = useState<SavedPayload | null>(null);
   const [modal, setModal] = useState<null | { title: string }>(null);
