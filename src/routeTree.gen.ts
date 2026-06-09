@@ -13,6 +13,7 @@ import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
 import { Route as IndexRouteImport } from './routes/index'
@@ -38,6 +39,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EssayRoute = EssayRouteImport.update({
+  id: '/essay',
+  path: '/essay',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/blank'
     | '/dashboard'
+    | '/essay'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/blank'
     | '/dashboard'
+    | '/essay'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/blank'
     | '/dashboard'
+    | '/essay'
     | '/onboarding'
     | '/profile'
     | '/signin'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlankRoute: typeof BlankRoute
   DashboardRoute: typeof DashboardRoute
+  EssayRoute: typeof EssayRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/essay': {
+      id: '/essay'
+      path: '/essay'
+      fullPath: '/essay'
+      preLoaderRoute: typeof EssayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlankRoute: BlankRoute,
   DashboardRoute: DashboardRoute,
+  EssayRoute: EssayRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
