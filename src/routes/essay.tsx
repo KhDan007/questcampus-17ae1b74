@@ -652,6 +652,27 @@ function TargetPicker({
         </p>
       )}
 
+      {/* Free-text fallback — type any school name. */}
+      <div className="mt-4 rounded-xl border-2 border-on-surface/30 bg-surface/80 p-4">
+        <label className="block font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+          Or type a school name
+        </label>
+        <p className="mt-0.5 text-label-sm text-on-surface-variant">
+          Anything works — we'll tune the essay around it.
+        </p>
+        <input
+          type="text"
+          value={value?.externalId ? "" : value && value.name !== "No specific school" ? value.name : ""}
+          onChange={(e) => {
+            const name = e.target.value;
+            if (!name.trim()) onChange(null);
+            else onChange({ name });
+          }}
+          placeholder="e.g. Northwestern University"
+          className="mt-2 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+        />
+      </div>
+
       <div className="mt-8 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <button
           type="button"
