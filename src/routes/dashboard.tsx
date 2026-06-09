@@ -156,14 +156,14 @@ function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setModal({ title: "Detailed onboarding" })}
+              <Link
+                to={isAuthenticated ? "/onboarding" : "/signin"}
+                search={isAuthenticated ? undefined : ({ redirect: "/onboarding" } as never)}
                 className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
                 Refine now
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </button>
+              </Link>
             </div>
           </div>
         </motion.section>
