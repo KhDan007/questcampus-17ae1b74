@@ -1,23 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { NavBar } from "@/components/landing/NavBar";
-import { HeroSection } from "@/components/landing/HeroSection";
-import { ProblemSection } from "@/components/landing/ProblemSection";
-import { HowItWorks } from "@/components/landing/HowItWorks";
-import { PricingSection } from "@/components/landing/PricingSection";
-import { RoadmapSection } from "@/components/landing/RoadmapSection";
-import { FinalCTA } from "@/components/landing/FinalCTA";
-import { Footer } from "@/components/landing/Footer";
+import { LivingBackground } from "@/components/landing2/LivingBackground";
+import { NavV2 } from "@/components/landing2/NavV2";
+import { HeroOnboarding } from "@/components/landing2/HeroOnboarding";
+import { ParallaxShowcase } from "@/components/landing2/ParallaxShowcase";
+import { HowItWorks } from "@/components/landing2/HowItWorks";
+import { RoadmapV2 } from "@/components/landing2/RoadmapV2";
+import { WaitlistV2 } from "@/components/landing2/WaitlistV2";
+import { FooterV2 } from "@/components/landing2/FooterV2";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "QuestCampus — Find universities that want someone like you" },
+      { title: "QuestCampus — Find the universities that actually fit you" },
       {
         name: "description",
         content:
-          "Answer a few questions. Get a personalized list of universities that match your grades, goals, and scholarship needs — in minutes. No account required to start.",
+          "Answer 5 questions. Get a personalized ranked list of universities — Safety, Target, Reach — with scholarships and deadlines. AI-matched in under a minute. Free to start, $5 to unlock all 20+.",
       },
-      { property: "og:title", content: "QuestCampus — Find universities that want someone like you" },
+      { property: "og:title", content: "QuestCampus — Find the universities that actually fit you" },
+      {
+        property: "og:description",
+        content:
+          "AI-matched university search for ambitious students. 11,000+ universities ranked to your real grades, goals, and budget. Free to start.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -27,16 +32,16 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   return (
     <>
-      <NavBar />
-      <main id="main-content">
-        <HeroSection />
-        <ProblemSection />
+      <LivingBackground />
+      <NavV2 />
+      <main id="main-content" className="relative">
+        <HeroOnboarding />
+        <ParallaxShowcase />
         <HowItWorks />
-        <PricingSection />
-        <RoadmapSection />
-        <FinalCTA />
+        <RoadmapV2 />
+        <WaitlistV2 />
       </main>
-      <Footer />
+      <FooterV2 />
     </>
   );
 }
