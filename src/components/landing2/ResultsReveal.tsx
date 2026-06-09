@@ -2,7 +2,11 @@
 
 import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Lock, Sparkles, Award, GraduationCap } from "lucide-react";
+import { Lock, Sparkles, Award, GraduationCap, AlertCircle } from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import type { QuizAnswers } from "./HeroQuiz";
 
 type Bucket = "Safety" | "Target" | "Reach";
 
@@ -15,32 +19,22 @@ type Match = {
   tag: string;
 };
 
-const FREE_MATCHES: Match[] = [
-  {
-    name: "University of Edinburgh",
-    location: "Edinburgh, Scotland",
-    match: 94,
-    bucket: "Target",
-    why: "Your strong humanities grades and international profile align with their generous global scholarships and reputation for interdisciplinary study.",
-    tag: "Globally ranked top-40",
-  },
-  {
-    name: "McGill University",
-    location: "Montréal, Canada",
-    match: 91,
-    bucket: "Safety",
-    why: "Lower competition for your profile, strong financial aid for international students, and a vibrant campus that matches your interests.",
-    tag: "Best value pick",
-  },
-  {
-    name: "ETH Zürich",
-    location: "Zürich, Switzerland",
-    match: 88,
-    bucket: "Reach",
-    why: "Pushes your limit on STEM rigor, but your trajectory + their tuition structure for internationals make this a calculated reach worth swinging at.",
-    tag: "Tuition-free for many",
-  },
-];
+type RawResult = {
+  externalId: string;
+  name: string;
+  city?: string;
+  state?: string;
+  country: string;
+  region?: string;
+  website?: string;
+  acceptanceRate?: number;
+  satAvg?: number;
+  costAttendance?: number;
+  sizeBucket?: string;
+  bucket: "safety" | "target" | "reach";
+  score: number;
+  why: string;
+};
 
 const LOCKED_MATCHES: Match[] = [
   {
@@ -87,35 +81,93 @@ const THINKING_STEPS = [
   "Locking in your top matches…",
 ];
 
-export function ResultsReveal({ visible }: { visible: boolean }) {
-  const reduce = useReducedMotion();
-  const [phase, setPhase] = useState<"thinking" | "results">("thinking");
-  const [thinkStep, setThinkStep] = useState(0);
+function capBucket(b: RawResult["bucket"]): Bucket {
+  return (b.charAt(0).toUpperCase() + b.slice(1)) as Bucket;
+}
 
+function toMatch(r: RawResult): Match {
+  const location =
+    [r.city, r.state].filter(Boolean).join(", ") || r.country;
+  const tag = r.acceptanceRate
+    ? `${Math.round(r.acceptanceRate * 100)}% acceptance`
+    : r.region || r.country;
+  return {
+    name: r.name,
+    location,
+    match: Math.max(0, Math.min(100, Math.round(r.score * 100))),
+    bucket: capBucket(r.bucket),
+    why: r.why,
+    tag,
+  };
+}
+
+export function ResultsReveal({
+  visible,
+  answers,
+}: {
+  visible: boolean;
+  answers: QuizAnswers | null;
+}) {
+  const reduce = useReducedMotion();
+  const { lang } = useI18n();
+  const quickMatch = useAction(api.rag.recommend.quickMatch);
+
+  const [thinkDone, setThinkDone] = useState(false);
+  const [thinkStep, setThinkStep] = useState(0);
+  const [results, setResults] = useState<Match[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+
+  // Thinking animation
   useEffect(() => {
     if (!visible) {
-      setPhase("thinking");
+      setThinkDone(false);
       setThinkStep(0);
       return;
     }
     if (reduce) {
-      setPhase("results");
+      setThinkDone(true);
       return;
     }
+    setThinkDone(false);
+    setThinkStep(0);
     let i = 0;
     const interval = setInterval(() => {
       i += 1;
       if (i >= THINKING_STEPS.length) {
         clearInterval(interval);
-        setPhase("results");
+        setThinkDone(true);
       } else {
         setThinkStep(i);
       }
     }, 700);
     return () => clearInterval(interval);
-  }, [visible, reduce]);
+  }, [visible, reduce, attempt]);
+
+  // Fetch matches
+  useEffect(() => {
+    if (!visible || !answers) return;
+    let cancelled = false;
+    setResults(null);
+    setError(null);
+    quickMatch({ quiz: answers, lang })
+      .then((res: { results: RawResult[] }) => {
+        if (cancelled) return;
+        setResults((res.results ?? []).slice(0, 3).map(toMatch));
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        console.error("quickMatch failed", e);
+        setError("Couldn't load matches — try again");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, answers, lang, quickMatch, attempt]);
 
   if (!visible) return null;
+
+  const showResults = thinkDone && results !== null;
 
   return (
     <section className="relative px-5 py-20 sm:px-8 sm:py-28">
@@ -134,12 +186,20 @@ export function ResultsReveal({ visible }: { visible: boolean }) {
           </h2>
         </motion.div>
 
-        {phase === "thinking" ? (
+        {error ? (
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              setError(null);
+              setAttempt((n) => n + 1);
+            }}
+          />
+        ) : !showResults ? (
           <ThinkingState step={thinkStep} />
         ) : (
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {FREE_MATCHES.map((m, i) => (
-              <MatchCard key={m.name} match={m} delay={i * 0.12} />
+            {results!.map((m, i) => (
+              <MatchCard key={`${m.name}-${i}`} match={m} delay={i * 0.12} />
             ))}
 
             {/* Locked cards spanning lower row */}
@@ -152,7 +212,6 @@ export function ResultsReveal({ visible }: { visible: boolean }) {
                     </div>
                   </div>
                 ))}
-                {/* third blurred placeholder for symmetry */}
                 <div className="relative hidden lg:block">
                   <div className="pointer-events-none h-full select-none blur-[6px] saturate-75">
                     <MatchCard
@@ -176,6 +235,24 @@ export function ResultsReveal({ visible }: { visible: boolean }) {
         )}
       </div>
     </section>
+  );
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="mt-12 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-10 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-error/10 text-error">
+        <AlertCircle className="h-6 w-6" />
+      </div>
+      <p className="text-headline-sm text-on-surface">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+      >
+        Try again
+      </button>
+    </div>
   );
 }
 
