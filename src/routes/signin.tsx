@@ -179,12 +179,6 @@ function SignInPage() {
             <p className="mt-2 text-body-md text-on-surface-variant">
               {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
             </p>
-          <h1 className="text-display-lg-mobile text-on-background">
-            {mode === "signin" ? t("signin.title.signin") : t("signin.title.signup")}
-          </h1>
-          <p className="mt-3 text-body-md text-on-surface-variant">
-            {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
-          </p>
 
           <button
             type="button"
