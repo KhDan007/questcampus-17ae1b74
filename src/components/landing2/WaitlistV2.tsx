@@ -61,7 +61,7 @@ export function WaitlistV2() {
 
             <form
               onSubmit={onSubmit}
-              className="relative rounded-lg border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+              className="relative rounded-lg border-2 border-on-surface bg-surface p-5 sm:p-6 qc-hard-shadow"
             >
               {!done ? (
                 <>
