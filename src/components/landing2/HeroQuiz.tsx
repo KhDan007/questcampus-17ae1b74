@@ -126,10 +126,10 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
         <AnimatePresence mode="wait">
           <motion.div
             key={q.key}
-            initial={reduce ? false : { opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduce ? undefined : { opacity: 0, x: -24 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={reduce ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <h2 className="text-headline-lg text-on-surface sm:text-display-lg">
               {q.prompt}
