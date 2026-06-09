@@ -508,12 +508,14 @@ function TargetPicker({
   value,
   onChange,
   onNext,
+  onSkip,
 }: {
   matches: RecCard[] | null;
   matchesErr: boolean;
   value: { externalId?: string; name: string } | null;
   onChange: (v: { externalId?: string; name: string } | null) => void;
   onNext: () => void;
+  onSkip: () => void;
 }) {
   const loading = matches === null && !matchesErr;
   return (
