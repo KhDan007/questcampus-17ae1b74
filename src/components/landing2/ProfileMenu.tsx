@@ -78,7 +78,10 @@ export function ProfileMenu() {
                   </p>
                 </div>
                 <div className="my-1 h-px bg-on-surface/10" />
-                <MenuLink href="/profile" icon={<LayoutDashboard className="h-4 w-4" />}>
+                <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>
+                  Dashboard
+                </MenuLink>
+                <MenuLink href="/profile" icon={<UserIcon className="h-4 w-4" />}>
                   My profile
                 </MenuLink>
                 <button
