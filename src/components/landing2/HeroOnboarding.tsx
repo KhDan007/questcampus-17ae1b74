@@ -7,10 +7,10 @@ import { ResultsReveal } from "./ResultsReveal";
 
 export function HeroOnboarding() {
   const reduce = useReducedMotion();
-  const [done, setDone] = useState(false);
+  const [answers, setAnswers] = useState<QuizAnswers | null>(null);
 
-  function onComplete(_a: QuizAnswers) {
-    setDone(true);
+  function onComplete(a: QuizAnswers) {
+    setAnswers(a);
     // Smooth scroll to the results section.
     setTimeout(() => {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
