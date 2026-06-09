@@ -19,8 +19,8 @@ export function HeroOnboarding() {
 
   return (
     <>
-      <section className="relative isolate px-5 pb-20 pt-28 sm:px-8 sm:pt-36">
-        <div className="mx-auto grid max-w-(--container-content) gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+      <section className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
+        <div className="mx-auto grid max-w-(--container-content) gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           {/* Headline column */}
           <div>
             <motion.span
