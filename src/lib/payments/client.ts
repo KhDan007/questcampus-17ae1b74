@@ -1,5 +1,5 @@
-// Frontend payments client. Card data NEVER touches our code — Stripe-hosted
-// Checkout only. Entitlement is granted ONLY by the backend webhook; this
+// Frontend payments client. Card data NEVER touches our code — third-party-hosted
+// checkout only. Entitlement is granted ONLY by the backend webhook; this
 // module just kicks off the checkout redirect.
 
 function siteBase(): string {

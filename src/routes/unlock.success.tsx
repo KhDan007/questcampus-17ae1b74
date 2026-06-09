@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n/I18nProvider";
 export const Route = createFileRoute("/unlock/success")({
   head: () => ({ meta: [{ title: "QuestCampus — Unlocking your matches" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
-    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
+    checkout_id: typeof s.checkout_id === "string" ? s.checkout_id : undefined,
   }),
   component: UnlockSuccessPage,
 });
