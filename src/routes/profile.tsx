@@ -59,7 +59,7 @@ function ProfilePage() {
   if (!sessionId || convexProfile === undefined) {
     return (
       <>
-        <NavBar variant="minimal" />
+        <><LivingBackground /><NavV2 /></>
         <Splash />
       </>
     );
@@ -68,7 +68,7 @@ function ProfilePage() {
   if (!answers) {
     return (
       <>
-        <NavBar variant="minimal" />
+        <><LivingBackground /><NavV2 /></>
         <EmptyState />
       </>
     );
@@ -76,7 +76,7 @@ function ProfilePage() {
 
   return (
     <>
-      <NavBar variant="minimal" />
+      <><LivingBackground /><NavV2 /></>
       <div className="min-h-screen bg-surface">
         <ProfileHero
           firstName={firstName}
