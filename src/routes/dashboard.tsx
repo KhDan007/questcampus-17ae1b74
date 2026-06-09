@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
-import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/dashboard")({
