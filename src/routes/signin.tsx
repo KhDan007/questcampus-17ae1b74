@@ -290,9 +290,34 @@ function SignInPage() {
               {mode === "signin" ? t("signin.toggle.createAccount") : t("signin.toggle.signinLink")}
             </button>
           </p>
-        </motion.div>
+          </motion.div>
+        </div>
       </main>
     </>
+  );
+}
+
+function Perk({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-primary-container text-on-primary-container qc-hard-shadow-sm">
+        {icon}
+      </span>
+      <div>
+        <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+          {title}
+        </p>
+        <p className="text-body-sm text-on-surface-variant">{children}</p>
+      </div>
+    </li>
   );
 }
 
