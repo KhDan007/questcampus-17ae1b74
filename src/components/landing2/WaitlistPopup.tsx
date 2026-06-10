@@ -161,10 +161,12 @@ export function WaitlistPopup({
                   <Check className="h-6 w-6" strokeWidth={3} />
                 </div>
                 <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-                  You're on the list.
+                  {alreadyJoined ? "You're already on the list." : "You're on the list!"}
                 </h3>
                 <p className="mt-2 text-body-md text-on-surface-variant">
-                  We'll email you the moment it's ready — with your 30% lifetime discount locked in.
+                  {alreadyJoined
+                    ? "You're all set — we'll email you the moment it's ready."
+                    : "Check your inbox for confirmation. We'll email you the moment it's ready — with your 30% lifetime discount locked in."}
                 </p>
                 <button
                   type="button"
