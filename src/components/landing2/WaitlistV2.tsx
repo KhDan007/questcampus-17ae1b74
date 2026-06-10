@@ -136,9 +136,13 @@ export function WaitlistV2() {
                   <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-tertiary-container text-on-tertiary-container">
                     <Check className="h-6 w-6" strokeWidth={3} />
                   </div>
-                  <p className="text-headline-sm text-on-surface">You're on the list.</p>
+                  <p className="text-headline-sm text-on-surface">
+                    {alreadyJoined ? "You're already on the list." : "You're on the list!"}
+                  </p>
                   <p className="mt-1 text-body-md text-on-surface-variant">
-                    We'll email you the moment each feature ships — 30% off locked in.
+                    {alreadyJoined
+                      ? "You're all set — we'll email you the moment it's ready."
+                      : "Check your inbox for confirmation. We'll email you the moment each feature ships — 30% off locked in."}
                   </p>
                 </motion.div>
               )}
