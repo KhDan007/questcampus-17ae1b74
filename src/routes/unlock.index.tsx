@@ -73,7 +73,7 @@ function UnlockPage() {
   ];
 
   const guarantees = [
-    { Icon: ShieldCheck, label: "Secure Stripe checkout" },
+    { Icon: ShieldCheck, label: "Secure Polar checkout" },
     { Icon: Sparkles, label: "Lifetime access — no renewals" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
