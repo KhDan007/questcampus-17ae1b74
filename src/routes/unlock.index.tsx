@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
+import { useAuth } from "@/lib/auth/useAuth";
 import { NavBar } from "@/components/landing/NavBar";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
