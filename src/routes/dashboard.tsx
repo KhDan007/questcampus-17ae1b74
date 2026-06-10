@@ -116,6 +116,7 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
       bucket: bucketCap(r.bucket),
       why: r.why || "",
       tag: r.fields?.[0] ?? r.region ?? r.country ?? "",
+      website: r.website,
     })),
   };
 }
