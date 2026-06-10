@@ -55,11 +55,17 @@ export function ParallaxShowcase() {
   const yB = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["-15%", "25%"]);
   const yC = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["10%", "-20%"]);
 
-  // Cursor parallax (-1..1 around stage center), spring-smoothed.
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const sx = useSpring(px, { stiffness: 80, damping: 20, mass: 0.6 });
-  const sy = useSpring(py, { stiffness: 80, damping: 20, mass: 0.6 });
+  // Raw cursor position in stage-local pixels (null when outside).
+  const cx = useMotionValue<number | null>(null);
+  const cy = useMotionValue<number | null>(null);
+  const active = useMotionValue(0); // 0..1, gates attraction
+
+  // Glow follows cursor in % of stage
+  const glowX = useMotionValue(50);
+  const glowY = useMotionValue(50);
+  const sGlowX = useSpring(glowX, { stiffness: 120, damping: 24 });
+  const sGlowY = useSpring(glowY, { stiffness: 120, damping: 24 });
+  const sActive = useSpring(active, { stiffness: 120, damping: 24 });
 
   useEffect(() => {
     if (reduce) return;
@@ -68,17 +74,21 @@ export function ParallaxShowcase() {
     let raf = 0;
     const onMove = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        px.set(Math.max(-1, Math.min(1, nx)));
-        py.set(Math.max(-1, Math.min(1, ny)));
+        cx.set(x);
+        cy.set(y);
+        glowX.set((x / rect.width) * 100);
+        glowY.set((y / rect.height) * 100);
+        active.set(1);
       });
     };
     const onLeave = () => {
-      px.set(0);
-      py.set(0);
+      active.set(0);
+      cx.set(null);
+      cy.set(null);
     };
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerleave", onLeave);
@@ -87,31 +97,12 @@ export function ParallaxShowcase() {
       el.removeEventListener("pointerleave", onLeave);
       cancelAnimationFrame(raf);
     };
-  }, [reduce, px, py]);
+  }, [reduce, cx, cy, glowX, glowY, active]);
 
   // Mobile-tuned tile dimensions; desktop keeps the original generous sizing.
   const sizes = isMobile
     ? { a: 76, b: 100, c: 80, gapA: 12, gapB: 16, gapC: 14, topB: 110, topC: 240, height: 360 }
     : { a: 130, b: 170, c: 140, gapA: 20, gapB: 28, gapC: 24, topB: 180, topC: 400, height: 620 };
-
-  // Layer parallax depth (px of travel per pointer unit).
-  const depthA = 18;
-  const depthB = 38;
-  const depthC = 28;
-
-  const txA = useTransform(sx, (v) => v * depthA);
-  const tyA = useTransform(sy, (v) => v * depthA * 0.6);
-  const txB = useTransform(sx, (v) => v * depthB);
-  const tyB = useTransform(sy, (v) => v * depthB * 0.6);
-  const txC = useTransform(sx, (v) => v * depthC);
-  const tyC = useTransform(sy, (v) => v * depthC * 0.6);
-  const rotA = useTransform(sx, (v) => v * -1.5);
-  const rotB = useTransform(sx, (v) => v * 2);
-  const rotC = useTransform(sx, (v) => v * -2.5);
-
-  // Spotlight glow that follows the cursor.
-  const glowX = useTransform(sx, (v) => `${50 + v * 30}%`);
-  const glowY = useTransform(sy, (v) => `${50 + v * 30}%`);
 
   return (
     <section
@@ -166,30 +157,30 @@ export function ParallaxShowcase() {
             className="pointer-events-none absolute inset-0 -z-10"
             style={{
               background: useTransform(
-                [glowX, glowY] as MotionValue<string>[],
-                ([x, y]) =>
-                  `radial-gradient(420px circle at ${x} ${y}, rgba(255,183,77,0.18), rgba(255,95,93,0.10) 35%, transparent 65%)`,
+                [sGlowX, sGlowY, sActive] as MotionValue<number>[],
+                ([x, y, a]) =>
+                  `radial-gradient(420px circle at ${x}% ${y}%, rgba(255,183,77,${0.22 * (a as number)}), rgba(255,95,93,${0.12 * (a as number)}) 35%, transparent 65%)`,
               ),
             }}
           />
 
           <motion.div
-            style={{ y: yA, x: txA, translateY: tyA, rotate: rotA, filter: "blur(2px)", opacity: 0.55 }}
+            style={{ y: yA, filter: "blur(2px)", opacity: 0.55 }}
             className="absolute inset-x-0 top-0 flex justify-center will-change-transform"
           >
-            <TileRow names={ROW_A} size={sizes.a} gap={sizes.gapA} rot={-2} px={sx} py={sy} depth={6} />
+            <TileRow names={ROW_A} size={sizes.a} gap={sizes.gapA} rot={-2} stageRef={stageRef} cx={cx} cy={cy} active={sActive} pull={0.55} />
           </motion.div>
           <motion.div
-            style={{ y: yB, x: txB, translateY: tyB, rotate: rotB, top: sizes.topB }}
+            style={{ y: yB, top: sizes.topB }}
             className="absolute inset-x-0 flex justify-center will-change-transform"
           >
-            <TileRow names={ROW_B} size={sizes.b} gap={sizes.gapB} rot={1} highlight px={sx} py={sy} depth={14} />
+            <TileRow names={ROW_B} size={sizes.b} gap={sizes.gapB} rot={1} highlight stageRef={stageRef} cx={cx} cy={cy} active={sActive} pull={0.9} />
           </motion.div>
           <motion.div
-            style={{ y: yC, x: txC, translateY: tyC, rotate: rotC, filter: "blur(3px)", opacity: 0.45, top: sizes.topC }}
+            style={{ y: yC, filter: "blur(3px)", opacity: 0.45, top: sizes.topC }}
             className="absolute inset-x-0 flex justify-center will-change-transform"
           >
-            <TileRow names={ROW_C} size={sizes.c} gap={sizes.gapC} rot={3} px={sx} py={sy} depth={10} />
+            <TileRow names={ROW_C} size={sizes.c} gap={sizes.gapC} rot={3} stageRef={stageRef} cx={cx} cy={cy} active={sActive} pull={0.7} />
           </motion.div>
 
           {/* edge fades */}
@@ -213,38 +204,39 @@ function TileRow({
   gap,
   rot,
   highlight = false,
-  px,
-  py,
-  depth,
+  stageRef,
+  cx,
+  cy,
+  active,
+  pull,
 }: {
   names: string[];
   size: number;
   gap: number;
   rot: number;
   highlight?: boolean;
-  px: MotionValue<number>;
-  py: MotionValue<number>;
-  depth: number;
+  stageRef: React.RefObject<HTMLDivElement | null>;
+  cx: MotionValue<number | null>;
+  cy: MotionValue<number | null>;
+  active: MotionValue<number>;
+  pull: number;
 }) {
   return (
     <div className="flex items-center" style={{ gap }}>
-      {names.map((n, i) => {
-        // Each tile drifts slightly differently for an organic feel.
-        const sign = i % 2 === 0 ? -1 : 1;
-        const variance = 0.6 + ((i * 37) % 70) / 100;
-        return (
-          <ShowcaseTile
-            key={n + i}
-            name={n}
-            size={size}
-            rot={rot + (i % 2 === 0 ? -1 : 1)}
-            highlight={highlight}
-            px={px}
-            py={py}
-            depth={depth * variance * sign}
-          />
-        );
-      })}
+      {names.map((n, i) => (
+        <ShowcaseTile
+          key={n + i}
+          name={n}
+          size={size}
+          rot={rot + (i % 2 === 0 ? -1 : 1)}
+          highlight={highlight}
+          stageRef={stageRef}
+          cx={cx}
+          cy={cy}
+          active={active}
+          pull={pull}
+        />
+      ))}
     </div>
   );
 }
@@ -254,44 +246,127 @@ function ShowcaseTile({
   size,
   rot,
   highlight,
-  px,
-  py,
-  depth,
+  stageRef,
+  cx,
+  cy,
+  active,
+  pull,
 }: {
   name: string;
   size: number;
   rot: number;
   highlight: boolean;
-  px: MotionValue<number>;
-  py: MotionValue<number>;
-  depth: number;
+  stageRef: React.RefObject<HTMLDivElement | null>;
+  cx: MotionValue<number | null>;
+  cy: MotionValue<number | null>;
+  active: MotionValue<number>;
+  pull: number;
 }) {
   const hue = HUES[name] ?? "#b3272c";
   const logo = UNI_LOGOS[name];
-  const tx = useTransform(px, (v) => v * depth);
-  const ty = useTransform(py, (v) => v * depth * 0.7);
-  const tiltX = useTransform(py, (v) => v * -6);
-  const tiltY = useTransform(px, (v) => v * 6);
+  const tileRef = useRef<HTMLDivElement | null>(null);
+
+  // Animated targets, spring-smoothed for buttery motion.
+  const tx = useMotionValue(0);
+  const ty = useMotionValue(0);
+  const scale = useMotionValue(1);
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const lift = useMotionValue(0); // 0..1 proximity
+
+  const sx = useSpring(tx, { stiffness: 180, damping: 20, mass: 0.6 });
+  const sy = useSpring(ty, { stiffness: 180, damping: 20, mass: 0.6 });
+  const sScale = useSpring(scale, { stiffness: 220, damping: 22 });
+  const sTiltX = useSpring(tiltX, { stiffness: 180, damping: 22 });
+  const sTiltY = useSpring(tiltY, { stiffness: 180, damping: 22 });
+  const sLift = useSpring(lift, { stiffness: 180, damping: 24 });
+
+  useEffect(() => {
+    let raf = 0;
+    const RADIUS = 260; // px of influence
+    const MAX_PULL = 38 * pull;
+
+    const update = () => {
+      const tile = tileRef.current;
+      const stage = stageRef.current;
+      const a = active.get();
+      const px = cx.get();
+      const py = cy.get();
+
+      if (!tile || !stage || px == null || py == null || a <= 0.001) {
+        tx.set(0);
+        ty.set(0);
+        scale.set(1);
+        tiltX.set(0);
+        tiltY.set(0);
+        lift.set(0);
+        return;
+      }
+
+      const sRect = stage.getBoundingClientRect();
+      const tRect = tile.getBoundingClientRect();
+      // Tile center in stage-local coords
+      const tcx = tRect.left - sRect.left + tRect.width / 2;
+      const tcy = tRect.top - sRect.top + tRect.height / 2;
+      const dx = px - tcx;
+      const dy = py - tcy;
+      const dist = Math.hypot(dx, dy);
+      const t = Math.max(0, 1 - dist / RADIUS); // 0..1 proximity (smooth falloff)
+      const ease = t * t * (3 - 2 * t); // smoothstep
+
+      const nx = dist > 0.001 ? dx / dist : 0;
+      const ny = dist > 0.001 ? dy / dist : 0;
+
+      tx.set(nx * MAX_PULL * ease * a);
+      ty.set(ny * MAX_PULL * ease * a);
+      scale.set(1 + 0.14 * ease * a);
+      // tilt away from cursor for 3D parallax illusion
+      tiltY.set(nx * 10 * ease * a);
+      tiltX.set(-ny * 10 * ease * a);
+      lift.set(ease * a);
+    };
+
+    const onFrame = () => {
+      update();
+      raf = requestAnimationFrame(onFrame);
+    };
+    raf = requestAnimationFrame(onFrame);
+    return () => cancelAnimationFrame(raf);
+  }, [stageRef, cx, cy, active, pull, tx, ty, scale, tiltX, tiltY, lift]);
+
+  const shadow = useTransform(sLift, (v) =>
+    highlight
+      ? `0 ${20 + v * 40}px ${50 + v * 40}px -20px rgba(0,0,0,${0.55 + v * 0.25}), 0 0 ${v * 40}px rgba(255,183,77,${v * 0.45})`
+      : `0 ${16 + v * 30}px ${36 + v * 30}px -20px rgba(0,0,0,${0.5 + v * 0.2}), 0 0 ${v * 28}px rgba(255,183,77,${v * 0.35})`,
+  );
+  const z = useTransform(sLift, (v) => v * 60);
+  const sheenX = useTransform([cx, cy] as MotionValue<number | null>[], () => {
+    const t = tileRef.current;
+    const px = cx.get();
+    if (!t || px == null) return 50;
+    const r = t.getBoundingClientRect();
+    return Math.max(-20, Math.min(120, ((px - r.left - (stageRef.current?.getBoundingClientRect().left ?? 0) + (stageRef.current?.getBoundingClientRect().left ?? 0) - r.left) / r.width) * 100));
+  });
 
   return (
     <motion.div
+      ref={tileRef}
       className="relative shrink-0 overflow-hidden rounded-xl ring-1 ring-white/15 [transform-style:preserve-3d]"
       style={{
         width: size,
         height: size,
-        x: tx,
-        y: ty,
+        x: sx,
+        y: sy,
         rotate: rot,
-        rotateX: tiltX,
-        rotateY: tiltY,
+        scale: sScale,
+        rotateX: sTiltX,
+        rotateY: sTiltY,
+        z,
         background: logo
           ? "#ffffff"
           : `linear-gradient(135deg, ${hue}ee 0%, ${hue}88 60%, ${hue}33 100%)`,
-        boxShadow: highlight
-          ? "0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)"
-          : "0 20px 40px -20px rgba(0,0,0,0.5)",
+        boxShadow: shadow,
       }}
-      whileHover={{ scale: 1.08, zIndex: 5, transition: { type: "spring", stiffness: 260, damping: 18 } }}
     >
       {logo ? (
         <img
@@ -310,17 +385,16 @@ function ShowcaseTile({
           </svg>
         </div>
       )}
-      {/* Specular sheen that shifts with cursor */}
+      {/* Specular sheen that brightens with proximity */}
       <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-0 mix-blend-overlay"
         style={{
           background: useTransform(
-            [px, py] as MotionValue<number>[],
-            ([x, y]) =>
-              `radial-gradient(120% 80% at ${50 + (x as number) * 40}% ${50 + (y as number) * 40}%, rgba(255,255,255,0.45), transparent 55%)`,
+            [sheenX, sLift] as MotionValue<number>[],
+            ([x, v]) =>
+              `radial-gradient(120% 80% at ${x}% 30%, rgba(255,255,255,${0.25 + (v as number) * 0.45}), transparent 60%)`,
           ),
-          opacity: 0.6,
         }}
       />
       <div className="absolute inset-x-1.5 bottom-1.5 sm:inset-x-2 sm:bottom-2">
