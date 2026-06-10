@@ -338,8 +338,12 @@ function EssayPage() {
   ) as EssayResult | null | undefined;
 
   useEffect(() => {
-    if (!result || result.locked === false) return;
-    if (essayDoc && essayDoc.locked === false && essayDoc.fullText) {
+    if (!result) return;
+    if (!essayDoc) return;
+    // Sync server doc when we're still locked OR when we haven't loaded the
+    // full text yet (e.g. user just opened a past essay from the history list).
+    const needsFullText = !result.fullText && essayDoc.fullText;
+    if ((result.locked && essayDoc.locked === false) || needsFullText) {
       setResult(essayDoc);
     }
   }, [essayDoc, result]);
