@@ -315,7 +315,7 @@ function EssayPage() {
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   // Re-fetch the full essay once the user pays.
   const essayDoc = useQuery(
