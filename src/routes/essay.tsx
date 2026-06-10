@@ -943,18 +943,143 @@ function errorMessage(e: EssayError["error"]): string {
 // Step 3: Result
 // -----------------------------------------------------------------------------
 
+type ReviseAction =
+  | "stronger_hook"
+  | "more_specific"
+  | "more_personal"
+  | "shorten"
+  | "lengthen"
+  | "simpler"
+  | "punchier_ending"
+  | "less_ai";
+
+const REVISE_ACTIONS: { key: ReviseAction; label: string; hint: string }[] = [
+  { key: "stronger_hook", label: "Stronger hook", hint: "sharpen the opening" },
+  { key: "more_specific", label: "More specific", hint: "swap vague for concrete" },
+  { key: "more_personal", label: "More personal", hint: "deeper reflection" },
+  { key: "shorten", label: "Tighten", hint: "~15% shorter" },
+  { key: "lengthen", label: "Expand", hint: "deepen thin moments" },
+  { key: "simpler", label: "Simpler language", hint: "plainer, clearer" },
+  { key: "punchier_ending", label: "Punchier ending", hint: "stronger close" },
+  { key: "less_ai", label: "Sound more human", hint: "strip AI-tells" },
+];
+
 function ResultView({
   result,
+  setResult,
   isPaid,
   token,
   onRegenerate,
 }: {
   result: EssayResult;
+  setResult: (r: EssayResult | null) => void;
   isPaid: boolean;
   token: string | undefined;
   onRegenerate: () => void;
 }) {
+  const reduce = useReducedMotion();
   const locked = result.locked && !result.fullText;
+  const editable = !locked && isPaid && !!result.fullText;
+
+  // Manual editing (paid only)
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(result.fullText ?? "");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const updateEssay = useAction(api.essays.updateEssay);
+  const saveTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!editing) setDraft(result.fullText ?? "");
+  }, [result.fullText, editing]);
+
+  const doSave = useCallback(
+    async (text: string) => {
+      if (!token || !text.trim()) return;
+      setSaveState("saving");
+      try {
+        const res = (await updateEssay({ token, essayId: result.essayId, fullText: text })) as
+          | { ok: true; preview: string; wordCount: number; placeholders: string[] }
+          | { error: string };
+        if ("error" in res) {
+          setSaveState("error");
+          return;
+        }
+        setResult({
+          ...result,
+          fullText: text,
+          preview: res.preview,
+          wordCount: res.wordCount,
+          placeholders: res.placeholders,
+        });
+        setSaveState("saved");
+        window.setTimeout(() => setSaveState((s) => (s === "saved" ? "idle" : s)), 1600);
+      } catch {
+        setSaveState("error");
+      }
+    },
+    [token, updateEssay, result, setResult],
+  );
+
+  // Debounced autosave on draft change while editing
+  useEffect(() => {
+    if (!editing) return;
+    if (draft === (result.fullText ?? "")) return;
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => {
+      void doSave(draft);
+    }, 900);
+    return () => {
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    };
+  }, [draft, editing, result.fullText, doSave]);
+
+  // Revise sidebar
+  const revise = useAction(api.essays.revise);
+  const [revising, setRevising] = useState<ReviseAction | null>(null);
+  const [reviseErr, setReviseErr] = useState<string | null>(null);
+  const [undoBuf, setUndoBuf] = useState<EssayResult | null>(null);
+  const [bodyKey, setBodyKey] = useState(0);
+
+  const runRevise = useCallback(
+    async (action: ReviseAction) => {
+      if (!token) return;
+      setRevising(action);
+      setReviseErr(null);
+      try {
+        const res = (await revise({ token, essayId: result.essayId, action })) as
+          | { ok: true; fullText: string; preview: string; wordCount: number; placeholders: string[] }
+          | { error: string };
+        if ("error" in res) {
+          setReviseErr(res.error);
+          return;
+        }
+        setUndoBuf(result);
+        setResult({
+          ...result,
+          fullText: res.fullText,
+          preview: res.preview,
+          wordCount: res.wordCount,
+          placeholders: res.placeholders,
+        });
+        setBodyKey((k) => k + 1);
+      } catch {
+        setReviseErr("generation_failed");
+      } finally {
+        setRevising(null);
+      }
+    },
+    [token, revise, result, setResult],
+  );
+
+  const onUndo = () => {
+    if (!undoBuf) return;
+    setResult(undoBuf);
+    setUndoBuf(null);
+    setBodyKey((k) => k + 1);
+  };
+
+  const bodyText = renderText(result);
+  const edited = undoBuf !== null || saveState === "saved";
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -962,22 +1087,109 @@ function ResultView({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
-              Common App essay · {result.wordCount} words
+              Common App essay ·{" "}
+              <motion.span
+                key={result.wordCount}
+                initial={reduce ? false : { scale: 1.15 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4 }}
+                className="inline-block"
+              >
+                {result.wordCount}
+              </motion.span>{" "}
+              words
+              {edited && (
+                <span className="ml-2 rounded-full bg-secondary-container px-2 py-0.5 text-label-sm normal-case tracking-normal text-on-surface">
+                  Edited
+                </span>
+              )}
             </p>
             <h2 className="mt-1 font-display text-headline-md font-bold text-on-surface">
               {result.targetName ?? "Your personal statement"}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={onRegenerate}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            <RefreshCw className="h-3.5 w-3.5" /> Edit answers
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {editable && !editing && (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit text
+              </button>
+            )}
+            {editing && (
+              <>
+                <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                  {saveState === "saving" && (
+                    <span className="inline-flex items-center gap-1">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
+                    </span>
+                  )}
+                  {saveState === "saved" && (
+                    <span className="inline-flex items-center gap-1 text-primary">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Saved
+                    </span>
+                  )}
+                  {saveState === "error" && (
+                    <span className="text-on-surface">Save failed</span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditing(false);
+                    setDraft(result.fullText ?? "");
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  Done
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={onRegenerate}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Edit answers
+            </button>
+          </div>
         </div>
 
-        <EssayBody text={renderText(result)} />
+        {editing ? (
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={() => void doSave(draft)}
+            rows={22}
+            className="mt-6 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface focus:border-on-surface focus:outline-none"
+          />
+        ) : (
+          <div className={`relative ${revising ? "opacity-70" : ""}`}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={bodyKey}
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+              >
+                <EssayBody text={bodyText} />
+              </motion.div>
+            </AnimatePresence>
+            {revising && (
+              <div className="pointer-events-none absolute inset-0 -m-2 overflow-hidden rounded-xl ring-2 ring-primary/30">
+                <motion.div
+                  className="absolute inset-x-0 top-0 h-0.5 bg-primary"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+                  style={{ width: "33%" }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {locked && (
           <div className="relative mt-2">
@@ -1011,9 +1223,26 @@ function ResultView({
             </div>
           </div>
         )}
+
+        {reviseErr && (
+          <div className="mt-4 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm text-on-surface">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Revision didn't go through. Try a different tweak.</span>
+          </div>
+        )}
       </div>
 
-      <aside className="space-y-5">
+      <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+        {editable && (
+          <ReviseSideblock
+            actions={REVISE_ACTIONS}
+            revising={revising}
+            canUndo={!!undoBuf}
+            onRevise={runRevise}
+            onUndo={onUndo}
+          />
+        )}
+
         {result.placeholders && result.placeholders.length > 0 && (
           <div className="rounded-2xl border-2 border-on-surface bg-secondary-container p-5 qc-hard-shadow-sm">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
@@ -1052,6 +1281,334 @@ function ResultView({
         </div>
       </aside>
     </div>
+  );
+}
+
+function ReviseSideblock({
+  actions,
+  revising,
+  canUndo,
+  onRevise,
+  onUndo,
+}: {
+  actions: { key: ReviseAction; label: string; hint: string }[];
+  revising: ReviseAction | null;
+  canUndo: boolean;
+  onRevise: (a: ReviseAction) => void;
+  onUndo: () => void;
+}) {
+  const [openMobile, setOpenMobile] = useState(false);
+  const disabled = !!revising;
+  const list = (
+    <ul className="mt-4 grid gap-2">
+      {actions.map((a) => {
+        const isRunning = revising === a.key;
+        return (
+          <li key={a.key}>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onRevise(a.key)}
+              className="group flex w-full items-center justify-between gap-3 rounded-xl border-2 border-on-surface/20 bg-surface px-3.5 py-2.5 text-left transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+            >
+              <span className="min-w-0">
+                <span className="block font-display text-label-md font-bold text-on-surface">
+                  {a.label}
+                </span>
+                <span className="block text-label-sm text-on-surface-variant">
+                  {a.hint}
+                </span>
+              </span>
+              {isRunning ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
+              ) : (
+                <Wand2 className="h-4 w-4 shrink-0 text-on-surface-variant transition-colors group-hover:text-primary" />
+              )}
+            </button>
+          </li>
+        );
+      })}
+      {canUndo && (
+        <li>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onUndo}
+            className="mt-1 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface disabled:opacity-50"
+          >
+            <Undo2 className="h-3.5 w-3.5" /> Undo last revision
+          </button>
+        </li>
+      )}
+    </ul>
+  );
+
+  return (
+    <>
+      <div className="hidden rounded-2xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow-sm lg:block">
+        <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
+          ✨ Improve
+        </p>
+        <h3 className="mt-1 font-display text-headline-sm font-bold text-on-surface">
+          One-tap revisions
+        </h3>
+        <p className="mt-2 text-body-sm text-on-surface-variant">
+          Rewrites the whole essay toward one goal. Stays grounded in your facts.
+        </p>
+        {list}
+      </div>
+
+      <div className="lg:hidden">
+        <button
+          type="button"
+          onClick={() => setOpenMobile((v) => !v)}
+          className="flex w-full items-center justify-between rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 qc-hard-shadow-sm"
+        >
+          <span className="font-display text-label-lg font-bold text-on-surface">
+            ✨ Improve essay
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 text-on-surface transition-transform ${openMobile ? "rotate-180" : ""}`}
+          />
+        </button>
+        <AnimatePresence initial={false}>
+          {openMobile && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="overflow-hidden"
+            >
+              <div className="px-1 pb-1">{list}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// AI-assist popup for intake fields
+// -----------------------------------------------------------------------------
+
+function AssistTrigger({
+  sessionId,
+  token,
+  question,
+  currentValue,
+  hasValue,
+  onAccept,
+}: {
+  sessionId: string;
+  token: string;
+  question: string;
+  currentValue: string;
+  hasValue: boolean;
+  onAccept: (text: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/30 bg-gradient-to-r from-primary/10 via-secondary-container/40 to-primary/10 px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:border-on-surface active:scale-[0.97]"
+      >
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        {hasValue ? "Improve" : "Help me write this"}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <AssistPopover
+            sessionId={sessionId}
+            token={token}
+            question={question}
+            initialNotes={currentValue}
+            onClose={() => setOpen(false)}
+            onAccept={(t) => {
+              onAccept(t);
+              setOpen(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function AssistPopover({
+  sessionId,
+  token,
+  question,
+  initialNotes,
+  onClose,
+  onAccept,
+}: {
+  sessionId: string;
+  token: string;
+  question: string;
+  initialNotes: string;
+  onClose: () => void;
+  onAccept: (text: string) => void;
+}) {
+  const reduce = useReducedMotion();
+  const assist = useAction(api.essays.assistAnswer);
+  const [notes, setNotes] = useState(initialNotes);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [text, setText] = useState<string>("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onClick);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onClick);
+    };
+  }, [onClose]);
+
+  const run = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const res = (await assist({ sessionId, token, question, notes, lang: "en" })) as
+        | { ok: true; text: string }
+        | { error: string };
+      if ("error" in res) {
+        setStatus("error");
+        return;
+      }
+      setText(res.text);
+      setStatus("ready");
+    } catch {
+      setStatus("error");
+    }
+  }, [assist, sessionId, token, question, notes]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 4 }}
+      animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+      exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 4 }}
+      transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
+      style={{ transformOrigin: "top right" }}
+      className="absolute right-0 top-full z-50 mt-2 w-[min(360px,90vw)] rounded-2xl border border-on-surface/15 bg-surface p-4 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.25)]"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <p className="font-display text-label-md font-bold text-on-surface">✨ AI assist</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <p className="mt-1 text-label-sm text-on-surface-variant">
+        Drop rough notes — we'll turn them into 2–4 honest sentences. We never invent facts.
+      </p>
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        rows={4}
+        placeholder="rough notes, fragments, anything…"
+        className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/25 bg-surface px-3 py-2 text-body-sm text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+      />
+
+      {status === "ready" && text && (
+        <motion.div
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.22 }}
+          className="mt-3 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-body-sm text-on-surface"
+        >
+          {text}
+        </motion.div>
+      )}
+      {status === "loading" && (
+        <div className="relative mt-3 h-16 overflow-hidden rounded-lg bg-surface-container">
+          <motion.div
+            className="absolute inset-y-0 w-1/3"
+            animate={reduce ? undefined : { x: ["-100%", "300%"] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(53,37,205,0.18), transparent)",
+            }}
+          />
+        </div>
+      )}
+      {status === "error" && (
+        <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border-2 border-on-surface/20 bg-error-container/30 p-2 text-label-sm text-on-surface">
+          <span className="inline-flex items-center gap-1.5">
+            <AlertCircle className="h-3.5 w-3.5" /> That didn't work
+          </span>
+          <button
+            type="button"
+            onClick={() => void run()}
+            className="rounded-md border-2 border-on-surface px-2 py-0.5 text-label-sm font-semibold"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4 flex items-center justify-between gap-2">
+        {status === "ready" && text ? (
+          <>
+            <button
+              type="button"
+              onClick={() => void run()}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-semibold text-on-surface hover:border-on-surface"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Regenerate
+            </button>
+            <button
+              type="button"
+              onClick={() => onAccept(text)}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <Save className="h-3.5 w-3.5" /> Use this
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-label-sm font-semibold text-on-surface-variant hover:text-on-surface"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={status === "loading"}
+              onClick={() => void run()}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {status === "loading" ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Thinking…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5" /> Write it for me
+                </>
+              )}
+            </button>
+          </>
+        )}
+      </div>
+    </motion.div>
   );
 }
 
