@@ -60,11 +60,7 @@ export function NavV2() {
                 </NavLink>
               </>
             ) : isAuthenticated ? (
-              <>
-                <NavLink href="/dashboard">Dashboard</NavLink>
-                <NavLink href="/essay">Essay</NavLink>
-                <NavLink href="/onboarding">Refine matches</NavLink>
-              </>
+              <NavLink href="/dashboard">Dashboard</NavLink>
             ) : null}
           </div>
 
