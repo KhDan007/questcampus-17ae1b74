@@ -449,6 +449,7 @@ function EssayPage() {
                 loading={genStatus === "loading"}
                 error={genError}
                 token={token}
+                sessionId={sessionId}
               />
             </StepWrap>
           )}
@@ -457,6 +458,7 @@ function EssayPage() {
             <StepWrap key="result">
               <ResultView
                 result={result}
+                setResult={setResult}
                 isPaid={isPaid}
                 token={token}
                 onRegenerate={() => {
