@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useAction, useQuery } from "convex/react";
 import {
@@ -13,6 +13,12 @@ import {
   Loader2,
   CheckCircle2,
   FileText,
+  Wand2,
+  Save,
+  Undo2,
+  X,
+  Pencil,
+  ChevronDown,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
