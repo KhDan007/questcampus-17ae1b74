@@ -54,10 +54,12 @@ export function RecommendationsSection({
   const [paidStatus, setPaidStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
 
   // Live entitlement — flips to {paid:true} ~instantly once the webhook lands.
+  // Admins (UI override) always pass; backend is still the real gate.
+  const { isAdmin } = useAuth();
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   const loadFree = useCallback(
     async (force = false) => {
