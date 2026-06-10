@@ -3,14 +3,19 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useRouterState } from "@tanstack/react-router";
 import logoAsset from "@/assets/questcampus-logo.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
+import { useAuth } from "@/lib/auth/useAuth";
 
 export function NavV2() {
   const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [popup, setPopup] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isLanding = pathname === "/" || pathname === "";
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -19,14 +24,8 @@ export function NavV2() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function isOnLanding() {
-    if (typeof window === "undefined") return false;
-    return window.location.pathname === "/" || window.location.pathname === "";
-  }
-
   function joinWaitlist(e: React.MouseEvent) {
-    // On the landing page, scroll to the inline section. Elsewhere, open the popup.
-    if (isOnLanding()) return; // let the anchor scroll naturally
+    if (isLanding) return; // let the anchor scroll naturally on the landing page
     e.preventDefault();
     setPopup(true);
   }
