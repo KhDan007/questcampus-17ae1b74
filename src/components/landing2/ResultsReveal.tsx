@@ -100,7 +100,15 @@ function toMatch(r: RawResult): Match {
     bucket: capBucket(r.bucket),
     why: r.why,
     tag,
+    website: r.website,
   };
+}
+
+function normalizeUrl(u?: string): string | null {
+  if (!u) return null;
+  const trimmed = u.trim();
+  if (!trimmed) return null;
+  return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
 }
 
 export function ResultsReveal({
