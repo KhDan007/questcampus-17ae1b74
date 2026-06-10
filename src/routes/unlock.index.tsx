@@ -128,8 +128,8 @@ function UnlockPage() {
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
             className="mt-12 grid gap-6 md:grid-cols-[1.15fr_1fr]"
           >
-            {/* Left: Price + CTA */}
-            <div className="relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 sm:p-9 qc-hard-shadow">
+            {/* Left: Price + CTA (cursor-tilt) */}
+            <TiltCard className="group relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9">
               <div
                 aria-hidden
                 className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/15 blur-2xl"
@@ -192,19 +192,6 @@ function UnlockPage() {
                     token={token}
                     className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
                   />
-                )}
-
-                {!token && !alreadyPaid && (
-                  <p className="text-center text-label-sm text-on-surface-variant">
-                    {t("unlock.needAccount")}{" "}
-                    <Link
-                      to={SIGNIN_PATH}
-                      className="font-semibold underline hover:text-primary"
-                    >
-                      {t("unlock.signinLink")}
-                    </Link>
-                    .
-                  </p>
                 )}
               </div>
 
