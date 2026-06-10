@@ -28,11 +28,12 @@ export const Route = createFileRoute("/unlock/")({
 
 function UnlockPage() {
   const { t } = useI18n();
+  const { isAdmin } = useAuth();
   const token = auth.getSession()?.token;
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const alreadyPaid = entitlement?.paid === true;
+  const alreadyPaid = isAdmin || entitlement?.paid === true;
 
   const referral = useQuery(api.referrals.summary, token ? { token } : "skip") as
     | { discountPercent: number; maxPercent: number; perReferralPercent: number }
