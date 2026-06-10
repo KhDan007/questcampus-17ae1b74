@@ -96,9 +96,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <div className="relative flex min-h-screen w-full">
-        {/* Desktop sidebar */}
-        <aside className="fixed bottom-0 left-0 top-16 z-40 hidden w-[260px] flex-col border-r-2 border-on-surface/15 bg-surface/95 backdrop-blur-xl lg:flex">
+      <div className="relative flex min-h-screen w-full items-start">
+        {/* Desktop sidebar — sticky so it survives transform ancestors (motion.div in __root) */}
+        <aside
+          className="sticky top-16 z-40 hidden w-[260px] shrink-0 flex-col self-start border-r-2 border-on-surface/15 bg-surface/95 backdrop-blur-xl lg:flex"
+          style={{ height: "calc(100vh - 4rem)" }}
+        >
           <SidebarBody
             pathname={pathname}
             onWaitlist={(f) => setWaitlist(f)}
@@ -106,7 +109,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
         </aside>
 
-        <div className="w-full pt-12 lg:pl-[260px] lg:pt-0">
+        <div className="w-full min-w-0 pt-12 lg:pt-0">
           {children}
         </div>
       </div>
