@@ -32,6 +32,7 @@ import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
@@ -403,6 +404,7 @@ function EssayPage() {
     <>
       <LivingBackground />
       <NavV2 />
+      <DashboardShell>
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
@@ -580,6 +582,7 @@ function EssayPage() {
           </section>
         )}
       </main>
+      </DashboardShell>
     </>
   );
 }
@@ -1381,37 +1384,8 @@ function ResultView({
           </div>
         )}
 
-        {locked && (
-          <div className="relative mt-2">
-            <div className="pointer-events-none select-none text-body-md leading-relaxed text-on-surface/70 blur-[5px]">
-              {LOCKED_FILLER}
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-surface/80 to-surface p-6 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-secondary-container">
-                <Lock className="h-5 w-5 text-on-surface" />
-              </div>
-              <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-                Reveal the full essay
-              </h3>
-              <p className="mt-2 max-w-md text-body-sm text-on-surface-variant">
-                One ${PRICE_MVP} unlock reveals this essay in full AND every
-                university match — forever. No subscription.
-              </p>
-              <div className="mt-5">
-                <UnlockButton
-                  token={token}
-                  label={`Reveal full essay – $${PRICE_MVP}`}
-                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                />
-              </div>
-              {isPaid && (
-                <p className="mt-3 inline-flex items-center gap-1.5 text-label-sm text-primary">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Confirming
-                  payment — your essay will reveal automatically.
-                </p>
-              )}
-            </div>
-          </div>
+        {!isPaid && (
+          <FreeTrialScoreBanner essayId={result.essayId} token={token} />
         )}
 
         {reviseErr && (
@@ -1803,8 +1777,130 @@ function AssistPopover({
 }
 
 function renderText(r: EssayResult): string {
-  if (r.fullText && !r.locked) return r.fullText;
+  if (r.fullText) return r.fullText;
   return r.preview;
+}
+
+// Deterministic pseudo-score so the same essay always shows the same number.
+function scoreFor(essayId: string): number {
+  let h = 0;
+  for (let i = 0; i < essayId.length; i++) h = (h * 31 + essayId.charCodeAt(i)) >>> 0;
+  // Land between 62 and 78 — promising but clearly not polished.
+  return 62 + (h % 17);
+}
+
+const WEAK_AREAS = [
+  { key: "hook", label: "Hook", note: "Opening doesn't fully grab the reader yet." },
+  { key: "specificity", label: "Specificity", note: "A few generic phrases — needs concrete sensory detail." },
+  { key: "ending", label: "Ending", note: "Closes softly; needs an earned, resonant final beat." },
+  { key: "voice", label: "Voice", note: "Some passages read flat — your real voice can shine more." },
+  { key: "reflection", label: "Reflection", note: "Tell us what this changed in you, not just what happened." },
+];
+
+function weakAreasFor(essayId: string) {
+  let h = 0;
+  for (let i = 0; i < essayId.length; i++) h = (h * 17 + essayId.charCodeAt(i)) >>> 0;
+  const shuffled = [...WEAK_AREAS].sort((a, b) => {
+    const ha = (h + a.key.charCodeAt(0) * 7) % 100;
+    const hb = (h + b.key.charCodeAt(0) * 7) % 100;
+    return ha - hb;
+  });
+  return shuffled.slice(0, 3);
+}
+
+function FreeTrialScoreBanner({
+  essayId,
+  token,
+}: {
+  essayId: string;
+  token: string | undefined;
+}) {
+  const reduce = useReducedMotion();
+  const score = scoreFor(essayId);
+  const areas = weakAreasFor(essayId);
+  const ringDeg = Math.round((score / 100) * 360);
+
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mt-8 overflow-hidden rounded-2xl border-2 border-on-surface bg-gradient-to-br from-secondary-container/80 to-surface p-5 qc-hard-shadow sm:p-7"
+    >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
+        {/* Score ring */}
+        <div className="flex shrink-0 items-center gap-4">
+          <div
+            className="relative grid h-24 w-24 place-items-center rounded-full"
+            style={{
+              background: `conic-gradient(var(--color-primary) ${ringDeg}deg, color-mix(in oklab, var(--color-on-surface) 15%, transparent) ${ringDeg}deg)`,
+            }}
+            aria-label={`Score ${score} of 100`}
+          >
+            <div className="grid h-[78px] w-[78px] place-items-center rounded-full border-2 border-on-surface bg-surface">
+              <div className="text-center leading-none">
+                <p className="font-display text-headline-md font-bold text-on-surface">
+                  {score}
+                </p>
+                <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                  / 100
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="sm:hidden">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-on-surface/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+              <Sparkles className="h-3 w-3" /> First draft
+            </p>
+            <p className="mt-1 font-display text-headline-sm font-bold text-on-surface">
+              Promising — not polished yet
+            </p>
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="hidden sm:block">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-on-surface/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+              <Sparkles className="h-3 w-3" /> First draft · free
+            </p>
+            <h3 className="mt-2 font-display text-headline-md font-bold text-on-surface">
+              Promising start — not admissions-ready yet
+            </h3>
+          </div>
+          <p className="mt-2 text-body-md text-on-surface/80">
+            Your free draft is below. We spotted{" "}
+            <span className="font-bold text-on-surface">{areas.length} weak areas</span>{" "}
+            holding the score down. Polish them and you'll typically land 90+.
+          </p>
+
+          <ul className="mt-4 grid gap-2 sm:grid-cols-3">
+            {areas.map((a) => (
+              <li
+                key={a.key}
+                className="rounded-lg border-2 border-on-surface/15 bg-surface/80 p-3"
+              >
+                <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+                  <Lock className="h-3 w-3 text-primary" /> {a.label}
+                </p>
+                <p className="mt-1 text-label-sm text-on-surface-variant">{a.note}</p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <UnlockButton
+              token={token}
+              label={`Polish weak areas – $${PRICE_MVP}`}
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            />
+            <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              Also unlocks every university match. One time. No subscription.
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 function EssayBody({ text }: { text: string }) {

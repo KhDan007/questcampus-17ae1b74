@@ -19,6 +19,7 @@ import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import type { RecCard } from "@/components/profile/UniversityCard";
@@ -194,6 +195,7 @@ function DashboardPage() {
     <>
       <LivingBackground />
       <NavV2 />
+      <DashboardShell>
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
@@ -420,6 +422,7 @@ function DashboardPage() {
           </p>
         )}
       </main>
+      </DashboardShell>
 
       <WaitlistPopup
         open={!!modal}
