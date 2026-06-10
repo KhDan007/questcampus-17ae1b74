@@ -520,7 +520,10 @@ function EssayPage() {
           )}
         </AnimatePresence>
 
-        {past && past.length > 0 && (
+        </AnimatePresence>
+        )}
+
+        {view === "write" && past && past.length > 0 && (
           <section className="mt-20">
             <h2 className="font-display text-headline-md font-bold text-on-surface">
               My personal statements
