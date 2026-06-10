@@ -20,6 +20,7 @@ import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { UnlockButton } from "@/components/payments/UnlockButton";
+import { TiltCard } from "@/components/payments/TiltCard";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { SIGNIN_PATH } from "@/lib/routes";
 import { PRICE_MVP } from "@/lib/config";
