@@ -17,7 +17,9 @@ type Props = {
 export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) {
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [message, setMessage] = useState<string | null>(null);
 
   const resolvedLabel = label ?? t("unlock.button", { price: PRICE_MVP });
