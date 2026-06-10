@@ -45,7 +45,9 @@ function UnlockPage() {
   const { t } = useI18n();
   const reduce = useReducedMotion();
   const { isAdmin } = useAuth();
-  const token = auth.getSession()?.token;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const token = mounted ? auth.getSession()?.token : undefined;
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
