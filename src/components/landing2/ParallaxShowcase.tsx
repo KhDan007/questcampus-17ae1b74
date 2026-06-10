@@ -340,13 +340,22 @@ function ShowcaseTile({
       : `0 ${16 + v * 30}px ${36 + v * 30}px -20px rgba(0,0,0,${0.5 + v * 0.2}), 0 0 ${v * 28}px rgba(255,183,77,${v * 0.35})`,
   );
   const z = useTransform(sLift, (v) => v * 60);
-  const sheenX = useTransform([cx, cy] as MotionValue<number | null>[], () => {
-    const t = tileRef.current;
-    const px = cx.get();
-    if (!t || px == null) return 50;
-    const r = t.getBoundingClientRect();
-    return Math.max(-20, Math.min(120, ((px - r.left - (stageRef.current?.getBoundingClientRect().left ?? 0) + (stageRef.current?.getBoundingClientRect().left ?? 0) - r.left) / r.width) * 100));
-  });
+  const sheenX = useMotionValue(50);
+  useEffect(() => {
+    const unsub = cx.on("change", (v) => {
+      const t = tileRef.current;
+      const stage = stageRef.current;
+      if (!t || !stage || v == null) {
+        sheenX.set(50);
+        return;
+      }
+      const sRect = stage.getBoundingClientRect();
+      const tRect = t.getBoundingClientRect();
+      const localX = v - (tRect.left - sRect.left);
+      sheenX.set(Math.max(-20, Math.min(120, (localX / tRect.width) * 100)));
+    });
+    return unsub;
+  }, [cx, sheenX, stageRef]);
 
   return (
     <motion.div
