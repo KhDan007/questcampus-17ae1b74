@@ -463,6 +463,13 @@ function EssayPage() {
         )}
 
 
+        {view === "review" && (
+          <div className="mt-8">
+            <EssayReview sessionId={sessionId} token={token} isPaid={isPaid} />
+          </div>
+        )}
+
+        {view === "write" && (
         <AnimatePresence mode="wait">
           {step === "target" && (
             <StepWrap key="target">
