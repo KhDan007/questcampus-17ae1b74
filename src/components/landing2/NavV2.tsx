@@ -15,6 +15,7 @@ export function NavV2() {
   const [popup, setPopup] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname === "/" || pathname === "";
+  const isUnlock = pathname.startsWith("/unlock");
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
