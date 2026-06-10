@@ -39,8 +39,16 @@ type SavedMatch = {
   bucket: Bucket;
   why: string;
   tag: string;
+  website?: string;
 };
 type SavedPayload = { matches: SavedMatch[]; at: number };
+
+function normalizeUrl(u?: string): string | null {
+  if (!u) return null;
+  const trimmed = u.trim();
+  if (!trimmed) return null;
+  return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+}
 
 const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof Award }> = {
   Safety: {
