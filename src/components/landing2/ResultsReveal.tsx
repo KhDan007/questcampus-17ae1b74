@@ -18,6 +18,7 @@ type Match = {
   bucket: Bucket;
   why: string;
   tag: string;
+  website?: string;
 };
 
 type RawResult = {
@@ -99,7 +100,15 @@ function toMatch(r: RawResult): Match {
     bucket: capBucket(r.bucket),
     why: r.why,
     tag,
+    website: r.website,
   };
+}
+
+function normalizeUrl(u?: string): string | null {
+  if (!u) return null;
+  const trimmed = u.trim();
+  if (!trimmed) return null;
+  return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
 }
 
 export function ResultsReveal({
@@ -336,7 +345,7 @@ function MatchCard({
       initial={{ opacity: 0, y: 28, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay }}
-      whileHover={locked ? undefined : { y: -4 }}
+      whileHover={locked ? undefined : { y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 transition-shadow ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)]`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -356,10 +365,20 @@ function MatchCard({
 
       <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
 
-      <div className="mt-5 flex items-center gap-2 border-t border-on-surface/10 pt-4">
+      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-4">
         <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
           {match.tag}
         </span>
+        {!locked && normalizeUrl(match.website) && (
+          <a
+            href={normalizeUrl(match.website)!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+          >
+            Official site <ArrowRight className="h-3 w-3" />
+          </a>
+        )}
       </div>
     </motion.article>
   );

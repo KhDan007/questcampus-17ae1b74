@@ -39,8 +39,16 @@ type SavedMatch = {
   bucket: Bucket;
   why: string;
   tag: string;
+  website?: string;
 };
 type SavedPayload = { matches: SavedMatch[]; at: number };
+
+function normalizeUrl(u?: string): string | null {
+  if (!u) return null;
+  const trimmed = u.trim();
+  if (!trimmed) return null;
+  return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+}
 
 const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof Award }> = {
   Safety: {
@@ -108,6 +116,7 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
       bucket: bucketCap(r.bucket),
       why: r.why || "",
       tag: r.fields?.[0] ?? r.region ?? r.country ?? "",
+      website: r.website,
     })),
   };
 }
@@ -438,7 +447,7 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
           transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
         },
       }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -460,11 +469,23 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
       {match.why && (
         <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
       )}
-      {match.tag && (
-        <div className="mt-5 flex items-center gap-2 border-t border-on-surface/10 pt-4">
-          <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
-            {match.tag}
-          </span>
+      {(match.tag || normalizeUrl(match.website)) && (
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-4">
+          {match.tag && (
+            <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
+              {match.tag}
+            </span>
+          )}
+          {normalizeUrl(match.website) && (
+            <a
+              href={normalizeUrl(match.website)!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+            >
+              Official site <ArrowRight className="h-3 w-3" />
+            </a>
+          )}
         </div>
       )}
     </motion.article>
@@ -493,7 +514,7 @@ function ToolTile({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay }}
-      whileHover={{ y: -3 }}
+      whileHover={{ y: -3, transition: { type: "spring", stiffness: 280, damping: 22 } }}
       className="group relative flex w-full items-start gap-4 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-5 text-left backdrop-blur-md qc-hard-shadow transition-all hover:shadow-[6px_6px_0_0_var(--color-primary)]"
     >
       <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-container text-on-primary-container">
