@@ -15,6 +15,7 @@ export function NavV2() {
   const [popup, setPopup] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname === "/" || pathname === "";
+  const isUnlock = pathname.startsWith("/unlock");
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -29,6 +30,8 @@ export function NavV2() {
     e.preventDefault();
     setPopup(true);
   }
+
+  const showWaitlistButton = isLanding || isUnlock;
 
   return (
     <>
@@ -59,15 +62,17 @@ export function NavV2() {
                   Waitlist
                 </NavLink>
               </>
+            ) : isUnlock ? (
+              <NavLink href="/dashboard">Dashboard</NavLink>
             ) : isAuthenticated ? (
               <NavLink href="/dashboard">Dashboard</NavLink>
             ) : null}
           </div>
 
           <div className="flex items-center gap-3">
-            {isLanding && (
+            {showWaitlistButton && (
               <a
-                href="/#waitlist"
+                href={isLanding ? "/#waitlist" : "#waitlist"}
                 onClick={joinWaitlist}
                 className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
               >
@@ -75,7 +80,7 @@ export function NavV2() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             )}
-            <ProfileMenu />
+            {!isUnlock && <ProfileMenu />}
           </div>
         </nav>
       </motion.header>

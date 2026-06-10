@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Check, Copy, Share2 } from "lucide-react";
+import { Check, Copy, Gift, Share2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { shareLinkFor } from "@/lib/referral/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -52,7 +52,7 @@ export function InviteFriendsPanel({
   return (
     <PanelShell variant={variant}>
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-label-md font-semibold uppercase text-primary">
             {t("inv.eyebrow")}
           </p>
@@ -61,7 +61,12 @@ export function InviteFriendsPanel({
           </h3>
           <p className="mt-1 text-body-sm text-on-surface-variant">{body}</p>
         </div>
-        <span aria-hidden className="text-2xl">🎁</span>
+        <span
+          aria-hidden
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-container text-on-primary"
+        >
+          <Gift className="h-5 w-5" />
+        </span>
       </div>
 
       <ShareRow link={link} code={summary.referralCode} />
@@ -160,18 +165,20 @@ function ShareRow({ link, code }: { link: string; code: string }) {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-      <div className="flex min-h-[48px] flex-1 items-center gap-2 rounded-full border border-outline-variant bg-surface px-4 text-body-sm text-on-surface">
-        <span className="truncate" title={link}>{link}</span>
-        <span className="ml-auto rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm font-medium text-on-surface-variant">
+    <div className="mt-4 flex w-full min-w-0 flex-col gap-2 sm:flex-row">
+      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-outline-variant bg-surface px-4 py-2 text-body-sm text-on-surface">
+        <span className="min-w-0 flex-1 truncate" title={link}>
+          {link}
+        </span>
+        <span className="shrink-0 rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm font-medium text-on-surface-variant">
           {code}
         </span>
       </div>
-      <div className="flex gap-2">
+      <div className="flex shrink-0 gap-2">
         <button
           type="button"
           onClick={copy}
-          className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary transition-transform hover:scale-[1.02]"
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary transition-transform hover:scale-[1.02] sm:flex-none"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           {copied ? t("inv.copied") : t("inv.copy")}
@@ -180,7 +187,7 @@ function ShareRow({ link, code }: { link: string; code: string }) {
           type="button"
           onClick={share}
           aria-label={t("inv.share")}
-          className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-outline-variant px-4 text-on-surface transition-colors hover:bg-surface-container"
+          className="inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-full border border-outline-variant px-4 text-on-surface transition-colors hover:bg-surface-container"
         >
           <Share2 className="h-4 w-4" />
         </button>
