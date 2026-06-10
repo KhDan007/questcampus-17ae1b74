@@ -52,7 +52,7 @@ export function InviteFriendsPanel({
   return (
     <PanelShell variant={variant}>
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-label-md font-semibold uppercase text-primary">
             {t("inv.eyebrow")}
           </p>
@@ -61,7 +61,12 @@ export function InviteFriendsPanel({
           </h3>
           <p className="mt-1 text-body-sm text-on-surface-variant">{body}</p>
         </div>
-        <span aria-hidden className="text-2xl">🎁</span>
+        <span
+          aria-hidden
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-container text-on-primary"
+        >
+          <Gift className="h-5 w-5" />
+        </span>
       </div>
 
       <ShareRow link={link} code={summary.referralCode} />
