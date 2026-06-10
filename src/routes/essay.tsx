@@ -227,7 +227,7 @@ function readLandingMatchesAsRecCards(): RecCard[] {
 function EssayPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const token = auth.getSession()?.token;
   const [sessionId, setSessionId] = useState<string | null>(null);
 
