@@ -19,7 +19,15 @@ import {
   X,
   Pencil,
   ChevronDown,
+  History,
+  RotateCcw,
 } from "lucide-react";
+import {
+  loadVersions,
+  pushVersion,
+  formatVersionTime,
+  type EssayVersion,
+} from "@/lib/essays/history";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
@@ -330,8 +338,12 @@ function EssayPage() {
   ) as EssayResult | null | undefined;
 
   useEffect(() => {
-    if (!result || result.locked === false) return;
-    if (essayDoc && essayDoc.locked === false && essayDoc.fullText) {
+    if (!result) return;
+    if (!essayDoc) return;
+    // Sync server doc when we're still locked OR when we haven't loaded the
+    // full text yet (e.g. user just opened a past essay from the history list).
+    const needsFullText = !result.fullText && essayDoc.fullText;
+    if ((result.locked && essayDoc.locked === false) || needsFullText) {
       setResult(essayDoc);
     }
   }, [essayDoc, result]);
@@ -476,23 +488,55 @@ function EssayPage() {
             <h2 className="font-display text-headline-md font-bold text-on-surface">
               My personal statements
             </h2>
+            <p className="mt-1 text-body-sm text-on-surface-variant">
+              Click any draft to reopen it — every edit you make is saved as a version you can roll back to.
+            </p>
             <ul className="mt-5 grid gap-3">
-              {past.map((p) => (
-                <li
-                  key={p.essayId}
-                  className="flex items-start gap-3 rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4 backdrop-blur-sm"
-                >
-                  <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div className="min-w-0">
-                    <p className="font-display text-label-lg font-bold text-on-surface">
-                      {p.targetName ?? "Common App essay"} · {p.wordCount} words
-                    </p>
-                    <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
-                      {p.preview}
-                    </p>
-                  </div>
-                </li>
-              ))}
+              {past.map((p) => {
+                const active = result?.essayId === p.essayId;
+                return (
+                  <li key={p.essayId}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setResult({
+                          essayId: p.essayId,
+                          format: "common_app",
+                          targetName: p.targetName,
+                          preview: p.preview,
+                          wordCount: p.wordCount,
+                          placeholders: [],
+                          locked: !isPaid,
+                          fullText: undefined,
+                        });
+                        setStep("result");
+                        if (typeof window !== "undefined") {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      }}
+                      className={`group flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
+                        active
+                          ? "border-on-surface bg-secondary-container"
+                          : "border-on-surface/15 bg-surface/80"
+                      }`}
+                    >
+                      <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-display text-label-lg font-bold text-on-surface">
+                          {p.targetName ?? "Common App essay"} · {p.wordCount} words
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
+                          {p.preview}
+                        </p>
+                        <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                          {formatVersionTime(p.createdAt)}
+                        </p>
+                      </div>
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
@@ -1078,6 +1122,50 @@ function ResultView({
     setBodyKey((k) => k + 1);
   };
 
+  // -------- Version history (local, per essayId) --------
+  const [versions, setVersions] = useState<EssayVersion[]>(() =>
+    loadVersions(result.essayId),
+  );
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const lastSnapshot = useRef<string>("");
+
+  // Reload list when switching to a different essay.
+  useEffect(() => {
+    setVersions(loadVersions(result.essayId));
+    lastSnapshot.current = "";
+    setHistoryOpen(false);
+  }, [result.essayId]);
+
+  // Snapshot whenever fullText changes (initial load, save, revise, undo).
+  useEffect(() => {
+    const text = result.fullText ?? "";
+    if (!text.trim()) return;
+    if (text === lastSnapshot.current) return;
+    lastSnapshot.current = text;
+    const label = versions.length === 0 ? "Original" : "Edit";
+    pushVersion(result.essayId, {
+      fullText: text,
+      wordCount: result.wordCount,
+      label,
+    });
+    setVersions(loadVersions(result.essayId));
+  }, [result.fullText, result.wordCount, result.essayId, versions.length]);
+
+  const restoreVersion = useCallback(
+    (v: EssayVersion) => {
+      // Optimistic UI first, then persist via the same save path.
+      setResult({
+        ...result,
+        fullText: v.fullText,
+        wordCount: v.wordCount,
+      });
+      setBodyKey((k) => k + 1);
+      setHistoryOpen(false);
+      if (token && editable) void doSave(v.fullText);
+    },
+    [result, setResult, token, editable, doSave],
+  );
+
   const bodyText = renderText(result);
   const edited = undoBuf !== null || saveState === "saved";
 
@@ -1146,6 +1234,69 @@ function ResultView({
                   Done
                 </button>
               </>
+            )}
+            {versions.length > 1 && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen((v) => !v)}
+                  aria-expanded={historyOpen}
+                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  <History className="h-3.5 w-3.5" /> Versions
+                  <span className="ml-0.5 rounded-full bg-secondary-container px-1.5 text-label-sm">
+                    {versions.length}
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {historyOpen && (
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                      className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border-2 border-on-surface bg-surface p-2 qc-hard-shadow"
+                    >
+                      <p className="px-2 pb-1 pt-1 font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface-variant">
+                        Version history
+                      </p>
+                      <ul className="max-h-80 overflow-y-auto">
+                        {versions.map((v, i) => {
+                          const isCurrent = v.fullText === (result.fullText ?? "");
+                          return (
+                            <li key={v.id}>
+                              <button
+                                type="button"
+                                disabled={isCurrent || !editable}
+                                onClick={() => restoreVersion(v)}
+                                className="group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-secondary-container/70 disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent"
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-display text-label-md font-bold text-on-surface">
+                                    {i === 0 ? "Current" : v.label ?? "Edit"}
+                                    <span className="ml-2 font-[var(--font-label)] text-label-sm font-normal text-on-surface-variant">
+                                      · {v.wordCount} words · {formatVersionTime(v.ts)}
+                                    </span>
+                                  </p>
+                                  <p className="mt-0.5 line-clamp-2 text-body-sm text-on-surface-variant">
+                                    {v.fullText.slice(0, 140)}
+                                  </p>
+                                </div>
+                                {!isCurrent && editable && (
+                                  <RotateCcw className="mt-1 h-3.5 w-3.5 shrink-0 text-on-surface-variant transition-colors group-hover:text-primary" />
+                                )}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <p className="border-t border-on-surface/10 px-2 pb-1 pt-2 text-label-sm text-on-surface-variant">
+                        Saved locally on this device.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
             <button
               type="button"
