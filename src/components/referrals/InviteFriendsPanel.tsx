@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Check, Copy, Share2 } from "lucide-react";
+import { Check, Copy, Gift, Share2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { shareLinkFor } from "@/lib/referral/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
