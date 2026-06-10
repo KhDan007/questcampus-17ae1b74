@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { startCheckout } from "@/lib/payments/client";
 import { SIGNIN_PATH } from "@/lib/routes";
