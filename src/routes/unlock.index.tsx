@@ -88,7 +88,7 @@ function UnlockPage() {
           <div className="absolute left-[-10%] top-1/3 h-[360px] w-[360px] rounded-full bg-primary-container/40 blur-3xl" />
         </div>
 
-        <div className="mx-auto w-full max-w-[920px]">
+        <div className="mx-auto w-full" style={{ maxWidth: "920px" }}>
           {/* HERO */}
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 14 }}
