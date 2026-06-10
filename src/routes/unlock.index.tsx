@@ -2,6 +2,7 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import {
   ArrowRight,
