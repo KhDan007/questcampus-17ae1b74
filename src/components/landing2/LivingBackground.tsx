@@ -1,6 +1,15 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { UNI_LOGOS } from "@/assets/unis";
 
@@ -24,12 +33,11 @@ type Tile = {
   top: string;
   size: number;
   rot: number;
-  depth: number; // 0..1 (0 = far, 1 = near)
+  depth: number;
   dur: number;
 };
 
-function makeTiles(): Tile[] {
-  // Deterministic-ish layout so SSR/client match.
+function makeTiles(scale: number): Tile[] {
   const seeds = [
     [6, 8], [22, 64], [38, 22], [54, 70], [70, 12], [82, 48],
     [12, 36], [44, 90], [62, 38], [88, 78], [30, 4],
@@ -41,7 +49,7 @@ function makeTiles(): Tile[] {
       uni,
       left: `${l}%`,
       top: `${t}%`,
-      size: 96 + Math.round(depth * 96),
+      size: Math.round((96 + depth * 96) * scale),
       rot: ((i % 5) - 2) * 4,
       depth,
       dur: 8 + (i % 5),
@@ -49,60 +57,88 @@ function makeTiles(): Tile[] {
   });
 }
 
+function useIsMobile() {
+  const [m, setM] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const on = () => setM(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return m;
+}
+
 export function LivingBackground() {
   const reduce = useReducedMotion();
+  const isMobile = useIsMobile();
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll();
   const yFar = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
   const yMid = useTransform(scrollYProgress, [0, 1], ["0%", "-18%"]);
   const yNear = useTransform(scrollYProgress, [0, 1], ["0%", "-32%"]);
 
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  // Motion values for pointer — no React state, no re-renders per move.
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const spx = useSpring(px, { stiffness: 60, damping: 18, mass: 0.6 });
+  const spy = useSpring(py, { stiffness: 60, damping: 18, mass: 0.6 });
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || isMobile) return;
     let raf = 0;
+    let nx = 0;
+    let ny = 0;
+    let pending = false;
+    const flush = () => {
+      pending = false;
+      px.set(nx);
+      py.set(ny);
+    };
     const onMove = (e: PointerEvent) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 2;
-        const y = (e.clientY / window.innerHeight - 0.5) * 2;
-        setPointer({ x, y });
-      });
+      nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!pending) {
+        pending = true;
+        raf = requestAnimationFrame(flush);
+      }
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
     };
-  }, [reduce]);
+  }, [reduce, isMobile, px, py]);
 
-  const tiles = makeTiles();
+  // Smaller tiles on mobile so they don't feel oversized.
+  const tiles = makeTiles(isMobile ? 0.55 : 1);
 
   return (
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-surface"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-surface [contain:strict]"
     >
-      {/* Aurora mesh */}
+      {/* Aurora mesh — slightly reduced blur radius for cheaper compositing */}
       <div className="absolute inset-0">
         <div
-          className="animate-aurora-1 absolute -left-[20%] -top-[20%] h-[80vh] w-[80vh] rounded-full blur-[120px]"
+          className="animate-aurora-1 absolute -left-[20%] -top-[20%] h-[80vh] w-[80vh] rounded-full blur-[90px] will-change-transform"
           style={{ background: "radial-gradient(circle, rgba(255,95,93,0.45), transparent 65%)" }}
         />
         <div
-          className="animate-aurora-2 absolute -right-[15%] top-[10%] h-[85vh] w-[85vh] rounded-full blur-[140px]"
+          className="animate-aurora-2 absolute -right-[15%] top-[10%] h-[85vh] w-[85vh] rounded-full blur-[100px] will-change-transform"
           style={{ background: "radial-gradient(circle, rgba(254,183,0,0.28), transparent 65%)" }}
         />
         <div
-          className="animate-aurora-3 absolute -bottom-[20%] left-[20%] h-[90vh] w-[90vh] rounded-full blur-[140px]"
+          className="animate-aurora-3 absolute -bottom-[20%] left-[20%] h-[90vh] w-[90vh] rounded-full blur-[100px] will-change-transform"
           style={{ background: "radial-gradient(circle, rgba(113,162,103,0.30), transparent 65%)" }}
         />
-        <div
-          className="animate-aurora-1 absolute right-[15%] bottom-[5%] h-[55vh] w-[55vh] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, rgba(179,39,44,0.30), transparent 65%)", animationDelay: "-6s" }}
-        />
+        {!isMobile && (
+          <div
+            className="animate-aurora-1 absolute right-[15%] bottom-[5%] h-[55vh] w-[55vh] rounded-full blur-[90px] will-change-transform"
+            style={{ background: "radial-gradient(circle, rgba(179,39,44,0.30), transparent 65%)", animationDelay: "-6s" }}
+          />
+        )}
       </div>
 
       {/* Starfield dots */}
@@ -125,21 +161,24 @@ export function LivingBackground() {
       <FloatLayer
         tiles={tiles.filter((_, i) => i % 3 === 0)}
         y={yFar}
-        pointer={pointer}
+        px={spx}
+        py={spy}
         depthMultiplier={6}
         opacity={0.35}
       />
       <FloatLayer
         tiles={tiles.filter((_, i) => i % 3 === 1)}
         y={yMid}
-        pointer={pointer}
+        px={spx}
+        py={spy}
         depthMultiplier={14}
         opacity={0.5}
       />
       <FloatLayer
         tiles={tiles.filter((_, i) => i % 3 === 2)}
         y={yNear}
-        pointer={pointer}
+        px={spx}
+        py={spy}
         depthMultiplier={24}
         opacity={0.7}
       />
@@ -162,39 +201,43 @@ export function LivingBackground() {
 function FloatLayer({
   tiles,
   y,
-  pointer,
+  px,
+  py,
   depthMultiplier,
   opacity,
 }: {
   tiles: Tile[];
   y: MotionValue<string>;
-  pointer: { x: number; y: number };
+  px: MotionValue<number>;
+  py: MotionValue<number>;
   depthMultiplier: number;
   opacity: number;
 }) {
+  // Single shared transform per layer, GPU-composited via motion value.
+  const tx = useTransform(px, (v) => v * depthMultiplier);
+  const ty = useTransform(py, (v) => v * depthMultiplier);
+  const transform = useMotionTemplate`translate3d(${tx}px, ${ty}px, 0)`;
+
   return (
-    <motion.div className="absolute inset-0" style={{ y, opacity }}>
-      {tiles.map((tile, i) => (
-        <div
-          key={tile.uni.name + i}
-          className="animate-float-bob absolute"
-          style={{
-            left: tile.left,
-            top: tile.top,
-            width: tile.size,
-            height: tile.size,
-            // CSS vars consumed by float-bob keyframes
-            ["--rot" as string]: `${tile.rot}deg`,
-            ["--bob-dur" as string]: `${tile.dur}s`,
-            transform: `translate3d(${pointer.x * depthMultiplier}px, ${
-              pointer.y * depthMultiplier
-            }px, 0)`,
-            transition: "transform 600ms cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-        >
-          <UniTile uni={tile.uni} size={tile.size} />
-        </div>
-      ))}
+    <motion.div className="absolute inset-0 will-change-transform" style={{ y, opacity }}>
+      <motion.div className="absolute inset-0 will-change-transform" style={{ transform }}>
+        {tiles.map((tile, i) => (
+          <div
+            key={tile.uni.name + i}
+            className="animate-float-bob absolute will-change-transform"
+            style={{
+              left: tile.left,
+              top: tile.top,
+              width: tile.size,
+              height: tile.size,
+              ["--rot" as string]: `${tile.rot}deg`,
+              ["--bob-dur" as string]: `${tile.dur}s`,
+            }}
+          >
+            <UniTile uni={tile.uni} size={tile.size} />
+          </div>
+        ))}
+      </motion.div>
     </motion.div>
   );
 }
@@ -203,7 +246,7 @@ function UniTile({ uni, size }: { uni: { name: string; hue: string }; size: numb
   const logo = UNI_LOGOS[uni.name];
   return (
     <div
-      className="relative h-full w-full overflow-hidden rounded-xl ring-1 ring-on-surface/10 backdrop-blur-[2px]"
+      className="relative h-full w-full overflow-hidden rounded-xl ring-1 ring-on-surface/10"
       style={{
         background: logo
           ? `linear-gradient(135deg, #ffffff 0%, #ffffffcc 100%)`
@@ -217,6 +260,7 @@ function UniTile({ uni, size }: { uni: { name: string; hue: string }; size: numb
           alt={uni.name}
           className="absolute inset-0 h-full w-full object-contain p-3"
           loading="lazy"
+          decoding="async"
         />
       ) : (
         <div className="absolute inset-0 opacity-30 mix-blend-soft-light">
@@ -230,7 +274,7 @@ function UniTile({ uni, size }: { uni: { name: string; hue: string }; size: numb
         </div>
       )}
       <div className="absolute inset-x-2 bottom-2">
-        <div className="rounded-md bg-surface/85 px-2 py-1 text-center font-[var(--font-label)] text-[10px] font-semibold tracking-wide text-on-surface backdrop-blur">
+        <div className="rounded-md bg-surface/85 px-2 py-1 text-center font-[var(--font-label)] text-[10px] font-semibold tracking-wide text-on-surface">
           {uni.name}
         </div>
       </div>
