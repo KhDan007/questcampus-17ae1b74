@@ -488,23 +488,55 @@ function EssayPage() {
             <h2 className="font-display text-headline-md font-bold text-on-surface">
               My personal statements
             </h2>
+            <p className="mt-1 text-body-sm text-on-surface-variant">
+              Click any draft to reopen it — every edit you make is saved as a version you can roll back to.
+            </p>
             <ul className="mt-5 grid gap-3">
-              {past.map((p) => (
-                <li
-                  key={p.essayId}
-                  className="flex items-start gap-3 rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4 backdrop-blur-sm"
-                >
-                  <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div className="min-w-0">
-                    <p className="font-display text-label-lg font-bold text-on-surface">
-                      {p.targetName ?? "Common App essay"} · {p.wordCount} words
-                    </p>
-                    <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
-                      {p.preview}
-                    </p>
-                  </div>
-                </li>
-              ))}
+              {past.map((p) => {
+                const active = result?.essayId === p.essayId;
+                return (
+                  <li key={p.essayId}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setResult({
+                          essayId: p.essayId,
+                          format: "common_app",
+                          targetName: p.targetName,
+                          preview: p.preview,
+                          wordCount: p.wordCount,
+                          placeholders: [],
+                          locked: !isPaid,
+                          fullText: undefined,
+                        });
+                        setStep("result");
+                        if (typeof window !== "undefined") {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      }}
+                      className={`group flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
+                        active
+                          ? "border-on-surface bg-secondary-container"
+                          : "border-on-surface/15 bg-surface/80"
+                      }`}
+                    >
+                      <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-display text-label-lg font-bold text-on-surface">
+                          {p.targetName ?? "Common App essay"} · {p.wordCount} words
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
+                          {p.preview}
+                        </p>
+                        <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                          {formatVersionTime(p.createdAt)}
+                        </p>
+                      </div>
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
