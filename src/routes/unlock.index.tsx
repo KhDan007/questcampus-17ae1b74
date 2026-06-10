@@ -206,7 +206,7 @@ function UnlockPage() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
 
             {/* Right: What you get */}
             <div className="rounded-3xl border-2 border-on-surface bg-secondary-container p-7 qc-hard-shadow-sm sm:p-9">
