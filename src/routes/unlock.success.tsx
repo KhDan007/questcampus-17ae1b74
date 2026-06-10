@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
+import { useAuth } from "@/lib/auth/useAuth";
 import { NavBar } from "@/components/landing/NavBar";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
