@@ -27,10 +27,11 @@ function UnlockSuccessPage() {
   const [error, setError] = useState<string | null>(null);
   const { t } = useI18n();
 
+  const { isAdmin } = useAuth();
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   useEffect(() => {
     if (!isPaid || primed) return;
