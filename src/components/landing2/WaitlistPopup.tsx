@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check, Mail, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Mail, Sparkles, X } from "lucide-react";
+import { joinWaitlist } from "@/lib/waitlist/api";
 
 type Props = {
   open: boolean;
@@ -14,8 +15,6 @@ type Props = {
 
 /**
  * Reusable waitlist popup. Replaces the old dedicated /waitlist route.
- * Persists the email locally — wiring to the real signup endpoint can
- * happen later without changing call sites.
  */
 export function WaitlistPopup({
   open,
@@ -26,19 +25,34 @@ export function WaitlistPopup({
 }: Props) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setEmail("");
     setDone(false);
+    setAlreadyJoined(false);
+    setLoading(false);
+    setError("");
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
+    setLoading(true);
+    setError("");
+    const result = await joinWaitlist(email);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setAlreadyJoined(result.alreadyJoined);
     try {
       window.localStorage.setItem("qc.waitlist.email", email);
       const raw = window.localStorage.getItem("qc.waitlist.list");
