@@ -582,6 +582,7 @@ function EssayPage() {
           </section>
         )}
       </main>
+      </DashboardShell>
     </>
   );
 }
