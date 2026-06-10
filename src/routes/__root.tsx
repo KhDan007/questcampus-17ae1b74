@@ -4,10 +4,12 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 
@@ -141,9 +143,34 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
         <I18nProvider>
-          <Outlet />
+          <RouteTransitions>
+            <Outlet />
+          </RouteTransitions>
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
+  );
+}
+
+function RouteTransitions({ children }: { children: ReactNode }) {
+  const reduce = useReducedMotion();
+  // Key on the top-level route segment so in-page state (search params, hashes,
+  // nested updates) doesn't trigger a fade. Only true route changes animate.
+  const segment = useRouterState({
+    select: (s) => "/" + (s.location.pathname.split("/")[1] ?? ""),
+  });
+  if (reduce) return <>{children}</>;
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={segment}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }
