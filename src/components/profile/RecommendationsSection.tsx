@@ -9,6 +9,7 @@ import { WAITLIST_PATH } from "@/lib/routes";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { useAuth } from "@/lib/auth/useAuth";
 
 
 type FreePayload = {
