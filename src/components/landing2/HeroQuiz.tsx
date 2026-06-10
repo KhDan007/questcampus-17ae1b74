@@ -88,7 +88,7 @@ const QUESTIONS: {
   },
   {
     key: "country",
-    prompt: "Where do you call home?",
+    prompt: "Where do you wanna go?",
     helper: "Affects visa, fees, and country quotas.",
     options: [
       { value: "us", label: "United States", sub: "US schools only" },
