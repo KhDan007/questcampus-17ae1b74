@@ -447,7 +447,7 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
           transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
         },
       }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
     >
       <div className="flex items-start justify-between gap-3">
