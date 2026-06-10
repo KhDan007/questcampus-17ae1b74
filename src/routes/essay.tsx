@@ -716,6 +716,7 @@ function QuestionsForm({
   loading,
   error,
   token,
+  sessionId,
 }: {
   answers: AnswerMap;
   setAnswers: (next: AnswerMap | ((prev: AnswerMap) => AnswerMap)) => void;
@@ -725,9 +726,11 @@ function QuestionsForm({
   loading: boolean;
   error: EssayError["error"] | null;
   token: string | undefined;
+  sessionId: string | null;
 }) {
   const setField = (key: string, patch: Partial<AnswerVal>) =>
     setAnswers((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  const [flashKey, setFlashKey] = useState<string | null>(null);
 
   return (
     <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
