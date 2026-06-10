@@ -1122,6 +1122,50 @@ function ResultView({
     setBodyKey((k) => k + 1);
   };
 
+  // -------- Version history (local, per essayId) --------
+  const [versions, setVersions] = useState<EssayVersion[]>(() =>
+    loadVersions(result.essayId),
+  );
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const lastSnapshot = useRef<string>("");
+
+  // Reload list when switching to a different essay.
+  useEffect(() => {
+    setVersions(loadVersions(result.essayId));
+    lastSnapshot.current = "";
+    setHistoryOpen(false);
+  }, [result.essayId]);
+
+  // Snapshot whenever fullText changes (initial load, save, revise, undo).
+  useEffect(() => {
+    const text = result.fullText ?? "";
+    if (!text.trim()) return;
+    if (text === lastSnapshot.current) return;
+    lastSnapshot.current = text;
+    const label = versions.length === 0 ? "Original" : "Edit";
+    pushVersion(result.essayId, {
+      fullText: text,
+      wordCount: result.wordCount,
+      label,
+    });
+    setVersions(loadVersions(result.essayId));
+  }, [result.fullText, result.wordCount, result.essayId, versions.length]);
+
+  const restoreVersion = useCallback(
+    (v: EssayVersion) => {
+      // Optimistic UI first, then persist via the same save path.
+      setResult({
+        ...result,
+        fullText: v.fullText,
+        wordCount: v.wordCount,
+      });
+      setBodyKey((k) => k + 1);
+      setHistoryOpen(false);
+      if (token && editable) void doSave(v.fullText);
+    },
+    [result, setResult, token, editable, doSave],
+  );
+
   const bodyText = renderText(result);
   const edited = undoBuf !== null || saveState === "saved";
 
