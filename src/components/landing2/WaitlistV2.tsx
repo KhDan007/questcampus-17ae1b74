@@ -86,25 +86,41 @@ export function WaitlistV2() {
                   >
                     Your email
                   </label>
-                  <div className="mt-2 flex items-center gap-2 rounded-sm border-2 border-on-surface bg-surface-container-lowest px-3 transition-colors focus-within:border-primary">
+                  <div
+                    className={`mt-2 flex items-center gap-2 rounded-sm border-2 bg-surface-container-lowest px-3 transition-colors focus-within:border-primary ${error ? "border-error" : "border-on-surface"}`}
+                  >
                     <Mail className="h-4 w-4 text-on-surface-variant" />
                     <input
                       id="wl-email"
                       type="email"
                       required
+                      disabled={loading}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (error) setError("");
+                      }}
                       placeholder="you@school.edu"
-                      className="w-full bg-transparent py-3 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60"
+                      className="w-full bg-transparent py-3 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60 disabled:opacity-50"
                     />
                   </div>
+                  {error && (
+                    <p className="mt-1.5 text-label-sm text-error">{error}</p>
+                  )}
 
                   <button
                     type="submit"
-                    className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                    disabled={loading}
+                    className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <Sparkles className="h-4 w-4" />
-                    Join the waitlist
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Join the waitlist
+                      </>
+                    )}
                   </button>
                   <p className="mt-3 font-[var(--font-label)] text-label-sm text-on-surface-variant">
                     No spam. One launch email when each feature ships.
