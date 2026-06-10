@@ -1235,6 +1235,69 @@ function ResultView({
                 </button>
               </>
             )}
+            {versions.length > 1 && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen((v) => !v)}
+                  aria-expanded={historyOpen}
+                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  <History className="h-3.5 w-3.5" /> Versions
+                  <span className="ml-0.5 rounded-full bg-secondary-container px-1.5 text-label-sm">
+                    {versions.length}
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {historyOpen && (
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                      className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border-2 border-on-surface bg-surface p-2 qc-hard-shadow"
+                    >
+                      <p className="px-2 pb-1 pt-1 font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface-variant">
+                        Version history
+                      </p>
+                      <ul className="max-h-80 overflow-y-auto">
+                        {versions.map((v, i) => {
+                          const isCurrent = v.fullText === (result.fullText ?? "");
+                          return (
+                            <li key={v.id}>
+                              <button
+                                type="button"
+                                disabled={isCurrent || !editable}
+                                onClick={() => restoreVersion(v)}
+                                className="group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-secondary-container/70 disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent"
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-display text-label-md font-bold text-on-surface">
+                                    {i === 0 ? "Current" : v.label ?? "Edit"}
+                                    <span className="ml-2 font-[var(--font-label)] text-label-sm font-normal text-on-surface-variant">
+                                      · {v.wordCount} words · {formatVersionTime(v.ts)}
+                                    </span>
+                                  </p>
+                                  <p className="mt-0.5 line-clamp-2 text-body-sm text-on-surface-variant">
+                                    {v.fullText.slice(0, 140)}
+                                  </p>
+                                </div>
+                                {!isCurrent && editable && (
+                                  <RotateCcw className="mt-1 h-3.5 w-3.5 shrink-0 text-on-surface-variant transition-colors group-hover:text-primary" />
+                                )}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <p className="border-t border-on-surface/10 px-2 pb-1 pt-2 text-label-sm text-on-surface-variant">
+                        Saved locally on this device.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
             <button
               type="button"
               onClick={onRegenerate}
