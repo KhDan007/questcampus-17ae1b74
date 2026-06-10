@@ -365,10 +365,20 @@ function MatchCard({
 
       <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
 
-      <div className="mt-5 flex items-center gap-2 border-t border-on-surface/10 pt-4">
+      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-4">
         <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
           {match.tag}
         </span>
+        {!locked && normalizeUrl(match.website) && (
+          <a
+            href={normalizeUrl(match.website)!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+          >
+            Official site <ArrowRight className="h-3 w-3" />
+          </a>
+        )}
       </div>
     </motion.article>
   );
