@@ -55,9 +55,12 @@ export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) 
     }
   }
 
-  const disabled = loading || !token;
+  // Until mounted, treat as "has token" to avoid SSR/client mismatch since
+  // token is read from localStorage and is always undefined on the server.
+  const disabled = mounted ? loading || !token : loading;
+  const showSignInHint = mounted && !token;
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex w-full flex-col items-center gap-2">
       <button
         type="button"
         onClick={handleClick}
@@ -70,7 +73,7 @@ export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) 
         {loading ? t("unlock.redirecting") : resolvedLabel}
         {!loading && <span aria-hidden>→</span>}
       </button>
-      {!token && (
+      {showSignInHint && (
         <p className="text-label-sm text-on-surface-variant">
           <a href={SIGNIN_PATH} className="underline hover:text-primary">
             {t("unlock.signinPrompt")}
