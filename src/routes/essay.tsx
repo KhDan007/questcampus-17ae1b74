@@ -28,6 +28,7 @@ import {
   formatVersionTime,
   type EssayVersion,
 } from "@/lib/essays/history";
+import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
@@ -296,6 +297,7 @@ function EssayPage() {
   }, [sessionId, token, recommend]);
 
   // ---- Form state
+  const [view, setView] = useState<"write" | "review">("write");
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>(() => {
