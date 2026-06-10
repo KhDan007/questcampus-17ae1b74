@@ -2,15 +2,28 @@
 
 import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Check, Mail, Sparkles } from "lucide-react";
+import { Check, Loader2, Mail, Sparkles } from "lucide-react";
+import { joinWaitlist } from "@/lib/waitlist/api";
 
 export function WaitlistV2() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
+    setLoading(true);
+    setError("");
+    const result = await joinWaitlist(email);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setAlreadyJoined(result.alreadyJoined);
     try {
       window.localStorage.setItem("qc.waitlist.email", email);
       const raw = window.localStorage.getItem("qc.waitlist.list");
