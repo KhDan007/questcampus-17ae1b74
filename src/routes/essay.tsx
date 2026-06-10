@@ -227,7 +227,7 @@ function readLandingMatchesAsRecCards(): RecCard[] {
 function EssayPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const token = auth.getSession()?.token;
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -315,7 +315,7 @@ function EssayPage() {
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   // Re-fetch the full essay once the user pays.
   const essayDoc = useQuery(

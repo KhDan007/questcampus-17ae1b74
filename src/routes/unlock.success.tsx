@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
+import { useAuth } from "@/lib/auth/useAuth";
 import { NavBar } from "@/components/landing/NavBar";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -26,10 +27,11 @@ function UnlockSuccessPage() {
   const [error, setError] = useState<string | null>(null);
   const { t } = useI18n();
 
+  const { isAdmin } = useAuth();
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   useEffect(() => {
     if (!isPaid || primed) return;

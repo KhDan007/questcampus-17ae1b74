@@ -9,6 +9,7 @@ import { WAITLIST_PATH } from "@/lib/routes";
 import { WAITLIST_BASE_DISCOUNT, REFERRAL_EXTRA_DISCOUNT } from "@/lib/config";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { useAuth } from "@/lib/auth/useAuth";
 
 
 type FreePayload = {
@@ -53,10 +54,12 @@ export function RecommendationsSection({
   const [paidStatus, setPaidStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
 
   // Live entitlement — flips to {paid:true} ~instantly once the webhook lands.
+  // Admins (UI override) always pass; backend is still the real gate.
+  const { isAdmin } = useAuth();
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
-  const isPaid = entitlement?.paid === true;
+  const isPaid = isAdmin || entitlement?.paid === true;
 
   const loadFree = useCallback(
     async (force = false) => {
