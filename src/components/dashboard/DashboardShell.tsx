@@ -98,7 +98,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen w-full">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex fixed top-16 bottom-0 left-0 w-[260px] flex-col border-r-2 border-on-surface/10 bg-surface/60 backdrop-blur-md">
+        <aside
+          className="hidden lg:flex flex-col border-r-2 border-on-surface/15 bg-surface/95 backdrop-blur-xl"
+          style={{
+            position: "fixed",
+            top: "4rem",
+            bottom: 0,
+            left: 0,
+            width: "260px",
+            zIndex: 40,
+          }}
+        >
           <SidebarBody
             pathname={pathname}
             onWaitlist={(f) => setWaitlist(f)}
@@ -106,7 +116,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
         </aside>
 
-        <div className="w-full lg:pl-[260px] lg:pt-0 pt-12">
+        <div
+          className="w-full pt-12 lg:pt-0"
+          style={{ paddingLeft: typeof window !== "undefined" && window.innerWidth >= 1024 ? "260px" : undefined }}
+        >
           {children}
         </div>
       </div>
