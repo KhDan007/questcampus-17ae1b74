@@ -31,6 +31,8 @@ export function NavV2() {
     setPopup(true);
   }
 
+  const showWaitlistButton = isLanding || isUnlock;
+
   return (
     <>
       <motion.header
