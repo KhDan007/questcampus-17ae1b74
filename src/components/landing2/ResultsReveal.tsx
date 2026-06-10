@@ -18,6 +18,7 @@ type Match = {
   bucket: Bucket;
   why: string;
   tag: string;
+  website?: string;
 };
 
 type RawResult = {
