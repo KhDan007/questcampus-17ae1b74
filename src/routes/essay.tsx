@@ -28,6 +28,7 @@ import {
   formatVersionTime,
   type EssayVersion,
 } from "@/lib/essays/history";
+import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
@@ -296,6 +297,7 @@ function EssayPage() {
   }, [sessionId, token, recommend]);
 
   // ---- Form state
+  const [view, setView] = useState<"write" | "review">("write");
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>(() => {
@@ -429,10 +431,45 @@ function EssayPage() {
           </p>
         </motion.div>
 
-        <div className="mt-10">
-          <Stepper step={step} />
+        <div className="mt-8">
+          <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+            {([
+              { k: "write", label: "Write" },
+              { k: "review", label: "Review" },
+            ] as { k: "write" | "review"; label: string }[]).map((t) => {
+              const active = view === t.k;
+              return (
+                <button
+                  key={t.k}
+                  type="button"
+                  onClick={() => setView(t.k)}
+                  className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                    active
+                      ? "bg-primary text-white qc-hard-shadow-sm"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
+        {view === "write" && (
+          <div className="mt-6">
+            <Stepper step={step} />
+          </div>
+        )}
+
+
+        {view === "review" && (
+          <div className="mt-8">
+            <EssayReview sessionId={sessionId} token={token} isPaid={isPaid} />
+          </div>
+        )}
+
+        {view === "write" && (
         <AnimatePresence mode="wait">
           {step === "target" && (
             <StepWrap key="target">
@@ -482,8 +519,10 @@ function EssayPage() {
             </StepWrap>
           )}
         </AnimatePresence>
+        )}
 
-        {past && past.length > 0 && (
+
+        {view === "write" && past && past.length > 0 && (
           <section className="mt-20">
             <h2 className="font-display text-headline-md font-bold text-on-surface">
               My personal statements
