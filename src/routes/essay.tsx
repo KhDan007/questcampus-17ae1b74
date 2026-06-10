@@ -752,19 +752,35 @@ function QuestionsForm({
           const goodLength = q.minChars ? charCount >= Math.min(120, q.minChars + 40) : false;
           return (
             <div key={q.key}>
-              <div className="flex items-baseline gap-2">
-                <label className="block font-display text-label-lg font-bold text-on-surface">
-                  {q.label}
-                </label>
-                {q.required && (
-                  <span className="font-[var(--font-label)] text-label-sm font-semibold text-primary">
-                    Required
-                  </span>
-                )}
-                {q.optional && (
-                  <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                    Optional
-                  </span>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex items-baseline gap-2">
+                  <label className="block font-display text-label-lg font-bold text-on-surface">
+                    {q.label}
+                  </label>
+                  {q.required && (
+                    <span className="font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                      Required
+                    </span>
+                  )}
+                  {q.optional && (
+                    <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                      Optional
+                    </span>
+                  )}
+                </div>
+                {(isStory || q.shortText) && sessionId && token && (
+                  <AssistTrigger
+                    sessionId={sessionId}
+                    token={token}
+                    question={q.label}
+                    currentValue={text}
+                    hasValue={charCount > 0}
+                    onAccept={(t) => {
+                      setField(q.key, { text: t });
+                      setFlashKey(q.key);
+                      window.setTimeout(() => setFlashKey((k) => (k === q.key ? null : k)), 900);
+                    }}
+                  />
                 )}
               </div>
 
@@ -821,7 +837,11 @@ function QuestionsForm({
                     rows={4}
                     placeholder={q.textPlaceholder}
                     maxLength={800}
-                    className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                    className={`mt-3 w-full resize-y rounded-lg border-2 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none transition-colors ${
+                      flashKey === q.key
+                        ? "border-primary ring-2 ring-primary/30"
+                        : "border-on-surface/30"
+                    }`}
                   />
                   <div className="mt-1.5 flex items-start justify-between gap-3">
                     <p className="text-label-sm text-on-surface-variant">
@@ -844,7 +864,9 @@ function QuestionsForm({
                   onChange={(e) => setField(q.key, { text: e.target.value })}
                   placeholder={q.textPlaceholder}
                   maxLength={220}
-                  className="mt-3 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+                  className={`mt-3 w-full rounded-lg border-2 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none transition-colors ${
+                    flashKey === q.key ? "border-primary ring-2 ring-primary/30" : "border-on-surface/30"
+                  }`}
                 />
               )}
             </div>
