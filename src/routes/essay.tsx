@@ -519,9 +519,8 @@ function EssayPage() {
             </StepWrap>
           )}
         </AnimatePresence>
-
-        </AnimatePresence>
         )}
+
 
         {view === "write" && past && past.length > 0 && (
           <section className="mt-20">
