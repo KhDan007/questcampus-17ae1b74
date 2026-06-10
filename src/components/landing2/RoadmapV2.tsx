@@ -71,17 +71,40 @@ export function RoadmapV2() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6 }}
-              className="group relative flex h-full flex-col rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow transition-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)]"
+              whileHover={{
+                y: -10,
+                scale: 1.03,
+                rotate: -0.4,
+                transition: { type: "spring", stiffness: 280, damping: 18 },
+              }}
+              className="group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow transition-shadow duration-300 hover:shadow-[8px_8px_0_0_var(--color-primary)]"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary-fixed text-primary transition-transform group-hover:scale-110">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -inset-px -z-0 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70"
+                style={{
+                  background:
+                    "radial-gradient(120% 80% at 20% 0%, rgba(255,95,93,0.35), transparent 55%), radial-gradient(120% 80% at 100% 100%, rgba(254,183,0,0.30), transparent 55%)",
+                }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100"
+              />
+              <div className="relative flex items-start justify-between gap-3">
+                <motion.div
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-primary-fixed text-primary"
+                  whileHover={{ rotate: -8, scale: 1.15 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 14 }}
+                >
                   <f.icon className="h-5 w-5" strokeWidth={2.2} />
-                </div>
+                </motion.div>
                 <Badge tone={f.badgeTone}>{f.badge}</Badge>
               </div>
-              <h3 className="mt-4 text-headline-sm text-on-surface">{f.title}</h3>
-              <p className="mt-2 flex-1 text-body-md text-on-surface-variant">{f.body}</p>
+              <h3 className="relative mt-4 text-headline-sm text-on-surface transition-colors duration-300 group-hover:text-primary">
+                {f.title}
+              </h3>
+              <p className="relative mt-2 flex-1 text-body-md text-on-surface-variant">{f.body}</p>
             </motion.article>
           ))}
         </div>
