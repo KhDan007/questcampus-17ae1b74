@@ -2,17 +2,18 @@
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useQuery, useAction } from "convex/react";
+import { ArrowRight, PartyPopper, Loader2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
-import { NavBar } from "@/components/landing/NavBar";
+import { NavV2 } from "@/components/landing2/NavV2";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/unlock/success")({
-  head: () => ({ meta: [{ title: "QuestCampus — Unlocking your matches" }] }),
+  head: () => ({ meta: [{ title: "Unlocking your matches — QuestCampus" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
     checkout_id: typeof s.checkout_id === "string" ? s.checkout_id : undefined,
   }),
@@ -26,6 +27,7 @@ function UnlockSuccessPage() {
   const [primed, setPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useI18n();
+  const reduce = useReducedMotion();
 
   const { isAdmin } = useAuth();
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
@@ -56,21 +58,32 @@ function UnlockSuccessPage() {
 
   return (
     <>
-      <NavBar variant="minimal" />
-      <main className="flex min-h-screen items-center justify-center bg-surface px-4">
-        <div className="mx-auto max-w-[520px] text-center">
+      <NavV2 />
+      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 pt-24">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute bottom-0 right-[-10%] h-[420px] w-[420px] rounded-full bg-secondary-container/60 blur-3xl" />
+        </div>
+
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto w-full max-w-[560px] rounded-3xl border-2 border-on-surface bg-surface p-8 text-center qc-hard-shadow sm:p-10"
+        >
           {!token ? (
             <SignedOutState />
           ) : isPaid ? (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-container text-3xl text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)]">
-                🎉
-              </span>
-              <h1 className="mt-6 text-display-lg-mobile text-on-background">
+            <>
+              <motion.span
+                initial={reduce ? false : { scale: 0.6, rotate: -20, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 220, damping: 14, delay: 0.05 }}
+                className="inline-grid h-16 w-16 place-items-center rounded-2xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm"
+              >
+                <PartyPopper className="h-7 w-7" />
+              </motion.span>
+              <h1 className="mt-6 font-display text-3xl font-black tracking-tight text-on-surface sm:text-4xl">
                 {t("unlockOk.title")}
               </h1>
               <p className="mt-3 text-body-lg text-on-surface-variant">
@@ -79,15 +92,16 @@ function UnlockSuccessPage() {
               {error && <p className="mt-3 text-label-sm text-error">{error}</p>}
               <Link
                 to="/profile"
-                className="mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03]"
+                className="group mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
               >
                 {t("unlockOk.go")}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-            </motion.div>
+            </>
           ) : (
             <WaitingState />
           )}
-        </div>
+        </motion.div>
       </main>
     </>
   );
@@ -96,19 +110,17 @@ function UnlockSuccessPage() {
 function WaitingState() {
   const { t } = useI18n();
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <motion.span
-        className="mx-auto block h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-      />
-      <h1 className="mt-6 text-headline-md text-on-background">{t("unlockOk.waiting")}</h1>
-      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.waitingBody")}</p>
-    </motion.div>
+    <div>
+      <span className="inline-grid h-14 w-14 place-items-center rounded-2xl border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </span>
+      <h1 className="mt-6 font-display text-2xl font-black tracking-tight text-on-surface sm:text-3xl">
+        {t("unlockOk.waiting")}
+      </h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">
+        {t("unlockOk.waitingBody")}
+      </p>
+    </div>
   );
 }
 
@@ -116,13 +128,18 @@ function SignedOutState() {
   const { t } = useI18n();
   return (
     <div>
-      <h1 className="text-headline-md text-on-background">{t("unlockOk.signedOutTitle")}</h1>
-      <p className="mt-3 text-body-md text-on-surface-variant">{t("unlockOk.signedOutBody")}</p>
+      <h1 className="font-display text-2xl font-black tracking-tight text-on-surface sm:text-3xl">
+        {t("unlockOk.signedOutTitle")}
+      </h1>
+      <p className="mt-3 text-body-md text-on-surface-variant">
+        {t("unlockOk.signedOutBody")}
+      </p>
       <Link
         to="/signin"
-        className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
+        className="group mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-6 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
       >
         {t("unlockOk.signin")}
+        <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
   );

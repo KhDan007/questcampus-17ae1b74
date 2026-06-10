@@ -20,6 +20,7 @@ import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { UnlockButton } from "@/components/payments/UnlockButton";
+import { TiltCard } from "@/components/payments/TiltCard";
 import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
 import { SIGNIN_PATH } from "@/lib/routes";
 import { PRICE_MVP } from "@/lib/config";
@@ -72,7 +73,7 @@ function UnlockPage() {
   ];
 
   const guarantees = [
-    { Icon: ShieldCheck, label: "Secure Stripe checkout" },
+    { Icon: ShieldCheck, label: "Secure Polar checkout" },
     { Icon: Sparkles, label: "Lifetime access — no renewals" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
@@ -127,8 +128,8 @@ function UnlockPage() {
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
             className="mt-12 grid gap-6 md:grid-cols-[1.15fr_1fr]"
           >
-            {/* Left: Price + CTA */}
-            <div className="relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 sm:p-9 qc-hard-shadow">
+            {/* Left: Price + CTA (cursor-tilt) */}
+            <TiltCard className="group relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9">
               <div
                 aria-hidden
                 className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/15 blur-2xl"
@@ -192,19 +193,6 @@ function UnlockPage() {
                     className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
                   />
                 )}
-
-                {!token && !alreadyPaid && (
-                  <p className="text-center text-label-sm text-on-surface-variant">
-                    {t("unlock.needAccount")}{" "}
-                    <Link
-                      to={SIGNIN_PATH}
-                      className="font-semibold underline hover:text-primary"
-                    >
-                      {t("unlock.signinLink")}
-                    </Link>
-                    .
-                  </p>
-                )}
               </div>
 
               <ul className="mt-6 flex flex-col gap-2 border-t-2 border-dashed border-on-surface/15 pt-5">
@@ -218,7 +206,7 @@ function UnlockPage() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
 
             {/* Right: What you get */}
             <div className="rounded-3xl border-2 border-on-surface bg-secondary-container p-7 qc-hard-shadow-sm sm:p-9">
