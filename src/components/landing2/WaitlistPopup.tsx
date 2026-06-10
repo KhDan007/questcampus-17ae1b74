@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check, Mail, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Mail, Sparkles, X } from "lucide-react";
+import { joinWaitlist } from "@/lib/waitlist/api";
 
 type Props = {
   open: boolean;
@@ -14,8 +15,6 @@ type Props = {
 
 /**
  * Reusable waitlist popup. Replaces the old dedicated /waitlist route.
- * Persists the email locally — wiring to the real signup endpoint can
- * happen later without changing call sites.
  */
 export function WaitlistPopup({
   open,
@@ -26,19 +25,34 @@ export function WaitlistPopup({
 }: Props) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setEmail("");
     setDone(false);
+    setAlreadyJoined(false);
+    setLoading(false);
+    setError("");
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
+    setLoading(true);
+    setError("");
+    const result = await joinWaitlist(email);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setAlreadyJoined(result.alreadyJoined);
     try {
       window.localStorage.setItem("qc.waitlist.email", email);
       const raw = window.localStorage.getItem("qc.waitlist.list");
@@ -99,25 +113,39 @@ export function WaitlistPopup({
                 >
                   Your email
                 </label>
-                <div className="mt-2 flex items-center gap-2 rounded-sm border-2 border-on-surface bg-surface-container-lowest px-3 transition-colors focus-within:border-primary">
+                <div
+                  className={`mt-2 flex items-center gap-2 rounded-sm border-2 bg-surface-container-lowest px-3 transition-colors focus-within:border-primary ${error ? "border-error" : "border-on-surface"}`}
+                >
                   <Mail className="h-4 w-4 text-on-surface-variant" />
                   <input
                     id="wlp-email"
                     type="email"
                     required
                     autoFocus
+                    disabled={loading}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError("");
+                    }}
                     placeholder="you@school.edu"
-                    className="w-full bg-transparent py-2.5 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60"
+                    className="w-full bg-transparent py-2.5 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60 disabled:opacity-50"
                   />
                 </div>
+                {error && (
+                  <p className="mt-1.5 text-label-sm text-error">{error}</p>
+                )}
 
                 <button
                   type="submit"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  disabled={loading}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Join the waitlist
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Join the waitlist"
+                  )}
                 </button>
                 <p className="mt-3 text-label-sm text-on-surface-variant">
                   No spam. One email when it ships.
@@ -133,10 +161,12 @@ export function WaitlistPopup({
                   <Check className="h-6 w-6" strokeWidth={3} />
                 </div>
                 <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-                  You're on the list.
+                  {alreadyJoined ? "You're already on the list." : "You're on the list!"}
                 </h3>
                 <p className="mt-2 text-body-md text-on-surface-variant">
-                  We'll email you the moment it's ready — with your 30% lifetime discount locked in.
+                  {alreadyJoined
+                    ? "You're all set — we'll email you the moment it's ready."
+                    : "Check your inbox for confirmation. We'll email you the moment it's ready — with your 30% lifetime discount locked in."}
                 </p>
                 <button
                   type="button"
