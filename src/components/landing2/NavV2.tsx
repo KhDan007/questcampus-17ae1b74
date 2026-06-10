@@ -51,22 +51,34 @@ export function NavV2() {
           </a>
 
           <div className="hidden items-center gap-7 md:flex">
-            <NavLink href="/#how">How it works</NavLink>
-            <NavLink href="/#roadmap">What's coming</NavLink>
-            <NavLink href="/#waitlist" onClick={joinWaitlist}>
-              Waitlist
-            </NavLink>
+            {isLanding ? (
+              <>
+                <NavLink href="/#how">How it works</NavLink>
+                <NavLink href="/#roadmap">What's coming</NavLink>
+                <NavLink href="/#waitlist" onClick={joinWaitlist}>
+                  Waitlist
+                </NavLink>
+              </>
+            ) : isAuthenticated ? (
+              <>
+                <NavLink href="/dashboard">Dashboard</NavLink>
+                <NavLink href="/essay">Essay</NavLink>
+                <NavLink href="/onboarding">Refine matches</NavLink>
+              </>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-3">
-            <a
-              href="/#waitlist"
-              onClick={joinWaitlist}
-              className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
-            >
-              Join waitlist
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </a>
+            {isLanding && (
+              <a
+                href="/#waitlist"
+                onClick={joinWaitlist}
+                className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+              >
+                Join waitlist
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            )}
             <ProfileMenu />
           </div>
         </nav>
