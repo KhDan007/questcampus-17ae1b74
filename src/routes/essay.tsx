@@ -19,7 +19,15 @@ import {
   X,
   Pencil,
   ChevronDown,
+  History,
+  RotateCcw,
 } from "lucide-react";
+import {
+  loadVersions,
+  pushVersion,
+  formatVersionTime,
+  type EssayVersion,
+} from "@/lib/essays/history";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { NavV2 } from "@/components/landing2/NavV2";
