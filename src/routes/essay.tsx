@@ -1384,37 +1384,8 @@ function ResultView({
           </div>
         )}
 
-        {locked && (
-          <div className="relative mt-2">
-            <div className="pointer-events-none select-none text-body-md leading-relaxed text-on-surface/70 blur-[5px]">
-              {LOCKED_FILLER}
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-surface/80 to-surface p-6 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-secondary-container">
-                <Lock className="h-5 w-5 text-on-surface" />
-              </div>
-              <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-                Reveal the full essay
-              </h3>
-              <p className="mt-2 max-w-md text-body-sm text-on-surface-variant">
-                One ${PRICE_MVP} unlock reveals this essay in full AND every
-                university match — forever. No subscription.
-              </p>
-              <div className="mt-5">
-                <UnlockButton
-                  token={token}
-                  label={`Reveal full essay – $${PRICE_MVP}`}
-                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                />
-              </div>
-              {isPaid && (
-                <p className="mt-3 inline-flex items-center gap-1.5 text-label-sm text-primary">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Confirming
-                  payment — your essay will reveal automatically.
-                </p>
-              )}
-            </div>
-          </div>
+        {!isPaid && (
+          <FreeTrialScoreBanner essayId={result.essayId} token={token} />
         )}
 
         {reviseErr && (
