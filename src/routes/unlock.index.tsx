@@ -2,7 +2,6 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import {
   ArrowRight,
@@ -45,9 +44,7 @@ function UnlockPage() {
   const { t } = useI18n();
   const reduce = useReducedMotion();
   const { isAdmin } = useAuth();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const token = mounted ? auth.getSession()?.token : undefined;
+  const token = auth.getSession()?.token;
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
     | undefined;
