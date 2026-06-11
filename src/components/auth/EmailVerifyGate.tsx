@@ -212,16 +212,16 @@ function Modal({
           </button>
         </p>
 
-        {/* Tiny dismiss for the event-triggered case — the gate will auto-reopen
-            on the next protected action if the user is still unverified. */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full text-on-surface-variant hover:bg-surface-container"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        {dismissible && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full text-on-surface-variant hover:bg-surface-container"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );
