@@ -661,7 +661,120 @@ function EssayPage() {
         )}
       </main>
       </DashboardShell>
+      <ReviewSuggestionModal
+        open={reviewPromptOpen && step === "result" && !!result}
+        targetName={result?.targetName}
+        onClose={() => setReviewPromptOpen(false)}
+        onConfirm={() => {
+          if (result) setAutoReviewEssayId(result.essayId);
+          setView("review");
+          setReviewPromptOpen(false);
+          if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
     </>
+  );
+}
+
+function ReviewSuggestionModal({
+  open,
+  targetName,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  targetName?: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[80] grid place-items-center px-4"
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="absolute inset-0 bg-on-surface/40 backdrop-blur-sm"
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="review-suggest-title"
+            initial={reduce ? false : { opacity: 0, scale: 0.94, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 6 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-lg rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9"
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Dismiss"
+              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-2 border-on-surface/20 bg-surface text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> Next step
+            </div>
+            <h2
+              id="review-suggest-title"
+              className="mt-4 font-display text-headline-lg font-bold text-on-surface text-balance"
+            >
+              Run the review on your <span className="qc-text-gradient">new essay</span>?
+            </h2>
+            <p className="mt-3 text-body-md text-on-surface-variant">
+              You'll get a score across 7 dimensions, inline notes on the exact lines that
+              need work, and one-click rewrites you can apply with a single tap
+              {targetName ? <> — tailored to <span className="font-semibold text-on-surface">{targetName}</span></> : null}.
+            </p>
+            <ul className="mt-5 grid gap-2 text-body-sm text-on-surface">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                Catch weak hooks and vague claims before submission.
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                Apply suggested rewrites in one click — undo anytime.
+              </li>
+            </ul>
+            <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center justify-center rounded-md border-2 border-on-surface/30 bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+              >
+                Maybe later
+              </button>
+              <button
+                type="button"
+                onClick={onConfirm}
+                className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                <Sparkles className="h-4 w-4" /> Review my essay
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
