@@ -41,10 +41,12 @@ export function EmailVerifyGate() {
 function Modal({
   token,
   email,
+  dismissible,
   onClose,
 }: {
   token: string;
   email: string;
+  dismissible: boolean;
   onClose: () => void;
 }) {
   const [code, setCode] = useState("");
