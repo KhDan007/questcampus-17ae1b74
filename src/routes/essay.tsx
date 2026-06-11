@@ -431,6 +431,14 @@ function EssayPage() {
       setStep("result");
       try {
         await clearDraft({ sessionId, token });
+        if (typeof window !== "undefined") {
+          try {
+            window.localStorage.removeItem("qc.essay.answers");
+            window.localStorage.removeItem("qc.essay.target");
+          } catch {
+            /* ignore */
+          }
+        }
       } catch {
         /* non-fatal */
       }
