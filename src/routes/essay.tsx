@@ -364,6 +364,20 @@ function EssayPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, sessionId, token]);
 
+  // Offline mirror: synchronously write to localStorage so a draft survives
+  // network hiccups. Convex remains the source of truth.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("qc.essay.answers", JSON.stringify(answers));
+      if (target) {
+        window.localStorage.setItem("qc.essay.target", JSON.stringify(target));
+      }
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [answers, target]);
+
   // ---- Generation
   const generate = useAction(api.essays.generate);
   const [genStatus, setGenStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
