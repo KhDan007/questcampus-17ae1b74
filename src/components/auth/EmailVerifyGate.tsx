@@ -26,9 +26,16 @@ export function EmailVerifyGate() {
   }, []);
 
   // Verified users never see the modal.
-  const open = !!token && unverified && (unverified || forceOpen);
+  const open = !!token && (unverified || forceOpen);
   if (!open || !token) return null;
-  return <Modal token={token} email={user?.email ?? ""} onClose={() => setForceOpen(false)} />;
+  return (
+    <Modal
+      token={token}
+      email={user?.email ?? ""}
+      dismissible={!unverified}
+      onClose={() => setForceOpen(false)}
+    />
+  );
 }
 
 function Modal({
