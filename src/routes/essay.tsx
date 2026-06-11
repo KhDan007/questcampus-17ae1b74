@@ -431,6 +431,7 @@ function EssayPage() {
       setResult(res);
       setGenStatus("ready");
       setStep("result");
+      setReviewPromptOpen(true);
       try {
         await clearDraft({ sessionId, token });
         if (typeof window !== "undefined") {
