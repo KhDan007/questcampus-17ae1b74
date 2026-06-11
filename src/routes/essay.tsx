@@ -296,26 +296,51 @@ function EssayPage() {
   const [view, setView] = useState<"write" | "review">("write");
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
-  const [answers, setAnswers] = useState<AnswerMap>(() => {
-    if (typeof window === "undefined") return {};
-    try {
-      const raw = window.localStorage.getItem("qc.essay.answers");
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? (parsed as AnswerMap) : {};
-    } catch {
-      return {};
-    }
-  });
+  const [answers, setAnswers] = useState<AnswerMap>({});
 
+  // ---- Draft persistence (Convex; replaces qc.essay.answers localStorage)
+  const draftQ = useQuery(
+    api.essays.getDraft,
+    sessionId ? { sessionId, token } : "skip",
+  ) as
+    | { target: { externalId?: string; name: string } | null; answers: AnswerMap }
+    | null
+    | undefined;
+  const hydratedRef = useRef(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem("qc.essay.answers", JSON.stringify(answers));
-    } catch {
-      /* quota: ignore */
+    if (hydratedRef.current) return;
+    if (draftQ === undefined) return; // still loading
+    hydratedRef.current = true;
+    if (draftQ) {
+      if (draftQ.target) setTarget(draftQ.target);
+      if (draftQ.answers && Object.keys(draftQ.answers).length > 0) {
+        setAnswers(draftQ.answers);
+      }
     }
-  }, [answers]);
+  }, [draftQ]);
+
+  const saveDraft = useMutation(api.essays.saveDraft);
+  const clearDraft = useMutation(api.essays.clearDraft);
+
+  // Debounced autosave of answers (full map; server replaces wholesale).
+  const draftTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (!sessionId || !hydratedRef.current) return;
+    if (draftTimer.current) window.clearTimeout(draftTimer.current);
+    draftTimer.current = window.setTimeout(() => {
+      void saveDraft({ sessionId, token, answers });
+    }, 600);
+    return () => {
+      if (draftTimer.current) window.clearTimeout(draftTimer.current);
+    };
+  }, [answers, sessionId, token, saveDraft]);
+
+  // Persist target whenever the user picks one (include full answer map).
+  useEffect(() => {
+    if (!sessionId || !hydratedRef.current || !target) return;
+    void saveDraft({ sessionId, token, target, answers });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, sessionId, token]);
 
   // ---- Generation
   const generate = useAction(api.essays.generate);
