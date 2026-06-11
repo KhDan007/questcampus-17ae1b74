@@ -297,6 +297,8 @@ function EssayPage() {
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>({});
+  const [reviewPromptOpen, setReviewPromptOpen] = useState(false);
+  const [autoReviewEssayId, setAutoReviewEssayId] = useState<string | null>(null);
 
   // ---- Draft persistence (Convex; replaces qc.essay.answers localStorage)
   const draftQ = useQuery(
