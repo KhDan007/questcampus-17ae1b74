@@ -393,11 +393,16 @@ function EssayPage() {
       setResult(res);
       setGenStatus("ready");
       setStep("result");
+      try {
+        await clearDraft({ sessionId, token });
+      } catch {
+        /* non-fatal */
+      }
     } catch {
       setGenStatus("error");
       setGenError("generation_failed");
     }
-  }, [sessionId, token, generate, answers, target]);
+  }, [sessionId, token, generate, answers, target, clearDraft]);
 
   const canSubmitQuestions = useMemo(() => {
     // Only the anchor story is required; everything else is optional.
