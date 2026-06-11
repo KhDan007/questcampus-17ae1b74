@@ -22,12 +22,7 @@ import {
   History,
   RotateCcw,
 } from "lucide-react";
-import {
-  loadVersions,
-  pushVersion,
-  formatVersionTime,
-  type EssayVersion,
-} from "@/lib/essays/history";
+import { formatVersionTime, type EssayVersion } from "@/lib/essays/history";
 import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
