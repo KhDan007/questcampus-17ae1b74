@@ -86,6 +86,7 @@ const GRADE_SCALES = ["4.0", "5.0", "10", "100"] as const;
 
 const SAT_BANDS = ["<1200", "1200-1350", "1350-1450", "1450-1550", "1550+"] as const;
 const ACT_BANDS = ["<24", "24-28", "28-31", "31-34", "34-36"] as const;
+const IELTS_BANDS = ["<6.0", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5+"] as const;
 
 const FINANCIAL_NEED = [
   { value: "critical", label: "Critical — aid decides where I can go" },
@@ -145,7 +146,7 @@ type Answers = {
   fields?: { selected: string[] };
   subjects?: { selected: string[] };
   grades?: { choice: string; detail?: string; detailScale?: string };
-  tests?: { selected: string[]; scores?: { sat?: string; act?: string } };
+  tests?: { selected: string[]; scores?: { sat?: string; act?: string; ielts?: string } };
   financialNeed?: { choice: string };
   budget?: { choice: string };
   uniSize?: { choice: string };
@@ -481,6 +482,7 @@ function OnboardingPage() {
             <Field label="Standardized tests" hint="Optional — what have you taken?">
               <div className="flex flex-wrap gap-2">
                 {[
+                  { value: "ielts", label: "IELTS" },
                   { value: "sat", label: "SAT" },
                   { value: "act", label: "ACT" },
                   { value: "none", label: "None" },
@@ -512,6 +514,22 @@ function OnboardingPage() {
                 })}
               </div>
 
+              {answers.tests?.selected?.includes("ielts") && (
+                <ScorePicker
+                  label="IELTS band"
+                  bands={IELTS_BANDS as unknown as string[]}
+                  value={answers.tests?.scores?.ielts}
+                  onChange={(v) =>
+                    setAnswers((a) => ({
+                      ...a,
+                      tests: {
+                        ...(a.tests ?? { selected: [] }),
+                        scores: { ...(a.tests?.scores ?? {}), ielts: v },
+                      },
+                    }))
+                  }
+                />
+              )}
               {answers.tests?.selected?.includes("sat") && (
                 <ScorePicker
                   label="SAT score"
