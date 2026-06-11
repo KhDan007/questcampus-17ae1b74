@@ -311,11 +311,33 @@ function EssayPage() {
     if (hydratedRef.current) return;
     if (draftQ === undefined) return; // still loading
     hydratedRef.current = true;
+    let convexUseful = false;
     if (draftQ) {
-      if (draftQ.target) setTarget(draftQ.target);
+      if (draftQ.target) {
+        setTarget(draftQ.target);
+        convexUseful = true;
+      }
       if (draftQ.answers && Object.keys(draftQ.answers).length > 0) {
         setAnswers(draftQ.answers);
+        convexUseful = true;
       }
+    }
+    if (convexUseful) return;
+    // Convex returned nothing useful — fall back to the local mirror.
+    if (typeof window === "undefined") return;
+    try {
+      const rawAnswers = window.localStorage.getItem("qc.essay.answers");
+      const rawTarget = window.localStorage.getItem("qc.essay.target");
+      if (rawAnswers) {
+        const parsed = JSON.parse(rawAnswers) as AnswerMap;
+        if (Object.keys(parsed).length > 0) setAnswers(parsed);
+      }
+      if (rawTarget) {
+        const parsed = JSON.parse(rawTarget) as { externalId?: string; name: string } | null;
+        if (parsed) setTarget(parsed);
+      }
+    } catch {
+      /* ignore corrupt localStorage */
     }
   }, [draftQ]);
 
@@ -341,6 +363,20 @@ function EssayPage() {
     void saveDraft({ sessionId, token, target, answers });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, sessionId, token]);
+
+  // Offline mirror: synchronously write to localStorage so a draft survives
+  // network hiccups. Convex remains the source of truth.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("qc.essay.answers", JSON.stringify(answers));
+      if (target) {
+        window.localStorage.setItem("qc.essay.target", JSON.stringify(target));
+      }
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [answers, target]);
 
   // ---- Generation
   const generate = useAction(api.essays.generate);
@@ -395,6 +431,14 @@ function EssayPage() {
       setStep("result");
       try {
         await clearDraft({ sessionId, token });
+        if (typeof window !== "undefined") {
+          try {
+            window.localStorage.removeItem("qc.essay.answers");
+            window.localStorage.removeItem("qc.essay.target");
+          } catch {
+            /* ignore */
+          }
+        }
       } catch {
         /* non-fatal */
       }
