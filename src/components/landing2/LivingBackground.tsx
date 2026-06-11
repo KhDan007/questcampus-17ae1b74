@@ -57,8 +57,15 @@ function makeTiles(scale: number): Tile[] {
   });
 }
 
+// Synchronously read mobile state on first render to avoid mounting the
+// expensive desktop tree on phones for a frame.
+function getInitialIsMobile() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
 function useIsMobile() {
-  const [m, setM] = useState(false);
+  const [m, setM] = useState<boolean>(getInitialIsMobile);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const on = () => setM(mq.matches);
@@ -69,9 +76,42 @@ function useIsMobile() {
   return m;
 }
 
+// Top-level: pick a cheap static background on mobile, the full animated
+// scene on desktop. Splitting components ensures none of the motion hooks,
+// scroll listeners, or pointer trackers ever mount on phones.
 export function LivingBackground() {
-  const reduce = useReducedMotion();
   const isMobile = useIsMobile();
+  return isMobile ? <StaticBackground /> : <DesktopLivingBackground />;
+}
+
+// Zero-animation, zero-listener background for mobile. Pure CSS gradients
+// over a solid surface — fully GPU-composited, no repaints, no JS work.
+function StaticBackground() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-surface"
+      style={{
+        backgroundImage: [
+          "radial-gradient(60vmax 60vmax at 15% 10%, rgba(255,95,93,0.22), transparent 60%)",
+          "radial-gradient(55vmax 55vmax at 90% 20%, rgba(254,183,0,0.18), transparent 60%)",
+          "radial-gradient(70vmax 70vmax at 50% 95%, rgba(113,162,103,0.20), transparent 60%)",
+        ].join(", "),
+      }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 55%, rgba(253,249,245,0.85) 100%)",
+        }}
+      />
+    </div>
+  );
+}
+
+function DesktopLivingBackground() {
+  const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll();
   const yFar = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
@@ -85,7 +125,7 @@ export function LivingBackground() {
   const spy = useSpring(py, { stiffness: 60, damping: 18, mass: 0.6 });
 
   useEffect(() => {
-    if (reduce || isMobile) return;
+    if (reduce) return;
     let raf = 0;
     let nx = 0;
     let ny = 0;
@@ -108,10 +148,9 @@ export function LivingBackground() {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
     };
-  }, [reduce, isMobile, px, py]);
+  }, [reduce, px, py]);
 
-  // Smaller tiles on mobile so they don't feel oversized.
-  const tiles = makeTiles(isMobile ? 0.55 : 1);
+  const tiles = makeTiles(1);
 
   return (
     <div
@@ -119,7 +158,7 @@ export function LivingBackground() {
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-surface [contain:strict]"
     >
-      {/* Aurora mesh — slightly reduced blur radius for cheaper compositing */}
+      {/* Aurora mesh */}
       <div className="absolute inset-0">
         <div
           className="animate-aurora-1 absolute -left-[20%] -top-[20%] h-[80vh] w-[80vh] rounded-full blur-[90px] will-change-transform"
@@ -133,12 +172,10 @@ export function LivingBackground() {
           className="animate-aurora-3 absolute -bottom-[20%] left-[20%] h-[90vh] w-[90vh] rounded-full blur-[100px] will-change-transform"
           style={{ background: "radial-gradient(circle, rgba(113,162,103,0.30), transparent 65%)" }}
         />
-        {!isMobile && (
-          <div
-            className="animate-aurora-1 absolute right-[15%] bottom-[5%] h-[55vh] w-[55vh] rounded-full blur-[90px] will-change-transform"
-            style={{ background: "radial-gradient(circle, rgba(179,39,44,0.30), transparent 65%)", animationDelay: "-6s" }}
-          />
-        )}
+        <div
+          className="animate-aurora-1 absolute right-[15%] bottom-[5%] h-[55vh] w-[55vh] rounded-full blur-[90px] will-change-transform"
+          style={{ background: "radial-gradient(circle, rgba(179,39,44,0.30), transparent 65%)", animationDelay: "-6s" }}
+        />
       </div>
 
       {/* Starfield dots */}
