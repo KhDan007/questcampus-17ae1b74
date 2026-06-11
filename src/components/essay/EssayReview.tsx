@@ -10,7 +10,9 @@ import {
   Loader2,
   Lock,
   RefreshCw,
+  RotateCcw,
   Sparkles,
+  Undo2,
   Upload,
   Wand2,
 } from "lucide-react";
@@ -19,7 +21,7 @@ import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
 
 // -----------------------------------------------------------------------------
-// Types from the backend (Essay Feedback handoff)
+// Types
 // -----------------------------------------------------------------------------
 
 type DimensionKey =
@@ -34,7 +36,7 @@ type DimensionKey =
 type Dimension = {
   key: DimensionKey;
   label: string;
-  score: number; // 1..5
+  score: number;
   rationale: string;
 };
 
@@ -47,7 +49,7 @@ type Comment = {
 type Rewrite = { before: string; after: string; why: string };
 
 type ReviewFree = {
-  overall: number; // 0..100
+  overall: number;
   verdict: string;
   dimensions: Dimension[];
   topTip: string;
@@ -141,20 +143,30 @@ function escapeReg(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Locate a verbatim quote inside the essay and split into [before, match, after].
-// Falls back to a lightly-normalised search (collapse whitespace).
 function locateQuote(text: string, quote: string): [string, string, string] | null {
   if (!quote.trim()) return null;
   const i = text.indexOf(quote);
   if (i >= 0) {
     return [text.slice(0, i), text.slice(i, i + quote.length), text.slice(i + quote.length)];
   }
-  // Normalised search: collapse whitespace in both haystack & needle, then map back.
   const norm = quote.trim().replace(/\s+/g, " ");
   const re = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
   const m = text.match(re);
   if (m && m.index != null) {
     return [text.slice(0, m.index), text.slice(m.index, m.index + m[0].length), text.slice(m.index + m[0].length)];
+  }
+  return null;
+}
+
+function applyRewriteToText(text: string, before: string, after: string): string | null {
+  if (!before.trim()) return null;
+  const i = text.indexOf(before);
+  if (i >= 0) return text.slice(0, i) + after + text.slice(i + before.length);
+  const norm = before.trim().replace(/\s+/g, " ");
+  const re = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
+  const m = text.match(re);
+  if (m && m.index != null) {
+    return text.slice(0, m.index) + after + text.slice(m.index + m[0].length);
   }
   return null;
 }
@@ -167,10 +179,14 @@ export function EssayReview({
   sessionId,
   token,
   isPaid,
+  autoEssayId,
+  onAutoEssayConsumed,
 }: {
   sessionId: string;
   token: string | undefined;
   isPaid: boolean;
+  autoEssayId?: string | null;
+  onAutoEssayConsumed?: () => void;
 }) {
   const reduce = useReducedMotion();
   const [mode, setMode] = useState<Mode>("paste");
@@ -184,8 +200,6 @@ export function EssayReview({
   const [reviewErr, setReviewErr] = useState<ReviewError["error"] | null>(null);
   const [result, setResult] = useState<ReviewSuccess | null>(null);
 
-  // For locating quotes in the essay body — we need the original text.
-  // For paste/upload, it's `pasted`. For a picked essay, fetch its body.
   const pickedEssay = useQuery(
     api.essays.getEssay,
     token && pickedEssayId
@@ -203,13 +217,11 @@ export function EssayReview({
     token ? { token } : "skip",
   ) as { essayId: string; targetName?: string; wordCount: number; preview: string; createdAt: number }[] | undefined;
 
-  // The essay body used to anchor inline comments.
-  const essayBody = useMemo(() => {
+  const originalBody = useMemo(() => {
     if (mode === "pick") return pickedEssay?.fullText ?? pickedEssay?.preview ?? "";
     return pasted;
   }, [mode, pasted, pickedEssay]);
 
-  // Re-fetch a review if the user pays (so paid tier flips on).
   const fetchedReview = useQuery(
     api.essayFeedback.getReview,
     token && result?.reviewId && result.locked
@@ -250,13 +262,32 @@ export function EssayReview({
     }
   }, [sessionId, token, review, mode, pasted, pickedEssayId]);
 
+  // Auto-run when an essay was just generated and the user accepted the popup.
+  const autoRanRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!autoEssayId || !token) return;
+    if (autoRanRef.current === autoEssayId) return;
+    autoRanRef.current = autoEssayId;
+    setMode("pick");
+    setPickedEssayId(autoEssayId);
+  }, [autoEssayId, token]);
+
+  useEffect(() => {
+    if (!autoEssayId) return;
+    if (mode !== "pick" || pickedEssayId !== autoEssayId) return;
+    if (status === "loading") return;
+    // Wait until we have the essay body cached before running, so anchors resolve cleanly.
+    if (!pickedEssay) return;
+    void run();
+    onAutoEssayConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoEssayId, mode, pickedEssayId, pickedEssay]);
+
   const openPast = useCallback((reviewId: string) => {
-    // Minimal optimistic shell; getReview query (below) will fill it in.
     setStatus("loading");
     setPastTarget(reviewId);
   }, []);
 
-  // Past-review viewer: fetch a specific review on click.
   const [pastTarget, setPastTarget] = useState<string | null>(null);
   const pastFetched = useQuery(
     api.essayFeedback.getReview,
@@ -265,7 +296,7 @@ export function EssayReview({
 
   useEffect(() => {
     if (!pastTarget) return;
-    if (pastFetched === undefined) return; // still loading
+    if (pastFetched === undefined) return;
     if (pastFetched === null) {
       setStatus("error");
       setReviewErr("feedback_failed");
@@ -278,7 +309,6 @@ export function EssayReview({
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, [pastFetched, pastTarget]);
 
-  // File upload (text-only; .docx/.pdf get a friendly nudge).
   const onFile = useCallback(async (file: File) => {
     setParseErr(null);
     setFileName(file.name);
@@ -454,17 +484,16 @@ export function EssayReview({
         {status === "loading" && <ThinkingShimmer reduce={!!reduce} />}
       </div>
 
-      {/* Score card + paid section */}
       {status === "ready" && result && (
         <ResultCard
           result={result}
-          essayBody={essayBody}
+          originalBody={originalBody}
           token={token}
           isPaid={isPaid}
+          essayId={mode === "pick" ? pickedEssayId : null}
         />
       )}
 
-      {/* Past reviews */}
       {past && past.length > 0 && (
         <section>
           <h3 className="font-display text-headline-sm font-bold text-on-surface">
@@ -501,102 +530,520 @@ export function EssayReview({
 }
 
 // -----------------------------------------------------------------------------
-// Score card + paid section
+// Result card — compact header + sticky two-pane workspace
 // -----------------------------------------------------------------------------
+
+type TabKey = "notes" | "rewrites" | "strengths" | "dimensions";
 
 function ResultCard({
   result,
-  essayBody,
+  originalBody,
   token,
   isPaid,
+  essayId,
 }: {
   result: ReviewSuccess;
-  essayBody: string;
+  originalBody: string;
   token: string | undefined;
   isPaid: boolean;
+  essayId: string | null;
 }) {
   const reduce = useReducedMotion();
   const { free, paid, locked, sourceLabel, wordCount } = result;
   const tier = tierColor(free.overall);
+
+  // Working text — what's actually shown / edited. Diverges from originalBody
+  // when the user applies rewrites.
+  const [workingText, setWorkingText] = useState<string>(originalBody);
+  const [undoStack, setUndoStack] = useState<Array<{ text: string; label: string }>>([]);
+  const [appliedIdx, setAppliedIdx] = useState<Set<number>>(new Set());
+  const [activeTab, setActiveTab] = useState<TabKey>("notes");
+  const [persistState, setPersistState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [missMsg, setMissMsg] = useState<string | null>(null);
+  const updateEssay = useAction(api.essays.updateEssay);
+  const persistTimer = useRef<number | null>(null);
+
+  // Reset working state when originalBody (source) changes.
+  useEffect(() => {
+    setWorkingText(originalBody);
+    setUndoStack([]);
+    setAppliedIdx(new Set());
+    setMissMsg(null);
+  }, [originalBody, result.reviewId]);
+
+  // Persist applied edits to the saved essay (if it's a picked draft).
+  useEffect(() => {
+    if (!token || !essayId) return;
+    if (workingText === originalBody) return;
+    if (!workingText.trim()) return;
+    setPersistState("saving");
+    if (persistTimer.current) window.clearTimeout(persistTimer.current);
+    persistTimer.current = window.setTimeout(async () => {
+      try {
+        const res = (await updateEssay({ token, essayId, fullText: workingText })) as
+          | { ok: true }
+          | { error: string };
+        if ("error" in res) setPersistState("error");
+        else {
+          setPersistState("saved");
+          window.setTimeout(() => setPersistState((s) => (s === "saved" ? "idle" : s)), 1500);
+        }
+      } catch {
+        setPersistState("error");
+      }
+    }, 700);
+    return () => {
+      if (persistTimer.current) window.clearTimeout(persistTimer.current);
+    };
+  }, [workingText, originalBody, essayId, token, updateEssay]);
+
+  const applyRewrite = (idx: number, r: Rewrite) => {
+    const next = applyRewriteToText(workingText, r.before, r.after);
+    if (next === null) {
+      setMissMsg("Couldn't find that exact passage anymore — the text may have shifted from prior edits.");
+      window.setTimeout(() => setMissMsg(null), 4000);
+      return;
+    }
+    setUndoStack((s) => [...s, { text: workingText, label: `Apply rewrite ${idx + 1}` }]);
+    setWorkingText(next);
+    setAppliedIdx((s) => new Set(s).add(idx));
+  };
+
+  const undo = () => {
+    setUndoStack((s) => {
+      if (s.length === 0) return s;
+      const last = s[s.length - 1];
+      setWorkingText(last.text);
+      // Clear the most recently applied flag (heuristic: pop highest idx that's applied).
+      setAppliedIdx((prev) => {
+        const arr = [...prev];
+        if (arr.length === 0) return prev;
+        const max = Math.max(...arr);
+        const next = new Set(arr);
+        next.delete(max);
+        return next;
+      });
+      return s.slice(0, -1);
+    });
+  };
+
+  const resetAll = () => {
+    if (workingText === originalBody) return;
+    setUndoStack((s) => [...s, { text: workingText, label: "Reset to original" }]);
+    setWorkingText(originalBody);
+    setAppliedIdx(new Set());
+  };
+
+  const applyAll = () => {
+    if (!paid) return;
+    let text = workingText;
+    const newlyApplied = new Set(appliedIdx);
+    const snap = workingText;
+    paid.rewrites.forEach((r, idx) => {
+      if (newlyApplied.has(idx)) return;
+      const next = applyRewriteToText(text, r.before, r.after);
+      if (next !== null) {
+        text = next;
+        newlyApplied.add(idx);
+      }
+    });
+    if (text === snap) {
+      setMissMsg("Nothing new to apply — passages may have shifted.");
+      window.setTimeout(() => setMissMsg(null), 3500);
+      return;
+    }
+    setUndoStack((s) => [...s, { text: snap, label: "Apply all rewrites" }]);
+    setWorkingText(text);
+    setAppliedIdx(newlyApplied);
+  };
 
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl border-2 border-on-surface bg-surface/95 p-6 qc-hard-shadow backdrop-blur-md sm:p-8"
+      className="rounded-2xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow backdrop-blur-md sm:p-6"
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
-            Review · {wordCount} words
-          </p>
-          <h2 className="mt-1 font-display text-headline-md font-bold text-on-surface">
-            {sourceLabel}
-          </h2>
+      {/* Compact hero: score + verdict + top tip, all in one row on desktop */}
+      <div className="grid items-center gap-5 sm:grid-cols-[auto_1fr_auto]">
+        <div className="flex items-center gap-4">
+          <ScoreRing value={free.overall} color={tier.ring} reduce={!!reduce} compact />
+          <div>
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-primary">
+              Review · {wordCount} words
+            </p>
+            <h2 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
+              {sourceLabel}
+            </h2>
+            <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}>
+              {tier.label}
+            </span>
+          </div>
         </div>
-        <span className={`rounded-full px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}>
-          {tier.label}
-        </span>
-      </div>
-
-      {/* Hero score */}
-      <div className="mt-6 grid items-center gap-6 sm:grid-cols-[auto_1fr]">
-        <ScoreRing value={free.overall} color={tier.ring} reduce={!!reduce} />
-        <div>
-          <p className="font-display text-headline-md text-on-surface text-balance">
-            {free.verdict}
-          </p>
-        </div>
-      </div>
-
-      {/* Dimensions */}
-      <div className="mt-8">
-        <h3 className="font-display text-headline-sm font-bold text-on-surface">
-          The seven dimensions
-        </h3>
-        <ul className="mt-4 grid gap-3">
-          {free.dimensions.map((d, i) => (
-            <motion.li
-              key={d.key}
-              initial={reduce ? false : { opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.28, delay: i * 0.04 }}
-              className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4"
+        <p className="font-display text-headline-sm text-on-surface text-balance sm:border-l-2 sm:border-on-surface/10 sm:pl-5">
+          {free.verdict}
+        </p>
+        {paid && !locked && (
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={applyAll}
+              disabled={paid.rewrites.length === 0 || appliedIdx.size === paid.rewrites.length}
+              className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              title="Apply every suggested rewrite at once"
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-display text-label-lg font-bold text-on-surface">
-                  {d.label}
-                </p>
-                <Dots score={d.score} />
-              </div>
-              <p className="mt-1.5 text-body-sm text-on-surface-variant">{d.rationale}</p>
-            </motion.li>
-          ))}
-        </ul>
+              <Wand2 className="h-3.5 w-3.5" /> Apply all
+            </button>
+            <button
+              type="button"
+              onClick={undo}
+              disabled={undoStack.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+            >
+              <Undo2 className="h-3.5 w-3.5" /> Undo
+            </button>
+            <button
+              type="button"
+              onClick={resetAll}
+              disabled={workingText === originalBody}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Reset
+            </button>
+            {essayId && persistState !== "idle" && (
+              <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                {persistState === "saving" && (
+                  <span className="inline-flex items-center gap-1"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</span>
+                )}
+                {persistState === "saved" && (
+                  <span className="inline-flex items-center gap-1 text-primary"><CheckCircle2 className="h-3.5 w-3.5" /> Saved</span>
+                )}
+                {persistState === "error" && <span className="text-on-surface">Save failed</span>}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Top tip */}
-      <div className="mt-6 rounded-2xl border-2 border-on-surface bg-secondary-container p-5 qc-hard-shadow-sm">
-        <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
-          Your highest-leverage fix
-        </p>
-        <p className="mt-2 font-display text-headline-sm text-on-surface text-balance">
-          {free.topTip}
-        </p>
+      {/* Top tip — slim banner */}
+      <div className="mt-4 flex items-start gap-3 rounded-xl border-2 border-on-surface bg-secondary-container px-4 py-3 qc-hard-shadow-sm">
+        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <div>
+          <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-on-surface/70">
+            Highest-leverage fix
+          </p>
+          <p className="mt-0.5 font-display text-label-lg font-bold text-on-surface text-balance">
+            {free.topTip}
+          </p>
+        </div>
       </div>
 
-      {/* Paid section */}
+      {missMsg && (
+        <p className="mt-3 inline-flex items-start gap-2 rounded-lg border-2 border-on-surface/30 bg-surface px-3 py-2 text-label-sm text-on-surface">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 text-primary" /> {missMsg}
+        </p>
+      )}
+
+      {/* Workspace */}
       {!locked && paid ? (
-        <PaidSection paid={paid} essayBody={essayBody} reduce={!!reduce} />
+        <Workspace
+          paid={paid}
+          dimensions={free.dimensions}
+          workingText={workingText}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          appliedIdx={appliedIdx}
+          onApply={applyRewrite}
+          reduce={!!reduce}
+        />
       ) : (
-        <LockedTeaser token={token} isPaid={isPaid} />
+        <LockedTeaser token={token} isPaid={isPaid} dimensions={free.dimensions} reduce={!!reduce} />
       )}
     </motion.div>
   );
 }
 
-function ScoreRing({ value, color, reduce }: { value: number; color: string; reduce: boolean }) {
+// -----------------------------------------------------------------------------
+// Two-pane workspace (sticky essay left, tabbed sidebar right)
+// -----------------------------------------------------------------------------
+
+function Workspace({
+  paid,
+  dimensions,
+  workingText,
+  activeTab,
+  setActiveTab,
+  appliedIdx,
+  onApply,
+  reduce,
+}: {
+  paid: ReviewPaid;
+  dimensions: Dimension[];
+  workingText: string;
+  activeTab: TabKey;
+  setActiveTab: (t: TabKey) => void;
+  appliedIdx: Set<number>;
+  onApply: (idx: number, r: Rewrite) => void;
+  reduce: boolean;
+}) {
+  const [activeAnchorIdx, setActiveAnchorIdx] = useState<number | null>(null);
+  const noteRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Resolve anchors against workingText (so edits stay highlighted).
+  type Anchor = { start: number; end: number; comment: Comment; idx: number };
+  const { anchors, orphans } = useMemo(() => {
+    const found: Anchor[] = [];
+    const miss: { c: Comment; idx: number }[] = [];
+    paid.comments.forEach((c, idx) => {
+      const loc = locateQuote(workingText, c.quote);
+      if (!loc) {
+        miss.push({ c, idx });
+        return;
+      }
+      const start = loc[0].length;
+      const end = start + loc[1].length;
+      found.push({ start, end, comment: c, idx });
+    });
+    found.sort((a, b) => a.start - b.start);
+    const kept: Anchor[] = [];
+    for (const a of found) {
+      if (kept.length === 0 || a.start >= kept[kept.length - 1].end) kept.push(a);
+      else miss.push({ c: a.comment, idx: a.idx });
+    }
+    return { anchors: kept, orphans: miss };
+  }, [paid.comments, workingText]);
+
+  const onAnchorClick = (idx: number) => {
+    setActiveTab("notes");
+    setActiveAnchorIdx(idx);
+    const el = noteRefs.current[idx];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  };
+
+  const segments: React.ReactNode[] = [];
+  let cursor = 0;
+  anchors.forEach((a, i) => {
+    if (a.start > cursor) segments.push(<span key={`t-${i}`}>{workingText.slice(cursor, a.start)}</span>);
+    const sc = severityClasses(a.comment.severity);
+    const isActive = activeAnchorIdx === a.idx;
+    segments.push(
+      <button
+        key={`m-${i}`}
+        type="button"
+        onClick={() => onAnchorClick(a.idx)}
+        className={`relative cursor-pointer rounded px-0.5 ${sc.bg} underline decoration-2 underline-offset-2 ${sc.ring} transition-all ${isActive ? "ring-2 ring-primary ring-offset-1" : ""}`}
+      >
+        {workingText.slice(a.start, a.end)}
+      </button>,
+    );
+    cursor = a.end;
+  });
+  if (cursor < workingText.length || workingText.length === 0) {
+    segments.push(<span key="t-end">{workingText.slice(cursor)}</span>);
+  }
+
+  const tabs: { k: TabKey; label: string; count?: number }[] = [
+    { k: "notes", label: "Inline notes", count: paid.comments.length },
+    { k: "rewrites", label: "Rewrites", count: paid.rewrites.length },
+    { k: "strengths", label: "Strengths", count: paid.strengths.length },
+    { k: "dimensions", label: "Dimensions", count: dimensions.length },
+  ];
+
+  return (
+    <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      {/* Essay column — sticky on desktop so the user never scrolls away from text */}
+      <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/95 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="font-display text-headline-sm font-bold text-on-surface">
+              Your essay
+            </h3>
+            <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {workingText.trim() ? `${workingText.trim().split(/\s+/).length} words` : ""}
+            </p>
+          </div>
+          <p className="mt-1 text-label-sm text-on-surface-variant">
+            Tap any highlight to jump to its note.
+          </p>
+          <div className="mt-3 max-h-[calc(100vh-260px)] overflow-y-auto whitespace-pre-wrap rounded-xl border-2 border-on-surface/10 bg-surface px-4 py-4 font-serif text-body-md leading-relaxed text-on-surface">
+            {segments}
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar with tabs */}
+      <div>
+        <div className="sticky top-24 z-10 -mx-1 mb-3 flex flex-wrap gap-1 rounded-full border-2 border-on-surface/20 bg-surface/95 p-1 backdrop-blur-md">
+          {tabs.map((t) => {
+            const active = activeTab === t.k;
+            return (
+              <button
+                key={t.k}
+                type="button"
+                onClick={() => setActiveTab(t.k)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all ${
+                  active ? "bg-primary text-white qc-hard-shadow-sm" : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                {t.label}
+                {t.count !== undefined && (
+                  <span className={`rounded-full px-1.5 text-label-sm ${active ? "bg-white/20" : "bg-on-surface/10"}`}>
+                    {t.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {activeTab === "notes" && (
+            <motion.div
+              key="notes"
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="grid gap-2"
+            >
+              {paid.comments.length === 0 && (
+                <p className="rounded-xl border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+                  No inline notes for this draft.
+                </p>
+              )}
+              {paid.comments.map((c, idx) => {
+                const isOrphan = orphans.some((o) => o.idx === idx);
+                return (
+                  <div
+                    key={idx}
+                    ref={(el) => {
+                      noteRefs.current[idx] = el;
+                    }}
+                  >
+                    <CommentCard
+                      c={c}
+                      highlighted={activeAnchorIdx === idx}
+                      orphan={isOrphan}
+                      onFocus={() => setActiveAnchorIdx(idx)}
+                    />
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+
+          {activeTab === "rewrites" && (
+            <motion.div
+              key="rewrites"
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="grid gap-3"
+            >
+              {paid.rewrites.length === 0 && (
+                <p className="rounded-xl border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+                  No rewrites suggested.
+                </p>
+              )}
+              {paid.rewrites.map((r, idx) => {
+                const applied = appliedIdx.has(idx);
+                return (
+                  <div
+                    key={idx}
+                    className={`rounded-2xl border-2 p-4 transition-colors ${
+                      applied ? "border-primary/60 bg-primary/5" : "border-on-surface/15 bg-surface/90"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
+                        Rewrite {idx + 1}
+                      </p>
+                      {applied ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-white">
+                          <CheckCircle2 className="h-3 w-3" /> Applied
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => onApply(idx, r)}
+                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                        >
+                          <Wand2 className="h-3.5 w-3.5" /> Apply
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap font-serif text-body-sm leading-relaxed text-on-surface/75 line-through decoration-on-surface/30">
+                      {r.before}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap font-serif text-body-md leading-relaxed text-on-surface">
+                      {renderRewriteAfter(r.after)}
+                    </p>
+                    <p className="mt-2 inline-flex items-start gap-1.5 text-label-sm text-on-surface-variant">
+                      <Wand2 className="mt-0.5 h-3 w-3 text-primary" /> {r.why}
+                    </p>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+
+          {activeTab === "strengths" && (
+            <motion.div
+              key="strengths"
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="rounded-2xl border-2 border-on-surface/15 bg-surface/90 p-4"
+            >
+              {paid.strengths.length === 0 ? (
+                <p className="text-body-sm text-on-surface-variant">No standout strengths flagged.</p>
+              ) : (
+                <ul className="grid gap-2">
+                  {paid.strengths.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2 text-body-sm text-on-surface">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {s}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab === "dimensions" && (
+            <motion.div
+              key="dimensions"
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+              className="grid gap-2"
+            >
+              {dimensions.map((d) => (
+                <div key={d.key} className="rounded-xl border-2 border-on-surface/15 bg-surface/90 p-3.5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
+                    <Dots score={d.score} />
+                  </div>
+                  <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Score ring, dots, badge, shimmer
+// -----------------------------------------------------------------------------
+
+function ScoreRing({ value, color, reduce, compact }: { value: number; color: string; reduce: boolean; compact?: boolean }) {
   const r = 52;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value)) / 100;
@@ -614,8 +1061,9 @@ function ScoreRing({ value, color, reduce }: { value: number; color: string; red
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [value, reduce]);
+  const dim = compact ? "h-24 w-24" : "h-32 w-32";
   return (
-    <div className="relative h-32 w-32">
+    <div className={`relative ${dim}`}>
       <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
         <circle cx="60" cy="60" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-on-surface/10" />
         <motion.circle
@@ -634,7 +1082,7 @@ function ScoreRing({ value, color, reduce }: { value: number; color: string; red
       </svg>
       <div className="absolute inset-0 grid place-items-center">
         <div className="text-center">
-          <p className="font-display text-display-md-mobile font-bold text-on-surface leading-none">
+          <p className={`font-display font-bold text-on-surface leading-none ${compact ? "text-headline-lg" : "text-display-md-mobile"}`}>
             {shown}
           </p>
           <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">/ 100</p>
@@ -699,42 +1147,51 @@ function ThinkingShimmer({ reduce }: { reduce: boolean }) {
   );
 }
 
-function LockedTeaser({ token, isPaid }: { token: string | undefined; isPaid: boolean }) {
+function LockedTeaser({
+  token,
+  isPaid,
+  dimensions,
+  reduce,
+}: {
+  token: string | undefined;
+  isPaid: boolean;
+  dimensions: Dimension[];
+  reduce: boolean;
+}) {
   return (
-    <div className="relative mt-8 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/80">
-      <div className="pointer-events-none select-none p-6 blur-[6px]" aria-hidden>
-        <div className="mb-4 h-3 w-32 rounded bg-on-surface/30" />
-        <div className="space-y-2">
-          <div className="h-3 w-full rounded bg-on-surface/20" />
-          <div className="h-3 w-11/12 rounded bg-on-surface/20" />
-          <div className="h-3 w-10/12 rounded bg-on-surface/20" />
-        </div>
-        <div className="mt-5 grid gap-3">
-          <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
-            <div className="h-3 w-2/3 rounded bg-on-surface/20" />
-            <div className="mt-2 h-3 w-3/4 rounded bg-on-surface/15" />
-          </div>
-          <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
-            <div className="h-3 w-1/2 rounded bg-on-surface/20" />
-            <div className="mt-2 h-3 w-2/3 rounded bg-on-surface/15" />
-          </div>
-        </div>
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent via-surface/80 to-surface p-6 text-center">
+    <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]">
+      <ul className="grid gap-2">
+        {dimensions.map((d, i) => (
+          <motion.li
+            key={d.key}
+            initial={reduce ? false : { opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.28, delay: i * 0.04 }}
+            className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-3.5"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
+              <Dots score={d.score} />
+            </div>
+            <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
+          </motion.li>
+        ))}
+      </ul>
+      <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/80 p-5 text-center lg:max-w-sm">
         <div className="grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-secondary-container">
           <Lock className="h-5 w-5 text-on-surface" />
         </div>
         <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
-          Unlock inline notes & rewrites
+          Unlock inline notes & one-click rewrites
         </h3>
-        <p className="mt-2 max-w-md text-body-sm text-on-surface-variant">
-          Inline comments on your exact lines + before/after rewrites — same ${PRICE_MVP} unlock as your full matches.
+        <p className="mt-2 text-body-sm text-on-surface-variant">
+          Inline comments on your exact lines + before/after rewrites with one-tap apply — same ${PRICE_MVP} unlock as your full matches.
         </p>
         <div className="mt-5">
           <UnlockButton
             token={token}
             label={`Unlock for $${PRICE_MVP}`}
-            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           />
         </div>
         {isPaid && (
@@ -747,85 +1204,7 @@ function LockedTeaser({ token, isPaid }: { token: string | undefined; isPaid: bo
   );
 }
 
-function PaidSection({
-  paid,
-  essayBody,
-  reduce,
-}: {
-  paid: ReviewPaid;
-  essayBody: string;
-  reduce: boolean;
-}) {
-  return (
-    <div className="mt-8 grid gap-6">
-      {/* Strengths */}
-      {paid.strengths.length > 0 && (
-        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/85 p-5">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">
-            What's working
-          </h3>
-          <ul className="mt-3 grid gap-2">
-            {paid.strengths.map((s, i) => (
-              <li key={i} className="flex items-start gap-2 text-body-sm text-on-surface">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {s}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Inline-anchored essay */}
-      {essayBody && paid.comments.length > 0 && (
-        <AnchoredEssay text={essayBody} comments={paid.comments} reduce={reduce} />
-      )}
-
-      {/* Unanchored comments (fallback when essayBody missing) */}
-      {(!essayBody || paid.comments.length === 0) && paid.comments.length > 0 && (
-        <ul className="grid gap-2">
-          {paid.comments.map((c, i) => (
-            <CommentCard key={i} c={c} />
-          ))}
-        </ul>
-      )}
-
-      {/* Rewrites */}
-      {paid.rewrites.length > 0 && (
-        <div>
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">
-            Suggested rewrites
-          </h3>
-          <ul className="mt-3 grid gap-3">
-            {paid.rewrites.map((r, i) => (
-              <li
-                key={i}
-                className="rounded-2xl border-2 border-on-surface/15 bg-surface/85 p-5"
-              >
-                <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
-                  Before
-                </p>
-                <p className="mt-1 whitespace-pre-wrap font-serif text-body-md leading-relaxed text-on-surface/80 line-through decoration-on-surface/30">
-                  {r.before}
-                </p>
-                <p className="mt-4 font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-primary">
-                  After
-                </p>
-                <p className="mt-1 whitespace-pre-wrap font-serif text-body-md leading-relaxed text-on-surface">
-                  {renderRewriteAfter(r.after)}
-                </p>
-                <p className="mt-3 inline-flex items-start gap-1.5 text-body-sm text-on-surface-variant">
-                  <Wand2 className="mt-0.5 h-3.5 w-3.5 text-primary" /> {r.why}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function renderRewriteAfter(after: string): React.ReactNode {
-  // Replace [ADD: …] with a chip.
   const parts: React.ReactNode[] = [];
   const re = /\[ADD:[^\]]*\]/g;
   let last = 0;
@@ -859,118 +1238,38 @@ function severityClasses(s: Comment["severity"]): { bg: string; border: string; 
   }
 }
 
-function CommentCard({ c }: { c: Comment }) {
+function CommentCard({
+  c,
+  highlighted,
+  orphan,
+  onFocus,
+}: {
+  c: Comment;
+  highlighted?: boolean;
+  orphan?: boolean;
+  onFocus?: () => void;
+}) {
   const sc = severityClasses(c.severity);
   return (
-    <div className={`rounded-xl border-2 ${sc.border} bg-surface p-4`}>
-      <p className="font-serif text-body-sm italic text-on-surface/80">"{c.quote}"</p>
-      <p className="mt-2 text-body-sm text-on-surface">{c.note}</p>
-    </div>
-  );
-}
-
-function AnchoredEssay({
-  text,
-  comments,
-  reduce,
-}: {
-  text: string;
-  comments: Comment[];
-  reduce: boolean;
-}) {
-  // Resolve each quote's char range; fall back to standalone cards for misses.
-  type Anchor = { start: number; end: number; comment: Comment; idx: number };
-  const { anchors, orphans } = useMemo(() => {
-    const found: Anchor[] = [];
-    const miss: Comment[] = [];
-    comments.forEach((c, idx) => {
-      const loc = locateQuote(text, c.quote);
-      if (!loc) {
-        miss.push(c);
-        return;
-      }
-      const start = loc[0].length;
-      const end = start + loc[1].length;
-      found.push({ start, end, comment: c, idx });
-    });
-    // Sort + drop overlaps (keep first, later ones become orphans).
-    found.sort((a, b) => a.start - b.start);
-    const kept: Anchor[] = [];
-    for (const a of found) {
-      if (kept.length === 0 || a.start >= kept[kept.length - 1].end) kept.push(a);
-      else miss.push(a.comment);
-    }
-    return { anchors: kept, orphans: miss };
-  }, [text, comments]);
-
-  const [active, setActive] = useState<number | null>(null);
-
-  // Build segments
-  const segments: React.ReactNode[] = [];
-  let cursor = 0;
-  anchors.forEach((a, i) => {
-    if (a.start > cursor) segments.push(<span key={`t-${i}`}>{text.slice(cursor, a.start)}</span>);
-    const sc = severityClasses(a.comment.severity);
-    segments.push(
-      <button
-        key={`m-${i}`}
-        type="button"
-        onClick={() => setActive((v) => (v === a.idx ? null : a.idx))}
-        className={`relative cursor-pointer rounded px-0.5 ${sc.bg} underline decoration-2 underline-offset-2 ${sc.ring} transition-colors`}
-      >
-        {text.slice(a.start, a.end)}
-      </button>,
-    );
-    cursor = a.end;
-  });
-  if (cursor < text.length) segments.push(<span key="t-end">{text.slice(cursor)}</span>);
-
-  const activeAnchor = anchors.find((a) => a.idx === active) ?? null;
-
-  return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/95 p-5">
-        <h3 className="font-display text-headline-sm font-bold text-on-surface">
-          Inline notes
-        </h3>
-        <p className="mt-1 text-label-sm text-on-surface-variant">
-          Tap any highlighted span to see the note.
-        </p>
-        <div className="mt-4 whitespace-pre-wrap font-serif text-body-lg leading-relaxed text-on-surface">
-          {segments}
-        </div>
-      </div>
-
-      <aside className="lg:sticky lg:top-24 lg:self-start">
-        <AnimatePresence mode="wait">
-          {activeAnchor ? (
-            <motion.div
-              key={activeAnchor.idx}
-              initial={reduce ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CommentCard c={activeAnchor.comment} />
-            </motion.div>
-          ) : (
-            <div className="rounded-xl border-2 border-dashed border-on-surface/30 bg-surface/60 p-4 text-body-sm text-on-surface-variant">
-              Tap a highlighted line to see the note here.
-            </div>
-          )}
-        </AnimatePresence>
-
-        {orphans.length > 0 && (
-          <div className="mt-4 grid gap-2">
-            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
-              Other notes
-            </p>
-            {orphans.map((c, i) => (
-              <CommentCard key={i} c={c} />
-            ))}
-          </div>
+    <button
+      type="button"
+      onClick={onFocus}
+      className={`block w-full rounded-xl border-2 ${sc.border} bg-surface p-3.5 text-left transition-all ${
+        highlighted ? "ring-2 ring-primary ring-offset-1" : ""
+      }`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className={`inline-block rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold capitalize ${sc.bg}`}>
+          {c.severity}
+        </span>
+        {orphan && (
+          <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+            general
+          </span>
         )}
-      </aside>
-    </div>
+      </div>
+      <p className="mt-2 font-serif text-body-sm italic text-on-surface/80">"{c.quote}"</p>
+      <p className="mt-1.5 text-body-sm text-on-surface">{c.note}</p>
+    </button>
   );
 }
