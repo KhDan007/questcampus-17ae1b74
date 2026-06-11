@@ -311,11 +311,33 @@ function EssayPage() {
     if (hydratedRef.current) return;
     if (draftQ === undefined) return; // still loading
     hydratedRef.current = true;
+    let convexUseful = false;
     if (draftQ) {
-      if (draftQ.target) setTarget(draftQ.target);
+      if (draftQ.target) {
+        setTarget(draftQ.target);
+        convexUseful = true;
+      }
       if (draftQ.answers && Object.keys(draftQ.answers).length > 0) {
         setAnswers(draftQ.answers);
+        convexUseful = true;
       }
+    }
+    if (convexUseful) return;
+    // Convex returned nothing useful — fall back to the local mirror.
+    if (typeof window === "undefined") return;
+    try {
+      const rawAnswers = window.localStorage.getItem("qc.essay.answers");
+      const rawTarget = window.localStorage.getItem("qc.essay.target");
+      if (rawAnswers) {
+        const parsed = JSON.parse(rawAnswers) as AnswerMap;
+        if (Object.keys(parsed).length > 0) setAnswers(parsed);
+      }
+      if (rawTarget) {
+        const parsed = JSON.parse(rawTarget) as { externalId?: string; name: string } | null;
+        if (parsed) setTarget(parsed);
+      }
+    } catch {
+      /* ignore corrupt localStorage */
     }
   }, [draftQ]);
 
