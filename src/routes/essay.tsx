@@ -539,7 +539,13 @@ function EssayPage() {
 
         {view === "review" && (
           <div className="mt-8">
-            <EssayReview sessionId={sessionId} token={token} isPaid={isPaid} />
+            <EssayReview
+              sessionId={sessionId}
+              token={token}
+              isPaid={isPaid}
+              autoEssayId={autoReviewEssayId}
+              onAutoEssayConsumed={() => setAutoReviewEssayId(null)}
+            />
           </div>
         )}
 
