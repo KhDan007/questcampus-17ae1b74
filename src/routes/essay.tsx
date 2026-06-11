@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -22,12 +22,7 @@ import {
   History,
   RotateCcw,
 } from "lucide-react";
-import {
-  loadVersions,
-  pushVersion,
-  formatVersionTime,
-  type EssayVersion,
-} from "@/lib/essays/history";
+import { formatVersionTime, type EssayVersion } from "@/lib/essays/history";
 import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -301,26 +296,51 @@ function EssayPage() {
   const [view, setView] = useState<"write" | "review">("write");
   const [step, setStep] = useState<"target" | "questions" | "result">("target");
   const [target, setTarget] = useState<{ externalId?: string; name: string } | null>(null);
-  const [answers, setAnswers] = useState<AnswerMap>(() => {
-    if (typeof window === "undefined") return {};
-    try {
-      const raw = window.localStorage.getItem("qc.essay.answers");
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? (parsed as AnswerMap) : {};
-    } catch {
-      return {};
-    }
-  });
+  const [answers, setAnswers] = useState<AnswerMap>({});
 
+  // ---- Draft persistence (Convex; replaces qc.essay.answers localStorage)
+  const draftQ = useQuery(
+    api.essays.getDraft,
+    sessionId ? { sessionId, token } : "skip",
+  ) as
+    | { target: { externalId?: string; name: string } | null; answers: AnswerMap }
+    | null
+    | undefined;
+  const hydratedRef = useRef(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem("qc.essay.answers", JSON.stringify(answers));
-    } catch {
-      /* quota: ignore */
+    if (hydratedRef.current) return;
+    if (draftQ === undefined) return; // still loading
+    hydratedRef.current = true;
+    if (draftQ) {
+      if (draftQ.target) setTarget(draftQ.target);
+      if (draftQ.answers && Object.keys(draftQ.answers).length > 0) {
+        setAnswers(draftQ.answers);
+      }
     }
-  }, [answers]);
+  }, [draftQ]);
+
+  const saveDraft = useMutation(api.essays.saveDraft);
+  const clearDraft = useMutation(api.essays.clearDraft);
+
+  // Debounced autosave of answers (full map; server replaces wholesale).
+  const draftTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (!sessionId || !hydratedRef.current) return;
+    if (draftTimer.current) window.clearTimeout(draftTimer.current);
+    draftTimer.current = window.setTimeout(() => {
+      void saveDraft({ sessionId, token, answers });
+    }, 600);
+    return () => {
+      if (draftTimer.current) window.clearTimeout(draftTimer.current);
+    };
+  }, [answers, sessionId, token, saveDraft]);
+
+  // Persist target whenever the user picks one (include full answer map).
+  useEffect(() => {
+    if (!sessionId || !hydratedRef.current || !target) return;
+    void saveDraft({ sessionId, token, target, answers });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, sessionId, token]);
 
   // ---- Generation
   const generate = useAction(api.essays.generate);
@@ -373,11 +393,16 @@ function EssayPage() {
       setResult(res);
       setGenStatus("ready");
       setStep("result");
+      try {
+        await clearDraft({ sessionId, token });
+      } catch {
+        /* non-fatal */
+      }
     } catch {
       setGenStatus("error");
       setGenError("generation_failed");
     }
-  }, [sessionId, token, generate, answers, target]);
+  }, [sessionId, token, generate, answers, target, clearDraft]);
 
   const canSubmitQuestions = useMemo(() => {
     // Only the anchor story is required; everything else is optional.
@@ -1164,16 +1189,18 @@ function ResultView({
     setBodyKey((k) => k + 1);
   };
 
-  // -------- Version history (local, per essayId) --------
-  const [versions, setVersions] = useState<EssayVersion[]>(() =>
-    loadVersions(result.essayId),
-  );
+  // -------- Version history (server, per essayId) --------
+  const versionsQ = useQuery(
+    api.essays.listVersions,
+    token ? { token, essayId: result.essayId } : "skip",
+  ) as EssayVersion[] | undefined;
+  const versions = useMemo(() => versionsQ ?? [], [versionsQ]);
+  const pushVersionMut = useMutation(api.essays.pushVersion);
   const [historyOpen, setHistoryOpen] = useState(false);
   const lastSnapshot = useRef<string>("");
 
-  // Reload list when switching to a different essay.
+  // Reset snapshot tracking when switching to a different essay.
   useEffect(() => {
-    setVersions(loadVersions(result.essayId));
     lastSnapshot.current = "";
     setHistoryOpen(false);
   }, [result.essayId]);
@@ -1183,15 +1210,17 @@ function ResultView({
     const text = result.fullText ?? "";
     if (!text.trim()) return;
     if (text === lastSnapshot.current) return;
+    if (!token) return;
     lastSnapshot.current = text;
     const label = versions.length === 0 ? "Original" : "Edit";
-    pushVersion(result.essayId, {
+    void pushVersionMut({
+      token,
+      essayId: result.essayId,
       fullText: text,
       wordCount: result.wordCount,
       label,
     });
-    setVersions(loadVersions(result.essayId));
-  }, [result.fullText, result.wordCount, result.essayId, versions.length]);
+  }, [result.fullText, result.wordCount, result.essayId, versions.length, token, pushVersionMut]);
 
   const restoreVersion = useCallback(
     (v: EssayVersion) => {

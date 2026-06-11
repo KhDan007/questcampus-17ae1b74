@@ -37,13 +37,20 @@ function SignInPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const linkOnLogin = useMutation(api.onboarding.linkOnLogin);
+  const linkDraftOnLogin = useMutation(api.essays.linkDraftOnLogin);
 
   async function afterLogin(token: string) {
     let doc: { completed?: boolean; currentStep?: number } | null = null;
+    const sessionId = getSessionId();
     try {
-      doc = await linkOnLogin({ token, sessionId: getSessionId() });
+      doc = await linkOnLogin({ token, sessionId });
     } catch {
       /* non-fatal — fall through to onboarding */
+    }
+    try {
+      await linkDraftOnLogin({ token, sessionId });
+    } catch {
+      /* non-fatal */
     }
     if (typeof window !== "undefined") {
       window.localStorage.removeItem("qc_profile");
