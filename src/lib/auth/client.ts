@@ -13,12 +13,20 @@ export type AuthUser = {
   name?: string | null;
   avatarUrl?: string | null;
   paid?: boolean;
+  emailVerified?: boolean;
 };
 
 export type AuthSession = {
   token: string;
   user: AuthUser;
 };
+
+export const VERIFY_EMAIL_EVENT = "qc:verify-email";
+
+export function requestEmailVerification(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(VERIFY_EMAIL_EVENT));
+}
 
 function base(): string {
   const explicit = import.meta.env.VITE_CONVEX_SITE_URL;
