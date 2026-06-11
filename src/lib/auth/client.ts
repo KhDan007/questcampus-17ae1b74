@@ -13,12 +13,20 @@ export type AuthUser = {
   name?: string | null;
   avatarUrl?: string | null;
   paid?: boolean;
+  emailVerified?: boolean;
 };
 
 export type AuthSession = {
   token: string;
   user: AuthUser;
 };
+
+export const VERIFY_EMAIL_EVENT = "qc:verify-email";
+
+export function requestEmailVerification(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(VERIFY_EMAIL_EVENT));
+}
 
 function base(): string {
   const explicit = import.meta.env.VITE_CONVEX_SITE_URL;
@@ -144,6 +152,62 @@ export const auth = {
 
   getSession(): AuthSession | null {
     return readSession();
+  },
+
+  updateUser(user: AuthUser): void {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+    emit();
+  },
+
+  async sendVerifyEmail(token: string): Promise<{
+    sent?: boolean;
+    alreadyVerified?: boolean;
+    retryAfter?: number;
+    error?: string;
+  }> {
+    const res = await fetch(`${base()}/api/auth/verify-email/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: "{}",
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 429) {
+      return { error: body?.error ?? "Too many requests.", retryAfter: body?.retryAfter };
+    }
+    return body ?? {};
+  },
+
+  async confirmVerifyEmail(
+    token: string,
+    code: string,
+  ): Promise<
+    | { ok: true; user: AuthUser }
+    | { ok: false; status: number; error: string; attemptsLeft?: number; expired?: boolean; locked?: boolean }
+  > {
+    const res = await fetch(`${base()}/api/auth/verify-email/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ code }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok && body?.user) {
+      return { ok: true, user: body.user as AuthUser };
+    }
+    return {
+      ok: false,
+      status: res.status,
+      error: body?.error ?? "Verification failed.",
+      attemptsLeft: body?.attemptsLeft,
+      expired: body?.expired,
+      locked: body?.locked,
+    };
   },
 };
 

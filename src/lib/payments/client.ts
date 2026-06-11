@@ -43,6 +43,12 @@ export async function startCheckout(token: string | undefined): Promise<Checkout
     /* ignore */
   }
 
+  if (res.status === 403 && body.error === "email_not_verified") {
+    const { requestEmailVerification } = await import("@/lib/auth/client");
+    requestEmailVerification();
+    return { kind: "error", message: "Please verify your email to continue." };
+  }
+
   if (!res.ok) {
     return { kind: "error", message: body.error ?? `Checkout failed (${res.status})` };
   }
