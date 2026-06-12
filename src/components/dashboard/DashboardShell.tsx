@@ -90,7 +90,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </div>
               <SidebarBody
                 pathname={pathname}
-                onWaitlist={(f) => setMobileOpen(false) ?? setWaitlist(f)}
+                onWaitlist={(f) => { setMobileOpen(false); setWaitlist(f); }}
                 hasPaidAccess={hasPaidAccess}
               />
             </motion.aside>
