@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useReducedMotion, motion } from "framer-motion";
 import {
@@ -12,8 +12,6 @@ import {
   Settings as SettingsIcon,
   Sparkles,
   Crown,
-  Menu,
-  X,
   Lock,
 } from "lucide-react";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
