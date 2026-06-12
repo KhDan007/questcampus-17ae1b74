@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useReducedMotion, motion } from "framer-motion";
 import {
   GraduationCap,
   PenLine,
@@ -41,16 +40,26 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   // Close mobile drawer on route change
   useEffect(() => setMobileOpen(false), [pathname]);
 
-  const mounted = typeof document !== "undefined";
-  const mobileChrome = (
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileOpen]);
+
+  return (
     <>
       {/* Mobile top bar with menu trigger */}
-      <div className="fixed inset-x-0 top-16 z-30 flex items-center gap-3 border-b-2 border-on-surface/10 bg-surface/80 px-5 py-2 backdrop-blur-xl lg:hidden">
+      <div className="sticky top-16 z-30 flex items-center gap-3 border-b-2 border-on-surface/10 bg-surface/90 px-5 py-2 backdrop-blur-xl lg:hidden">
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
-          className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm"
+          aria-expanded={mobileOpen}
+          className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none"
         >
           <Menu className="h-4 w-4" /> Menu
         </button>
@@ -59,54 +68,48 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </span>
       </div>
 
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
+      {/* Mobile drawer — plain fixed, no portal, no AnimatePresence to avoid stale state */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-[100] lg:hidden"
+          role="dialog"
+          aria-modal="true"
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 bg-black/50"
             onClick={() => setMobileOpen(false)}
+          />
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute inset-y-0 left-0 w-[82vw] max-w-[320px] border-r-2 border-on-surface bg-surface p-4 shadow-2xl overflow-y-auto"
           >
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute inset-y-0 left-0 w-[280px] border-r-2 border-on-surface bg-surface p-4"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <span className="font-display text-headline-sm font-bold text-on-surface">Menu</span>
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  aria-label="Close"
-                  className="grid h-8 w-8 place-items-center rounded-full text-on-surface-variant hover:bg-on-surface/10"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <SidebarBody
-                pathname={pathname}
-                onWaitlist={(f) => { setMobileOpen(false); setWaitlist(f); }}
-                hasPaidAccess={hasPaidAccess}
-              />
-            </motion.aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-
-  return (
-    <>
-      {/* Portal to body so transformed ancestors (route transition motion.div) don't break fixed positioning */}
-      {mounted ? createPortal(mobileChrome, document.body) : mobileChrome}
+            <div className="mb-4 flex items-center justify-between">
+              <span className="font-display text-headline-sm font-bold text-on-surface">Menu</span>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+                className="grid h-9 w-9 place-items-center rounded-full text-on-surface-variant hover:bg-on-surface/10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <SidebarBody
+              pathname={pathname}
+              onWaitlist={(f) => { setMobileOpen(false); setWaitlist(f); }}
+              hasPaidAccess={hasPaidAccess}
+            />
+          </motion.aside>
+        </div>
+      )}
 
       <div className="relative flex min-h-screen w-full items-start">
-        {/* Desktop sidebar — sticky so it survives transform ancestors (motion.div in __root) */}
+        {/* Desktop sidebar */}
         <aside
           className="sticky top-16 z-40 hidden w-[260px] shrink-0 flex-col self-start border-r-2 border-on-surface/15 bg-surface/95 backdrop-blur-xl lg:flex"
           style={{ height: "calc(100vh - 4rem)" }}
@@ -118,7 +121,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
         </aside>
 
-        <div className="w-full min-w-0 pt-12 lg:pt-0">
+        <div className="w-full min-w-0">
           {children}
         </div>
       </div>
