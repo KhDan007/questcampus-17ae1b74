@@ -7,7 +7,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 export type QuizAnswers = {
   stage: string;
   grades: string;
-  interests: string;
+  interests: string[];
   budget: string;
   country: string;
   countries?: string[];
@@ -67,7 +67,7 @@ const QUESTIONS: {
   {
     key: "interests",
     prompt: "What pulls you in?",
-    helper: "Pick the closest — we'll refine after.",
+    helper: "Pick all that apply — you can choose more than one.",
     options: [
       { value: "stem", label: "STEM & engineering" },
       { value: "biz", label: "Business & economics" },
@@ -113,6 +113,9 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const selectedCountries = answers.countries ?? [];
   const customSelected = isCountryStep && countryChoice === "custom";
 
+  const MULTI_SELECT_KEYS: (keyof QuizAnswers)[] = ["interests"];
+  const isMultiSelect = MULTI_SELECT_KEYS.includes(q.key);
+
   function choose(value: string) {
     if (q.key === "country") {
       if (value === "custom") {
@@ -124,6 +127,16 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
       onComplete(next as QuizAnswers);
       return;
     }
+
+    if (isMultiSelect) {
+      setAnswers((a) => {
+        const cur = ((a[q.key] ?? []) as string[]);
+        const next = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
+        return { ...a, [q.key]: next };
+      });
+      return;
+    }
+
     const next = { ...answers, [q.key]: value } as Partial<QuizAnswers>;
     setAnswers(next);
     if (isLast) {
@@ -141,6 +154,8 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
     });
   }
 
+  const currentMultiValues = (answers[q.key] ?? []) as string[];
+  const canContinueMulti = isMultiSelect && currentMultiValues.length > 0;
   const canSubmitCustom = customSelected && selectedCountries.length > 0;
 
   return (
@@ -185,8 +200,11 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
 
             <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {q.options.map((opt) => {
-                const selected =
-                  isCountryStep ? countryChoice === opt.value : answers[q.key] === opt.value;
+                const selected = isCountryStep
+                  ? countryChoice === opt.value
+                  : Array.isArray(answers[q.key])
+                    ? (answers[q.key] as string[]).includes(opt.value)
+                    : answers[q.key] === opt.value;
                 return (
                   <button
                     key={opt.value}
@@ -199,7 +217,9 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
                     }`}
                   >
                     <span
-                      className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                      className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-colors ${
+                        isMultiSelect ? "rounded-md" : "rounded-full"
+                      } ${
                         selected ? "border-primary bg-primary text-white" : "border-on-surface/30"
                       }`}
                     >
@@ -219,6 +239,23 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
                 );
               })}
             </div>
+
+            {canContinueMulti && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-7"
+              >
+                <button
+                  type="button"
+                  onClick={() => setStep((s) => s + 1)}
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-4 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  Continue
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </button>
+              </motion.div>
+            )}
 
             {customSelected && (
               <motion.div
