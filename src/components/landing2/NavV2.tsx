@@ -166,13 +166,9 @@ export function NavV2() {
 
                 <nav className="flex flex-col gap-1">
                   <MobileLink to="/" icon={Home} label="Home" active={isLanding} onClick={() => setMobileOpen(false)} />
-                  {isAuthenticated && (
-                    <>
-                      <MobileLink to="/dashboard" icon={GraduationCap} label="Universities" active={pathname.startsWith("/dashboard")} onClick={() => setMobileOpen(false)} />
-                      <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} onClick={() => setMobileOpen(false)} />
-                      <MobileLink to="/profile" icon={SettingsIcon} label="Settings" active={pathname.startsWith("/profile")} onClick={() => setMobileOpen(false)} />
-                    </>
-                  )}
+                  <MobileLink to="/dashboard" icon={GraduationCap} label="Universities" active={pathname.startsWith("/dashboard")} onClick={() => setMobileOpen(false)} />
+                  <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} onClick={() => setMobileOpen(false)} />
+                  <MobileLink to="/profile" icon={SettingsIcon} label="Settings" active={pathname.startsWith("/profile")} onClick={() => setMobileOpen(false)} />
                   {isLanding && (
                     <>
                       <MobileAnchor href="/#how" label="How it works" onClick={() => setMobileOpen(false)} />
