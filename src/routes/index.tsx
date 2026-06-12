@@ -10,7 +10,7 @@ import { FooterV2 } from "@/components/landing2/FooterV2";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "QuestCampus — Find the universities that actually fit you" },
+      { title: "QuestCampus" },
       {
         name: "description",
         content:
