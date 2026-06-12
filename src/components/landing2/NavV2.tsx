@@ -2,8 +2,8 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import { useRouterState } from "@tanstack/react-router";
+import { ArrowRight, Menu, X, GraduationCap, PenLine, Settings as SettingsIcon, Home, Sparkles } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import logoAsset from "@/assets/questcampus-logo.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
@@ -13,6 +13,7 @@ export function NavV2() {
   const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [popup, setPopup] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = pathname === "/" || pathname === "";
   const isUnlock = pathname.startsWith("/unlock");
@@ -24,6 +25,19 @@ export function NavV2() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close drawer on route change
+  useEffect(() => setMobileOpen(false), [pathname]);
+
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileOpen]);
 
   function joinWaitlist(e: React.MouseEvent) {
     if (isLanding) return; // let the anchor scroll naturally on the landing page
@@ -46,12 +60,25 @@ export function NavV2() {
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-(--container-content) items-center justify-between px-5 sm:px-8 lg:px-12">
-          <a href="/" className="group flex items-center gap-2.5">
-            <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-8" />
-            <span className="font-display text-lg font-bold tracking-tight text-on-surface">
-              QuestCampus
-            </span>
-          </a>
+          <div className="flex items-center gap-2">
+            {/* Mobile hamburger — every page */}
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={mobileOpen}
+              className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            <a href="/" className="group flex items-center gap-2.5">
+              <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-8" />
+              <span className="font-display text-lg font-bold tracking-tight text-on-surface">
+                QuestCampus
+              </span>
+            </a>
+          </div>
 
           <div className="hidden items-center gap-7 md:flex">
             {isLanding ? (
@@ -74,7 +101,7 @@ export function NavV2() {
               <a
                 href={isLanding ? "/#waitlist" : "#waitlist"}
                 onClick={joinWaitlist}
-                className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+                className="group hidden items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none sm:inline-flex"
               >
                 Join waitlist
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -85,8 +112,126 @@ export function NavV2() {
         </nav>
       </motion.header>
 
+      {/* Mobile drawer — available on every page */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setMobileOpen(false)}
+          />
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute inset-y-0 left-0 flex w-[82vw] max-w-[320px] flex-col border-r-2 border-on-surface bg-surface p-4 shadow-2xl overflow-y-auto"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <a href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+                <img src={logoAsset.url} alt="QuestCampus" className="h-7 w-7" />
+                <span className="font-display text-base font-bold tracking-tight text-on-surface">
+                  QuestCampus
+                </span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+                className="grid h-9 w-9 place-items-center rounded-full text-on-surface-variant hover:bg-on-surface/10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1">
+              <MobileLink to="/" icon={Home} label="Home" active={isLanding} />
+              {isAuthenticated && (
+                <>
+                  <MobileLink to="/dashboard" icon={GraduationCap} label="Universities" active={pathname.startsWith("/dashboard")} />
+                  <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} />
+                  <MobileLink to="/profile" icon={SettingsIcon} label="Settings" active={pathname.startsWith("/profile")} />
+                </>
+              )}
+              {isLanding && (
+                <>
+                  <MobileAnchor href="/#how" label="How it works" />
+                  <MobileAnchor href="/#roadmap" label="What's coming" />
+                </>
+              )}
+            </nav>
+
+            <div className="mt-auto pt-6">
+              {showWaitlistButton ? (
+                <a
+                  href={isLanding ? "/#waitlist" : "#waitlist"}
+                  onClick={(e) => { setMobileOpen(false); joinWaitlist(e); }}
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm"
+                >
+                  Join waitlist <ArrowRight className="h-4 w-4" />
+                </a>
+              ) : !isAuthenticated ? (
+                <Link
+                  to="/signin"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
+                >
+                  Sign in <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link
+                  to="/unlock"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
+                >
+                  <Sparkles className="h-4 w-4" /> Unlock — $5
+                </Link>
+              )}
+            </div>
+          </motion.aside>
+        </div>
+      )}
+
       <WaitlistPopup open={popup} onClose={() => setPopup(false)} />
     </>
+  );
+}
+
+function MobileLink({
+  to,
+  icon: Icon,
+  label,
+  active,
+}: {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-3 rounded-lg px-3 py-3 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
+        active
+          ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
+          : "border-2 border-transparent text-on-surface/80 hover:bg-on-surface/5"
+      }`}
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </Link>
+  );
+}
+
+function MobileAnchor({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="flex items-center gap-3 rounded-lg border-2 border-transparent px-3 py-3 font-[var(--font-label)] text-label-md font-semibold text-on-surface/80 hover:bg-on-surface/5"
+    >
+      {label}
+    </a>
   );
 }
 
