@@ -17,9 +17,15 @@ export function isAdminUser(user: { email?: string | null } | null | undefined):
  * Single source of truth for premium gating on the frontend.
  * Backend remains the security boundary — this is UI convenience only.
  */
+// TEMPORARY: frontend-only full access for everyone for ~3h after first load.
+// After this expires, gating falls back to the normal admin/paid check.
+const TEMP_FULL_ACCESS_UNTIL_MS =
+  (typeof Date !== "undefined" ? Date.now() : 0) + 3 * 60 * 60 * 1000;
+
 export function hasPaidAccess(
   user: { email?: string | null; paid?: boolean } | null | undefined,
 ): boolean {
+  if (Date.now() < TEMP_FULL_ACCESS_UNTIL_MS) return true;
   if (!user) return false;
   return isAdminUser(user) || user.paid === true;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -40,7 +41,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   // Close mobile drawer on route change
   useEffect(() => setMobileOpen(false), [pathname]);
 
-  return (
+  const mounted = typeof document !== "undefined";
+  const mobileChrome = (
     <>
       {/* Mobile top bar with menu trigger */}
       <div className="fixed inset-x-0 top-16 z-30 flex items-center gap-3 border-b-2 border-on-surface/10 bg-surface/80 px-5 py-2 backdrop-blur-xl lg:hidden">
@@ -88,13 +90,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </div>
               <SidebarBody
                 pathname={pathname}
-                onWaitlist={(f) => setWaitlist(f)}
+                onWaitlist={(f) => { setMobileOpen(false); setWaitlist(f); }}
                 hasPaidAccess={hasPaidAccess}
               />
             </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  );
+
+  return (
+    <>
+      {/* Portal to body so transformed ancestors (route transition motion.div) don't break fixed positioning */}
+      {mounted ? createPortal(mobileChrome, document.body) : mobileChrome}
 
       <div className="relative flex min-h-screen w-full items-start">
         {/* Desktop sidebar — sticky so it survives transform ancestors (motion.div in __root) */}
