@@ -67,7 +67,7 @@ const QUESTIONS: {
   {
     key: "interests",
     prompt: "What pulls you in?",
-    helper: "Pick the closest — we'll refine after.",
+    helper: "Pick all that apply — you can choose more than one.",
     options: [
       { value: "stem", label: "STEM & engineering" },
       { value: "biz", label: "Business & economics" },
