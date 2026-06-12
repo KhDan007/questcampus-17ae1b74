@@ -104,59 +104,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <>
       {/* Portal to body so transformed ancestors (route transition motion.div) don't break fixed positioning */}
       {mounted ? createPortal(mobileChrome, document.body) : mobileChrome}
-      {/* Mobile top bar with menu trigger */}
-      <div className="fixed inset-x-0 top-16 z-30 flex items-center gap-3 border-b-2 border-on-surface/10 bg-surface/80 px-5 py-2 backdrop-blur-xl lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open menu"
-          className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm"
-        >
-          <Menu className="h-4 w-4" /> Menu
-        </button>
-        <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-          {pageLabel(pathname)}
-        </span>
-      </div>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
-            onClick={() => setMobileOpen(false)}
-          >
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute inset-y-0 left-0 w-[280px] border-r-2 border-on-surface bg-surface p-4"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <span className="font-display text-headline-sm font-bold text-on-surface">Menu</span>
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  aria-label="Close"
-                  className="grid h-8 w-8 place-items-center rounded-full text-on-surface-variant hover:bg-on-surface/10"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <SidebarBody
-                pathname={pathname}
-                onWaitlist={(f) => setWaitlist(f)}
-                hasPaidAccess={hasPaidAccess}
-              />
-            </motion.aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="relative flex min-h-screen w-full items-start">
         {/* Desktop sidebar — sticky so it survives transform ancestors (motion.div in __root) */}
