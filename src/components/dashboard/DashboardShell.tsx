@@ -33,79 +33,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  // Close mobile drawer on route change
-  useEffect(() => setMobileOpen(false), [pathname]);
-
-  // Lock body scroll when drawer is open
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    if (mobileOpen) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = prev; };
-    }
-  }, [mobileOpen]);
 
   return (
     <>
-      {/* Mobile top bar with menu trigger */}
-      <div className="sticky top-16 z-30 flex items-center gap-3 border-b-2 border-on-surface/10 bg-surface/90 px-5 py-2 backdrop-blur-xl lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open menu"
-          aria-expanded={mobileOpen}
-          className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none"
-        >
-          <Menu className="h-4 w-4" /> Menu
-        </button>
-        <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-          {pageLabel(pathname)}
-        </span>
-      </div>
-
-      {/* Mobile drawer — plain fixed, no portal, no AnimatePresence to avoid stale state */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-[100] lg:hidden"
-          role="dialog"
-          aria-modal="true"
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setMobileOpen(false)}
-          />
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute inset-y-0 left-0 w-[82vw] max-w-[320px] border-r-2 border-on-surface bg-surface p-4 shadow-2xl overflow-y-auto"
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <span className="font-display text-headline-sm font-bold text-on-surface">Menu</span>
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
-                className="grid h-9 w-9 place-items-center rounded-full text-on-surface-variant hover:bg-on-surface/10"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <SidebarBody
-              pathname={pathname}
-              onWaitlist={(f) => { setMobileOpen(false); setWaitlist(f); }}
-              hasPaidAccess={hasPaidAccess}
-            />
-          </motion.aside>
-        </div>
-      )}
-
       <div className="relative flex min-h-screen w-full items-start">
         {/* Desktop sidebar */}
         <aside
