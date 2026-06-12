@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, ArrowRight, Sparkles, X } from "lucide-react";
 import { HeroQuiz, type QuizAnswers } from "./HeroQuiz";
 import { ResultsReveal } from "./ResultsReveal";
