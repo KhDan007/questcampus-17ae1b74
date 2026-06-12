@@ -225,15 +225,18 @@ function MobileLink({
   icon: Icon,
   label,
   active,
+  onClick,
 }: {
   to: string;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       to={to}
+      onClick={onClick}
       className={`flex items-center gap-3 rounded-lg px-3 py-3 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
         active
           ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
@@ -246,10 +249,11 @@ function MobileLink({
   );
 }
 
-function MobileAnchor({ href, label }: { href: string; label: string }) {
+function MobileAnchor({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) {
   return (
     <a
       href={href}
+      onClick={onClick}
       className="flex items-center gap-3 rounded-lg border-2 border-transparent px-3 py-3 font-[var(--font-label)] text-label-md font-semibold text-on-surface/80 hover:bg-on-surface/5"
     >
       {label}
