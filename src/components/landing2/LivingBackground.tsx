@@ -62,13 +62,13 @@ function makeTiles(scale: number): Tile[] {
 // expensive desktop tree on phones for a frame.
 function getInitialIsMobile() {
   if (typeof window === "undefined") return false;
-  return window.matchMedia("(max-width: 768px)").matches;
+  return window.matchMedia("(max-width: 1279px)").matches;
 }
 
 function useIsMobile() {
   const [m, setM] = useState<boolean>(getInitialIsMobile);
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
+    const mq = window.matchMedia("(max-width: 1279px)");
     const on = () => setM(mq.matches);
     on();
     mq.addEventListener("change", on);
