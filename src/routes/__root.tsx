@@ -16,6 +16,7 @@ import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
 
 import appCss from "../styles.css?url";
+import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -83,17 +84,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "QuestCampus — Find universities that want someone like you" },
+      { title: "QuestCampus" },
       {
         name: "description",
         content:
           "Answer a few questions. Get a personalized list of universities that match your grades, goals, and scholarship needs — in minutes.",
       },
-      { property: "og:title", content: "QuestCampus — Find universities that want someone like you" },
+      { property: "og:title", content: "QuestCampus" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "QuestCampus — Find universities that want someone like you" },
-      { name: "description", content: "QuestCampus front is a web application for user onboarding and authentication." },
+      { name: "twitter:title", content: "QuestCampus" },
       { property: "og:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
       { name: "twitter:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aec448e7-0839-42f5-8bbb-53aae96b8cc6/id-preview-608e99aa--a2be596c-1a32-48dd-b3dc-34e3242da808.lovable.app-1780666475149.png" },
@@ -101,6 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: faviconAsset.url },
+      { rel: "apple-touch-icon", href: faviconAsset.url },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
