@@ -1979,8 +1979,11 @@ function AssistPopover({
         )}
       </div>
     </motion.div>
+    </div>,
+    document.body,
   );
 }
+
 
 function renderText(r: EssayResult): string {
   if (r.fullText) return r.fullText;
