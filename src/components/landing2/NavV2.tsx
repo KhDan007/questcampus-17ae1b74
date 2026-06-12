@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Menu, X, GraduationCap, PenLine, Settings as SettingsIcon, Home, Sparkles } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import logoAsset from "@/assets/questcampus-logo.png.asset.json";
+import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -86,11 +86,8 @@ export function NavV2() {
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
-            <a href="/" className="group flex items-center gap-2.5">
-              <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-8" />
-              <span className="font-display text-lg font-bold tracking-tight text-on-surface">
-                QuestCampus
-              </span>
+            <a href="/" className="group flex items-center">
+              <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-auto object-contain" />
             </a>
           </div>
 
@@ -148,11 +145,8 @@ export function NavV2() {
                 className="absolute inset-y-0 left-0 flex w-[84vw] max-w-[320px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface p-4 shadow-2xl"
               >
                 <div className="mb-4 flex items-center justify-between">
-                  <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-                    <img src={logoAsset.url} alt="QuestCampus" className="h-7 w-7" />
-                    <span className="font-display text-base font-bold tracking-tight text-on-surface">
-                      QuestCampus
-                    </span>
+                  <Link to="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
+                    <img src={logoAsset.url} alt="QuestCampus" className="h-7 w-auto object-contain" />
                   </Link>
                   <button
                     type="button"
