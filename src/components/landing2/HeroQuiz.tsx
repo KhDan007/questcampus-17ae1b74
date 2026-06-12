@@ -7,7 +7,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 export type QuizAnswers = {
   stage: string;
   grades: string;
-  interests: string;
+  interests: string[];
   budget: string;
   country: string;
   countries?: string[];
