@@ -96,78 +96,114 @@ export function HeroOnboarding() {
       <div id="results" />
       <ResultsReveal visible={!!answers} answers={answers} />
 
-      <AnimatePresence>
-        {warnOpen && (
+      <WarnModal
+        open={warnOpen}
+        reduce={!!reduce}
+        onClose={() => setWarnOpen(false)}
+        onAck={() => {
+          setAck(true);
+          setWarnOpen(false);
+        }}
+      />
+    </>
+  );
+}
+
+function WarnModal({
+  open,
+  reduce,
+  onClose,
+  onAck,
+}: {
+  open: boolean;
+  reduce: boolean;
+  onClose: () => void;
+  onAck: () => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, onClose]);
+  if (!mounted) return null;
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+        >
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            initial={reduce ? false : { opacity: 0, y: 16, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            role="dialog"
+            aria-modal="true"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow"
           >
             <button
               type="button"
+              onClick={onClose}
               aria-label="Close"
-              onClick={() => setWarnOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={reduce ? false : { opacity: 0, y: 16, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              role="dialog"
-              aria-modal="true"
-              className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow"
+              className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
             >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="p-6 sm:p-7">
+              <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-container">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Heads up
+              </div>
+              <h3 className="mt-4 font-display text-headline-md font-bold text-on-surface">
+                This will erase your current matches
+              </h3>
+              <p className="mt-2 text-body-md text-on-surface-variant">
+                Re-taking the quick quiz overwrites the recommendations saved to your
+                account. For sharper results, complete the detailed onboarding instead —
+                it asks a few more questions and tunes your matches much better.
+              </p>
+
+              <a
+                href="/dashboard"
+                className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                <Sparkles className="h-4 w-4" />
+                Refine with detailed onboarding
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </a>
+
               <button
                 type="button"
-                onClick={() => setWarnOpen(false)}
-                aria-label="Close"
-                className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
+                onClick={onAck}
+                className="mt-3 w-full rounded-md border-2 border-on-surface/15 bg-surface-container-low px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:border-on-surface"
               >
-                <X className="h-4 w-4" />
+                Continue and overwrite my matches
               </button>
-
-              <div className="p-6 sm:p-7">
-                <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-container">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Heads up
-                </div>
-                <h3 className="mt-4 font-display text-headline-md font-bold text-on-surface">
-                  This will erase your current matches
-                </h3>
-                <p className="mt-2 text-body-md text-on-surface-variant">
-                  Re-taking the quick quiz overwrites the recommendations saved to your
-                  account. For sharper results, complete the detailed onboarding instead —
-                  it asks a few more questions and tunes your matches much better.
-                </p>
-
-                <a
-                  href="/dashboard"
-                  className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Refine with detailed onboarding
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAck(true);
-                    setWarnOpen(false);
-                  }}
-                  className="mt-3 w-full rounded-md border-2 border-on-surface/15 bg-surface-container-low px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:border-on-surface"
-                >
-                  Continue and overwrite my matches
-                </button>
-              </div>
-            </motion.div>
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
   );
 }
 
