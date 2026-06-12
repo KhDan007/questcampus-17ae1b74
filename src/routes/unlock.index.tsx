@@ -33,7 +33,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "One $5 payment unlocks your full ranked university shortlist, polished essay drafts, and every premium feature we ship — for life.",
+          "$15/month unlocks your full ranked university shortlist, polished essay drafts, and every premium feature we ship. Cancel anytime.",
       },
     ],
   }),
@@ -74,7 +74,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "Lifetime access — no renewals" },
+    { Icon: Sparkles, label: "Cancel anytime — no lock-in" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
@@ -99,7 +99,7 @@ function UnlockPage() {
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              Lifetime access — one-time ${PRICE_MVP}
+              Monthly — ${PRICE_MVP}/mo · Cancel anytime
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
@@ -117,7 +117,7 @@ function UnlockPage() {
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned
               to your profile — plus polished essay drafts and every premium
-              feature we ship. One payment. Forever.
+              feature we ship. Billed monthly. Cancel anytime.
             </p>
           </motion.div>
 
@@ -155,7 +155,7 @@ function UnlockPage() {
                       ${PRICE_MVP}
                     </span>
                     <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                      once · forever
+                      /month · Cancel anytime
                     </span>
                   </>
                 )}
@@ -169,8 +169,8 @@ function UnlockPage() {
               )}
 
               <p className="mt-4 text-body-md text-on-surface-variant">
-                Less than a coffee. Worth months of research, second-guessing,
-                and college-counsellor calls.
+                Less than a couple of coffees a month. Worth months of research,
+                second-guessing, and college-counsellor calls. Cancel anytime.
               </p>
 
               <div className="mt-7 flex flex-col items-stretch gap-3">
