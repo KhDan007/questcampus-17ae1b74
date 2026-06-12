@@ -34,15 +34,6 @@ export function HeroOnboarding() {
       <section className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
         <div className="mx-auto grid max-w-(--container-content) gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div>
-            <motion.span
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-container"
-            >
-              <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-              AI-matched in under a minute
-            </motion.span>
 
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 24 }}
