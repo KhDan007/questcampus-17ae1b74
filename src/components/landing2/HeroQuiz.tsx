@@ -113,6 +113,9 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const selectedCountries = answers.countries ?? [];
   const customSelected = isCountryStep && countryChoice === "custom";
 
+  const MULTI_SELECT_KEYS: (keyof QuizAnswers)[] = ["interests"];
+  const isMultiSelect = MULTI_SELECT_KEYS.includes(q.key);
+
   function choose(value: string) {
     if (q.key === "country") {
       if (value === "custom") {
@@ -124,6 +127,16 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
       onComplete(next as QuizAnswers);
       return;
     }
+
+    if (isMultiSelect) {
+      setAnswers((a) => {
+        const cur = ((a[q.key] ?? []) as string[]);
+        const next = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
+        return { ...a, [q.key]: next };
+      });
+      return;
+    }
+
     const next = { ...answers, [q.key]: value } as Partial<QuizAnswers>;
     setAnswers(next);
     if (isLast) {
@@ -141,6 +154,8 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
     });
   }
 
+  const currentMultiValues = (answers[q.key] ?? []) as string[];
+  const canContinueMulti = isMultiSelect && currentMultiValues.length > 0;
   const canSubmitCustom = customSelected && selectedCountries.length > 0;
 
   return (
