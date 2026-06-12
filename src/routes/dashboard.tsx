@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -194,7 +193,6 @@ function DashboardPage() {
   return (
     <>
       <LivingBackground />
-      <NavV2 />
       <DashboardShell>
       <main
         id="main-content"

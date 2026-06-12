@@ -13,6 +13,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
+import { NavV2 } from "@/components/landing2/NavV2";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -144,6 +145,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
         <I18nProvider>
+          <NavV2 />
           <RouteTransitions>
             <Outlet />
           </RouteTransitions>
