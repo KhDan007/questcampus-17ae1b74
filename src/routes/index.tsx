@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { HeroOnboarding } from "@/components/landing2/HeroOnboarding";
 import { ParallaxShowcase } from "@/components/landing2/ParallaxShowcase";
 import { HowItWorks } from "@/components/landing2/HowItWorks";
@@ -33,7 +32,6 @@ function LandingPage() {
   return (
     <>
       <LivingBackground />
-      <NavV2 />
       <main id="main-content" className="relative">
         <HeroOnboarding />
         <ParallaxShowcase />

@@ -3,7 +3,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, CircleSlash } from "lucide-react";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/unlock/cancel")({
@@ -16,7 +15,6 @@ function UnlockCancelPage() {
   const reduce = useReducedMotion();
   return (
     <>
-      <NavV2 />
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 pt-24">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-secondary-container/60 blur-3xl" />

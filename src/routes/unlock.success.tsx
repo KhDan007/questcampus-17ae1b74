@@ -8,7 +8,6 @@ import { ArrowRight, PartyPopper, Loader2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
@@ -58,7 +57,6 @@ function UnlockSuccessPage() {
 
   return (
     <>
-      <NavV2 />
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 pt-24">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />

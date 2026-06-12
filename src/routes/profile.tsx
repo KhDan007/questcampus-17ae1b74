@@ -14,7 +14,6 @@ import {
   Bookmark,
 } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
@@ -93,7 +92,6 @@ function ProfilePage() {
   return (
     <>
       <LivingBackground />
-      <NavV2 />
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
