@@ -65,12 +65,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function pageLabel(path: string): string {
-  if (path.startsWith("/essay")) return "Essays";
-  if (path.startsWith("/profile")) return "Settings";
-  if (path.startsWith("/dashboard")) return "Universities";
-  return "";
-}
 
 function SidebarBody({
   pathname,
