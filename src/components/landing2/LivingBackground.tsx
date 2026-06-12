@@ -18,13 +18,8 @@ const UNIVERSITIES = [
   { name: "Stanford", hue: "#8c1515" },
   { name: "MIT", hue: "#2e4a7a" },
   { name: "Oxford", hue: "#002147" },
-  { name: "Cambridge", hue: "#a3c1ad" },
   { name: "Yale", hue: "#0f4d92" },
   { name: "Princeton", hue: "#e77500" },
-  { name: "UC Berkeley", hue: "#003262" },
-  { name: "NYU", hue: "#57068c" },
-  { name: "Columbia", hue: "#9bcbeb" },
-  { name: "Imperial", hue: "#003e74" },
 ];
 
 type Tile = {
@@ -38,9 +33,15 @@ type Tile = {
 };
 
 function makeTiles(scale: number): Tile[] {
-  const seeds = [
-    [6, 8], [22, 64], [38, 22], [54, 70], [70, 12], [82, 48],
-    [12, 36], [44, 90], [62, 38], [88, 78], [30, 4],
+  // Keep tiles clear of the center column (roughly 22%-78%) where the
+  // headline + quiz live. Alternate left / right edges down the page.
+  const seeds: Array<[number, number]> = [
+    [4, 8],
+    [86, 14],
+    [2, 44],
+    [90, 52],
+    [6, 78],
+    [84, 84],
   ];
   return UNIVERSITIES.map((uni, i) => {
     const [l, t] = seeds[i] ?? [50, 50];
@@ -49,7 +50,7 @@ function makeTiles(scale: number): Tile[] {
       uni,
       left: `${l}%`,
       top: `${t}%`,
-      size: Math.round((96 + depth * 96) * scale),
+      size: Math.round((88 + depth * 64) * scale),
       rot: ((i % 5) - 2) * 4,
       depth,
       dur: 8 + (i % 5),
