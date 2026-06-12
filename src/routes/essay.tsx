@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
@@ -1818,19 +1819,19 @@ function AssistPopover({
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [text, setText] = useState<string>("");
   const ref = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
     window.addEventListener("keydown", onKey);
-    window.addEventListener("mousedown", onClick);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("mousedown", onClick);
+      document.body.style.overflow = prev;
     };
   }, [onClose]);
 
@@ -1851,16 +1852,26 @@ function AssistPopover({
     }
   }, [assist, sessionId, token, question, notes]);
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 4 }}
-      animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-      exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 4 }}
-      transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
-      style={{ transformOrigin: "top right" }}
-      className="absolute right-0 top-full z-50 mt-2 w-[min(360px,90vw)] rounded-2xl border border-on-surface/15 bg-surface p-4 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.25)]"
-    >
+  if (!mounted) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+      />
+      <motion.div
+        ref={ref}
+        initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+        animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+        exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 4 }}
+        transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow"
+      >
+
       <div className="flex items-start justify-between gap-2">
         <p className="font-display text-label-md font-bold text-on-surface">✨ AI assist</p>
         <button
@@ -1968,8 +1979,11 @@ function AssistPopover({
         )}
       </div>
     </motion.div>
+    </div>,
+    document.body,
   );
 }
+
 
 function renderText(r: EssayResult): string {
   if (r.fullText) return r.fullText;
