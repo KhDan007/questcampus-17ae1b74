@@ -1162,7 +1162,7 @@ function QuestionsForm({
             <div className="mt-4">
               <UnlockButton
                 token={token}
-                label={`Unlock for $${PRICE_MVP} & generate`}
+                label={`Subscribe for $${PRICE_MVP}/mo & generate`}
                 className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-md font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               />
             </div>
@@ -1209,9 +1209,9 @@ function errorMessage(e: EssayError["error"]): string {
     case "not_logged_in":
       return "Your session expired. Please sign in again.";
     case "no_profile":
-      return `Generating a personal statement is a paid feature ($${PRICE_MVP} one-time). Unlock once and your essay generates instantly from your answers — no quiz required.`;
+      return `Generating a personal statement is a paid feature ($${PRICE_MVP}/month · cancel anytime). Subscribe and your essay generates instantly from your answers — no quiz required.`;
     case "trial_used":
-      return `You've used your free generation. Unlock the full essay for $${PRICE_MVP} to generate again.`;
+      return `You've used your free generation. Subscribe for $${PRICE_MVP}/mo to generate again. Cancel anytime.`;
     case "generation_failed":
       return "The model hiccuped. Try generating again.";
   }
