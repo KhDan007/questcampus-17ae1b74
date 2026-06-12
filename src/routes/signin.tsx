@@ -5,7 +5,6 @@ import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck, Bookmark } from "lucide-re
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -137,7 +136,6 @@ function SignInPage() {
   return (
     <>
       <LivingBackground />
-      <NavV2 />
       <main
         id="main-content"
         className="relative mx-auto flex min-h-screen w-full max-w-(--container-content) items-center justify-center px-5 pb-16 pt-28 sm:px-8 lg:px-12"

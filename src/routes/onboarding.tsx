@@ -5,7 +5,6 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { ArrowRight, Check, Loader2, Sparkles } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
-import { NavV2 } from "@/components/landing2/NavV2";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 
@@ -273,7 +272,6 @@ function OnboardingPage() {
   return (
     <>
       <LivingBackground />
-      <NavV2 />
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-28 sm:px-8"
