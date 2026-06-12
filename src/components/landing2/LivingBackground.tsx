@@ -61,7 +61,7 @@ function makeTiles(scale: number): Tile[] {
 // Synchronously read mobile state on first render to avoid mounting the
 // expensive desktop tree on phones for a frame.
 function getInitialIsMobile() {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") return true;
   return window.matchMedia("(max-width: 1279px)").matches;
 }
 
