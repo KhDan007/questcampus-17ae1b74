@@ -3,7 +3,8 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AlertTriangle, ArrowRight, Sparkles, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Search, Sparkles, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { HeroQuiz, type QuizAnswers } from "./HeroQuiz";
 import { ResultsReveal } from "./ResultsReveal";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -73,7 +74,27 @@ export function HeroOnboarding() {
                 <Dot /> $15/mo unlocks all 20+
               </span>
             </motion.div>
+
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.34 }}
+              className="mt-6"
+            >
+              <Link
+                to="/universities"
+                className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                <Search className="h-4 w-4" />
+                Search universities
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <p className="mt-2 text-body-sm text-on-surface-variant">
+                Already have schools in mind? Search and build your list.
+              </p>
+            </motion.div>
           </div>
+
 
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 30, scale: 0.97 }}
