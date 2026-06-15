@@ -159,7 +159,7 @@ function SignInPage() {
               and unlock waitlist pricing on everything coming next.
             </p>
             <ul className="mt-8 space-y-4">
-              <Perk icon={<Sparkles className="h-4 w-4" />} title="20+ ranked matches">
+              <Perk icon={<Sparkles className="h-4 w-4" />} title="20 ranked matches">
                 Safety, Target, and Reach universities tuned to your profile.
               </Perk>
               <Perk icon={<Bookmark className="h-4 w-4" />} title="Save & compare">

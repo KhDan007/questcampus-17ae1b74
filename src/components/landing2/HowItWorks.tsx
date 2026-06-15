@@ -17,7 +17,7 @@ const STEPS = [
   {
     icon: Trophy,
     title: "Unlock your full list",
-    body: "Get all 20+ Safety, Target & Reach matches — with scholarships, deadlines, and why each fits.",
+    body: "Get all 20 Safety, Target & Reach matches — with scholarships, deadlines, and why each fits.",
   },
 ];
 

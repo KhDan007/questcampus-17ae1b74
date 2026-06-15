@@ -62,8 +62,8 @@ export function WaitlistV2() {
                 them first with{" "}
                 <strong className="text-primary">30% off for life</strong>. The Essay
                 Assistant launches at{" "}
-                <strong className="text-on-surface">$15/mo</strong> — waitlist price{" "}
-                <strong className="text-primary">$10.50/mo</strong>.
+                <strong className="text-on-surface">$15 one-time</strong> — waitlist price{" "}
+                <strong className="text-primary">$10.50</strong>.
               </p>
 
               <div className="mt-6 flex items-center gap-4">

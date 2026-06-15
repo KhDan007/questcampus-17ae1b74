@@ -32,7 +32,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "$15/month unlocks your full ranked university shortlist, polished essay drafts, and every premium feature we ship. Cancel anytime.",
+          "$15 one-time unlocks your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
       },
     ],
   }),
@@ -73,7 +73,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "Cancel anytime — no lock-in" },
+    { Icon: Sparkles, label: "One payment - no subscription" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
@@ -97,7 +97,7 @@ function UnlockPage() {
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              Monthly — ${PRICE_MVP}/mo · Cancel anytime
+              ${PRICE_MVP} one-time unlock
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
@@ -115,7 +115,7 @@ function UnlockPage() {
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned
               to your profile — plus polished essay drafts and every premium
-              feature we ship. Billed monthly. Cancel anytime.
+              feature we ship. One payment. Full list unlocked.
             </p>
           </motion.div>
 
@@ -153,7 +153,7 @@ function UnlockPage() {
                       ${PRICE_MVP}
                     </span>
                     <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                      /month · Cancel anytime
+                      one-time
                     </span>
                   </>
                 )}
@@ -167,8 +167,8 @@ function UnlockPage() {
               )}
 
               <p className="mt-4 text-body-md text-on-surface-variant">
-                Less than a couple of coffees a month. Worth months of research,
-                second-guessing, and college-counsellor calls. Cancel anytime.
+                Less than one application fee. Worth months of research,
+                second-guessing, and college-counsellor calls.
               </p>
 
               <div className="mt-7 flex flex-col items-stretch gap-3">
@@ -178,7 +178,7 @@ function UnlockPage() {
                       {t("unlock.already")}
                     </p>
                     <Link
-                      to="/profile"
+                      to="/universities"
                       className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none"
                     >
                       {t("unlock.seeList")}
@@ -292,7 +292,7 @@ function UnlockPage() {
 
           <div className="mt-12 text-center">
             <Link
-              to="/dashboard"
+              to="/universities"
               className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />

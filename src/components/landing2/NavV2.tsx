@@ -103,7 +103,10 @@ export function NavV2() {
             ) : isUnlock ? (
               <NavLink href="/dashboard">Dashboard</NavLink>
             ) : isAuthenticated ? (
-              <NavLink href="/dashboard">Dashboard</NavLink>
+              <>
+                <NavLink href="/universities">Universities</NavLink>
+                <NavLink href="/dashboard">Dashboard</NavLink>
+              </>
             ) : null}
           </div>
 
@@ -160,7 +163,7 @@ export function NavV2() {
 
                 <nav className="flex flex-col gap-1">
                   <MobileLink to="/" icon={Home} label="Home" active={isLanding} onClick={() => setMobileOpen(false)} />
-                  <MobileLink to="/dashboard" icon={GraduationCap} label="Universities" active={pathname.startsWith("/dashboard")} onClick={() => setMobileOpen(false)} />
+                  <MobileLink to="/universities" icon={GraduationCap} label="Universities" active={pathname.startsWith("/universities")} onClick={() => setMobileOpen(false)} />
                   <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} onClick={() => setMobileOpen(false)} />
                   <MobileLink to="/profile" icon={SettingsIcon} label="Settings" active={pathname.startsWith("/profile")} onClick={() => setMobileOpen(false)} />
                   {isLanding && (

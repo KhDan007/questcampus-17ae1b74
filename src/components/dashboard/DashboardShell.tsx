@@ -22,7 +22,7 @@ type Item =
   | { kind: "waitlist"; key: string; label: string; icon: React.ComponentType<{ className?: string }>; feature: string };
 
 const TOP_ITEMS: Item[] = [
-  { kind: "link", key: "universities", label: "Universities", to: "/dashboard", icon: GraduationCap, match: (p) => p === "/dashboard" },
+  { kind: "link", key: "universities", label: "Universities", to: "/universities", icon: GraduationCap, match: (p) => p.startsWith("/universities") },
   { kind: "link", key: "essays", label: "Essays", to: "/essay", icon: PenLine, match: (p) => p.startsWith("/essay") },
   { kind: "waitlist", key: "activities", label: "Activities", icon: Activity, feature: "Activities" },
   { kind: "waitlist", key: "deadlines", label: "Deadlines", icon: CalendarClock, feature: "Deadline tracker" },

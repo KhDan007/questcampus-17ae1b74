@@ -384,7 +384,7 @@ function UniversitiesPage() {
                     {matchesLoading
                       ? "Loading your matches…"
                       : isPaid
-                        ? `${visibleMatches.length} match${visibleMatches.length === 1 ? "" : "es"} unlocked`
+                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"} unlocked${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
                         : "Top 3 teaser — unlock the full list for the complete ranking."}
                   </p>
                 </div>

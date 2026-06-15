@@ -1185,12 +1185,12 @@ function LockedTeaser({
           Unlock inline notes & one-click rewrites
         </h3>
         <p className="mt-2 text-body-sm text-on-surface-variant">
-          Inline comments on your exact lines + before/after rewrites with one-tap apply — same ${PRICE_MVP}/mo subscription as your full matches.
+          Inline comments on your exact lines + before/after rewrites with one-tap apply — same ${PRICE_MVP} one-time unlock as your full matches.
         </p>
         <div className="mt-5">
           <UnlockButton
             token={token}
-            label={`Subscribe for $${PRICE_MVP}/mo`}
+            label={`Unlock for $${PRICE_MVP}`}
             className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           />
         </div>

@@ -357,7 +357,7 @@
   "step.9.title": "What's something you did that made you feel genuinely proud?",
   "unlock.already": "✅ You already have full access.",
   "unlock.alreadyHave": "You already have full access — refreshing…",
-  "unlock.back": "← Back to your profile",
+  "unlock.back": "Back to universities",
   "unlock.button": "Unlock full list — ${price}",
   "unlock.discount": "🎉 {pct}% off applied — pay {discounted} instead of ${price}",
   "unlock.genericError": "Something went wrong. Try again.",

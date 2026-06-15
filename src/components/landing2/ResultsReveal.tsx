@@ -446,7 +446,7 @@ function UnlockOverlay() {
             <ul className="mt-5 space-y-2 text-left">
               <li className="flex items-start gap-2 text-body-sm text-on-surface">
                 <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>20+ ranked Safety, Target & Reach universities</span>
+                <span>20 ranked Safety, Target & Reach universities</span>
               </li>
               <li className="flex items-start gap-2 text-body-sm text-on-surface">
                 <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -459,10 +459,10 @@ function UnlockOverlay() {
             </ul>
 
             <a
-              href="/dashboard"
+              href="/universities"
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none animate-pulse-glow"
             >
-              Go to dashboard
+              Go to universities
               <ArrowRight className="h-5 w-5" />
             </a>
           </>
@@ -481,7 +481,7 @@ function UnlockOverlay() {
             <ul className="mt-5 space-y-2 text-left">
               <li className="flex items-start gap-2 text-body-sm text-on-surface">
                 <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>20+ ranked Safety, Target & Reach universities</span>
+                <span>20 ranked Safety, Target & Reach universities</span>
               </li>
               <li className="flex items-start gap-2 text-body-sm text-on-surface">
                 <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

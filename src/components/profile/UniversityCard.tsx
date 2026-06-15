@@ -78,7 +78,7 @@ export function UniversityCard({
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
-  const location = [card.city, card.state].filter(Boolean).join(", ");
+  const location = [card.city, card.state, card.country].filter(Boolean).join(", ");
   const translatedWhy = useAutoTranslate(card.why || null);
 
   const aidKey =

@@ -159,7 +159,7 @@ export const UI_EN: Record<string, string> = {
   "unlock.alreadyHave": "You already have full access — refreshing…",
   "unlock.notLive": "Payments aren't live yet — check back soon.",
   "unlock.genericError": "Something went wrong. Try again.",
-  "unlock.back": "← Back to your profile",
+  "unlock.back": "Back to universities",
 
   // Unlock success
   "unlockOk.title": "You're unlocked!",
