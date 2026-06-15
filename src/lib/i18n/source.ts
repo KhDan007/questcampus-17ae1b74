@@ -102,7 +102,7 @@ export const UI_EN: Record<string, string> = {
   "rec.section.reach": "Reach schools",
   "rec.upsell.title": "See your full list — safety, target & reach",
   "rec.upsell.body": "Unlock every match sorted into safety, target, and reach schools, with full requirements, deadlines, and filters.",
-  "rec.upsell.note": "$15/month · Cancel anytime · 30% off for waitlist members",
+  "rec.upsell.note": "$15 one-time unlock · 30% off for waitlist members",
   "rec.waitlist.title": "Not ready to pay? Join the waitlist 🎓",
   "rec.waitlist.body": "Lock in {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge and early access to every new tool included.",
   "rec.waitlist.cta": "Join the waitlist",
