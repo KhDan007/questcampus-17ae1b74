@@ -68,11 +68,13 @@ export function UniversityCard({
   index,
   locked = false,
   reduce = false,
+  onDismiss,
 }: {
   card: RecCard;
   index: number;
   locked?: boolean;
   reduce?: boolean;
+  onDismiss?: () => void;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
