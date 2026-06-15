@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
@@ -12,7 +12,7 @@ import type { UniversitySearchResult } from "@/routes/universities";
 
 function useDebounced<T>(value: T, ms = 250): T {
   const [v, setV] = useState(value);
-  useMemo(() => {
+  useEffect(() => {
     const id = setTimeout(() => setV(value), ms);
     return () => clearTimeout(id);
   }, [value, ms]);
