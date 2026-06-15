@@ -181,3 +181,25 @@ export function UniversityCard({
     </motion.article>
   );
 }
+
+function RecommendationSaveToggle({ source, externalId }: { source: string; externalId: string }) {
+  const { isSaved, isAuthenticated, requireAuth, addFromRecommendation, removeByUniversity } =
+    useSavedUniversities();
+  const saved = isSaved(source, externalId);
+  return (
+    <SaveToggle
+      saved={saved}
+      onAdd={async () => {
+        if (!isAuthenticated) {
+          requireAuth();
+          return;
+        }
+        await addFromRecommendation(source, externalId);
+      }}
+      onRemove={async () => {
+        if (!isAuthenticated) return;
+        await removeByUniversity(source, externalId);
+      }}
+    />
+  );
+}
