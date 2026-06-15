@@ -22,6 +22,8 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import type { RecCard } from "@/components/profile/UniversityCard";
+import { UniversitySearchSection } from "@/components/universities/UniversitySearchSection";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
@@ -344,6 +346,25 @@ function DashboardPage() {
               </Link>
             </div>
           )}
+        </section>
+
+        {/* Search any university */}
+        <section className="mt-14 rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-8">
+          <SilentErrorBoundary>
+            <UniversitySearchSection
+              title="Search any university"
+              subtitle="Search 11,000+ universities and add the ones you're already considering to your shortlist."
+            />
+          </SilentErrorBoundary>
+          <div className="mt-5">
+            <Link
+              to="/universities"
+              className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md font-semibold text-primary hover:underline"
+            >
+              Open full universities workspace
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
 
         {/* Personal statement — live feature, logged-in only */}
