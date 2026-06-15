@@ -152,7 +152,7 @@ export const UI_EN: Record<string, string> = {
   "unlock.signinLink": "Sign in or sign up",
   "unlock.secureNote": "Secure checkout · No card stored · Referral discount applied automatically",
   "unlock.discount": "🎉 {pct}% off applied — pay {discounted} instead of ${price}",
-  "unlock.button": "Subscribe — ${price}/mo",
+  "unlock.button": "Unlock for ${price}",
   "unlock.redirecting": "Redirecting…",
   "unlock.signinPrompt": "Sign in",
   "unlock.signinSuffix": "to unlock.",
