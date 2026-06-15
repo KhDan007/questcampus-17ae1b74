@@ -22,6 +22,8 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import type { RecCard } from "@/components/profile/UniversityCard";
+import { UniversitySearchSection } from "@/components/universities/UniversitySearchSection";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
