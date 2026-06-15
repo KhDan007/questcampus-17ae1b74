@@ -170,6 +170,16 @@ export function UniversityCard({
             <span aria-hidden>{open ? "▲" : "▼"}</span>
           </button>
           <RecommendationSaveToggle source={card.source ?? "scorecard"} externalId={card.externalId} />
+          {onDismiss && (
+            <button
+              type="button"
+              onClick={onDismiss}
+              aria-label="Remove from matches"
+              className="ml-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-4 text-label-md font-medium text-on-surface-variant transition-colors hover:bg-error-container hover:text-on-error-container"
+            >
+              Remove
+            </button>
+          )}
         </div>
       )}
 
