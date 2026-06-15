@@ -102,7 +102,7 @@ export const UI_EN: Record<string, string> = {
   "rec.section.reach": "Reach schools",
   "rec.upsell.title": "See your full list — safety, target & reach",
   "rec.upsell.body": "Unlock every match sorted into safety, target, and reach schools, with full requirements, deadlines, and filters.",
-  "rec.upsell.note": "$15/month · Cancel anytime · 30% off for waitlist members",
+  "rec.upsell.note": "$15 one-time unlock · 30% off for waitlist members",
   "rec.waitlist.title": "Not ready to pay? Join the waitlist 🎓",
   "rec.waitlist.body": "Lock in {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge and early access to every new tool included.",
   "rec.waitlist.cta": "Join the waitlist",
@@ -141,7 +141,7 @@ export const UI_EN: Record<string, string> = {
 
   // Unlock
   "unlock.title": "Unlock your full match list",
-  "unlock.subtitle": "${price}/month · Cancel anytime. Every match sorted into safety, target, and reach — with the why behind each one.",
+  "unlock.subtitle": "${price} one-time unlock. One payment. Full list unlocked — every match sorted into safety, target, and reach.",
   "unlock.perk1": "Every safety school where you're a likely admit",
   "unlock.perk2": "Target schools matched to your grades and goals",
   "unlock.perk3": "Reach schools worth aiming for — with the why",
@@ -152,7 +152,7 @@ export const UI_EN: Record<string, string> = {
   "unlock.signinLink": "Sign in or sign up",
   "unlock.secureNote": "Secure checkout · No card stored · Referral discount applied automatically",
   "unlock.discount": "🎉 {pct}% off applied — pay {discounted} instead of ${price}",
-  "unlock.button": "Subscribe — ${price}/mo",
+  "unlock.button": "Unlock for ${price}",
   "unlock.redirecting": "Redirecting…",
   "unlock.signinPrompt": "Sign in",
   "unlock.signinSuffix": "to unlock.",

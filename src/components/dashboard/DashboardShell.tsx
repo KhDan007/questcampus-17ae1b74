@@ -149,10 +149,10 @@ function SidebarBody({
               <Sparkles className="h-3.5 w-3.5" /> Upgrade
             </p>
             <p className="relative mt-1 font-display text-label-lg font-bold">
-              Subscribe — $15/mo
+              Unlock — $15 one-time
             </p>
             <p className="relative mt-0.5 text-label-sm text-white/85">
-              All matches + polished essays. Cancel anytime.
+              All matches + polished essays. One payment.
             </p>
           </Link>
         )}
