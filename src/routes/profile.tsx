@@ -230,7 +230,9 @@ function ProfilePage() {
           )}
         </section>
 
-        <MyUniversitiesSection />
+        <SilentErrorBoundary>
+          <MyUniversitiesSection />
+        </SilentErrorBoundary>
 
 
         {/* Upcoming */}
