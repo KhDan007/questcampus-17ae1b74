@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 import { EnrichmentDetails } from "./EnrichmentDetails";
+import { SaveToggle } from "@/components/universities/SaveToggle";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
 
 // Shape returned by convex rag/recommend:recommend (per card).
 export type RecCard = {
@@ -165,6 +167,7 @@ export function UniversityCard({
             {open ? t("enrich.hide") : t("enrich.show")}
             <span aria-hidden>{open ? "▲" : "▼"}</span>
           </button>
+          <RecommendationSaveToggle source={card.source ?? "scorecard"} externalId={card.externalId} />
         </div>
       )}
 
