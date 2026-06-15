@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
+import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 
@@ -227,6 +228,9 @@ function ProfilePage() {
             </div>
           )}
         </section>
+
+        <MyUniversitiesSection />
+
 
         {/* Upcoming */}
         <section className="mt-16">
