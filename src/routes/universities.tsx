@@ -37,6 +37,13 @@ export const Route = createFileRoute("/universities")({
     q: typeof s.q === "string" ? s.q : "",
     country: typeof s.country === "string" ? s.country : "",
     region: typeof s.region === "string" ? s.region : "",
+    source: typeof s.source === "string" ? s.source : "",
+    sizeBucket: typeof s.sizeBucket === "string" ? s.sizeBucket : "",
+    field: typeof s.field === "string" ? s.field : "",
+    language: typeof s.language === "string" ? s.language : "",
+    maxGlobalRank: typeof s.maxGlobalRank === "string" ? s.maxGlobalRank : "",
+    maxAcceptanceRate: typeof s.maxAcceptanceRate === "string" ? s.maxAcceptanceRate : "",
+    maxTuition: typeof s.maxTuition === "string" ? s.maxTuition : "",
   }),
   component: UniversitiesPage,
 });
@@ -55,6 +62,20 @@ export type UniversitySearchResult = {
   globalRank?: number;
   acceptanceRate?: number;
   sizeBucket?: string;
+  tuitionOutState?: number;
+  costAttendance?: number;
+  languageOfInstruction?: string[];
+};
+
+type FilterOptions = {
+  countries: string[];
+  regions: string[];
+  sources: string[];
+  sizeBuckets: string[];
+  fields: string[];
+  languages: string[];
+  complete: boolean;
+  scanned: number;
 };
 
 type FreePayload = { plan: "free"; firstName?: string; results: RecCard[] };
