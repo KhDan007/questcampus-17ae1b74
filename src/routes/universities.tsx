@@ -435,18 +435,34 @@ function UniversitiesPage() {
             </div>
           </label>
 
-          {/* Filters */}
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            <FilterSelect label="Country" value={country} onChange={setCountry} options={filterOptions?.countries} />
-            <FilterSelect label="Region" value={region} onChange={setRegion} options={filterOptions?.regions} />
-            <FilterSelect label="Dataset" value={source} onChange={setSource} options={filterOptions?.sources} />
-            <FilterSelect label="Size" value={sizeBucket} onChange={setSizeBucket} options={filterOptions?.sizeBuckets} />
-            <FilterSelect label="Field" value={field} onChange={setField} options={filterOptions?.fields} />
-            <FilterSelect label="Language" value={language} onChange={setLanguage} options={filterOptions?.languages} />
-            <FilterNumber label="Max global rank" placeholder="e.g. 200" value={maxGlobalRank} onChange={setMaxGlobalRank} />
-            <FilterNumber label="Max acceptance %" placeholder="e.g. 20" value={maxAcceptanceRate} onChange={setMaxAcceptanceRate} />
-            <FilterNumber label="Max tuition (USD)" placeholder="e.g. 30000" value={maxTuition} onChange={setMaxTuition} />
-          </div>
+          {/* Filters (wrapped: if backend filterOptions is unavailable, render basic selects only) */}
+          <SilentErrorBoundary
+            fallback={
+              <BasicFilters
+                country={country} setCountry={setCountry}
+                region={region} setRegion={setRegion}
+                source={source} setSource={setSource}
+                sizeBucket={sizeBucket} setSizeBucket={setSizeBucket}
+                field={field} setField={setField}
+                language={language} setLanguage={setLanguage}
+                maxGlobalRank={maxGlobalRank} setMaxGlobalRank={setMaxGlobalRank}
+                maxAcceptanceRate={maxAcceptanceRate} setMaxAcceptanceRate={setMaxAcceptanceRate}
+                maxTuition={maxTuition} setMaxTuition={setMaxTuition}
+              />
+            }
+          >
+            <FiltersWithOptions
+              country={country} setCountry={setCountry}
+              region={region} setRegion={setRegion}
+              source={source} setSource={setSource}
+              sizeBucket={sizeBucket} setSizeBucket={setSizeBucket}
+              field={field} setField={setField}
+              language={language} setLanguage={setLanguage}
+              maxGlobalRank={maxGlobalRank} setMaxGlobalRank={setMaxGlobalRank}
+              maxAcceptanceRate={maxAcceptanceRate} setMaxAcceptanceRate={setMaxAcceptanceRate}
+              maxTuition={maxTuition} setMaxTuition={setMaxTuition}
+            />
+          </SilentErrorBoundary>
           {hasActiveFilters && (
             <div className="mt-3 flex items-center justify-end">
               <button
@@ -457,11 +473,6 @@ function UniversitiesPage() {
                 <X className="h-3.5 w-3.5" /> Clear filters
               </button>
             </div>
-          )}
-          {filterOptions && !filterOptions.complete && (
-            <p className="mt-2 text-label-sm text-on-surface-variant">
-              Showing filter options from {filterOptions.scanned.toLocaleString()} indexed schools.
-            </p>
           )}
         </section>
 
