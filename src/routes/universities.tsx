@@ -411,14 +411,18 @@ function UniversitiesPage() {
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
-          <Link
-            to="/profile"
+          <a
+            href="#saved-panel"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("saved-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
             className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
             <Bookmark className="h-4 w-4 text-primary" />
             Saved: <span className="font-bold">{savedCount}</span>
-            <span aria-hidden>→</span>
-          </Link>
+            <span aria-hidden>↓</span>
+          </a>
         </motion.header>
 
         {/* Search box */}
