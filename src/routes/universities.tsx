@@ -161,10 +161,6 @@ function UniversitiesPage() {
     navigate,
   ]);
 
-  const filterOptions = useQuery(api.universitySearch.filterOptions, {}) as
-    | FilterOptions
-    | undefined;
-
   const numOrUndef = (s: string): number | undefined => {
     const n = Number(s);
     return s !== "" && Number.isFinite(n) && n > 0 ? n : undefined;
@@ -184,11 +180,7 @@ function UniversitiesPage() {
         maxTuition: numOrUndef(maxTuition),
         limit: 15,
       }
-    : "skip";
-
-  const results = useQuery(api.universitySearch.search, searchArgs) as
-    | UniversitySearchResult[]
-    | undefined;
+    : null;
 
   const clearFilters = () => {
     setCountry("");
