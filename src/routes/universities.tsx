@@ -593,62 +593,6 @@ function SearchRow({
   );
 }
 
-function SavedPanel({
-  saved,
-  reduce,
-}: {
-  saved: SavedUniversity[] | undefined;
-  reduce: boolean;
-}) {
-  const { removeById } = useSavedUniversities();
-  if (saved === undefined) {
-    return (
-      <div className="mt-4 flex items-center gap-2 text-body-sm text-on-surface-variant">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading…
-      </div>
-    );
-  }
-  if (saved.length === 0) {
-    return (
-      <p className="mt-4 text-body-sm text-on-surface-variant">
-        Search for universities you already know, or add schools from your matches.
-      </p>
-    );
-  }
-  return (
-    <ul className="mt-4 grid gap-2">
-      {saved.map((u, i) => (
-        <motion.li
-          key={u.id}
-          initial={reduce ? false : { opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: Math.min(i, 6) * 0.03 }}
-          className="flex items-start gap-2 rounded-lg border border-on-surface/15 bg-surface/95 p-3"
-        >
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-on-surface/20 bg-secondary-container">
-            <GraduationCap className="h-3.5 w-3.5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-[var(--font-label)] text-label-md font-bold text-on-surface">
-              {u.name}
-            </p>
-            <p className="truncate text-label-sm text-on-surface-variant">
-              {[u.city, u.country].filter(Boolean).join(", ")}
-            </p>
-          </div>
-          <button
-            type="button"
-            aria-label="Remove saved university"
-            onClick={() => void removeById(u.id)}
-            className="grid h-7 w-7 place-items-center rounded-md text-on-surface/60 hover:bg-error-container hover:text-on-error-container"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </motion.li>
-      ))}
-    </ul>
-  );
-}
 
 function Paywall({
   token,
