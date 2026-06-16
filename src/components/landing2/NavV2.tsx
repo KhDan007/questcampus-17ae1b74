@@ -197,7 +197,7 @@ export function NavV2() {
                       onClick={() => setMobileOpen(false)}
                       className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
                     >
-                      <Sparkles className="h-4 w-4" /> Unlock — $15 one-time
+                      <Sparkles className="h-4 w-4" /> Unlock — $15/month
                     </Link>
                   )}
                 </div>

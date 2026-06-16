@@ -681,7 +681,7 @@ function Paywall({
               Unlock your full match list
             </h3>
             <p className="mt-1 max-w-md text-body-md text-on-surface-variant">
-              $15 one-time. Up to 20 universities across Safety, Target, and Reach.
+              $15/month. Up to 20 universities across Safety, Target, and Reach.
             </p>
             {paidStatus === "payment_required" && (
               <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -690,7 +690,7 @@ function Paywall({
             )}
           </div>
         </div>
-        <UnlockButton token={token} label="$15 one-time unlock" />
+        <UnlockButton token={token} label="$15/month subscription" />
       </div>
     </div>
   );
