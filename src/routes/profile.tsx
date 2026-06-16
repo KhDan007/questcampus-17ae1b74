@@ -198,8 +198,8 @@ function ProfilePage() {
             {/* Quick stats */}
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               <Stat
-                label="Saved matches"
-                value={String(saved?.matches.length ?? 0)}
+                label="Your matches"
+                value={String(recs?.length ?? 0)}
                 tone="primary"
               />
               <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
