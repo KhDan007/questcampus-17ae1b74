@@ -227,41 +227,86 @@ function ProfilePage() {
           />
         </section>
 
-        {/* Saved matches */}
+        {/* Your matches — names-only list */}
         <section className="mt-14">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                Saved university matches
+                Your university matches
               </h2>
               <p className="mt-1 text-body-md text-on-surface-variant">
-                {saved
-                  ? `From your quiz · ${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
-                  : "Take the 60-second quiz to fill this in."}
+                {recs && recs.length > 0
+                  ? `${recs.length} matches · open the full list for details`
+                  : "Run the quiz to generate your matches."}
               </p>
             </div>
             <Link
-              to="/"
-              className="hidden shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
+              to="/universities"
+              className="hidden shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
             >
-              {saved ? "Retake quiz" : "Take quiz"}
+              See full list <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          {saved && saved.matches.length > 0 ? (
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {saved.matches.map((m, i) => (
-                <SavedMatchCard key={`${m.name}-${i}`} match={m} delay={i * 0.06} />
+          {recStatus === "loading" && (
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-11 animate-pulse rounded-lg border-2 border-on-surface/10 bg-surface/60"
+                />
               ))}
             </div>
-          ) : (
+          )}
+
+          {recStatus === "ready" && recs && recs.length > 0 && (
+            <ol className="mt-6 grid gap-2 sm:grid-cols-2">
+              {recs.map((r, i) => {
+                const loc = [r.city, r.state, r.country].filter(Boolean).join(", ");
+                const bucket = r.bucket ? BUCKET_LABEL[r.bucket] : null;
+                return (
+                  <li
+                    key={r.externalId}
+                    className="flex min-w-0 items-center gap-3 overflow-hidden rounded-lg border-2 border-on-surface bg-surface/85 px-3 py-2.5 qc-hard-shadow-sm"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 font-[var(--font-label)] text-label-sm font-bold text-primary">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-display text-label-lg font-semibold text-on-surface">
+                        {r.name}
+                      </p>
+                      {loc && (
+                        <p className="truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                          {loc}
+                        </p>
+                      )}
+                    </div>
+                    {bucket && (
+                      <span
+                        className={`shrink-0 rounded-md px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-bold ${bucket.chip}`}
+                      >
+                        {bucket.label}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+
+          {(recStatus === "error" || (recStatus === "ready" && (!recs || recs.length === 0))) && (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-              <p className="text-body-lg text-on-surface-variant">No saved matches yet.</p>
+              <p className="text-body-lg text-on-surface-variant">
+                {recStatus === "error"
+                  ? "Couldn't load your matches — try again."
+                  : "No matches yet."}
+              </p>
               <Link
-                to="/"
+                to="/universities"
                 className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
-                Start the quiz <ArrowRight className="h-4 w-4" />
+                Open universities <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           )}
