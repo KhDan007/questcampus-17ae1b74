@@ -1098,18 +1098,21 @@ function FilterNumber({
   );
 }
 
-function SavedPanel({
+function SavedTab({
   saved,
   onRemove,
+  reduce,
 }: {
   saved: ReturnType<typeof useSavedUniversities>["saved"];
   onRemove: (id: string) => Promise<void> | void;
+  reduce: boolean;
 }) {
   return (
-    <section id="saved-panel" className="mt-12 scroll-mt-24">
-      <div className="flex items-end justify-between gap-3">
+    <section>
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="font-display text-headline-md font-bold text-on-surface">
+            <Bookmark className="mr-1 inline h-5 w-5 text-primary" />
             Saved universities
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
@@ -1118,51 +1121,43 @@ function SavedPanel({
         </div>
       </div>
       {saved === undefined ? (
-        <div className="mt-4 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm">
+        <div className="mt-6 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm">
           <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
           <span className="text-body-sm text-on-surface-variant">Loading your saved list…</span>
         </div>
       ) : saved.length === 0 ? (
-        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+        <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
           <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
           <p className="mt-3 text-body-md text-on-surface-variant">
-            Search for universities you already know, or save schools from your matches.
+            Search for universities you already know, or save schools from your matches using the
+            bookmark icon.
           </p>
         </div>
       ) : (
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {saved.map((u) => {
-            const location = [u.city, u.state, u.country].filter(Boolean).join(", ");
+        <ul className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {saved.map((u, i) => {
+            const card: RecCard = {
+              externalId: u.externalId,
+              source: u.source,
+              name: u.name,
+              city: u.city,
+              state: u.state,
+              country: u.country,
+              region: u.region,
+              website: u.website,
+              fields: u.fields,
+              bucket: "target",
+              score: 0,
+              why: "",
+            };
             return (
-              <li
+              <CompactMatchCard
                 key={u.id}
-                className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-3 qc-hard-shadow-sm"
-              >
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
-                  <GraduationCap className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-display text-label-lg font-bold text-on-surface">
-                    {u.name}
-                  </p>
-                  {location && (
-                    <p className="mt-0.5 truncate text-label-sm text-on-surface-variant">
-                      {location}
-                    </p>
-                  )}
-                  <p className="mt-1 truncate text-label-sm uppercase tracking-wider text-on-surface-variant">
-                    Added from {u.origin}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Remove from saved"
-                  onClick={() => void onRemove(u.id)}
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </li>
+                card={card}
+                index={i}
+                reduce={reduce}
+                onDismiss={() => void onRemove(u.id)}
+              />
             );
           })}
         </ul>
