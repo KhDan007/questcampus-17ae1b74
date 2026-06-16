@@ -425,20 +425,32 @@ function UniversitiesPage() {
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
-          <a
-            href="#saved-panel"
-            onClick={(e) => {
-              e.preventDefault();
-              document
-                .getElementById("saved-panel")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            <Bookmark className="h-4 w-4 text-primary" />
-            Saved: <span className="font-bold">{savedCount}</span>
-            <span aria-hidden>↓</span>
-          </a>
+          <div className="inline-flex items-center gap-1 rounded-lg border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+            <button
+              type="button"
+              onClick={() => setTab("matches")}
+              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                tab === "matches"
+                  ? "bg-primary text-white"
+                  : "text-on-surface/70 hover:text-on-surface"
+              }`}
+            >
+              <Sparkles className="mr-1 inline h-3.5 w-3.5" />
+              Matches
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("saved")}
+              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                tab === "saved"
+                  ? "bg-primary text-white"
+                  : "text-on-surface/70 hover:text-on-surface"
+              }`}
+            >
+              <Bookmark className="mr-1 inline h-3.5 w-3.5" />
+              Saved <span className="opacity-75">({savedCount})</span>
+            </button>
+          </div>
         </motion.header>
 
         {/* Search box */}
