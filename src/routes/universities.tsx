@@ -504,20 +504,6 @@ function UniversitiesPage() {
             </section>
           </div>
 
-          {/* Saved panel */}
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-2xl border-2 border-on-surface bg-surface/85 p-5 backdrop-blur-md qc-hard-shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-headline-sm font-bold text-on-surface">
-                  Saved universities
-                </h3>
-                <span className="font-[var(--font-label)] text-label-md font-bold text-primary">
-                  {savedCount}
-                </span>
-              </div>
-              <SavedPanel saved={saved} reduce={!!reduce} />
-            </div>
-          </aside>
         </div>
 
         {/* Undo toast */}
