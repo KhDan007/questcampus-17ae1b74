@@ -23,16 +23,35 @@ function UnlockSuccessPage() {
   const navigate = useNavigate();
   const token = auth.getSession()?.token;
   const recommend = useAction(api.rag.recommend.recommend);
+  const convex = useConvex();
   const [primed, setPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [slow, setSlow] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
+  const slowTimer = useRef<number | null>(null);
   const { t } = useI18n();
   const reduce = useReducedMotion();
 
   const { isAdmin } = useAuth();
-  const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
-    | { paid: boolean }
-    | undefined;
+  const entitlement = useQuery(
+    api.payments.entitlement,
+    token ? { token, _retry: retryTick } : "skip",
+  ) as { paid: boolean } | undefined;
   const isPaid = isAdmin || entitlement?.paid === true;
+
+  // Show "still finalizing" after ~15s without paid:true
+  useEffect(() => {
+    if (isPaid) {
+      if (slowTimer.current) window.clearTimeout(slowTimer.current);
+      setSlow(false);
+      return;
+    }
+    if (slowTimer.current) window.clearTimeout(slowTimer.current);
+    slowTimer.current = window.setTimeout(() => setSlow(true), 15000);
+    return () => {
+      if (slowTimer.current) window.clearTimeout(slowTimer.current);
+    };
+  }, [isPaid, retryTick]);
 
   useEffect(() => {
     if (!isPaid || primed) return;
@@ -54,6 +73,13 @@ function UnlockSuccessPage() {
       cancelled = true;
     };
   }, [isPaid, primed, recommend, token, navigate]);
+
+  const onRetry = () => {
+    setSlow(false);
+    setRetryTick((n) => n + 1);
+    // Touch convex client to ensure reactive refresh
+    void convex;
+  };
 
   return (
     <>
@@ -97,7 +123,7 @@ function UnlockSuccessPage() {
               </Link>
             </>
           ) : (
-            <WaitingState />
+            <WaitingState slow={slow} onRetry={onRetry} />
           )}
         </motion.div>
       </main>
