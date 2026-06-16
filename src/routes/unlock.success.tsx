@@ -44,7 +44,7 @@ function UnlockSuccessPage() {
         await recommend({ sessionId, token, plan: "paid", force: true });
         if (!cancelled) {
           setPrimed(true);
-          setTimeout(() => navigate({ to: "/profile" }), 800);
+          setTimeout(() => navigate({ to: "/universities" }), 800);
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load matches.");
@@ -89,7 +89,7 @@ function UnlockSuccessPage() {
               </p>
               {error && <p className="mt-3 text-label-sm text-error">{error}</p>}
               <Link
-                to="/profile"
+                to="/universities"
                 className="group mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
               >
                 {t("unlockOk.go")}

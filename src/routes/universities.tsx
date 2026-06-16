@@ -178,12 +178,17 @@ function UniversitiesPage() {
     [recommend, sessionId, token],
   );
 
+  // Free users load free recommendations; paid users skip free entirely.
   useEffect(() => {
-    if (sessionId) void loadFree();
-  }, [sessionId, loadFree]);
+    if (!sessionId) return;
+    if (isPaid) return;
+    void loadFree();
+  }, [sessionId, isPaid, loadFree]);
 
+  // Paid users load cached paid matches (no force — backend serves from cache).
   useEffect(() => {
-    if (isPaid && !paid && paidStatus !== "loading") void loadPaid(true);
+    if (!isPaid || paid || paidStatus === "loading") return;
+    void loadPaid();
   }, [isPaid, paid, paidStatus, loadPaid]);
 
   // Dismissed matches (per user/session)
@@ -248,7 +253,15 @@ function UniversitiesPage() {
     setLastDismissed(null);
   }, [persistDismissed]);
 
-  // Resolve matches per plan
+  // Resolve matches per plan. For paid, prefer buckets and fall back to grouping results.
+  const paidBuckets = useMemo(() => {
+    if (!isPaid || !paid) return null;
+    if (paid.buckets) return paid.buckets;
+    const grouped = { safety: [] as RecCard[], target: [] as RecCard[], reach: [] as RecCard[] };
+    for (const r of paid.results ?? []) grouped[r.bucket]?.push(r);
+    return grouped;
+  }, [isPaid, paid]);
+
   const rawMatches: RecCard[] = useMemo(() => {
     if (isPaid && paid) {
       if (paid.results?.length) return paid.results;
@@ -263,11 +276,21 @@ function UniversitiesPage() {
   const visibleMatches = matchesToRender.filter((m) => !dismissed.has(universityKey(m)));
   const hiddenCount = matchesToRender.length - visibleMatches.length;
 
+  const visibleBuckets = useMemo(() => {
+    if (!paidBuckets) return null;
+    const filter = (list: RecCard[]) => list.filter((m) => !dismissed.has(universityKey(m)));
+    return {
+      safety: filter(paidBuckets.safety ?? []),
+      target: filter(paidBuckets.target ?? []),
+      reach: filter(paidBuckets.reach ?? []),
+    };
+  }, [paidBuckets, dismissed]);
+
   const { saved } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
 
   const matchesLoading =
-    freeStatus === "loading" || (isPaid && paidStatus === "loading" && !paid);
+    (!isPaid && freeStatus === "loading") || (isPaid && paidStatus === "loading" && !paid);
 
   return (
     <>
@@ -294,10 +317,12 @@ function UniversitiesPage() {
               Universities
             </p>
             <h1 className="mt-2 font-display text-display-md text-on-surface">
-              Your matches, search, and saved list
+              Universities
             </h1>
             <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
-              Browse your AI matches and add schools you already know — all in one workspace.
+              {isPaid
+                ? `${matchesToRender.length} matches. Search and save schools.`
+                : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md text-on-surface qc-hard-shadow-sm">
@@ -382,10 +407,12 @@ function UniversitiesPage() {
                   </h2>
                   <p className="mt-1 text-body-md text-on-surface-variant">
                     {matchesLoading
-                      ? "Loading your matches…"
+                      ? isPaid
+                        ? "Loading saved matches…"
+                        : "Loading your matches…"
                       : isPaid
-                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"} unlocked${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
-                        : "Top 3 teaser — unlock the full list for the complete ranking."}
+                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
+                        : "Top 3 preview — unlock the full list."}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -403,12 +430,13 @@ function UniversitiesPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        void loadFree(true);
                         if (isPaid) void loadPaid(true);
+                        else void loadFree(true);
                       }}
                       className="text-label-md text-on-surface-variant hover:text-primary"
+                      title={isPaid && paidStatus === "loading" ? "Refreshing matches…" : "Refresh"}
                     >
-                      Refresh
+                      {isPaid && paidStatus === "loading" ? "Refreshing…" : "Refresh"}
                     </button>
                   )}
                 </div>
@@ -424,6 +452,33 @@ function UniversitiesPage() {
                 <EmptyHint>
                   You hid all current matches. Use "Restore hidden" to bring them back.
                 </EmptyHint>
+              ) : isPaid && visibleBuckets ? (
+                <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                  <MatchColumn
+                    title="Safety"
+                    subtitle="Likely admits"
+                    tone="safety"
+                    items={visibleBuckets.safety}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                  <MatchColumn
+                    title="Target"
+                    subtitle="Strong fit"
+                    tone="target"
+                    items={visibleBuckets.target}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                  <MatchColumn
+                    title="Reach"
+                    subtitle="Ambitious picks"
+                    tone="reach"
+                    items={visibleBuckets.reach}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                </div>
               ) : (
                 <div className="mt-6 grid gap-5">
                   {visibleMatches.map((card, i) => (
@@ -626,8 +681,7 @@ function Paywall({
               Unlock your full match list
             </h3>
             <p className="mt-1 max-w-md text-body-md text-on-surface-variant">
-              One payment. Full list unlocked — up to 20 universities ranked across
-              Safety, Target, and Reach.
+              $15 one-time. Up to 20 universities across Safety, Target, and Reach.
             </p>
             {paidStatus === "payment_required" && (
               <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -678,5 +732,154 @@ function MatchesSkeleton() {
         </div>
       ))}
     </div>
+  );
+}
+
+const TONE_BADGE: Record<"safety" | "target" | "reach", string> = {
+  safety: "bg-tertiary-container/40 text-tertiary border-tertiary/40",
+  target: "bg-primary-fixed text-primary border-primary/40",
+  reach: "bg-secondary-container/40 text-secondary border-secondary/40",
+};
+
+function MatchColumn({
+  title,
+  subtitle,
+  tone,
+  items,
+  reduce,
+  onDismiss,
+}: {
+  title: string;
+  subtitle: string;
+  tone: "safety" | "target" | "reach";
+  items: RecCard[];
+  reduce: boolean;
+  onDismiss: (key: string) => void;
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="font-display text-headline-sm font-bold text-on-surface">
+          {title}{" "}
+          <span className="font-[var(--font-label)] text-label-md font-normal text-on-surface-variant">
+            {items.length}
+          </span>
+        </h3>
+        <span
+          className={`rounded-full border px-2 py-0.5 text-label-sm font-medium ${TONE_BADGE[tone]}`}
+        >
+          {subtitle}
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-4 text-body-sm text-on-surface-variant">No matches in this bucket.</p>
+      ) : (
+        <ul className="mt-3 grid gap-2.5">
+          {items.map((card, i) => (
+            <CompactMatchCard
+              key={universityKey(card)}
+              card={card}
+              index={i}
+              reduce={reduce}
+              onDismiss={() => onDismiss(universityKey(card))}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function CompactMatchCard({
+  card,
+  index,
+  reduce,
+  onDismiss,
+}: {
+  card: RecCard;
+  index: number;
+  reduce: boolean;
+  onDismiss: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const location = [card.city, card.country].filter(Boolean).join(", ");
+  const facts: string[] = [];
+  if (card.globalRank) facts.push(`#${card.globalRank}`);
+  if (card.acceptanceRate != null) facts.push(`${Math.round(card.acceptanceRate * 100)}% accept`);
+  if (card.ieltsOverall) facts.push(`IELTS ${card.ieltsOverall}`);
+  else if (card.toeflIbt) facts.push(`TOEFL ${card.toeflIbt}`);
+  return (
+    <motion.li
+      initial={reduce ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, delay: Math.min(index, 6) * 0.03 }}
+      className="rounded-lg border border-on-surface/15 bg-surface-container-lowest p-3"
+    >
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display text-label-lg font-bold text-on-surface">
+            {card.name}
+          </p>
+          {location && (
+            <p className="truncate text-label-sm text-on-surface-variant">{location}</p>
+          )}
+          {card.why && (
+            <p className="mt-1.5 line-clamp-2 text-body-sm text-on-surface">{card.why}</p>
+          )}
+          {facts.length > 0 && (
+            <p className="mt-1.5 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {facts.join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <RecommendationSaveIcon source={card.source ?? "scorecard"} externalId={card.externalId} />
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="rounded-md border border-on-surface/20 px-2 py-1 text-label-sm text-on-surface hover:bg-surface-container"
+        >
+          {open ? "Hide" : "Details"}
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="ml-auto rounded-md px-2 py-1 text-label-sm text-on-surface-variant hover:bg-error-container hover:text-on-error-container"
+        >
+          Hide
+        </button>
+      </div>
+      {open && (
+        <div className="mt-3 border-t border-on-surface/10 pt-3">
+          <UniversityCard card={card} index={0} reduce={reduce} />
+        </div>
+      )}
+    </motion.li>
+  );
+}
+
+function RecommendationSaveIcon({ source, externalId }: { source: string; externalId: string }) {
+  const { isSaved, isAuthenticated, requireAuth, addFromRecommendation, removeByUniversity } =
+    useSavedUniversities();
+  const saved = isSaved(source, externalId);
+  return (
+    <SaveToggle
+      variant="icon"
+      saved={saved}
+      onAdd={async () => {
+        if (!isAuthenticated) {
+          requireAuth();
+          return;
+        }
+        await addFromRecommendation(source, externalId);
+      }}
+      onRemove={async () => {
+        if (!isAuthenticated) return;
+        await removeByUniversity(source, externalId);
+      }}
+    />
   );
 }
