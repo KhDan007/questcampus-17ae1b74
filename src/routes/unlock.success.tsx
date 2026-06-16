@@ -44,7 +44,7 @@ function UnlockSuccessPage() {
         await recommend({ sessionId, token, plan: "paid", force: true });
         if (!cancelled) {
           setPrimed(true);
-          setTimeout(() => navigate({ to: "/profile" }), 800);
+          setTimeout(() => navigate({ to: "/universities" }), 800);
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load matches.");
