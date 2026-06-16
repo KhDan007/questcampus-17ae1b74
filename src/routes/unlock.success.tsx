@@ -1,10 +1,10 @@
 "use client";
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useQuery, useAction } from "convex/react";
-import { ArrowRight, PartyPopper, Loader2 } from "lucide-react";
+import { useQuery, useAction, useConvex } from "convex/react";
+import { ArrowRight, PartyPopper, Loader2, RefreshCw } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -23,16 +23,35 @@ function UnlockSuccessPage() {
   const navigate = useNavigate();
   const token = auth.getSession()?.token;
   const recommend = useAction(api.rag.recommend.recommend);
+  const convex = useConvex();
   const [primed, setPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [slow, setSlow] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
+  const slowTimer = useRef<number | null>(null);
   const { t } = useI18n();
   const reduce = useReducedMotion();
 
   const { isAdmin } = useAuth();
-  const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
-    | { paid: boolean }
-    | undefined;
+  const entitlement = useQuery(
+    api.payments.entitlement,
+    token ? { token } : "skip",
+  ) as { paid: boolean } | undefined;
   const isPaid = isAdmin || entitlement?.paid === true;
+
+  // Show "still finalizing" after ~15s without paid:true
+  useEffect(() => {
+    if (isPaid) {
+      if (slowTimer.current) window.clearTimeout(slowTimer.current);
+      setSlow(false);
+      return;
+    }
+    if (slowTimer.current) window.clearTimeout(slowTimer.current);
+    slowTimer.current = window.setTimeout(() => setSlow(true), 15000);
+    return () => {
+      if (slowTimer.current) window.clearTimeout(slowTimer.current);
+    };
+  }, [isPaid, retryTick]);
 
   useEffect(() => {
     if (!isPaid || primed) return;
@@ -54,6 +73,13 @@ function UnlockSuccessPage() {
       cancelled = true;
     };
   }, [isPaid, primed, recommend, token, navigate]);
+
+  const onRetry = () => {
+    setSlow(false);
+    setRetryTick((n) => n + 1);
+    // Touch convex client to ensure reactive refresh
+    void convex;
+  };
 
   return (
     <>
@@ -97,7 +123,7 @@ function UnlockSuccessPage() {
               </Link>
             </>
           ) : (
-            <WaitingState />
+            <WaitingState slow={slow} onRetry={onRetry} />
           )}
         </motion.div>
       </main>
@@ -105,7 +131,7 @@ function UnlockSuccessPage() {
   );
 }
 
-function WaitingState() {
+function WaitingState({ slow, onRetry }: { slow: boolean; onRetry: () => void }) {
   const { t } = useI18n();
   return (
     <div>
@@ -113,11 +139,22 @@ function WaitingState() {
         <Loader2 className="h-6 w-6 animate-spin" />
       </span>
       <h1 className="mt-6 font-display text-2xl font-black tracking-tight text-on-surface sm:text-3xl">
-        {t("unlockOk.waiting")}
+        {slow ? "Still finalizing payment" : t("unlockOk.waiting")}
       </h1>
       <p className="mt-3 text-body-md text-on-surface-variant">
-        {t("unlockOk.waitingBody")}
+        {slow
+          ? "This usually takes a few seconds. If it's stuck, try again."
+          : t("unlockOk.waitingBody")}
       </p>
+      {slow && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-5 inline-flex items-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <RefreshCw className="h-4 w-4" /> Retry
+        </button>
+      )}
     </div>
   );
 }

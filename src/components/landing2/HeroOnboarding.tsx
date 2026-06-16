@@ -71,7 +71,7 @@ export function HeroOnboarding() {
                 <Dot /> 3 free matches
               </span>
               <span className="inline-flex items-center gap-2">
-                <Dot /> $15/month subscriptions all 20
+                <Dot /> $15 one-time unlocks all 20
               </span>
             </motion.div>
 

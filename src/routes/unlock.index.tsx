@@ -32,7 +32,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "$15/month subscriptions your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
+          "$15 one-time unlock for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
       },
     ],
   }),
@@ -73,7 +73,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "Monthly subscription · cancel anytime" },
+    { Icon: Sparkles, label: "One-time payment" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
@@ -97,7 +97,7 @@ function UnlockPage() {
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              ${PRICE_MVP}/month subscription
+              ${PRICE_MVP} one-time unlock
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
@@ -115,7 +115,7 @@ function UnlockPage() {
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned
               to your profile — plus polished essay drafts and every premium
-              feature we ship. Cancel anytime. Full list unlocked.
+              feature we ship. One payment. Full list unlocked.
             </p>
           </motion.div>
 
@@ -153,7 +153,7 @@ function UnlockPage() {
                       ${PRICE_MVP}
                     </span>
                     <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                      per month
+                      one-time
                     </span>
                   </>
                 )}

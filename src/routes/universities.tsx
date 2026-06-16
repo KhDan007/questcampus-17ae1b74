@@ -12,6 +12,9 @@ import {
   Lock,
   Undo2,
   RotateCcw,
+  Trash2,
+  Loader2,
+  X,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -37,6 +40,13 @@ export const Route = createFileRoute("/universities")({
     q: typeof s.q === "string" ? s.q : "",
     country: typeof s.country === "string" ? s.country : "",
     region: typeof s.region === "string" ? s.region : "",
+    source: typeof s.source === "string" ? s.source : "",
+    sizeBucket: typeof s.sizeBucket === "string" ? s.sizeBucket : "",
+    field: typeof s.field === "string" ? s.field : "",
+    language: typeof s.language === "string" ? s.language : "",
+    maxGlobalRank: typeof s.maxGlobalRank === "string" ? s.maxGlobalRank : "",
+    maxAcceptanceRate: typeof s.maxAcceptanceRate === "string" ? s.maxAcceptanceRate : "",
+    maxTuition: typeof s.maxTuition === "string" ? s.maxTuition : "",
   }),
   component: UniversitiesPage,
 });
@@ -55,6 +65,20 @@ export type UniversitySearchResult = {
   globalRank?: number;
   acceptanceRate?: number;
   sizeBucket?: string;
+  tuitionOutState?: number;
+  costAttendance?: number;
+  languageOfInstruction?: string[];
+};
+
+type FilterOptions = {
+  countries: string[];
+  regions: string[];
+  sources: string[];
+  sizeBuckets: string[];
+  fields: string[];
+  languages: string[];
+  complete: boolean;
+  scanned: number;
 };
 
 type FreePayload = { plan: "free"; firstName?: string; results: RecCard[] };
@@ -96,24 +120,88 @@ function UniversitiesPage() {
   const [query, setQuery] = useState(initial.q);
   const [country, setCountry] = useState(initial.country);
   const [region, setRegion] = useState(initial.region);
+  const [source, setSource] = useState(initial.source);
+  const [sizeBucket, setSizeBucket] = useState(initial.sizeBucket);
+  const [field, setField] = useState(initial.field);
+  const [language, setLanguage] = useState(initial.language);
+  const [maxGlobalRank, setMaxGlobalRank] = useState(initial.maxGlobalRank);
+  const [maxAcceptanceRate, setMaxAcceptanceRate] = useState(initial.maxAcceptanceRate);
+  const [maxTuition, setMaxTuition] = useState(initial.maxTuition);
   const debouncedQuery = useDebounced(query.trim(), 250);
   const canSearch = debouncedQuery.length >= 2;
 
   useEffect(() => {
-    void navigate({ search: { q: query, country, region }, replace: true });
-  }, [query, country, region, navigate]);
+    void navigate({
+      search: {
+        q: query,
+        country,
+        region,
+        source,
+        sizeBucket,
+        field,
+        language,
+        maxGlobalRank,
+        maxAcceptanceRate,
+        maxTuition,
+      },
+      replace: true,
+    });
+  }, [
+    query,
+    country,
+    region,
+    source,
+    sizeBucket,
+    field,
+    language,
+    maxGlobalRank,
+    maxAcceptanceRate,
+    maxTuition,
+    navigate,
+  ]);
 
-  const results = useQuery(
-    api.universitySearch.search,
-    canSearch
-      ? {
-          query: debouncedQuery,
-          country: country || undefined,
-          region: region || undefined,
-          limit: 10,
-        }
-      : "skip",
-  ) as UniversitySearchResult[] | undefined;
+  const filterOptions = useQuery(api.universitySearch.filterOptions, {}) as
+    | FilterOptions
+    | undefined;
+
+  const numOrUndef = (s: string): number | undefined => {
+    const n = Number(s);
+    return s !== "" && Number.isFinite(n) && n > 0 ? n : undefined;
+  };
+
+  const searchArgs = canSearch
+    ? {
+        query: debouncedQuery,
+        country: country || undefined,
+        region: region || undefined,
+        source: source || undefined,
+        sizeBucket: sizeBucket || undefined,
+        field: field || undefined,
+        language: language || undefined,
+        maxGlobalRank: numOrUndef(maxGlobalRank),
+        maxAcceptanceRate: numOrUndef(maxAcceptanceRate),
+        maxTuition: numOrUndef(maxTuition),
+        limit: 15,
+      }
+    : "skip";
+
+  const results = useQuery(api.universitySearch.search, searchArgs) as
+    | UniversitySearchResult[]
+    | undefined;
+
+  const clearFilters = () => {
+    setCountry("");
+    setRegion("");
+    setSource("");
+    setSizeBucket("");
+    setField("");
+    setLanguage("");
+    setMaxGlobalRank("");
+    setMaxAcceptanceRate("");
+    setMaxTuition("");
+  };
+  const hasActiveFilters =
+    !!(country || region || source || sizeBucket || field || language || maxGlobalRank || maxAcceptanceRate || maxTuition);
 
   // Matches
   const recommend = useAction(api.rag.recommend.recommend);
@@ -284,7 +372,7 @@ function UniversitiesPage() {
     };
   }, [paidBuckets, dismissed]);
 
-  const { saved } = useSavedUniversities();
+  const { saved, removeById } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
 
   const matchesLoading =
@@ -323,14 +411,18 @@ function UniversitiesPage() {
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
-          <Link
-            to="/profile"
+          <a
+            href="#saved-panel"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("saved-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
             className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
             <Bookmark className="h-4 w-4 text-primary" />
             Saved: <span className="font-bold">{savedCount}</span>
-            <span aria-hidden>→</span>
-          </Link>
+            <span aria-hidden>↓</span>
+          </a>
         </motion.header>
 
         {/* Search box */}
@@ -349,20 +441,35 @@ function UniversitiesPage() {
               />
             </div>
           </label>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <input
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="Country (optional)"
-              className="h-11 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-md text-on-surface qc-hard-shadow-sm focus:-translate-y-0.5 focus:translate-x-0.5 focus:shadow-none focus:outline-none"
-            />
-            <input
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              placeholder="Region (optional)"
-              className="h-11 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-md text-on-surface qc-hard-shadow-sm focus:-translate-y-0.5 focus:translate-x-0.5 focus:shadow-none focus:outline-none"
-            />
+
+          {/* Filters */}
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <FilterSelect label="Country" value={country} onChange={setCountry} options={filterOptions?.countries} />
+            <FilterSelect label="Region" value={region} onChange={setRegion} options={filterOptions?.regions} />
+            <FilterSelect label="Dataset" value={source} onChange={setSource} options={filterOptions?.sources} />
+            <FilterSelect label="Size" value={sizeBucket} onChange={setSizeBucket} options={filterOptions?.sizeBuckets} />
+            <FilterSelect label="Field" value={field} onChange={setField} options={filterOptions?.fields} />
+            <FilterSelect label="Language" value={language} onChange={setLanguage} options={filterOptions?.languages} />
+            <FilterNumber label="Max global rank" placeholder="e.g. 200" value={maxGlobalRank} onChange={setMaxGlobalRank} />
+            <FilterNumber label="Max acceptance %" placeholder="e.g. 20" value={maxAcceptanceRate} onChange={setMaxAcceptanceRate} />
+            <FilterNumber label="Max tuition (USD)" placeholder="e.g. 30000" value={maxTuition} onChange={setMaxTuition} />
           </div>
+          {hasActiveFilters && (
+            <div className="mt-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-medium text-on-surface hover:bg-surface-container"
+              >
+                <X className="h-3.5 w-3.5" /> Clear filters
+              </button>
+            </div>
+          )}
+          {filterOptions && !filterOptions.complete && (
+            <p className="mt-2 text-label-sm text-on-surface-variant">
+              Showing filter options from {filterOptions.scanned.toLocaleString()} indexed schools.
+            </p>
+          )}
         </section>
 
         <div className="mt-10">
@@ -500,6 +607,9 @@ function UniversitiesPage() {
                 <Paywall token={token ?? undefined} paidStatus={paidStatus} />
               )}
             </section>
+
+            {/* Saved universities panel */}
+            <SavedPanel saved={saved} onRemove={removeById} />
           </div>
 
         </div>
@@ -569,9 +679,27 @@ function SearchRow({
           )}
           {result.globalRank ? <span>#{result.globalRank} global</span> : null}
           {result.acceptanceRate != null ? (
-            <span>{Math.round(result.acceptanceRate * 100)}% accept</span>
+            <span>
+              {Math.round(
+                result.acceptanceRate > 1
+                  ? result.acceptanceRate
+                  : result.acceptanceRate * 100,
+              )}
+              % accept
+            </span>
           ) : null}
           {result.sizeBucket ? <span className="capitalize">{result.sizeBucket}</span> : null}
+          {result.tuitionOutState
+            ? <span>${Math.round(result.tuitionOutState).toLocaleString()}/yr tuition</span>
+            : result.costAttendance
+              ? <span>${Math.round(result.costAttendance).toLocaleString()}/yr total</span>
+              : null}
+          {result.languageOfInstruction?.length
+            ? <span>{result.languageOfInstruction.slice(0, 2).join(", ")}</span>
+            : null}
+          {result.fields?.length
+            ? <span className="truncate">{result.fields.slice(0, 2).join(" · ")}</span>
+            : null}
         </p>
       </div>
       <SaveToggle
@@ -613,7 +741,7 @@ function Paywall({
               Unlock your full match list
             </h3>
             <p className="mt-1 max-w-md text-body-md text-on-surface-variant">
-              $15/month. Up to 20 universities across Safety, Target, and Reach.
+              $15 one-time unlock. Up to 20 universities across Safety, Target, and Reach.
             </p>
             {paidStatus === "payment_required" && (
               <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -622,7 +750,7 @@ function Paywall({
             )}
           </div>
         </div>
-        <UnlockButton token={token} label="$15/month subscription" />
+        <UnlockButton token={token} label="Unlock for $15" />
       </div>
     </div>
   );
@@ -853,5 +981,138 @@ function RecommendationSaveIcon({ source, externalId }: { source: string; extern
         await removeByUniversity(source, externalId);
       }}
     />
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options?: string[];
+}) {
+  return (
+    <label className="block">
+      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-2 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
+      >
+        <option value="">Any</option>
+        {(options ?? []).map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function FilterNumber({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder?: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        {label}
+      </span>
+      <input
+        type="number"
+        inputMode="numeric"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
+      />
+    </label>
+  );
+}
+
+function SavedPanel({
+  saved,
+  onRemove,
+}: {
+  saved: ReturnType<typeof useSavedUniversities>["saved"];
+  onRemove: (id: string) => Promise<void> | void;
+}) {
+  return (
+    <section id="saved-panel" className="mt-12 scroll-mt-24">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            Saved universities
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            {saved?.length ?? 0} saved · stays here as you research.
+          </p>
+        </div>
+      </div>
+      {saved === undefined ? (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm">
+          <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
+          <span className="text-body-sm text-on-surface-variant">Loading your saved list…</span>
+        </div>
+      ) : saved.length === 0 ? (
+        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+          <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
+          <p className="mt-3 text-body-md text-on-surface-variant">
+            Search for universities you already know, or save schools from your matches.
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {saved.map((u) => {
+            const location = [u.city, u.state, u.country].filter(Boolean).join(", ");
+            return (
+              <li
+                key={u.id}
+                className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-3 qc-hard-shadow-sm"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
+                  <GraduationCap className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                    {u.name}
+                  </p>
+                  {location && (
+                    <p className="mt-0.5 truncate text-label-sm text-on-surface-variant">
+                      {location}
+                    </p>
+                  )}
+                  <p className="mt-1 truncate text-label-sm uppercase tracking-wider text-on-surface-variant">
+                    Added from {u.origin}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Remove from saved"
+                  onClick={() => void onRemove(u.id)}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

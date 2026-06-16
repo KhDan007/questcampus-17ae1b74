@@ -125,10 +125,10 @@ function SidebarBody({
               <Crown className="h-3.5 w-3.5" /> Your plan
             </p>
             <p className="mt-1 font-display text-label-lg font-bold text-on-surface">
-              Monthly subscription
+              Full access unlocked
             </p>
             <p className="mt-0.5 text-label-sm text-on-surface/75">
-              All current features unlocked.
+              One-time payment. All current features unlocked.
             </p>
           </div>
         ) : (
@@ -149,10 +149,10 @@ function SidebarBody({
               <Sparkles className="h-3.5 w-3.5" /> Upgrade
             </p>
             <p className="relative mt-1 font-display text-label-lg font-bold">
-              Unlock — $15/month
+              Unlock for $15
             </p>
             <p className="relative mt-0.5 text-label-sm text-white/85">
-              All matches + polished essays. Cancel anytime.
+              One-time payment. Full matches + polished essays.
             </p>
           </Link>
         )}

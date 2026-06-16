@@ -498,7 +498,7 @@ function EssayPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
             Grounded in what you actually told us — never invented. The opening is
-            free. Unlock the full essay for ${PRICE_MVP}/month (cancel anytime, also unlocks all
+            free. Unlock the full essay for ${PRICE_MVP} one-time (also unlocks all
             your university matches).
           </p>
         </motion.div>
@@ -1206,9 +1206,9 @@ function errorMessage(e: EssayError["error"]): string {
     case "not_logged_in":
       return "Your session expired. Please sign in again.";
     case "no_profile":
-      return `Generating a personal statement is a paid feature ($${PRICE_MVP}/month subscription). Unlock and your essay generates instantly from your answers - no quiz required.`;
+      return `Generating a personal statement is a paid feature ($${PRICE_MVP} one-time unlock). Unlock and your essay generates instantly from your answers - no quiz required.`;
     case "trial_used":
-      return `You've used your free generation. Unlock for $${PRICE_MVP} to generate again. Cancel anytime.`;
+      return `You've used your free generation. Unlock for $${PRICE_MVP} (one-time) to generate again.`;
     case "generation_failed":
       return "The model hiccuped. Try generating again.";
   }
@@ -2100,7 +2100,7 @@ function FreeTrialScoreBanner({
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
             />
             <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              Also unlocks every university match. Monthly subscription. Cancel anytime.
+              Also unlocks every university match. One payment. Full list unlocked.
             </span>
           </div>
         </div>
