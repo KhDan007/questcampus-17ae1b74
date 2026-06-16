@@ -367,7 +367,7 @@ function UniversitiesPage() {
           </div>
         </section>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="mt-10">
           {/* Main column */}
           <div className="min-w-0">
             {/* Search results */}
