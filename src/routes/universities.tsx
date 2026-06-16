@@ -12,13 +12,11 @@ import {
   Lock,
   Undo2,
   RotateCcw,
-  Trash2,
-  Loader2,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SaveToggle } from "@/components/universities/SaveToggle";
-import { useSavedUniversities, type SavedUniversity } from "@/lib/universities/savedClient";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -325,10 +323,14 @@ function UniversitiesPage() {
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md text-on-surface qc-hard-shadow-sm">
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
             <Bookmark className="h-4 w-4 text-primary" />
             Saved: <span className="font-bold">{savedCount}</span>
-          </div>
+            <span aria-hidden>→</span>
+          </Link>
         </motion.header>
 
         {/* Search box */}
@@ -363,7 +365,7 @@ function UniversitiesPage() {
           </div>
         </section>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="mt-10">
           {/* Main column */}
           <div className="min-w-0">
             {/* Search results */}
@@ -500,20 +502,6 @@ function UniversitiesPage() {
             </section>
           </div>
 
-          {/* Saved panel */}
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-2xl border-2 border-on-surface bg-surface/85 p-5 backdrop-blur-md qc-hard-shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-headline-sm font-bold text-on-surface">
-                  Saved universities
-                </h3>
-                <span className="font-[var(--font-label)] text-label-md font-bold text-primary">
-                  {savedCount}
-                </span>
-              </div>
-              <SavedPanel saved={saved} reduce={!!reduce} />
-            </div>
-          </aside>
         </div>
 
         {/* Undo toast */}
@@ -605,62 +593,6 @@ function SearchRow({
   );
 }
 
-function SavedPanel({
-  saved,
-  reduce,
-}: {
-  saved: SavedUniversity[] | undefined;
-  reduce: boolean;
-}) {
-  const { removeById } = useSavedUniversities();
-  if (saved === undefined) {
-    return (
-      <div className="mt-4 flex items-center gap-2 text-body-sm text-on-surface-variant">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading…
-      </div>
-    );
-  }
-  if (saved.length === 0) {
-    return (
-      <p className="mt-4 text-body-sm text-on-surface-variant">
-        Search for universities you already know, or add schools from your matches.
-      </p>
-    );
-  }
-  return (
-    <ul className="mt-4 grid gap-2">
-      {saved.map((u, i) => (
-        <motion.li
-          key={u.id}
-          initial={reduce ? false : { opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: Math.min(i, 6) * 0.03 }}
-          className="flex items-start gap-2 rounded-lg border border-on-surface/15 bg-surface/95 p-3"
-        >
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-on-surface/20 bg-secondary-container">
-            <GraduationCap className="h-3.5 w-3.5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-[var(--font-label)] text-label-md font-bold text-on-surface">
-              {u.name}
-            </p>
-            <p className="truncate text-label-sm text-on-surface-variant">
-              {[u.city, u.country].filter(Boolean).join(", ")}
-            </p>
-          </div>
-          <button
-            type="button"
-            aria-label="Remove saved university"
-            onClick={() => void removeById(u.id)}
-            className="grid h-7 w-7 place-items-center rounded-md text-on-surface/60 hover:bg-error-container hover:text-on-error-container"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </motion.li>
-      ))}
-    </ul>
-  );
-}
 
 function Paywall({
   token,
