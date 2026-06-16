@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   Award,
-  GraduationCap,
   ArrowRight,
   PenLine,
   Mail,
@@ -12,13 +11,17 @@ import {
   UserCircle2,
   Compass,
   Bookmark,
+  GraduationCap,
 } from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import { getSessionId } from "@/lib/onboarding/session";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Your profile — QuestCampus" }] }),
