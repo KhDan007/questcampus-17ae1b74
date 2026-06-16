@@ -171,7 +171,7 @@ function SavedRow({
       initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index, 6) * 0.04 }}
-      className="flex items-start gap-3 rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm"
+      className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm"
     >
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
         <GraduationCap className="h-5 w-5" />
@@ -181,11 +181,12 @@ function SavedRow({
           {u.name}
         </p>
         {location && (
-          <p className="mt-0.5 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-            <MapPin className="h-3.5 w-3.5" /> {location}
+          <p className="mt-0.5 flex min-w-0 items-center gap-1 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{location}</span>
           </p>
         )}
-        <p className="mt-1 font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
+        <p className="mt-1 truncate font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
           Added from {u.origin}
         </p>
       </div>
