@@ -24,6 +24,7 @@ import { UniversityCard, type RecCard } from "@/components/profile/UniversityCar
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/universities")({
   head: () => ({
