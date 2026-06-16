@@ -28,35 +28,26 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
 });
 
-type Bucket = "Safety" | "Target" | "Reach";
-type SavedMatch = {
+type RecRow = {
+  externalId: string;
   name: string;
-  location: string;
-  match: number;
-  bucket: Bucket;
-  why: string;
-  tag: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  bucket?: "safety" | "target" | "reach";
 };
-type SavedPayload = { matches: SavedMatch[]; at: number };
-
-const BUCKET_STYLES: Record<Bucket, { chip: string; icon: typeof Award }> = {
-  Safety: { chip: "bg-[#bcf0ae] text-[#073707]", icon: GraduationCap },
-  Target: { chip: "bg-[#c7d8f0] text-[#0d2240]", icon: Sparkles },
-  Reach: { chip: "bg-[#f0c7e6] text-[#3a0e2e]", icon: Award },
+type FreePayload = { plan: "free"; results: RecRow[] };
+type PaidPayload = {
+  plan: "paid";
+  buckets?: { safety: RecRow[]; target: RecRow[]; reach: RecRow[] };
+  results: RecRow[];
 };
 
-function loadSaved(): SavedPayload | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem("qc.landing.matches");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as SavedPayload;
-    if (!Array.isArray(parsed?.matches)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
+const BUCKET_LABEL: Record<NonNullable<RecRow["bucket"]>, { label: string; chip: string }> = {
+  safety: { label: "Safety", chip: "bg-[#bcf0ae] text-[#073707]" },
+  target: { label: "Target", chip: "bg-[#c7d8f0] text-[#0d2240]" },
+  reach: { label: "Reach", chip: "bg-[#f0c7e6] text-[#3a0e2e]" },
+};
 
 function ProfilePage() {
   const reduce = useReducedMotion();
