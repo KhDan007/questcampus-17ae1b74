@@ -125,10 +125,10 @@ function SidebarBody({
               <Crown className="h-3.5 w-3.5" /> Your plan
             </p>
             <p className="mt-1 font-display text-label-lg font-bold text-on-surface">
-              Monthly subscription
+              Full access unlocked
             </p>
             <p className="mt-0.5 text-label-sm text-on-surface/75">
-              All current features unlocked.
+              One-time payment. All current features unlocked.
             </p>
           </div>
         ) : (
