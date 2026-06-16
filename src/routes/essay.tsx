@@ -71,11 +71,23 @@ const QUESTIONS: EssayQ[] = [
       "Tell us about one specific moment — a day, a scene, a thing that happened — that says something true about you. Where were you? What happened?",
     required: true,
     primes: [
-      { value: "place", label: "a place that mattered", seed: "The place I keep coming back to is " },
+      {
+        value: "place",
+        label: "a place that mattered",
+        seed: "The place I keep coming back to is ",
+      },
       { value: "wrong", label: "a time I was wrong", seed: "I was completely wrong about " },
-      { value: "couldnt-fix", label: "something I couldn't fix", seed: "There was one thing I couldn't fix: " },
+      {
+        value: "couldnt-fix",
+        label: "something I couldn't fix",
+        seed: "There was one thing I couldn't fix: ",
+      },
       { value: "small-win", label: "a small win nobody saw", seed: "A small win nobody saw — " },
-      { value: "changed-mind", label: "a moment I changed my mind", seed: "I changed my mind the day " },
+      {
+        value: "changed-mind",
+        label: "a moment I changed my mind",
+        seed: "I changed my mind the day ",
+      },
     ],
     textPlaceholder: "The first time I…",
     microcopy:
@@ -104,7 +116,11 @@ const QUESTIONS: EssayQ[] = [
       "A real difficulty, failure, or change you went through — and what you actually did, step by step.",
     optional: true,
     primes: [
-      { value: "failure", label: "a thing that failed first", seed: "My first attempt failed because " },
+      {
+        value: "failure",
+        label: "a thing that failed first",
+        seed: "My first attempt failed because ",
+      },
       { value: "family", label: "a family situation", seed: "At home, " },
       { value: "academic", label: "an academic wall", seed: "I hit a wall in " },
       { value: "belonging", label: "not belonging", seed: "I didn\u2019t belong when " },
@@ -116,7 +132,8 @@ const QUESTIONS: EssayQ[] = [
   },
   {
     key: "signatureThing",
-    label: "One thing you've made, built, led, fixed, or kept going. What was it, and what was hard about it?",
+    label:
+      "One thing you've made, built, led, fixed, or kept going. What was it, and what was hard about it?",
     optional: true,
     textPlaceholder: "What does it look like up close?",
   },
@@ -130,10 +147,12 @@ const QUESTIONS: EssayQ[] = [
   },
   {
     key: "person",
-    label: "A person who shaped you — and one specific thing they did or said (not just who they are).",
+    label:
+      "A person who shaped you — and one specific thing they did or said (not just who they are).",
     optional: true,
     shortText: true,
-    textPlaceholder: "e.g. my grandmother, who told me to \u201cfinish the row before you stop\u201d",
+    textPlaceholder:
+      "e.g. my grandmother, who told me to \u201cfinish the row before you stop\u201d",
   },
   {
     key: "voice",
@@ -301,10 +320,7 @@ function EssayPage() {
   const [autoReviewEssayId, setAutoReviewEssayId] = useState<string | null>(null);
 
   // ---- Draft persistence (Convex; replaces qc.essay.answers localStorage)
-  const draftQ = useQuery(
-    api.essays.getDraft,
-    sessionId ? { sessionId, token } : "skip",
-  ) as
+  const draftQ = useQuery(api.essays.getDraft, sessionId ? { sessionId, token } : "skip") as
     | { target: { externalId?: string; name: string } | null; answers: AnswerMap }
     | null
     | undefined;
@@ -459,7 +475,13 @@ function EssayPage() {
 
   // Past essays list (logged-in)
   const past = useQuery(api.essays.listEssays, token ? { token } : "skip") as
-    | { essayId: string; targetName?: string; wordCount: number; preview: string; createdAt: number }[]
+    | {
+        essayId: string;
+        targetName?: string;
+        wordCount: number;
+        preview: string;
+        createdAt: number;
+      }[]
     | undefined;
 
   if (!sessionId) {
@@ -475,189 +497,190 @@ function EssayPage() {
     <>
       <LivingBackground />
       <DashboardShell>
-      <main
-        id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
-      >
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        <main
+          id="main-content"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
         >
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <ArrowLeft className="h-4 w-4" /> Back to dashboard
-          </Link>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-            <PenLine className="h-3.5 w-3.5" /> Personal statement
-          </p>
-          <h1 className="mt-4 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
-            Write your <span className="qc-text-gradient">Common App essay</span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
-            Grounded in what you actually told us — never invented. The opening is
-            free. Unlock the full essay for ${PRICE_MVP} one-time (also unlocks all
-            your university matches).
-          </p>
-        </motion.div>
-
-        <div className="mt-8">
-          <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
-            {([
-              { k: "write", label: "Write" },
-              { k: "review", label: "Review" },
-            ] as { k: "write" | "review"; label: string }[]).map((t) => {
-              const active = view === t.k;
-              return (
-                <button
-                  key={t.k}
-                  type="button"
-                  onClick={() => setView(t.k)}
-                  className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
-                    active
-                      ? "bg-primary text-white qc-hard-shadow-sm"
-                      : "text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {view === "write" && (
-          <div className="mt-6">
-            <Stepper step={step} />
-          </div>
-        )}
-
-
-        {view === "review" && (
-          <div className="mt-8">
-            <EssayReview
-              sessionId={sessionId}
-              token={token}
-              isPaid={isPaid}
-              autoEssayId={autoReviewEssayId}
-              onAutoEssayConsumed={() => setAutoReviewEssayId(null)}
-            />
-          </div>
-        )}
-
-        {view === "write" && (
-        <AnimatePresence mode="wait">
-          {step === "target" && (
-            <StepWrap key="target">
-              <TargetPicker
-                matches={matches}
-                matchesErr={matchesErr}
-                value={target}
-                onChange={setTarget}
-                onNext={() => setStep("questions")}
-                onSkip={() => {
-                  setTarget({ name: "No specific school" });
-                  setStep("questions");
-                }}
-              />
-            </StepWrap>
-          )}
-
-          {step === "questions" && (
-            <StepWrap key="questions">
-              <QuestionsForm
-                answers={answers}
-                setAnswers={setAnswers}
-                onBack={() => setStep("target")}
-                onSubmit={runGenerate}
-                canSubmit={canSubmitQuestions && !!token}
-                loading={genStatus === "loading"}
-                error={genError}
-                token={token}
-                sessionId={sessionId}
-              />
-            </StepWrap>
-          )}
-
-          {step === "result" && result && (
-            <StepWrap key="result">
-              <ResultView
-                result={result}
-                setResult={setResult}
-                isPaid={isPaid}
-                token={token}
-                onRegenerate={() => {
-                  setResult(null);
-                  setGenStatus("idle");
-                  setStep("questions");
-                }}
-              />
-            </StepWrap>
-          )}
-        </AnimatePresence>
-        )}
-
-
-        {view === "write" && past && past.length > 0 && (
-          <section className="mt-20">
-            <h2 className="font-display text-headline-md font-bold text-on-surface">
-              My personal statements
-            </h2>
-            <p className="mt-1 text-body-sm text-on-surface-variant">
-              Click any draft to reopen it — every edit you make is saved as a version you can roll back to.
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to dashboard
+            </Link>
+            <p className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+              <PenLine className="h-3.5 w-3.5" /> Personal statement
             </p>
-            <ul className="mt-5 grid gap-3">
-              {past.map((p) => {
-                const active = result?.essayId === p.essayId;
+            <h1 className="mt-4 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
+              Write your <span className="qc-text-gradient">Common App essay</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
+              Grounded in what you actually told us — never invented. The opening is free. Unlock
+              the full essay with the ${PRICE_MVP}/month subscription (also unlocks all your
+              university matches).
+            </p>
+          </motion.div>
+
+          <div className="mt-8">
+            <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+              {(
+                [
+                  { k: "write", label: "Write" },
+                  { k: "review", label: "Review" },
+                ] as { k: "write" | "review"; label: string }[]
+              ).map((t) => {
+                const active = view === t.k;
                 return (
-                  <li key={p.essayId}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setResult({
-                          essayId: p.essayId,
-                          format: "common_app",
-                          targetName: p.targetName,
-                          preview: p.preview,
-                          wordCount: p.wordCount,
-                          placeholders: [],
-                          locked: !isPaid,
-                          fullText: undefined,
-                        });
-                        setStep("result");
-                        if (typeof window !== "undefined") {
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }
-                      }}
-                      className={`group flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
-                        active
-                          ? "border-on-surface bg-secondary-container"
-                          : "border-on-surface/15 bg-surface/80"
-                      }`}
-                    >
-                      <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-display text-label-lg font-bold text-on-surface">
-                          {p.targetName ?? "Common App essay"} · {p.wordCount} words
-                        </p>
-                        <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
-                          {p.preview}
-                        </p>
-                        <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                          {formatVersionTime(p.createdAt)}
-                        </p>
-                      </div>
-                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
-                    </button>
-                  </li>
+                  <button
+                    key={t.k}
+                    type="button"
+                    onClick={() => setView(t.k)}
+                    className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                      active
+                        ? "bg-primary text-white qc-hard-shadow-sm"
+                        : "text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
                 );
               })}
-            </ul>
-          </section>
-        )}
-      </main>
+            </div>
+          </div>
+
+          {view === "write" && (
+            <div className="mt-6">
+              <Stepper step={step} />
+            </div>
+          )}
+
+          {view === "review" && (
+            <div className="mt-8">
+              <EssayReview
+                sessionId={sessionId}
+                token={token}
+                isPaid={isPaid}
+                autoEssayId={autoReviewEssayId}
+                onAutoEssayConsumed={() => setAutoReviewEssayId(null)}
+              />
+            </div>
+          )}
+
+          {view === "write" && (
+            <AnimatePresence mode="wait">
+              {step === "target" && (
+                <StepWrap key="target">
+                  <TargetPicker
+                    matches={matches}
+                    matchesErr={matchesErr}
+                    value={target}
+                    onChange={setTarget}
+                    onNext={() => setStep("questions")}
+                    onSkip={() => {
+                      setTarget({ name: "No specific school" });
+                      setStep("questions");
+                    }}
+                  />
+                </StepWrap>
+              )}
+
+              {step === "questions" && (
+                <StepWrap key="questions">
+                  <QuestionsForm
+                    answers={answers}
+                    setAnswers={setAnswers}
+                    onBack={() => setStep("target")}
+                    onSubmit={runGenerate}
+                    canSubmit={canSubmitQuestions && !!token}
+                    loading={genStatus === "loading"}
+                    error={genError}
+                    token={token}
+                    sessionId={sessionId}
+                  />
+                </StepWrap>
+              )}
+
+              {step === "result" && result && (
+                <StepWrap key="result">
+                  <ResultView
+                    result={result}
+                    setResult={setResult}
+                    isPaid={isPaid}
+                    token={token}
+                    onRegenerate={() => {
+                      setResult(null);
+                      setGenStatus("idle");
+                      setStep("questions");
+                    }}
+                  />
+                </StepWrap>
+              )}
+            </AnimatePresence>
+          )}
+
+          {view === "write" && past && past.length > 0 && (
+            <section className="mt-20">
+              <h2 className="font-display text-headline-md font-bold text-on-surface">
+                My personal statements
+              </h2>
+              <p className="mt-1 text-body-sm text-on-surface-variant">
+                Click any draft to reopen it — every edit you make is saved as a version you can
+                roll back to.
+              </p>
+              <ul className="mt-5 grid gap-3">
+                {past.map((p) => {
+                  const active = result?.essayId === p.essayId;
+                  return (
+                    <li key={p.essayId}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResult({
+                            essayId: p.essayId,
+                            format: "common_app",
+                            targetName: p.targetName,
+                            preview: p.preview,
+                            wordCount: p.wordCount,
+                            placeholders: [],
+                            locked: !isPaid,
+                            fullText: undefined,
+                          });
+                          setStep("result");
+                          if (typeof window !== "undefined") {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }
+                        }}
+                        className={`group flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
+                          active
+                            ? "border-on-surface bg-secondary-container"
+                            : "border-on-surface/15 bg-surface/80"
+                        }`}
+                      >
+                        <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-display text-label-lg font-bold text-on-surface">
+                            {p.targetName ?? "Common App essay"} · {p.wordCount} words
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
+                            {p.preview}
+                          </p>
+                          <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                            {formatVersionTime(p.createdAt)}
+                          </p>
+                        </div>
+                        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+        </main>
       </DashboardShell>
       <ReviewSuggestionModal
         open={reviewPromptOpen && step === "result" && !!result}
@@ -738,9 +761,15 @@ function ReviewSuggestionModal({
               Run the review on your <span className="qc-text-gradient">new essay</span>?
             </h2>
             <p className="mt-3 text-body-md text-on-surface-variant">
-              You'll get a score across 7 dimensions, inline notes on the exact lines that
-              need work, and one-click rewrites you can apply with a single tap
-              {targetName ? <> — tailored to <span className="font-semibold text-on-surface">{targetName}</span></> : null}.
+              You'll get a score across 7 dimensions, inline notes on the exact lines that need
+              work, and one-click rewrites you can apply with a single tap
+              {targetName ? (
+                <>
+                  {" "}
+                  — tailored to <span className="font-semibold text-on-surface">{targetName}</span>
+                </>
+              ) : null}
+              .
             </p>
             <ul className="mt-5 grid gap-2 text-body-sm text-on-surface">
               <li className="flex items-start gap-2">
@@ -812,9 +841,7 @@ function Stepper({ step }: { step: "target" | "questions" | "result" }) {
             >
               {it.label}
             </span>
-            {i < items.length - 1 && (
-              <span aria-hidden className="h-[2px] w-8 bg-on-surface/20" />
-            )}
+            {i < items.length - 1 && <span aria-hidden className="h-[2px] w-8 bg-on-surface/20" />}
           </li>
         );
       })}
@@ -862,8 +889,8 @@ function TargetPicker({
         Which school is this for?
       </h2>
       <p className="mt-2 text-body-md text-on-surface-variant">
-        Picking a target lets us tune the essay to the school's culture. You can
-        also write a generic Common App essay.
+        Picking a target lets us tune the essay to the school's culture. You can also write a
+        generic Common App essay.
       </p>
 
       {loading && (
@@ -930,8 +957,8 @@ function TargetPicker({
 
       {matchesErr && (
         <p className="mt-4 inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
-          <AlertCircle className="h-4 w-4" /> Couldn't load your matches — you can
-          still write a generic essay.
+          <AlertCircle className="h-4 w-4" /> Couldn't load your matches — you can still write a
+          generic essay.
         </p>
       )}
 
@@ -945,7 +972,9 @@ function TargetPicker({
         </p>
         <input
           type="text"
-          value={value?.externalId ? "" : value && value.name !== "No specific school" ? value.name : ""}
+          value={
+            value?.externalId ? "" : value && value.name !== "No specific school" ? value.name : ""
+          }
           onChange={(e) => {
             const name = e.target.value;
             if (!name.trim()) onChange(null);
@@ -1013,8 +1042,8 @@ function QuestionsForm({
         Tell us your story
       </h2>
       <p className="mt-2 text-body-md text-on-surface-variant">
-        Short answers are fine. Free-text specifics are what make the essay
-        non-generic — even one concrete detail per question matters.
+        Short answers are fine. Free-text specifics are what make the essay non-generic — even one
+        concrete detail per question matters.
       </p>
 
       <div className="mt-8 grid gap-7">
@@ -1068,9 +1097,7 @@ function QuestionsForm({
                       <button
                         key={c.value}
                         type="button"
-                        onClick={() =>
-                          setField(q.key, { choice: active ? undefined : c.value })
-                        }
+                        onClick={() => setField(q.key, { choice: active ? undefined : c.value })}
                         className={`rounded-full border-2 px-3.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
                           active
                             ? "border-on-surface bg-primary text-white"
@@ -1140,7 +1167,9 @@ function QuestionsForm({
                   placeholder={q.textPlaceholder}
                   maxLength={220}
                   className={`mt-3 w-full rounded-lg border-2 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none transition-colors ${
-                    flashKey === q.key ? "border-primary ring-2 ring-primary/30" : "border-on-surface/30"
+                    flashKey === q.key
+                      ? "border-primary ring-2 ring-primary/30"
+                      : "border-on-surface/30"
                   }`}
                 />
               )}
@@ -1159,7 +1188,7 @@ function QuestionsForm({
             <div className="mt-4">
               <UnlockButton
                 token={token}
-                label={`Unlock for $${PRICE_MVP} & generate`}
+                label={`Unlock for $${PRICE_MVP}/month & generate`}
                 className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-md font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               />
             </div>
@@ -1194,7 +1223,8 @@ function QuestionsForm({
       </div>
       {!canSubmit && (
         <p className="mt-3 text-label-sm text-on-surface-variant">
-          Write at least a sentence or two for the anchor story to generate. The rest is optional — but more detail makes a better essay.
+          Write at least a sentence or two for the anchor story to generate. The rest is optional —
+          but more detail makes a better essay.
         </p>
       )}
     </div>
@@ -1206,9 +1236,9 @@ function errorMessage(e: EssayError["error"]): string {
     case "not_logged_in":
       return "Your session expired. Please sign in again.";
     case "no_profile":
-      return `Generating a personal statement is a paid feature ($${PRICE_MVP} one-time unlock). Unlock and your essay generates instantly from your answers - no quiz required.`;
+      return `Generating a personal statement is a paid feature ($${PRICE_MVP}/month subscription). Unlock and your essay generates instantly from your answers - no quiz required.`;
     case "trial_used":
-      return `You've used your free generation. Unlock for $${PRICE_MVP} (one-time) to generate again.`;
+      return `You've used your free generation. Unlock for $${PRICE_MVP}/month to generate again. Cancel anytime.`;
     case "generation_failed":
       return "The model hiccuped. Try generating again.";
   }
@@ -1322,7 +1352,13 @@ function ResultView({
       setReviseErr(null);
       try {
         const res = (await revise({ token, essayId: result.essayId, action })) as
-          | { ok: true; fullText: string; preview: string; wordCount: number; placeholders: string[] }
+          | {
+              ok: true;
+              fullText: string;
+              preview: string;
+              wordCount: number;
+              placeholders: string[];
+            }
           | { error: string };
         if ("error" in res) {
           setReviseErr(res.error);
@@ -1454,9 +1490,7 @@ function ResultView({
                       <CheckCircle2 className="h-3.5 w-3.5" /> Saved
                     </span>
                   )}
-                  {saveState === "error" && (
-                    <span className="text-on-surface">Save failed</span>
-                  )}
+                  {saveState === "error" && <span className="text-on-surface">Save failed</span>}
                 </span>
                 <button
                   type="button"
@@ -1508,7 +1542,7 @@ function ResultView({
                               >
                                 <div className="min-w-0 flex-1">
                                   <p className="font-display text-label-md font-bold text-on-surface">
-                                    {i === 0 ? "Current" : v.label ?? "Edit"}
+                                    {i === 0 ? "Current" : (v.label ?? "Edit")}
                                     <span className="ml-2 font-[var(--font-label)] text-label-sm font-normal text-on-surface-variant">
                                       · {v.wordCount} words · {formatVersionTime(v.ts)}
                                     </span>
@@ -1577,9 +1611,7 @@ function ResultView({
           </div>
         )}
 
-        {!isPaid && (
-          <FreeTrialScoreBanner essayId={result.essayId} token={token} />
-        )}
+        {!isPaid && <FreeTrialScoreBanner essayId={result.essayId} token={token} />}
 
         {reviseErr && (
           <div className="mt-4 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm text-on-surface">
@@ -1609,9 +1641,9 @@ function ResultView({
               Fill these in
             </h3>
             <p className="mt-2 text-body-sm text-on-surface/80">
-              We left {result.placeholders.length} blank{result.placeholders.length === 1 ? "" : "s"}{" "}
-              instead of inventing details. Replace each <code>[ADD: …]</code> with
-              your real story.
+              We left {result.placeholders.length} blank
+              {result.placeholders.length === 1 ? "" : "s"} instead of inventing details. Replace
+              each <code>[ADD: …]</code> with your real story.
             </p>
             <ul className="mt-4 space-y-2">
               {result.placeholders.map((p, i) => (
@@ -1631,9 +1663,18 @@ function ResultView({
             Backed by your data
           </h3>
           <ul className="mt-3 space-y-2 text-body-sm text-on-surface-variant">
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Zero invented facts — only what you told us.</li>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Fact-check pass strips unsupported specifics.</li>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Common App ready (650 words).</li>
+            <li className="flex gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Zero invented facts
+              — only what you told us.
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Fact-check pass
+              strips unsupported specifics.
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Common App ready
+              (650 words).
+            </li>
           </ul>
         </div>
       </aside>
@@ -1672,9 +1713,7 @@ function ReviseSideblock({
                 <span className="block font-display text-label-md font-bold text-on-surface">
                   {a.label}
                 </span>
-                <span className="block text-label-sm text-on-surface-variant">
-                  {a.hint}
-                </span>
+                <span className="block text-label-sm text-on-surface-variant">{a.hint}</span>
               </span>
               {isRunning ? (
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
@@ -1868,119 +1907,117 @@ function AssistPopover({
         aria-modal="true"
         className="relative w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow"
       >
-
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-display text-label-md font-bold text-on-surface">✨ AI assist</p>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-      <p className="mt-1 text-label-sm text-on-surface-variant">
-        Drop rough notes — we'll turn them into 2–4 honest sentences. We never invent facts.
-      </p>
-      <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        rows={4}
-        placeholder="rough notes, fragments, anything…"
-        className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/25 bg-surface px-3 py-2 text-body-sm text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
-      />
-
-      {status === "ready" && text && (
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.22 }}
-          className="mt-3 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-body-sm text-on-surface"
-        >
-          {text}
-        </motion.div>
-      )}
-      {status === "loading" && (
-        <div className="relative mt-3 h-16 overflow-hidden rounded-lg bg-surface-container">
-          <motion.div
-            className="absolute inset-y-0 w-1/3"
-            animate={reduce ? undefined : { x: ["-100%", "300%"] }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(53,37,205,0.18), transparent)",
-            }}
-          />
-        </div>
-      )}
-      {status === "error" && (
-        <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border-2 border-on-surface/20 bg-error-container/30 p-2 text-label-sm text-on-surface">
-          <span className="inline-flex items-center gap-1.5">
-            <AlertCircle className="h-3.5 w-3.5" /> That didn't work
-          </span>
+        <div className="flex items-start justify-between gap-2">
+          <p className="font-display text-label-md font-bold text-on-surface">✨ AI assist</p>
           <button
             type="button"
-            onClick={() => void run()}
-            className="rounded-md border-2 border-on-surface px-2 py-0.5 text-label-sm font-semibold"
+            onClick={onClose}
+            className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+            aria-label="Close"
           >
-            Try again
+            <X className="h-4 w-4" />
           </button>
         </div>
-      )}
+        <p className="mt-1 text-label-sm text-on-surface-variant">
+          Drop rough notes — we'll turn them into 2–4 honest sentences. We never invent facts.
+        </p>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={4}
+          placeholder="rough notes, fragments, anything…"
+          className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/25 bg-surface px-3 py-2 text-body-sm text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+        />
 
-      <div className="mt-4 flex items-center justify-between gap-2">
-        {status === "ready" && text ? (
-          <>
-            <button
-              type="button"
-              onClick={() => void run()}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-semibold text-on-surface hover:border-on-surface"
-            >
-              <RefreshCw className="h-3.5 w-3.5" /> Regenerate
-            </button>
-            <button
-              type="button"
-              onClick={() => onAccept(text)}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-            >
-              <Save className="h-3.5 w-3.5" /> Use this
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-label-sm font-semibold text-on-surface-variant hover:text-on-surface"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              disabled={status === "loading"}
-              onClick={() => void run()}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {status === "loading" ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Thinking…
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-3.5 w-3.5" /> Write it for me
-                </>
-              )}
-            </button>
-          </>
+        {status === "ready" && text && (
+          <motion.div
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.22 }}
+            className="mt-3 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-body-sm text-on-surface"
+          >
+            {text}
+          </motion.div>
         )}
-      </div>
-    </motion.div>
+        {status === "loading" && (
+          <div className="relative mt-3 h-16 overflow-hidden rounded-lg bg-surface-container">
+            <motion.div
+              className="absolute inset-y-0 w-1/3"
+              animate={reduce ? undefined : { x: ["-100%", "300%"] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(53,37,205,0.18), transparent)",
+              }}
+            />
+          </div>
+        )}
+        {status === "error" && (
+          <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border-2 border-on-surface/20 bg-error-container/30 p-2 text-label-sm text-on-surface">
+            <span className="inline-flex items-center gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5" /> That didn't work
+            </span>
+            <button
+              type="button"
+              onClick={() => void run()}
+              className="rounded-md border-2 border-on-surface px-2 py-0.5 text-label-sm font-semibold"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between gap-2">
+          {status === "ready" && text ? (
+            <>
+              <button
+                type="button"
+                onClick={() => void run()}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-semibold text-on-surface hover:border-on-surface"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Regenerate
+              </button>
+              <button
+                type="button"
+                onClick={() => onAccept(text)}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                <Save className="h-3.5 w-3.5" /> Use this
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-label-sm font-semibold text-on-surface-variant hover:text-on-surface"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={status === "loading"}
+                onClick={() => void run()}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {status === "loading" ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Thinking…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3.5 w-3.5" /> Write it for me
+                  </>
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      </motion.div>
     </div>,
     document.body,
   );
 }
-
 
 function renderText(r: EssayResult): string {
   if (r.fullText) return r.fullText;
@@ -1997,10 +2034,22 @@ function scoreFor(essayId: string): number {
 
 const WEAK_AREAS = [
   { key: "hook", label: "Hook", note: "Opening doesn't fully grab the reader yet." },
-  { key: "specificity", label: "Specificity", note: "A few generic phrases — needs concrete sensory detail." },
+  {
+    key: "specificity",
+    label: "Specificity",
+    note: "A few generic phrases — needs concrete sensory detail.",
+  },
   { key: "ending", label: "Ending", note: "Closes softly; needs an earned, resonant final beat." },
-  { key: "voice", label: "Voice", note: "Some passages read flat — your real voice can shine more." },
-  { key: "reflection", label: "Reflection", note: "Tell us what this changed in you, not just what happened." },
+  {
+    key: "voice",
+    label: "Voice",
+    note: "Some passages read flat — your real voice can shine more.",
+  },
+  {
+    key: "reflection",
+    label: "Reflection",
+    note: "Tell us what this changed in you, not just what happened.",
+  },
 ];
 
 function weakAreasFor(essayId: string) {
@@ -2014,13 +2063,7 @@ function weakAreasFor(essayId: string) {
   return shuffled.slice(0, 3);
 }
 
-function FreeTrialScoreBanner({
-  essayId,
-  token,
-}: {
-  essayId: string;
-  token: string | undefined;
-}) {
+function FreeTrialScoreBanner({ essayId, token }: { essayId: string; token: string | undefined }) {
   const reduce = useReducedMotion();
   const score = scoreFor(essayId);
   const areas = weakAreasFor(essayId);
@@ -2045,9 +2088,7 @@ function FreeTrialScoreBanner({
           >
             <div className="grid h-[78px] w-[78px] place-items-center rounded-full border-2 border-on-surface bg-surface">
               <div className="text-center leading-none">
-                <p className="font-display text-headline-md font-bold text-on-surface">
-                  {score}
-                </p>
+                <p className="font-display text-headline-md font-bold text-on-surface">{score}</p>
                 <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
                   / 100
                 </p>
@@ -2075,8 +2116,8 @@ function FreeTrialScoreBanner({
           </div>
           <p className="mt-2 text-body-md text-on-surface/80">
             Your free draft is below. We spotted{" "}
-            <span className="font-bold text-on-surface">{areas.length} weak areas</span>{" "}
-            holding the score down. Polish them and you'll typically land 90+.
+            <span className="font-bold text-on-surface">{areas.length} weak areas</span> holding the
+            score down. Polish them and you'll typically land 90+.
           </p>
 
           <ul className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -2096,11 +2137,11 @@ function FreeTrialScoreBanner({
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <UnlockButton
               token={token}
-              label={`Polish weak areas – $${PRICE_MVP}`}
+              label={`Polish weak areas - $${PRICE_MVP}/month`}
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
             />
             <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              Also unlocks every university match. One payment. Full list unlocked.
+              Also unlocks every university match. Billed monthly. Cancel anytime.
             </span>
           </div>
         </div>

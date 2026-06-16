@@ -1,13 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  PenLine,
-  Activity,
-  FileText,
-  CalendarClock,
-  Bot,
-} from "lucide-react";
+import { PenLine, Activity, FileText, CalendarClock, Bot } from "lucide-react";
 
 const FEATURES = [
   {
@@ -59,7 +53,7 @@ export function RoadmapV2() {
             <span className="qc-text-gradient">Then we apply for you.</span>
           </h2>
           <p className="mt-4 text-body-lg text-on-surface-variant">
-            Waitlist members get founding access — and the Essay Assistant free for life.
+            Waitlist members get founding access — and monthly discounts on the Essay Assistant.
           </p>
         </motion.div>
 
@@ -120,11 +114,15 @@ export function RoadmapV2() {
           <div aria-hidden className="pointer-events-none absolute inset-0">
             <div
               className="animate-aurora-1 absolute -left-20 top-1/2 h-[60vh] w-[60vh] -translate-y-1/2 rounded-full blur-[120px]"
-              style={{ background: "radial-gradient(circle, rgba(255,95,93,0.55), transparent 65%)" }}
+              style={{
+                background: "radial-gradient(circle, rgba(255,95,93,0.55), transparent 65%)",
+              }}
             />
             <div
               className="animate-aurora-2 absolute -right-20 top-0 h-[40vh] w-[40vh] rounded-full blur-[120px]"
-              style={{ background: "radial-gradient(circle, rgba(254,183,0,0.45), transparent 65%)" }}
+              style={{
+                background: "radial-gradient(circle, rgba(254,183,0,0.45), transparent 65%)",
+              }}
             />
           </div>
 
@@ -136,12 +134,10 @@ export function RoadmapV2() {
                 </span>
                 <Badge tone="later">The endgame</Badge>
               </div>
-              <h3 className="mt-5 text-headline-lg sm:text-display-lg-mobile">
-                Auto-Apply Agent
-              </h3>
+              <h3 className="mt-5 text-headline-lg sm:text-display-lg-mobile">Auto-Apply Agent</h3>
               <p className="mt-3 max-w-xl text-body-lg text-inverse-on-surface/80">
-                One profile. Every application filled, formatted, and submitted —
-                autonomously, with you in the loop only when it matters.
+                One profile. Every application filled, formatted, and submitted — autonomously, with
+                you in the loop only when it matters.
               </p>
             </div>
             <a
@@ -158,13 +154,7 @@ export function RoadmapV2() {
   );
 }
 
-function Badge({
-  tone,
-  children,
-}: {
-  tone: "soon" | "later";
-  children: React.ReactNode;
-}) {
+function Badge({ tone, children }: { tone: "soon" | "later"; children: React.ReactNode }) {
   const cls =
     tone === "soon"
       ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"

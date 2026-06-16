@@ -18,14 +18,53 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
 
 type Item =
-  | { kind: "link"; key: string; label: string; to: string; icon: React.ComponentType<{ className?: string }>; match?: (path: string) => boolean }
-  | { kind: "waitlist"; key: string; label: string; icon: React.ComponentType<{ className?: string }>; feature: string };
+  | {
+      kind: "link";
+      key: string;
+      label: string;
+      to: string;
+      icon: React.ComponentType<{ className?: string }>;
+      match?: (path: string) => boolean;
+    }
+  | {
+      kind: "waitlist";
+      key: string;
+      label: string;
+      icon: React.ComponentType<{ className?: string }>;
+      feature: string;
+    };
 
 const TOP_ITEMS: Item[] = [
-  { kind: "link", key: "universities", label: "Universities", to: "/universities", icon: GraduationCap, match: (p) => p.startsWith("/universities") },
-  { kind: "link", key: "essays", label: "Essays", to: "/essay", icon: PenLine, match: (p) => p.startsWith("/essay") },
-  { kind: "waitlist", key: "activities", label: "Activities", icon: Activity, feature: "Activities" },
-  { kind: "waitlist", key: "deadlines", label: "Deadlines", icon: CalendarClock, feature: "Deadline tracker" },
+  {
+    kind: "link",
+    key: "universities",
+    label: "Universities",
+    to: "/universities",
+    icon: GraduationCap,
+    match: (p) => p.startsWith("/universities"),
+  },
+  {
+    kind: "link",
+    key: "essays",
+    label: "Essays",
+    to: "/essay",
+    icon: PenLine,
+    match: (p) => p.startsWith("/essay"),
+  },
+  {
+    kind: "waitlist",
+    key: "activities",
+    label: "Activities",
+    icon: Activity,
+    feature: "Activities",
+  },
+  {
+    kind: "waitlist",
+    key: "deadlines",
+    label: "Deadlines",
+    icon: CalendarClock,
+    feature: "Deadline tracker",
+  },
   { kind: "waitlist", key: "autoapply", label: "Auto-Apply", icon: Send, feature: "Auto-Apply" },
 ];
 
@@ -49,22 +88,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
         </aside>
 
-        <div className="w-full min-w-0">
-          {children}
-        </div>
+        <div className="w-full min-w-0">{children}</div>
       </div>
 
       <WaitlistPopup
         open={!!waitlist}
         onClose={() => setWaitlist(null)}
         title={waitlist ? `${waitlist} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off for life."
+        body="Join the waitlist to be first in line and lock in 30% off monthly access."
         feature={waitlist ?? undefined}
       />
     </>
   );
 }
-
 
 function SidebarBody({
   pathname,
@@ -128,7 +164,7 @@ function SidebarBody({
               Full access unlocked
             </p>
             <p className="mt-0.5 text-label-sm text-on-surface/75">
-              One-time payment. All current features unlocked.
+              Monthly subscription. All current features unlocked.
             </p>
           </div>
         ) : (
@@ -141,7 +177,12 @@ function SidebarBody({
                 aria-hidden
                 className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                 animate={{ x: ["-120%", "220%"] }}
-                transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+                transition={{
+                  duration: 2.8,
+                  repeat: Infinity,
+                  repeatDelay: 1.2,
+                  ease: "easeInOut",
+                }}
                 style={{ width: "60%" }}
               />
             )}
@@ -149,10 +190,10 @@ function SidebarBody({
               <Sparkles className="h-3.5 w-3.5" /> Upgrade
             </p>
             <p className="relative mt-1 font-display text-label-lg font-bold">
-              Unlock for $15
+              Unlock for $15/month
             </p>
             <p className="relative mt-0.5 text-label-sm text-white/85">
-              One-time payment. Full matches + polished essays.
+              Monthly subscription. Full matches + polished essays.
             </p>
           </Link>
         )}

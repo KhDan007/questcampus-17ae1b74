@@ -71,12 +71,7 @@ type ReviewSuccess = {
 };
 
 type ReviewError = {
-  error:
-    | "not_logged_in"
-    | "no_input"
-    | "essay_not_found"
-    | "too_short"
-    | "feedback_failed";
+  error: "not_logged_in" | "no_input" | "essay_not_found" | "too_short" | "feedback_failed";
 };
 
 type PastReview = {
@@ -153,7 +148,11 @@ function locateQuote(text: string, quote: string): [string, string, string] | nu
   const re = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
   const m = text.match(re);
   if (m && m.index != null) {
-    return [text.slice(0, m.index), text.slice(m.index, m.index + m[0].length), text.slice(m.index + m[0].length)];
+    return [
+      text.slice(0, m.index),
+      text.slice(m.index, m.index + m[0].length),
+      text.slice(m.index + m[0].length),
+    ];
   }
   return null;
 }
@@ -202,20 +201,22 @@ export function EssayReview({
 
   const pickedEssay = useQuery(
     api.essays.getEssay,
-    token && pickedEssayId
-      ? { token, essayId: pickedEssayId }
-      : "skip",
+    token && pickedEssayId ? { token, essayId: pickedEssayId } : "skip",
   ) as { fullText?: string; preview?: string } | null | undefined;
 
-  const past = useQuery(
-    api.essayFeedback.listReviews,
-    token ? { token } : "skip",
-  ) as PastReview[] | undefined;
+  const past = useQuery(api.essayFeedback.listReviews, token ? { token } : "skip") as
+    | PastReview[]
+    | undefined;
 
-  const generatedEssays = useQuery(
-    api.essays.listEssays,
-    token ? { token } : "skip",
-  ) as { essayId: string; targetName?: string; wordCount: number; preview: string; createdAt: number }[] | undefined;
+  const generatedEssays = useQuery(api.essays.listEssays, token ? { token } : "skip") as
+    | {
+        essayId: string;
+        targetName?: string;
+        wordCount: number;
+        preview: string;
+        createdAt: number;
+      }[]
+    | undefined;
 
   const originalBody = useMemo(() => {
     if (mode === "pick") return pickedEssay?.fullText ?? pickedEssay?.preview ?? "";
@@ -224,9 +225,7 @@ export function EssayReview({
 
   const fetchedReview = useQuery(
     api.essayFeedback.getReview,
-    token && result?.reviewId && result.locked
-      ? { token, reviewId: result.reviewId }
-      : "skip",
+    token && result?.reviewId && result.locked ? { token, reviewId: result.reviewId } : "skip",
   ) as ReviewSuccess | null | undefined;
 
   useEffect(() => {
@@ -331,16 +330,18 @@ export function EssayReview({
           Get feedback on your personal statement
         </h2>
         <p className="mt-2 text-body-md text-on-surface-variant">
-          Honest scoring across seven dimensions, grounded in real essays that won
-          places. Free for everyone — unlock inline notes + rewrites for ${PRICE_MVP}.
+          Honest scoring across seven dimensions, grounded in real essays that won places. Free for
+          everyone — unlock inline notes + rewrites for ${PRICE_MVP}/month.
         </p>
 
         <div className="mt-6 inline-flex flex-wrap gap-2 rounded-full border-2 border-on-surface/20 bg-surface p-1">
-          {([
-            { k: "paste", label: "Paste" },
-            { k: "upload", label: "Upload" },
-            { k: "pick", label: "Pick a draft" },
-          ] as { k: Mode; label: string }[]).map((t) => {
+          {(
+            [
+              { k: "paste", label: "Paste" },
+              { k: "upload", label: "Upload" },
+              { k: "pick", label: "Pick a draft" },
+            ] as { k: Mode; label: string }[]
+          ).map((t) => {
             const active = mode === t.k;
             return (
               <button
@@ -395,7 +396,9 @@ export function EssayReview({
               className="w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
             />
             <p className="mt-1.5 text-label-sm text-on-surface-variant">
-              {pasted.trim() ? `${pasted.trim().split(/\s+/).length} words` : "Aim for at least ~120 words for real feedback."}
+              {pasted.trim()
+                ? `${pasted.trim().split(/\s+/).length} words`
+                : "Aim for at least ~120 words for real feedback."}
             </p>
           </div>
         )}
@@ -423,7 +426,9 @@ export function EssayReview({
                         type="button"
                         onClick={() => setPickedEssayId(e.essayId)}
                         className={`flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
-                          active ? "border-on-surface bg-secondary-container" : "border-on-surface/15 bg-surface/80"
+                          active
+                            ? "border-on-surface bg-secondary-container"
+                            : "border-on-surface/15 bg-surface/80"
                         }`}
                       >
                         <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -435,7 +440,9 @@ export function EssayReview({
                             {e.preview}
                           </p>
                         </div>
-                        {active && <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />}
+                        {active && (
+                          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                        )}
                       </button>
                     </li>
                   );
@@ -496,9 +503,7 @@ export function EssayReview({
 
       {past && past.length > 0 && (
         <section>
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">
-            Past reviews
-          </h3>
+          <h3 className="font-display text-headline-sm font-bold text-on-surface">Past reviews</h3>
           <p className="mt-1 text-body-sm text-on-surface-variant">
             Reopen any review — re-runs of the same essay text are instant.
           </p>
@@ -600,7 +605,9 @@ function ResultCard({
   const applyRewrite = (idx: number, r: Rewrite) => {
     const next = applyRewriteToText(workingText, r.before, r.after);
     if (next === null) {
-      setMissMsg("Couldn't find that exact passage anymore — the text may have shifted from prior edits.");
+      setMissMsg(
+        "Couldn't find that exact passage anymore — the text may have shifted from prior edits.",
+      );
       window.setTimeout(() => setMissMsg(null), 4000);
       return;
     }
@@ -675,7 +682,9 @@ function ResultCard({
             <h2 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
               {sourceLabel}
             </h2>
-            <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}>
+            <span
+              className={`mt-1 inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}
+            >
               {tier.label}
             </span>
           </div>
@@ -713,10 +722,14 @@ function ResultCard({
             {essayId && persistState !== "idle" && (
               <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
                 {persistState === "saving" && (
-                  <span className="inline-flex items-center gap-1"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
+                  </span>
                 )}
                 {persistState === "saved" && (
-                  <span className="inline-flex items-center gap-1 text-primary"><CheckCircle2 className="h-3.5 w-3.5" /> Saved</span>
+                  <span className="inline-flex items-center gap-1 text-primary">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Saved
+                  </span>
                 )}
                 {persistState === "error" && <span className="text-on-surface">Save failed</span>}
               </span>
@@ -757,7 +770,12 @@ function ResultCard({
           reduce={!!reduce}
         />
       ) : (
-        <LockedTeaser token={token} isPaid={isPaid} dimensions={free.dimensions} reduce={!!reduce} />
+        <LockedTeaser
+          token={token}
+          isPaid={isPaid}
+          dimensions={free.dimensions}
+          reduce={!!reduce}
+        />
       )}
     </motion.div>
   );
@@ -825,7 +843,8 @@ function Workspace({
   const segments: React.ReactNode[] = [];
   let cursor = 0;
   anchors.forEach((a, i) => {
-    if (a.start > cursor) segments.push(<span key={`t-${i}`}>{workingText.slice(cursor, a.start)}</span>);
+    if (a.start > cursor)
+      segments.push(<span key={`t-${i}`}>{workingText.slice(cursor, a.start)}</span>);
     const sc = severityClasses(a.comment.severity);
     const isActive = activeAnchorIdx === a.idx;
     segments.push(
@@ -857,9 +876,7 @@ function Workspace({
       <div className="lg:sticky lg:top-24 lg:self-start">
         <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/95 p-5">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="font-display text-headline-sm font-bold text-on-surface">
-              Your essay
-            </h3>
+            <h3 className="font-display text-headline-sm font-bold text-on-surface">Your essay</h3>
             <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
               {workingText.trim() ? `${workingText.trim().split(/\s+/).length} words` : ""}
             </p>
@@ -884,12 +901,16 @@ function Workspace({
                 type="button"
                 onClick={() => setActiveTab(t.k)}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all ${
-                  active ? "bg-primary text-white qc-hard-shadow-sm" : "text-on-surface-variant hover:text-on-surface"
+                  active
+                    ? "bg-primary text-white qc-hard-shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
                 {t.label}
                 {t.count !== undefined && (
-                  <span className={`rounded-full px-1.5 text-label-sm ${active ? "bg-white/20" : "bg-on-surface/10"}`}>
+                  <span
+                    className={`rounded-full px-1.5 text-label-sm ${active ? "bg-white/20" : "bg-on-surface/10"}`}
+                  >
                     {t.count}
                   </span>
                 )}
@@ -954,7 +975,9 @@ function Workspace({
                   <div
                     key={idx}
                     className={`rounded-2xl border-2 p-4 transition-colors ${
-                      applied ? "border-primary/60 bg-primary/5" : "border-on-surface/15 bg-surface/90"
+                      applied
+                        ? "border-primary/60 bg-primary/5"
+                        : "border-on-surface/15 bg-surface/90"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1000,7 +1023,9 @@ function Workspace({
               className="rounded-2xl border-2 border-on-surface/15 bg-surface/90 p-4"
             >
               {paid.strengths.length === 0 ? (
-                <p className="text-body-sm text-on-surface-variant">No standout strengths flagged.</p>
+                <p className="text-body-sm text-on-surface-variant">
+                  No standout strengths flagged.
+                </p>
               ) : (
                 <ul className="grid gap-2">
                   {paid.strengths.map((s, i) => (
@@ -1023,9 +1048,14 @@ function Workspace({
               className="grid gap-2"
             >
               {dimensions.map((d) => (
-                <div key={d.key} className="rounded-xl border-2 border-on-surface/15 bg-surface/90 p-3.5">
+                <div
+                  key={d.key}
+                  className="rounded-xl border-2 border-on-surface/15 bg-surface/90 p-3.5"
+                >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
+                    <p className="font-display text-label-lg font-bold text-on-surface">
+                      {d.label}
+                    </p>
                     <Dots score={d.score} />
                   </div>
                   <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
@@ -1043,7 +1073,17 @@ function Workspace({
 // Score ring, dots, badge, shimmer
 // -----------------------------------------------------------------------------
 
-function ScoreRing({ value, color, reduce, compact }: { value: number; color: string; reduce: boolean; compact?: boolean }) {
+function ScoreRing({
+  value,
+  color,
+  reduce,
+  compact,
+}: {
+  value: number;
+  color: string;
+  reduce: boolean;
+  compact?: boolean;
+}) {
   const r = 52;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value)) / 100;
@@ -1065,7 +1105,15 @@ function ScoreRing({ value, color, reduce, compact }: { value: number; color: st
   return (
     <div className={`relative ${dim}`}>
       <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-        <circle cx="60" cy="60" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-on-surface/10" />
+        <circle
+          cx="60"
+          cy="60"
+          r={r}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="10"
+          className="text-on-surface/10"
+        />
         <motion.circle
           cx="60"
           cy="60"
@@ -1082,7 +1130,9 @@ function ScoreRing({ value, color, reduce, compact }: { value: number; color: st
       </svg>
       <div className="absolute inset-0 grid place-items-center">
         <div className="text-center">
-          <p className={`font-display font-bold text-on-surface leading-none ${compact ? "text-headline-lg" : "text-display-md-mobile"}`}>
+          <p
+            className={`font-display font-bold text-on-surface leading-none ${compact ? "text-headline-lg" : "text-display-md-mobile"}`}
+          >
             {shown}
           </p>
           <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">/ 100</p>
@@ -1125,17 +1175,13 @@ function ThinkingShimmer({ reduce }: { reduce: boolean }) {
   return (
     <div className="mt-6 grid gap-3">
       {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="relative h-4 overflow-hidden rounded-md bg-on-surface/5"
-        >
+        <div key={i} className="relative h-4 overflow-hidden rounded-md bg-on-surface/5">
           <motion.div
             className="absolute inset-y-0 w-1/3"
             animate={reduce ? undefined : { x: ["-100%", "300%"] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "linear", delay: i * 0.15 }}
             style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(53,37,205,0.18), transparent)",
+              background: "linear-gradient(90deg, transparent, rgba(53,37,205,0.18), transparent)",
             }}
           />
         </div>
@@ -1185,18 +1231,20 @@ function LockedTeaser({
           Unlock inline notes & one-click rewrites
         </h3>
         <p className="mt-2 text-body-sm text-on-surface-variant">
-          Inline comments on your exact lines + before/after rewrites with one-tap apply — included in the same ${PRICE_MVP} one-time unlock as your full matches.
+          Inline comments on your exact lines + before/after rewrites with one-tap apply — included
+          in the same ${PRICE_MVP}/month subscription as your full matches.
         </p>
         <div className="mt-5">
           <UnlockButton
             token={token}
-            label={`Unlock for $${PRICE_MVP}`}
+            label={`Unlock for $${PRICE_MVP}/month`}
             className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           />
         </div>
         {isPaid && (
           <p className="mt-3 inline-flex items-center gap-1.5 text-label-sm text-primary">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Confirming payment — feedback will reveal automatically.
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Confirming payment — feedback will
+            reveal automatically.
           </p>
         )}
       </div>
@@ -1259,7 +1307,9 @@ function CommentCard({
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className={`inline-block rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold capitalize ${sc.bg}`}>
+        <span
+          className={`inline-block rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold capitalize ${sc.bg}`}
+        >
           {c.severity}
         </span>
         {orphan && (

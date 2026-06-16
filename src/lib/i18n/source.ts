@@ -16,7 +16,8 @@ export const UI_EN: Record<string, string> = {
   "ob.welcomeBack.badge": "Welcome back",
   "ob.welcomeBack.title": "Welcome back 👋",
   "ob.welcomeBack.titleNamed": "Welcome back, {name} 👋",
-  "ob.welcomeBack.subtitle": "Pick up right where you left off — you were on step {step} of {total}.",
+  "ob.welcomeBack.subtitle":
+    "Pick up right where you left off — you were on step {step} of {total}.",
   "ob.welcomeBack.resume": "Continue where I left off →",
   "ob.flow.finished.title": "That's everything.",
   "ob.flow.finished.titleNamed": "That's everything, {name}.",
@@ -72,9 +73,11 @@ export const UI_EN: Record<string, string> = {
   "profile.inprogress": "Profile in progress",
   "profile.hello.named": "Hey, {name}!",
   "profile.hello.anon": "Your Profile",
-  "profile.subtitle.fallback": "Here's a snapshot of your academic journey and your best-fit universities.",
+  "profile.subtitle.fallback":
+    "Here's a snapshot of your academic journey and your best-fit universities.",
   "profile.empty.title": "No profile yet",
-  "profile.empty.body": "Complete the onboarding questionnaire to see your personalized profile and university matches.",
+  "profile.empty.body":
+    "Complete the onboarding questionnaire to see your personalized profile and university matches.",
   "profile.empty.cta": "Start onboarding →",
   "profile.breakdown.title": "Your profile breakdown",
   "profile.breakdown.body": "Every answer you gave, chapter by chapter.",
@@ -101,10 +104,12 @@ export const UI_EN: Record<string, string> = {
   "rec.section.target": "Target schools",
   "rec.section.reach": "Reach schools",
   "rec.upsell.title": "See your full list — safety, target & reach",
-  "rec.upsell.body": "Unlock every match sorted into safety, target, and reach schools, with full requirements, deadlines, and filters.",
-  "rec.upsell.note": "$15 one-time unlock · 30% off for waitlist members",
+  "rec.upsell.body":
+    "Unlock every match sorted into safety, target, and reach schools, with full requirements, deadlines, and filters.",
+  "rec.upsell.note": "$15/month subscription · 30% off for waitlist members",
   "rec.waitlist.title": "Not ready to pay? Join the waitlist 🎓",
-  "rec.waitlist.body": "Lock in {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge and early access to every new tool included.",
+  "rec.waitlist.body":
+    "Lock in {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge and early access to every new tool included.",
   "rec.waitlist.cta": "Join the waitlist",
 
   // University card
@@ -141,7 +146,8 @@ export const UI_EN: Record<string, string> = {
 
   // Unlock
   "unlock.title": "Unlock your full match list",
-  "unlock.subtitle": "${price} one-time unlock. One payment. Full list unlocked — every match sorted into safety, target, and reach.",
+  "unlock.subtitle":
+    "${price}/month subscription. Billed monthly. Cancel anytime — every match sorted into safety, target, and reach.",
   "unlock.perk1": "Every safety school where you're a likely admit",
   "unlock.perk2": "Target schools matched to your grades and goals",
   "unlock.perk3": "Reach schools worth aiming for — with the why",
@@ -150,9 +156,10 @@ export const UI_EN: Record<string, string> = {
   "unlock.seeList": "See my full list →",
   "unlock.needAccount": "Need an account?",
   "unlock.signinLink": "Sign in or sign up",
-  "unlock.secureNote": "Secure checkout · No card stored · Referral discount applied automatically",
-  "unlock.discount": "🎉 {pct}% off applied — pay {discounted} instead of ${price}",
-  "unlock.button": "Unlock for ${price}",
+  "unlock.secureNote":
+    "Secure Polar checkout · Monthly subscription · Referral discount applied automatically",
+  "unlock.discount": "🎉 {pct}% off applied — pay {discounted}/month instead of ${price}/month",
+  "unlock.button": "Unlock for ${price}/month",
   "unlock.redirecting": "Redirecting…",
   "unlock.signinPrompt": "Sign in",
   "unlock.signinSuffix": "to unlock.",
@@ -167,14 +174,17 @@ export const UI_EN: Record<string, string> = {
   "unlockOk.loading": "Loading your full safety, target & reach list…",
   "unlockOk.go": "Go to my matches →",
   "unlockOk.waiting": "Finalizing your payment…",
-  "unlockOk.waitingBody": "This usually takes just a couple of seconds. We confirm your payment, then your full list unlocks automatically — no refresh needed.",
+  "unlockOk.waitingBody":
+    "This usually takes just a couple of seconds. We confirm your payment, then your full list unlocks automatically — no refresh needed.",
   "unlockOk.signedOutTitle": "Sign in to continue",
-  "unlockOk.signedOutBody": "Sign in with the same account you used at checkout and your full list will unlock automatically.",
+  "unlockOk.signedOutBody":
+    "Sign in with the same account you used at checkout and your full list will unlock automatically.",
   "unlockOk.signin": "Sign in →",
 
   // Unlock cancel
   "unlockX.title": "Checkout cancelled",
-  "unlockX.body": "No worries — no charge was made. Your free matches are still here whenever you want them.",
+  "unlockX.body":
+    "No worries — no charge was made. Your free matches are still here whenever you want them.",
   "unlockX.tryAgain": "Try again →",
   "unlockX.back": "← Back to your profile",
 
@@ -182,9 +192,11 @@ export const UI_EN: Record<string, string> = {
   "wait.badge": "Founding Member",
   "wait.title.anon": "Get in early",
   "wait.title.named": "{name}, get in early",
-  "wait.subtitle": "Join the waitlist and lock in founding-member perks — plus first access to every tool we ship next.",
+  "wait.subtitle":
+    "Join the waitlist and lock in founding-member perks — plus first access to every tool we ship next.",
   "wait.perk1": "{discount}% off the full product at launch",
-  "wait.perk2": "+{refDiscount}% off for every friend you refer (stackable — all the way to 50% off!)",
+  "wait.perk2":
+    "+{refDiscount}% off for every friend you refer (stackable — all the way to 50% off!)",
   "wait.perk3": "A Founding Member badge on your profile",
   "wait.perk4": "Early access to every new tool before it goes public",
   "wait.emailLabel": "Email address",
@@ -213,8 +225,10 @@ export const UI_EN: Record<string, string> = {
   "wait.success.already": "You're already on the list!",
   "wait.success.newNamed": "You're in, {name}!",
   "wait.success.new": "You're in!",
-  "wait.success.bodyAlready": "Your founding-member perks are locked in. We'll email you the moment early access opens.",
-  "wait.success.bodyNew": "Check your inbox — we just sent a welcome email with everything you unlocked. We'll be in touch the moment early access opens.",
+  "wait.success.bodyAlready":
+    "Your founding-member perks are locked in. We'll email you the moment early access opens.",
+  "wait.success.bodyNew":
+    "Check your inbox — we just sent a welcome email with everything you unlocked. We'll be in touch the moment early access opens.",
   "wait.success.cta": "Start your profile",
 
   // Referrals / invite friends

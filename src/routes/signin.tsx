@@ -123,9 +123,7 @@ function SignInPage() {
     setError(null);
     setGoogleLoading(true);
     try {
-      const { authorizationUrl } = await auth.startGoogle(
-        `${window.location.origin}/signin`,
-      );
+      const { authorizationUrl } = await auth.startGoogle(`${window.location.origin}/signin`);
       window.location.href = authorizationUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : t("signin.err.google"));
@@ -155,8 +153,8 @@ function SignInPage() {
               {mode === "signin" ? "Welcome back." : "One account.\nEvery match, saved."}
             </h2>
             <p className="mt-5 max-w-md text-body-lg text-on-surface-variant">
-              Pick up where you left off across devices, save universities you love,
-              and unlock waitlist pricing on everything coming next.
+              Pick up where you left off across devices, save universities you love, and unlock
+              waitlist pricing on everything coming next.
             </p>
             <ul className="mt-8 space-y-4">
               <Perk icon={<Sparkles className="h-4 w-4" />} title="20 ranked matches">
@@ -166,7 +164,7 @@ function SignInPage() {
                 Bookmark schools, track deadlines, and never re-do your answers.
               </Perk>
               <Perk icon={<ShieldCheck className="h-4 w-4" />} title="Waitlist pricing">
-                30% off for life on the Essay Assistant, Tracker, and Auto-Apply.
+                30% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
               </Perk>
             </ul>
           </motion.aside>
@@ -185,116 +183,116 @@ function SignInPage() {
               {mode === "signin" ? t("signin.subtitle.signin") : t("signin.subtitle.signup")}
             </p>
 
-          <button
-            type="button"
-            onClick={handleGoogle}
-            disabled={googleLoading || submitting}
-            className="mt-8 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-outline-variant bg-surface px-6 text-label-md text-on-surface transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {googleLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <GoogleIcon />
-            )}
-            {t("signin.google")}
-          </button>
-
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px flex-1 bg-outline-variant" />
-            <span className="text-label-sm uppercase text-on-surface-variant">{t("signin.or")}</span>
-            <div className="h-px flex-1 bg-outline-variant" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-            {mode === "signup" && (
-              <Field label={t("signin.field.name")}>
-                <input
-                  type="text"
-                  autoComplete="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  maxLength={120}
-                  className={inputCls}
-                  placeholder={t("signin.placeholder.name")}
-                />
-              </Field>
-            )}
-
-            <Field label={t("signin.field.email")}>
-              <input
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                maxLength={254}
-                className={inputCls}
-                placeholder={t("signin.placeholder.email")}
-              />
-            </Field>
-
-            <Field label={t("signin.field.password")}>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  maxLength={128}
-                  className={`${inputCls} pr-12`}
-                  placeholder={t("signin.placeholder.password")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? t("signin.hide") : t("signin.show")}
-                  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-on-surface-variant hover:text-on-surface"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </Field>
-
-            {error && (
-              <p
-                role="alert"
-                className="rounded-md bg-error-container/40 px-3 py-2 text-body-sm text-on-error-container"
-              >
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={submitting || googleLoading}
-              className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {submitting ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : mode === "signin" ? (
-                t("signin.cta.signin")
-              ) : (
-                t("signin.cta.signup")
-              )}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-body-sm text-on-surface-variant">
-            {mode === "signin" ? t("signin.toggle.toSignup") : t("signin.toggle.toSignin")}{" "}
             <button
               type="button"
-              onClick={() => {
-                setMode((m) => (m === "signin" ? "signup" : "signin"));
-                setError(null);
-              }}
-              className="font-medium text-primary hover:underline"
+              onClick={handleGoogle}
+              disabled={googleLoading || submitting}
+              className="mt-8 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-outline-variant bg-surface px-6 text-label-md text-on-surface transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {mode === "signin" ? t("signin.toggle.createAccount") : t("signin.toggle.signinLink")}
+              {googleLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <GoogleIcon />}
+              {t("signin.google")}
             </button>
-          </p>
+
+            <div className="my-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-outline-variant" />
+              <span className="text-label-sm uppercase text-on-surface-variant">
+                {t("signin.or")}
+              </span>
+              <div className="h-px flex-1 bg-outline-variant" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+              {mode === "signup" && (
+                <Field label={t("signin.field.name")}>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    maxLength={120}
+                    className={inputCls}
+                    placeholder={t("signin.placeholder.name")}
+                  />
+                </Field>
+              )}
+
+              <Field label={t("signin.field.email")}>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  maxLength={254}
+                  className={inputCls}
+                  placeholder={t("signin.placeholder.email")}
+                />
+              </Field>
+
+              <Field label={t("signin.field.password")}>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    maxLength={128}
+                    className={`${inputCls} pr-12`}
+                    placeholder={t("signin.placeholder.password")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? t("signin.hide") : t("signin.show")}
+                    className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-on-surface-variant hover:text-on-surface"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </Field>
+
+              {error && (
+                <p
+                  role="alert"
+                  className="rounded-md bg-error-container/40 px-3 py-2 text-body-sm text-on-error-container"
+                >
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting || googleLoading}
+                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submitting ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : mode === "signin" ? (
+                  t("signin.cta.signin")
+                ) : (
+                  t("signin.cta.signup")
+                )}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-body-sm text-on-surface-variant">
+              {mode === "signin" ? t("signin.toggle.toSignup") : t("signin.toggle.toSignin")}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode((m) => (m === "signin" ? "signup" : "signin"));
+                  setError(null);
+                }}
+                className="font-medium text-primary hover:underline"
+              >
+                {mode === "signin"
+                  ? t("signin.toggle.createAccount")
+                  : t("signin.toggle.signinLink")}
+              </button>
+            </p>
           </motion.div>
         </div>
       </main>

@@ -20,7 +20,7 @@ export function WaitlistPopup({
   open,
   onClose,
   title = "Join the waitlist",
-  body = "Be first in line and lock in 30% off for life when this feature ships.",
+  body = "Be first in line and lock in 30% off monthly access when this feature ships.",
   feature,
 }: Props) {
   const [email, setEmail] = useState("");
@@ -59,7 +59,9 @@ export function WaitlistPopup({
       const list: { email: string; feature?: string; at: number }[] = raw ? JSON.parse(raw) : [];
       list.push({ email, feature, at: Date.now() });
       window.localStorage.setItem("qc.waitlist.list", JSON.stringify(list));
-    } catch {}
+    } catch {
+      // localStorage may be unavailable in private browsing.
+    }
     setDone(true);
   }
 
@@ -132,20 +134,14 @@ export function WaitlistPopup({
                     className="w-full bg-transparent py-2.5 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60 disabled:opacity-50"
                   />
                 </div>
-                {error && (
-                  <p className="mt-1.5 text-label-sm text-error">{error}</p>
-                )}
+                {error && <p className="mt-1.5 text-label-sm text-error">{error}</p>}
 
                 <button
                   type="submit"
                   disabled={loading}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Join the waitlist"
-                  )}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join the waitlist"}
                 </button>
                 <p className="mt-3 text-label-sm text-on-surface-variant">
                   No spam. One email when it ships.
@@ -166,7 +162,7 @@ export function WaitlistPopup({
                 <p className="mt-2 text-body-md text-on-surface-variant">
                   {alreadyJoined
                     ? "You're all set — we'll email you the moment it's ready."
-                    : "Check your inbox for confirmation. We'll email you the moment it's ready — with your 30% lifetime discount locked in."}
+                    : "Check your inbox for confirmation. We'll email you the moment it's ready — with your 30% monthly discount locked in."}
                 </p>
                 <button
                   type="button"

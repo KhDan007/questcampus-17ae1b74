@@ -32,7 +32,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "$15 one-time unlock for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
+          "$15/month subscription for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
       },
     ],
   }),
@@ -53,12 +53,8 @@ function UnlockPage() {
     | { discountPercent: number; maxPercent: number; perReferralPercent: number }
     | null
     | undefined;
-  const discountPct = Math.min(
-    referral?.discountPercent ?? 0,
-    referral?.maxPercent ?? 50,
-  );
-  const discountedPrice =
-    discountPct > 0 ? (PRICE_MVP * (100 - discountPct)) / 100 : null;
+  const discountPct = Math.min(referral?.discountPercent ?? 0, referral?.maxPercent ?? 50);
+  const discountedPrice = discountPct > 0 ? (PRICE_MVP * (100 - discountPct)) / 100 : null;
   const formattedDiscounted =
     discountedPrice !== null
       ? `$${discountedPrice.toFixed(discountedPrice % 1 === 0 ? 0 : 2)}`
@@ -73,7 +69,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "One-time payment" },
+    { Icon: Sparkles, label: "Monthly subscription" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
@@ -96,8 +92,7 @@ function UnlockPage() {
             className="text-center"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" />
-              ${PRICE_MVP} one-time unlock
+              <Sparkles className="h-3.5 w-3.5" />${PRICE_MVP}/month subscription
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
@@ -113,9 +108,9 @@ function UnlockPage() {
             </h1>
 
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
-              The full ranked list of safety, target, and reach universities tuned
-              to your profile — plus polished essay drafts and every premium
-              feature we ship. One payment. Full list unlocked.
+              The full ranked list of safety, target, and reach universities tuned to your profile —
+              plus polished essay drafts and every premium feature we ship. Billed monthly. Cancel
+              anytime.
             </p>
           </motion.div>
 
@@ -146,6 +141,9 @@ function UnlockPage() {
                     <span className="pb-2 font-display text-2xl font-semibold text-on-surface-variant line-through">
                       ${PRICE_MVP}
                     </span>
+                    <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
+                      /month
+                    </span>
                   </>
                 ) : (
                   <>
@@ -153,7 +151,7 @@ function UnlockPage() {
                       ${PRICE_MVP}
                     </span>
                     <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                      one-time
+                      /month
                     </span>
                   </>
                 )}
@@ -167,7 +165,7 @@ function UnlockPage() {
               )}
 
               <p className="mt-4 text-body-md text-on-surface-variant">
-                Less than one application fee. Worth months of research,
+                $15/month for matches, essays, and premium tools. Worth months of research,
                 second-guessing, and college-counsellor calls.
               </p>
 
@@ -228,9 +226,7 @@ function UnlockPage() {
                     <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm">
                       <Icon className="h-4 w-4" />
                     </span>
-                    <span className="pt-1 text-body-md font-medium text-on-surface">
-                      {text}
-                    </span>
+                    <span className="pt-1 text-body-md font-medium text-on-surface">{text}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -262,18 +258,13 @@ function UnlockPage() {
             <div>
               <div className="flex items-center justify-center gap-0.5 sm:justify-start">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="h-4 w-4 fill-primary text-primary"
-                  />
+                  <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div>
               <p className="mt-1 text-label-md text-on-surface/80">
                 Trusted by students applying to{" "}
-                <span className="font-bold text-on-surface">
-                  Oxford, MIT, NUS, Sciences Po
-                </span>{" "}
-                and 80+ more.
+                <span className="font-bold text-on-surface">Oxford, MIT, NUS, Sciences Po</span> and
+                80+ more.
               </p>
             </div>
           </motion.div>

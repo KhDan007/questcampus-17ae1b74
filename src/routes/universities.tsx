@@ -32,8 +32,7 @@ export const Route = createFileRoute("/universities")({
       { title: "Universities — QuestCampus" },
       {
         name: "description",
-        content:
-          "Your AI matches, university search, and saved shortlist — all in one place.",
+        content: "Your AI matches, university search, and saved shortlist — all in one place.",
       },
     ],
   }),
@@ -111,10 +110,9 @@ function UniversitiesPage() {
   const { user, token, isAdmin } = useAuth();
 
   // Entitlement (live)
-  const entitlement = useQuery(
-    api.payments.entitlement,
-    token ? { token } : "skip",
-  ) as { paid: boolean } | undefined;
+  const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
+    | { paid: boolean }
+    | undefined;
   const isPaid = isAdmin || entitlement?.paid === true || user?.paid === true;
 
   // Search state
@@ -193,8 +191,17 @@ function UniversitiesPage() {
     setMaxAcceptanceRate("");
     setMaxTuition("");
   };
-  const hasActiveFilters =
-    !!(country || region || source || sizeBucket || field || language || maxGlobalRank || maxAcceptanceRate || maxTuition);
+  const hasActiveFilters = !!(
+    country ||
+    region ||
+    source ||
+    sizeBucket ||
+    field ||
+    language ||
+    maxGlobalRank ||
+    maxAcceptanceRate ||
+    maxTuition
+  );
 
   // Matches
   const recommend = useAction(api.rag.recommend.recommend);
@@ -202,7 +209,9 @@ function UniversitiesPage() {
   const [free, setFree] = useState<FreePayload | null>(null);
   const [paid, setPaid] = useState<PaidPayload | null>(null);
   const [freeStatus, setFreeStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
-  const [paidStatus, setPaidStatus] = useState<"idle" | "loading" | "ready" | "error" | "payment_required">("idle");
+  const [paidStatus, setPaidStatus] = useState<
+    "idle" | "loading" | "ready" | "error" | "payment_required"
+  >("idle");
 
   useEffect(() => {
     setSessionId(getSessionId());
@@ -395,9 +404,7 @@ function UniversitiesPage() {
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
               Universities
             </p>
-            <h1 className="mt-2 font-display text-display-md text-on-surface">
-              Universities
-            </h1>
+            <h1 className="mt-2 font-display text-display-md text-on-surface">Universities</h1>
             <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
               {isPaid
                 ? `${matchesToRender.length} matches. Search and save schools.`
@@ -408,7 +415,9 @@ function UniversitiesPage() {
             href="#saved-panel"
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById("saved-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              document
+                .getElementById("saved-panel")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
@@ -439,28 +448,46 @@ function UniversitiesPage() {
           <SilentErrorBoundary
             fallback={
               <BasicFilters
-                country={country} setCountry={setCountry}
-                region={region} setRegion={setRegion}
-                source={source} setSource={setSource}
-                sizeBucket={sizeBucket} setSizeBucket={setSizeBucket}
-                field={field} setField={setField}
-                language={language} setLanguage={setLanguage}
-                maxGlobalRank={maxGlobalRank} setMaxGlobalRank={setMaxGlobalRank}
-                maxAcceptanceRate={maxAcceptanceRate} setMaxAcceptanceRate={setMaxAcceptanceRate}
-                maxTuition={maxTuition} setMaxTuition={setMaxTuition}
+                country={country}
+                setCountry={setCountry}
+                region={region}
+                setRegion={setRegion}
+                source={source}
+                setSource={setSource}
+                sizeBucket={sizeBucket}
+                setSizeBucket={setSizeBucket}
+                field={field}
+                setField={setField}
+                language={language}
+                setLanguage={setLanguage}
+                maxGlobalRank={maxGlobalRank}
+                setMaxGlobalRank={setMaxGlobalRank}
+                maxAcceptanceRate={maxAcceptanceRate}
+                setMaxAcceptanceRate={setMaxAcceptanceRate}
+                maxTuition={maxTuition}
+                setMaxTuition={setMaxTuition}
               />
             }
           >
             <FiltersWithOptions
-              country={country} setCountry={setCountry}
-              region={region} setRegion={setRegion}
-              source={source} setSource={setSource}
-              sizeBucket={sizeBucket} setSizeBucket={setSizeBucket}
-              field={field} setField={setField}
-              language={language} setLanguage={setLanguage}
-              maxGlobalRank={maxGlobalRank} setMaxGlobalRank={setMaxGlobalRank}
-              maxAcceptanceRate={maxAcceptanceRate} setMaxAcceptanceRate={setMaxAcceptanceRate}
-              maxTuition={maxTuition} setMaxTuition={setMaxTuition}
+              country={country}
+              setCountry={setCountry}
+              region={region}
+              setRegion={setRegion}
+              source={source}
+              setSource={setSource}
+              sizeBucket={sizeBucket}
+              setSizeBucket={setSizeBucket}
+              field={field}
+              setField={setField}
+              language={language}
+              setLanguage={setLanguage}
+              maxGlobalRank={maxGlobalRank}
+              setMaxGlobalRank={setMaxGlobalRank}
+              maxAcceptanceRate={maxAcceptanceRate}
+              setMaxAcceptanceRate={setMaxAcceptanceRate}
+              maxTuition={maxTuition}
+              setMaxTuition={setMaxTuition}
             />
           </SilentErrorBoundary>
           {hasActiveFilters && (
@@ -487,9 +514,7 @@ function UniversitiesPage() {
                 </h2>
                 <SilentErrorBoundary
                   fallback={
-                    <EmptyHint>
-                      Search is temporarily unavailable. Try again in a moment.
-                    </EmptyHint>
+                    <EmptyHint>Search is temporarily unavailable. Try again in a moment.</EmptyHint>
                   }
                 >
                   <SearchResults args={searchArgs} reduce={!!reduce} />
@@ -611,7 +636,6 @@ function UniversitiesPage() {
             {/* Saved universities panel */}
             <SavedPanel saved={saved} onRemove={removeById} />
           </div>
-
         </div>
 
         {/* Undo toast */}
@@ -681,25 +705,23 @@ function SearchRow({
           {result.acceptanceRate != null ? (
             <span>
               {Math.round(
-                result.acceptanceRate > 1
-                  ? result.acceptanceRate
-                  : result.acceptanceRate * 100,
+                result.acceptanceRate > 1 ? result.acceptanceRate : result.acceptanceRate * 100,
               )}
               % accept
             </span>
           ) : null}
           {result.sizeBucket ? <span className="capitalize">{result.sizeBucket}</span> : null}
-          {result.tuitionOutState
-            ? <span>${Math.round(result.tuitionOutState).toLocaleString()}/yr tuition</span>
-            : result.costAttendance
-              ? <span>${Math.round(result.costAttendance).toLocaleString()}/yr total</span>
-              : null}
-          {result.languageOfInstruction?.length
-            ? <span>{result.languageOfInstruction.slice(0, 2).join(", ")}</span>
-            : null}
-          {result.fields?.length
-            ? <span className="truncate">{result.fields.slice(0, 2).join(" · ")}</span>
-            : null}
+          {result.tuitionOutState ? (
+            <span>${Math.round(result.tuitionOutState).toLocaleString()}/yr tuition</span>
+          ) : result.costAttendance ? (
+            <span>${Math.round(result.costAttendance).toLocaleString()}/yr total</span>
+          ) : null}
+          {result.languageOfInstruction?.length ? (
+            <span>{result.languageOfInstruction.slice(0, 2).join(", ")}</span>
+          ) : null}
+          {result.fields?.length ? (
+            <span className="truncate">{result.fields.slice(0, 2).join(" · ")}</span>
+          ) : null}
         </p>
       </div>
       <SaveToggle
@@ -721,7 +743,6 @@ function SearchRow({
   );
 }
 
-
 function Paywall({
   token,
   paidStatus,
@@ -741,7 +762,7 @@ function Paywall({
               Unlock your full match list
             </h3>
             <p className="mt-1 max-w-md text-body-md text-on-surface-variant">
-              $15 one-time unlock. Up to 20 universities across Safety, Target, and Reach.
+              $15/month subscription. Up to 20 universities across Safety, Target, and Reach.
             </p>
             {paidStatus === "payment_required" && (
               <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -750,7 +771,7 @@ function Paywall({
             )}
           </div>
         </div>
-        <UnlockButton token={token} label="Unlock for $15" />
+        <UnlockButton token={token} label="$15/month subscription" />
       </div>
     </div>
   );
@@ -879,7 +900,9 @@ function CompactMatchCard({
   if (card.ieltsOverall) bullets.push(`IELTS ${card.ieltsOverall}+ required`);
   else if (card.toeflIbt) bullets.push(`TOEFL iBT ${card.toeflIbt}+ required`);
   if (card.intlTuition && card.intlTuitionCurrency)
-    bullets.push(`Intl tuition ~${card.intlTuition.toLocaleString()} ${card.intlTuitionCurrency}/yr`);
+    bullets.push(
+      `Intl tuition ~${card.intlTuition.toLocaleString()} ${card.intlTuitionCurrency}/yr`,
+    );
   else if (card.tuitionOutState) bullets.push(`Tuition ${moneyLabel(card.tuitionOutState)}/yr`);
   if (card.costAttendance) bullets.push(`Total cost ${moneyLabel(card.costAttendance)}/yr`);
   if (card.sizeBucket)
@@ -899,9 +922,7 @@ function CompactMatchCard({
           <p className="truncate font-display text-label-lg font-bold text-on-surface">
             {card.name}
           </p>
-          {location && (
-            <p className="truncate text-label-sm text-on-surface-variant">{location}</p>
-          )}
+          {location && <p className="truncate text-label-sm text-on-surface-variant">{location}</p>}
           {card.why && (
             <p className="mt-1.5 line-clamp-2 break-words text-body-sm text-on-surface">
               {card.why}
@@ -909,7 +930,10 @@ function CompactMatchCard({
           )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          <RecommendationSaveIcon source={card.source ?? "scorecard"} externalId={card.externalId} />
+          <RecommendationSaveIcon
+            source={card.source ?? "scorecard"}
+            externalId={card.externalId}
+          />
         </div>
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -949,7 +973,10 @@ function CompactMatchCard({
             <ul className="space-y-1.5 text-body-sm text-on-surface">
               {bullets.map((b) => (
                 <li key={b} className="flex min-w-0 items-start gap-2 break-words">
-                  <span aria-hidden className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span
+                    aria-hidden
+                    className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                  />
                   <span className="min-w-0 flex-1 break-words">{b}</span>
                 </li>
               ))}
@@ -1118,30 +1145,84 @@ function SavedPanel({
 }
 
 type FilterProps = {
-  country: string; setCountry: (v: string) => void;
-  region: string; setRegion: (v: string) => void;
-  source: string; setSource: (v: string) => void;
-  sizeBucket: string; setSizeBucket: (v: string) => void;
-  field: string; setField: (v: string) => void;
-  language: string; setLanguage: (v: string) => void;
-  maxGlobalRank: string; setMaxGlobalRank: (v: string) => void;
-  maxAcceptanceRate: string; setMaxAcceptanceRate: (v: string) => void;
-  maxTuition: string; setMaxTuition: (v: string) => void;
+  country: string;
+  setCountry: (v: string) => void;
+  region: string;
+  setRegion: (v: string) => void;
+  source: string;
+  setSource: (v: string) => void;
+  sizeBucket: string;
+  setSizeBucket: (v: string) => void;
+  field: string;
+  setField: (v: string) => void;
+  language: string;
+  setLanguage: (v: string) => void;
+  maxGlobalRank: string;
+  setMaxGlobalRank: (v: string) => void;
+  maxAcceptanceRate: string;
+  setMaxAcceptanceRate: (v: string) => void;
+  maxTuition: string;
+  setMaxTuition: (v: string) => void;
 };
 
 function FilterGrid({ p, options }: { p: FilterProps; options?: FilterOptions }) {
   return (
     <>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        <FilterSelect label="Country" value={p.country} onChange={p.setCountry} options={options?.countries} />
-        <FilterSelect label="Region" value={p.region} onChange={p.setRegion} options={options?.regions} />
-        <FilterSelect label="Dataset" value={p.source} onChange={p.setSource} options={options?.sources} />
-        <FilterSelect label="Size" value={p.sizeBucket} onChange={p.setSizeBucket} options={options?.sizeBuckets} />
-        <FilterSelect label="Field" value={p.field} onChange={p.setField} options={options?.fields} />
-        <FilterSelect label="Language" value={p.language} onChange={p.setLanguage} options={options?.languages} />
-        <FilterNumber label="Max global rank" placeholder="e.g. 200" value={p.maxGlobalRank} onChange={p.setMaxGlobalRank} />
-        <FilterNumber label="Max acceptance %" placeholder="e.g. 20" value={p.maxAcceptanceRate} onChange={p.setMaxAcceptanceRate} />
-        <FilterNumber label="Max tuition (USD)" placeholder="e.g. 30000" value={p.maxTuition} onChange={p.setMaxTuition} />
+        <FilterSelect
+          label="Country"
+          value={p.country}
+          onChange={p.setCountry}
+          options={options?.countries}
+        />
+        <FilterSelect
+          label="Region"
+          value={p.region}
+          onChange={p.setRegion}
+          options={options?.regions}
+        />
+        <FilterSelect
+          label="Dataset"
+          value={p.source}
+          onChange={p.setSource}
+          options={options?.sources}
+        />
+        <FilterSelect
+          label="Size"
+          value={p.sizeBucket}
+          onChange={p.setSizeBucket}
+          options={options?.sizeBuckets}
+        />
+        <FilterSelect
+          label="Field"
+          value={p.field}
+          onChange={p.setField}
+          options={options?.fields}
+        />
+        <FilterSelect
+          label="Language"
+          value={p.language}
+          onChange={p.setLanguage}
+          options={options?.languages}
+        />
+        <FilterNumber
+          label="Max global rank"
+          placeholder="e.g. 200"
+          value={p.maxGlobalRank}
+          onChange={p.setMaxGlobalRank}
+        />
+        <FilterNumber
+          label="Max acceptance %"
+          placeholder="e.g. 20"
+          value={p.maxAcceptanceRate}
+          onChange={p.setMaxAcceptanceRate}
+        />
+        <FilterNumber
+          label="Max tuition (USD)"
+          placeholder="e.g. 30000"
+          value={p.maxTuition}
+          onChange={p.setMaxTuition}
+        />
       </div>
       {options && !options.complete && (
         <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -1157,9 +1238,7 @@ function BasicFilters(p: FilterProps) {
 }
 
 function FiltersWithOptions(p: FilterProps) {
-  const options = useQuery(api.universitySearch.filterOptions, {}) as
-    | FilterOptions
-    | undefined;
+  const options = useQuery(api.universitySearch.filterOptions, {}) as FilterOptions | undefined;
   return <FilterGrid p={p} options={options} />;
 }
 
@@ -1167,27 +1246,24 @@ function SearchResults({
   args,
   reduce,
 }: {
-  args:
-    | {
-        query: string;
-        country?: string;
-        region?: string;
-        source?: string;
-        sizeBucket?: string;
-        field?: string;
-        language?: string;
-        maxGlobalRank?: number;
-        maxAcceptanceRate?: number;
-        maxTuition?: number;
-        limit: number;
-      }
-    | null;
+  args: {
+    query: string;
+    country?: string;
+    region?: string;
+    source?: string;
+    sizeBucket?: string;
+    field?: string;
+    language?: string;
+    maxGlobalRank?: number;
+    maxAcceptanceRate?: number;
+    maxTuition?: number;
+    limit: number;
+  } | null;
   reduce: boolean;
 }) {
-  const results = useQuery(
-    api.universitySearch.search,
-    args ?? "skip",
-  ) as UniversitySearchResult[] | undefined;
+  const results = useQuery(api.universitySearch.search, args ?? "skip") as
+    | UniversitySearchResult[]
+    | undefined;
   if (!args) return null;
   if (results === undefined) return <LoadingHint />;
   if (results.length === 0)

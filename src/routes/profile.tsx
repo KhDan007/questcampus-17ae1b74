@@ -108,11 +108,15 @@ function ProfilePage() {
             <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
               <div
                 className="animate-aurora-1 absolute -left-20 -top-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
-                style={{ background: "radial-gradient(circle, rgba(79,70,229,0.28), transparent 65%)" }}
+                style={{
+                  background: "radial-gradient(circle, rgba(79,70,229,0.28), transparent 65%)",
+                }}
               />
               <div
                 className="animate-aurora-2 absolute -right-20 -bottom-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
-                style={{ background: "radial-gradient(circle, rgba(254,183,0,0.22), transparent 65%)" }}
+                style={{
+                  background: "radial-gradient(circle, rgba(254,183,0,0.22), transparent 65%)",
+                }}
               />
             </div>
 
@@ -136,8 +140,8 @@ function ProfilePage() {
                   </p>
                 )}
                 <p className="mt-3 max-w-2xl text-body-md text-on-surface-variant">
-                  Everything you've matched and built lives here. We'll keep adding tools as
-                  they ship — waitlist members get 30% off for life.
+                  Everything you've matched and built lives here. We'll keep adding tools as they
+                  ship — waitlist members get 30% off monthly access.
                 </p>
               </div>
 
@@ -159,11 +163,7 @@ function ProfilePage() {
                 value={String(saved?.matches.length ?? 0)}
                 tone="primary"
               />
-              <Stat
-                label="Account"
-                value={isAuthenticated ? "Active" : "Guest"}
-                tone="neutral"
-              />
+              <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
               <Stat label="Waitlist discount" value="30% off" tone="accent" />
             </div>
           </div>
@@ -217,9 +217,7 @@ function ProfilePage() {
             </div>
           ) : (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-              <p className="text-body-lg text-on-surface-variant">
-                No saved matches yet.
-              </p>
+              <p className="text-body-lg text-on-surface-variant">No saved matches yet.</p>
               <Link
                 to="/"
                 className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
@@ -234,14 +232,13 @@ function ProfilePage() {
           <MyUniversitiesSection />
         </SilentErrorBoundary>
 
-
         {/* Upcoming */}
         <section className="mt-16">
           <h2 className="font-display text-headline-lg font-bold text-on-surface">
             Coming soon to your account
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            Join the waitlist to lock in 30% off for life.
+            Join the waitlist to lock in 30% off monthly access.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <UpcomingTile
@@ -260,13 +257,16 @@ function ProfilePage() {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-display text-headline-sm font-bold">Refined recommendations</h3>
+                  <h3 className="font-display text-headline-sm font-bold">
+                    Refined recommendations
+                  </h3>
                   <span className="rounded-full bg-white px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-primary">
                     Live
                   </span>
                 </div>
                 <p className="mt-1 text-body-md text-white/85">
-                  Answer a few more questions and we'll re-rank your matches with much more precision.
+                  Answer a few more questions and we'll re-rank your matches with much more
+                  precision.
                 </p>
               </div>
               <ArrowRight className="h-5 w-5 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5" />
@@ -289,7 +289,7 @@ function ProfilePage() {
         open={waitlistOpen}
         onClose={() => setWaitlistOpen(false)}
         title="Coming soon"
-        body="Join the waitlist and we'll email you the moment this is ready — 30% off for life locked in."
+        body="Join the waitlist and we'll email you the moment this is ready — 30% off monthly access locked in."
       />
     </>
   );
@@ -394,9 +394,7 @@ function SavedMatchCard({ match, delay = 0 }: { match: SavedMatch; delay?: numbe
           </span>
         </div>
       </div>
-      <h3 className="mt-3 font-display text-headline-sm font-bold text-on-surface">
-        {match.name}
-      </h3>
+      <h3 className="mt-3 font-display text-headline-sm font-bold text-on-surface">{match.name}</h3>
       <p className="mt-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
         {match.location}
       </p>

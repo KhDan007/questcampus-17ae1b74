@@ -30,7 +30,9 @@ export function WaitlistV2() {
       const list: { email: string; at: number }[] = raw ? JSON.parse(raw) : [];
       list.push({ email, at: Date.now() });
       window.localStorage.setItem("qc.waitlist.list", JSON.stringify(list));
-    } catch {}
+    } catch {
+      // localStorage may be unavailable in private browsing.
+    }
     setDone(true);
   }
 
@@ -41,11 +43,15 @@ export function WaitlistV2() {
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
             <div
               className="animate-aurora-1 absolute -left-20 -top-20 h-[50vh] w-[50vh] rounded-full blur-[120px]"
-              style={{ background: "radial-gradient(circle, rgba(255,95,93,0.35), transparent 65%)" }}
+              style={{
+                background: "radial-gradient(circle, rgba(255,95,93,0.35), transparent 65%)",
+              }}
             />
             <div
               className="animate-aurora-2 absolute -right-20 -bottom-20 h-[50vh] w-[50vh] rounded-full blur-[120px]"
-              style={{ background: "radial-gradient(circle, rgba(254,183,0,0.30), transparent 65%)" }}
+              style={{
+                background: "radial-gradient(circle, rgba(254,183,0,0.30), transparent 65%)",
+              }}
             />
           </div>
 
@@ -58,12 +64,10 @@ export function WaitlistV2() {
                 Be first when the rest of QuestCampus opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
-                Essay Assistant, Application Tracker, Auto-Apply — waitlist members get
-                them first with{" "}
-                <strong className="text-primary">30% off for life</strong>. The Essay
-                Assistant launches at{" "}
-                <strong className="text-on-surface">$15 one-time unlock</strong> — waitlist price{" "}
-                <strong className="text-primary">$10.50</strong>.
+                Essay Assistant, Application Tracker, Auto-Apply — waitlist members get them first
+                with <strong className="text-primary">30% off monthly access</strong>. The Essay
+                Assistant launches at <strong className="text-on-surface">$15/month</strong> —
+                waitlist price <strong className="text-primary">$10.50/month</strong>.
               </p>
 
               <div className="mt-6 flex items-center gap-4">
@@ -104,9 +108,7 @@ export function WaitlistV2() {
                       className="w-full bg-transparent py-3 font-[var(--font-label)] text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/60 disabled:opacity-50"
                     />
                   </div>
-                  {error && (
-                    <p className="mt-1.5 text-label-sm text-error">{error}</p>
-                  )}
+                  {error && <p className="mt-1.5 text-label-sm text-error">{error}</p>}
 
                   <button
                     type="submit"

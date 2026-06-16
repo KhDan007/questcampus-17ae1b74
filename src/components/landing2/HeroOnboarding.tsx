@@ -36,7 +36,6 @@ export function HeroOnboarding() {
       <section className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
         <div className="mx-auto grid max-w-(--container-content) gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
-
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -53,8 +52,8 @@ export function HeroOnboarding() {
               transition={{ duration: 0.6, delay: 0.18 }}
               className="mt-6 max-w-xl text-body-lg text-on-surface-variant"
             >
-              Not a generic college search. A 60-second conversation that ranks 11,000+
-              universities against your real grades, goals, money, and geography —{" "}
+              Not a generic college search. A 60-second conversation that ranks 11,000+ universities
+              against your real grades, goals, money, and geography —{" "}
               <strong className="text-on-surface">free to start.</strong>
             </motion.p>
 
@@ -71,7 +70,7 @@ export function HeroOnboarding() {
                 <Dot /> 3 free matches
               </span>
               <span className="inline-flex items-center gap-2">
-                <Dot /> $15 one-time unlocks all 20
+                <Dot /> $15/month unlocks all 20
               </span>
             </motion.div>
 
@@ -94,7 +93,6 @@ export function HeroOnboarding() {
               </p>
             </motion.div>
           </div>
-
 
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 30, scale: 0.97 }}
@@ -198,9 +196,9 @@ function WarnModal({
                 This will erase your current matches
               </h3>
               <p className="mt-2 text-body-md text-on-surface-variant">
-                Re-taking the quick quiz overwrites the recommendations saved to your
-                account. For sharper results, complete the detailed onboarding instead —
-                it asks a few more questions and tunes your matches much better.
+                Re-taking the quick quiz overwrites the recommendations saved to your account. For
+                sharper results, complete the detailed onboarding instead — it asks a few more
+                questions and tunes your matches much better.
               </p>
 
               <a

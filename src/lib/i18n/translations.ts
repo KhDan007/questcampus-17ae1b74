@@ -18,27 +18,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "AI-Powered University Matching",
     "hero.titleA": "Find universities that",
     "hero.titleB": "want someone like you.",
-    "hero.subtitle": "Answer a few questions. Get a personalized list of universities that match your grades, goals, and scholarship needs — in minutes.",
+    "hero.subtitle":
+      "Answer a few questions. Get a personalized list of universities that match your grades, goals, and scholarship needs — in minutes.",
     "hero.cta": "Find my universities →",
     "hero.note": "Takes 4–6 minutes · No account required to start",
 
     "problem.heading": "The university application process was not designed for you.",
     "problem.p1.title": "No clear starting point",
-    "problem.p1.body": "Thousands of universities, zero guidance on which ones actually fit your profile and goals.",
+    "problem.p1.body":
+      "Thousands of universities, zero guidance on which ones actually fit your profile and goals.",
     "problem.p2.title": "Counselors cost thousands",
-    "problem.p2.body": "Private college counselors charge $1,500–$5,000+. That shouldn't determine who gets good advice.",
+    "problem.p2.body":
+      "Private college counselors charge $1,500–$5,000+. That shouldn't determine who gets good advice.",
     "problem.p3.title": "Deadlines sneak up fast",
-    "problem.p3.body": "By the time most students find the right schools, they've missed application windows entirely.",
-    "problem.quote": "QuestCampus is the older sibling who's already been through it — and built a map so you don't have to figure it out alone.",
+    "problem.p3.body":
+      "By the time most students find the right schools, they've missed application windows entirely.",
+    "problem.quote":
+      "QuestCampus is the older sibling who's already been through it — and built a map so you don't have to figure it out alone.",
 
     "howit.eyebrow": "How it works",
     "howit.heading": "From confused to confident in 4 minutes.",
     "howit.s1.title": "Answer a friendly questionnaire",
-    "howit.s1.body": "7 chapters, 22 questions — designed to feel like a conversation, not a form. Takes 4–6 minutes.",
+    "howit.s1.body":
+      "7 chapters, 22 questions — designed to feel like a conversation, not a form. Takes 4–6 minutes.",
     "howit.s2.title": "Our AI finds your best matches",
-    "howit.s2.body": "We match your grades, goals, scholarships, and location preferences against thousands of universities worldwide.",
+    "howit.s2.body":
+      "We match your grades, goals, scholarships, and location preferences against thousands of universities worldwide.",
     "howit.s3.title": "Receive a ranked, actionable list",
-    "howit.s3.body": "Universities sorted by scholarship match first, then fit. Each with a plain-English explanation of why it works for you.",
+    "howit.s3.body":
+      "Universities sorted by scholarship match first, then fit. Each with a plain-English explanation of why it works for you.",
     "howit.teaser.progress": "Chapter 3 of 7 — Your Dreams & Ambitions",
     "howit.teaser.matching": "Finding your best matches…",
     "howit.teaser.match": "{percent}% match",
@@ -59,7 +67,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Start for free →",
     "pricing.paid.badge": "Most popular",
     "pricing.paid.title": "Get the full picture",
-    "pricing.paid.subtitle": "$15 one-time unlock",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ with a private counselor",
     "pricing.paid.f1": "Everything in Free",
     "pricing.paid.f2": "Full safety / target / reach list",
@@ -67,25 +75,31 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Direct application links",
     "pricing.paid.f5": "Priority support",
     "pricing.paid.cta": "Get full access →",
-    "pricing.waitlist.text": "Joining the waitlist? Get {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge included.",
+    "pricing.waitlist.text":
+      "Joining the waitlist? Get {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge included.",
     "pricing.waitlist.link": "Join the waitlist →",
 
     "roadmap.eyebrow": "Coming soon",
     "roadmap.heading": "This is just the beginning.",
-    "roadmap.subtitle": "QuestCampus is building every tool a student needs — from first search to final submission.",
+    "roadmap.subtitle":
+      "QuestCampus is building every tool a student needs — from first search to final submission.",
     "roadmap.r1.title": "Essay Writing Assistant",
-    "roadmap.r1.body": "AI-guided personal statement + supplemental essays tailored to each university's prompts.",
+    "roadmap.r1.body":
+      "AI-guided personal statement + supplemental essays tailored to each university's prompts.",
     "roadmap.r2.title": "Extracurricular Manager",
-    "roadmap.r2.body": "Track, organize, and present your ECs strategically to strengthen your application narrative.",
+    "roadmap.r2.body":
+      "Track, organize, and present your ECs strategically to strengthen your application narrative.",
     "roadmap.r3.title": "Document Helper",
-    "roadmap.r3.body": "Checklists, templates, and AI review for transcripts, recommendation letters, and portfolios.",
+    "roadmap.r3.body":
+      "Checklists, templates, and AI review for transcripts, recommendation letters, and portfolios.",
     "roadmap.r4.title": "Application Tracker",
     "roadmap.r4.body": "Deadlines, status, and notes per school — never miss a window again.",
     "roadmap.r5.title": "Auto-Apply Agent",
     "roadmap.r5.body": "Fill and submit applications autonomously. The endgame.",
     "roadmap.status.soon": "Coming soon",
     "roadmap.status.later": "Later",
-    "roadmap.waitlistText": "Waitlist users get {discount}% off the full product ({price_full}) when these ship. Every referral stacks another {refDiscount}% off — it can reach 100% free.",
+    "roadmap.waitlistText":
+      "Waitlist users get {discount}% off the full product ({price_full}) when these ship. Every referral stacks another {refDiscount}% off — it can reach 100% free.",
     "roadmap.cta": "Join the waitlist →",
 
     "final.heading": "Your university list is waiting.",
@@ -114,27 +128,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "Coincidencia universitaria con IA",
     "hero.titleA": "Encuentra universidades que",
     "hero.titleB": "quieren a alguien como tú.",
-    "hero.subtitle": "Responde unas preguntas. Obtén una lista personalizada de universidades que coinciden con tus notas, metas y necesidades de beca — en minutos.",
+    "hero.subtitle":
+      "Responde unas preguntas. Obtén una lista personalizada de universidades que coinciden con tus notas, metas y necesidades de beca — en minutos.",
     "hero.cta": "Encontrar mis universidades →",
     "hero.note": "Tarda 4–6 minutos · No requiere cuenta para empezar",
 
     "problem.heading": "El proceso de aplicación universitaria no fue diseñado para ti.",
     "problem.p1.title": "Sin un punto de partida claro",
-    "problem.p1.body": "Miles de universidades, cero orientación sobre cuáles realmente encajan con tu perfil y metas.",
+    "problem.p1.body":
+      "Miles de universidades, cero orientación sobre cuáles realmente encajan con tu perfil y metas.",
     "problem.p2.title": "Los asesores cuestan miles",
-    "problem.p2.body": "Los asesores privados cobran $1.500–$5.000+. Eso no debería decidir quién recibe buenos consejos.",
+    "problem.p2.body":
+      "Los asesores privados cobran $1.500–$5.000+. Eso no debería decidir quién recibe buenos consejos.",
     "problem.p3.title": "Las fechas límite llegan rápido",
-    "problem.p3.body": "Para cuando la mayoría encuentra las escuelas adecuadas, ya han perdido los plazos de aplicación.",
-    "problem.quote": "QuestCampus es el hermano mayor que ya pasó por esto — y construyó un mapa para que no tengas que descifrarlo solo.",
+    "problem.p3.body":
+      "Para cuando la mayoría encuentra las escuelas adecuadas, ya han perdido los plazos de aplicación.",
+    "problem.quote":
+      "QuestCampus es el hermano mayor que ya pasó por esto — y construyó un mapa para que no tengas que descifrarlo solo.",
 
     "howit.eyebrow": "Cómo funciona",
     "howit.heading": "De la confusión a la confianza en 4 minutos.",
     "howit.s1.title": "Responde un cuestionario amigable",
-    "howit.s1.body": "7 capítulos, 22 preguntas — diseñadas para sentirse como una conversación, no un formulario. Tarda 4–6 minutos.",
+    "howit.s1.body":
+      "7 capítulos, 22 preguntas — diseñadas para sentirse como una conversación, no un formulario. Tarda 4–6 minutos.",
     "howit.s2.title": "Nuestra IA encuentra tus mejores coincidencias",
-    "howit.s2.body": "Comparamos tus notas, metas, becas y preferencias de ubicación con miles de universidades en todo el mundo.",
+    "howit.s2.body":
+      "Comparamos tus notas, metas, becas y preferencias de ubicación con miles de universidades en todo el mundo.",
     "howit.s3.title": "Recibe una lista clasificada y accionable",
-    "howit.s3.body": "Universidades ordenadas primero por coincidencia de beca, luego por ajuste. Cada una con una explicación clara de por qué te conviene.",
+    "howit.s3.body":
+      "Universidades ordenadas primero por coincidencia de beca, luego por ajuste. Cada una con una explicación clara de por qué te conviene.",
     "howit.teaser.progress": "Capítulo 3 de 7 — Tus sueños y ambiciones",
     "howit.teaser.matching": "Encontrando tus mejores coincidencias…",
     "howit.teaser.match": "{percent}% coincidencia",
@@ -155,7 +177,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Empezar gratis →",
     "pricing.paid.badge": "Más popular",
     "pricing.paid.title": "Obtén la imagen completa",
-    "pricing.paid.subtitle": "pago único · no es una suscripción",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ con un asesor privado",
     "pricing.paid.f1": "Todo lo del plan Gratis",
     "pricing.paid.f2": "Lista completa de seguro / objetivo / aspiracional",
@@ -163,25 +185,31 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Enlaces directos de aplicación",
     "pricing.paid.f5": "Soporte prioritario",
     "pricing.paid.cta": "Obtener acceso completo →",
-    "pricing.waitlist.text": "¿Te unes a la lista de espera? Obtén {discount}% de descuento al lanzamiento — más {refDiscount}% extra por cada amigo que invites. Insignia de Miembro Fundador incluida.",
+    "pricing.waitlist.text":
+      "¿Te unes a la lista de espera? Obtén {discount}% de descuento al lanzamiento — más {refDiscount}% extra por cada amigo que invites. Insignia de Miembro Fundador incluida.",
     "pricing.waitlist.link": "Unirse a la lista de espera →",
 
     "roadmap.eyebrow": "Próximamente",
     "roadmap.heading": "Esto es solo el comienzo.",
-    "roadmap.subtitle": "QuestCampus está construyendo cada herramienta que un estudiante necesita — desde la primera búsqueda hasta el envío final.",
+    "roadmap.subtitle":
+      "QuestCampus está construyendo cada herramienta que un estudiante necesita — desde la primera búsqueda hasta el envío final.",
     "roadmap.r1.title": "Asistente de redacción de ensayos",
-    "roadmap.r1.body": "Declaración personal y ensayos suplementarios guiados por IA, adaptados a cada universidad.",
+    "roadmap.r1.body":
+      "Declaración personal y ensayos suplementarios guiados por IA, adaptados a cada universidad.",
     "roadmap.r2.title": "Gestor de actividades extracurriculares",
-    "roadmap.r2.body": "Rastrea, organiza y presenta tus actividades estratégicamente para fortalecer tu aplicación.",
+    "roadmap.r2.body":
+      "Rastrea, organiza y presenta tus actividades estratégicamente para fortalecer tu aplicación.",
     "roadmap.r3.title": "Asistente de documentos",
-    "roadmap.r3.body": "Listas, plantillas y revisión con IA para expedientes, cartas de recomendación y portafolios.",
+    "roadmap.r3.body":
+      "Listas, plantillas y revisión con IA para expedientes, cartas de recomendación y portafolios.",
     "roadmap.r4.title": "Seguimiento de aplicaciones",
     "roadmap.r4.body": "Fechas, estado y notas por escuela — nunca pierdas una fecha de nuevo.",
     "roadmap.r5.title": "Agente de envío automático",
     "roadmap.r5.body": "Rellena y envía aplicaciones de forma autónoma. El gran objetivo.",
     "roadmap.status.soon": "Próximamente",
     "roadmap.status.later": "Más tarde",
-    "roadmap.waitlistText": "Los usuarios de la lista de espera obtienen {discount}% de descuento en el producto completo ({price_full}) cuando salgan. Cada referido suma {refDiscount}% más — puede llegar a 100% gratis.",
+    "roadmap.waitlistText":
+      "Los usuarios de la lista de espera obtienen {discount}% de descuento en el producto completo ({price_full}) cuando salgan. Cada referido suma {refDiscount}% más — puede llegar a 100% gratis.",
     "roadmap.cta": "Unirse a la lista de espera →",
 
     "final.heading": "Tu lista de universidades te espera.",
@@ -210,7 +238,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "AI 驱动的大学匹配",
     "hero.titleA": "找到那些",
     "hero.titleB": "想要你这样学生的大学。",
-    "hero.subtitle": "回答几个问题。几分钟内获得一份与你的成绩、目标和奖学金需求相匹配的个性化大学清单。",
+    "hero.subtitle":
+      "回答几个问题。几分钟内获得一份与你的成绩、目标和奖学金需求相匹配的个性化大学清单。",
     "hero.cta": "找到我的大学 →",
     "hero.note": "用时 4–6 分钟 · 无需注册即可开始",
 
@@ -251,7 +280,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "免费开始 →",
     "pricing.paid.badge": "最受欢迎",
     "pricing.paid.title": "获取完整结果",
-    "pricing.paid.subtitle": "一次性付款 · 非订阅",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "私人顾问需 {anchor}+",
     "pricing.paid.f1": "包含免费版全部内容",
     "pricing.paid.f2": "完整的保底 / 目标 / 冲刺清单",
@@ -259,7 +288,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "直接申请链接",
     "pricing.paid.f5": "优先支持",
     "pricing.paid.cta": "获取完整访问 →",
-    "pricing.waitlist.text": "加入候补名单?发布时享 {discount}% 优惠 — 每邀请一位朋友再多 {refDiscount}%。附赠创始会员徽章。",
+    "pricing.waitlist.text":
+      "加入候补名单?发布时享 {discount}% 优惠 — 每邀请一位朋友再多 {refDiscount}%。附赠创始会员徽章。",
     "pricing.waitlist.link": "加入候补名单 →",
 
     "roadmap.eyebrow": "即将推出",
@@ -277,7 +307,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "roadmap.r5.body": "自主填写并提交申请。终极目标。",
     "roadmap.status.soon": "即将推出",
     "roadmap.status.later": "稍后",
-    "roadmap.waitlistText": "候补名单用户在完整产品({price_full})上线时享 {discount}% 优惠。每位推荐再叠加 {refDiscount}% — 最多可达 100% 免费。",
+    "roadmap.waitlistText":
+      "候补名单用户在完整产品({price_full})上线时享 {discount}% 优惠。每位推荐再叠加 {refDiscount}% — 最多可达 100% 免费。",
     "roadmap.cta": "加入候补名单 →",
 
     "final.heading": "你的大学清单已就绪。",
@@ -306,27 +337,34 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "AI-संचालित यूनिवर्सिटी मिलान",
     "hero.titleA": "ऐसी यूनिवर्सिटीज़ खोजें जो",
     "hero.titleB": "आप जैसे छात्र को चाहती हैं।",
-    "hero.subtitle": "कुछ सवालों के जवाब दें। कुछ ही मिनटों में आपके अंकों, लक्ष्यों और स्कॉलरशिप ज़रूरतों से मेल खाती यूनिवर्सिटीज़ की व्यक्तिगत सूची पाएं।",
+    "hero.subtitle":
+      "कुछ सवालों के जवाब दें। कुछ ही मिनटों में आपके अंकों, लक्ष्यों और स्कॉलरशिप ज़रूरतों से मेल खाती यूनिवर्सिटीज़ की व्यक्तिगत सूची पाएं।",
     "hero.cta": "मेरी यूनिवर्सिटीज़ खोजें →",
     "hero.note": "4–6 मिनट · शुरू करने के लिए खाता ज़रूरी नहीं",
 
     "problem.heading": "यूनिवर्सिटी आवेदन प्रक्रिया आपके लिए नहीं बनी थी।",
     "problem.p1.title": "स्पष्ट शुरुआत नहीं",
-    "problem.p1.body": "हज़ारों यूनिवर्सिटीज़, लेकिन कोई मार्गदर्शन नहीं कि कौन सी आपके प्रोफ़ाइल से मेल खाती है।",
+    "problem.p1.body":
+      "हज़ारों यूनिवर्सिटीज़, लेकिन कोई मार्गदर्शन नहीं कि कौन सी आपके प्रोफ़ाइल से मेल खाती है।",
     "problem.p2.title": "काउंसलर बहुत महंगे",
-    "problem.p2.body": "प्राइवेट कॉलेज काउंसलर $1,500–$5,000+ लेते हैं। अच्छी सलाह केवल अमीरों की नहीं होनी चाहिए।",
+    "problem.p2.body":
+      "प्राइवेट कॉलेज काउंसलर $1,500–$5,000+ लेते हैं। अच्छी सलाह केवल अमीरों की नहीं होनी चाहिए।",
     "problem.p3.title": "समय-सीमाएँ अचानक आ जाती हैं",
-    "problem.p3.body": "जब तक छात्र सही स्कूल ढूंढते हैं, आवेदन की खिड़कियाँ अक्सर बंद हो चुकी होती हैं।",
-    "problem.quote": "QuestCampus वह बड़ा भाई/बहन है जिसने यह सब झेला है — और एक नक्शा बनाया ताकि आपको अकेले न जूझना पड़े।",
+    "problem.p3.body":
+      "जब तक छात्र सही स्कूल ढूंढते हैं, आवेदन की खिड़कियाँ अक्सर बंद हो चुकी होती हैं।",
+    "problem.quote":
+      "QuestCampus वह बड़ा भाई/बहन है जिसने यह सब झेला है — और एक नक्शा बनाया ताकि आपको अकेले न जूझना पड़े।",
 
     "howit.eyebrow": "यह कैसे काम करता है",
     "howit.heading": "4 मिनट में उलझन से आत्मविश्वास तक।",
     "howit.s1.title": "एक आसान प्रश्नावली भरें",
     "howit.s1.body": "7 अध्याय, 22 प्रश्न — फॉर्म नहीं, बातचीत जैसा। 4–6 मिनट लगते हैं।",
     "howit.s2.title": "हमारी AI आपकी सबसे अच्छी मिलान ढूंढती है",
-    "howit.s2.body": "हम आपके अंक, लक्ष्य, स्कॉलरशिप और स्थान वरीयताओं को दुनिया भर की हज़ारों यूनिवर्सिटीज़ से मिलाते हैं।",
+    "howit.s2.body":
+      "हम आपके अंक, लक्ष्य, स्कॉलरशिप और स्थान वरीयताओं को दुनिया भर की हज़ारों यूनिवर्सिटीज़ से मिलाते हैं।",
     "howit.s3.title": "एक क्रमबद्ध, कार्ययोग्य सूची पाएं",
-    "howit.s3.body": "यूनिवर्सिटीज़ पहले स्कॉलरशिप मेल से, फिर फिट से क्रमित। हर एक के साथ साफ़ भाषा में कारण।",
+    "howit.s3.body":
+      "यूनिवर्सिटीज़ पहले स्कॉलरशिप मेल से, फिर फिट से क्रमित। हर एक के साथ साफ़ भाषा में कारण।",
     "howit.teaser.progress": "अध्याय 3 / 7 — आपके सपने और महत्वाकांक्षाएँ",
     "howit.teaser.matching": "आपकी सबसे अच्छी मिलान खोज रहे हैं…",
     "howit.teaser.match": "{percent}% मिलान",
@@ -347,7 +385,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "मुफ़्त शुरू करें →",
     "pricing.paid.badge": "सबसे लोकप्रिय",
     "pricing.paid.title": "पूरी तस्वीर पाएं",
-    "pricing.paid.subtitle": "एक बार का भुगतान · सब्सक्रिप्शन नहीं",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "प्राइवेट काउंसलर के साथ {anchor}+",
     "pricing.paid.f1": "मुफ़्त की सभी सुविधाएँ",
     "pricing.paid.f2": "पूर्ण सेफ्टी / टार्गेट / रीच सूची",
@@ -355,25 +393,29 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "सीधे आवेदन लिंक",
     "pricing.paid.f5": "प्राथमिकता सहायता",
     "pricing.paid.cta": "पूर्ण पहुँच पाएं →",
-    "pricing.waitlist.text": "वेटलिस्ट से जुड़ रहे हैं? लॉन्च पर {discount}% की छूट — और हर दोस्त के रेफ़रल पर अतिरिक्त {refDiscount}%. फ़ाउंडिंग मेंबर बैज शामिल।",
+    "pricing.waitlist.text":
+      "वेटलिस्ट से जुड़ रहे हैं? लॉन्च पर {discount}% की छूट — और हर दोस्त के रेफ़रल पर अतिरिक्त {refDiscount}%. फ़ाउंडिंग मेंबर बैज शामिल।",
     "pricing.waitlist.link": "वेटलिस्ट में शामिल हों →",
 
     "roadmap.eyebrow": "जल्द आ रहा है",
     "roadmap.heading": "यह तो बस शुरुआत है।",
-    "roadmap.subtitle": "QuestCampus हर वो टूल बना रहा है जो छात्र को चाहिए — पहली खोज से अंतिम आवेदन तक।",
+    "roadmap.subtitle":
+      "QuestCampus हर वो टूल बना रहा है जो छात्र को चाहिए — पहली खोज से अंतिम आवेदन तक।",
     "roadmap.r1.title": "निबंध लेखन सहायक",
     "roadmap.r1.body": "हर यूनिवर्सिटी के प्रश्नों के अनुरूप AI-निर्देशित व्यक्तिगत और पूरक निबंध।",
     "roadmap.r2.title": "एक्स्ट्राकरिकुलर प्रबंधक",
     "roadmap.r2.body": "अपनी गतिविधियों को रणनीतिक रूप से ट्रैक, व्यवस्थित और प्रस्तुत करें।",
     "roadmap.r3.title": "दस्तावेज़ सहायक",
-    "roadmap.r3.body": "ट्रांसक्रिप्ट, अनुशंसा पत्रों और पोर्टफोलियो के लिए चेकलिस्ट, टेम्पलेट और AI समीक्षा।",
+    "roadmap.r3.body":
+      "ट्रांसक्रिप्ट, अनुशंसा पत्रों और पोर्टफोलियो के लिए चेकलिस्ट, टेम्पलेट और AI समीक्षा।",
     "roadmap.r4.title": "आवेदन ट्रैकर",
     "roadmap.r4.body": "हर स्कूल की समय-सीमा, स्थिति और नोट्स — कोई खिड़की न छूटे।",
     "roadmap.r5.title": "ऑटो-अप्लाई एजेंट",
     "roadmap.r5.body": "स्वायत्त रूप से आवेदन भरें और भेजें। अंतिम लक्ष्य।",
     "roadmap.status.soon": "जल्द आ रहा है",
     "roadmap.status.later": "बाद में",
-    "roadmap.waitlistText": "वेटलिस्ट उपयोगकर्ताओं को पूर्ण उत्पाद ({price_full}) पर {discount}% की छूट मिलती है। हर रेफ़रल {refDiscount}% और जोड़ता है — 100% मुफ़्त तक पहुँच सकता है।",
+    "roadmap.waitlistText":
+      "वेटलिस्ट उपयोगकर्ताओं को पूर्ण उत्पाद ({price_full}) पर {discount}% की छूट मिलती है। हर रेफ़रल {refDiscount}% और जोड़ता है — 100% मुफ़्त तक पहुँच सकता है।",
     "roadmap.cta": "वेटलिस्ट में शामिल हों →",
 
     "final.heading": "आपकी यूनिवर्सिटी सूची आपका इंतज़ार कर रही है।",
@@ -402,7 +444,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "مطابقة جامعية مدعومة بالذكاء الاصطناعي",
     "hero.titleA": "اعثر على جامعات",
     "hero.titleB": "تريد شخصًا مثلك.",
-    "hero.subtitle": "أجب عن بعض الأسئلة. واحصل في دقائق على قائمة شخصية بالجامعات التي تتناسب مع درجاتك وأهدافك واحتياجاتك من المنح.",
+    "hero.subtitle":
+      "أجب عن بعض الأسئلة. واحصل في دقائق على قائمة شخصية بالجامعات التي تتناسب مع درجاتك وأهدافك واحتياجاتك من المنح.",
     "hero.cta": "اعثر على جامعاتي ←",
     "hero.note": "تستغرق 4–6 دقائق · لا حاجة لحساب للبدء",
 
@@ -410,7 +453,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "problem.p1.title": "لا نقطة بداية واضحة",
     "problem.p1.body": "آلاف الجامعات بلا أي توجيه حول أيها يناسب ملفك وأهدافك فعلًا.",
     "problem.p2.title": "المستشارون يكلّفون الآلاف",
-    "problem.p2.body": "المستشارون الخاصون يتقاضون 1500–5000 دولار+. النصيحة الجيدة لا يجب أن تكون حكرًا على الأثرياء.",
+    "problem.p2.body":
+      "المستشارون الخاصون يتقاضون 1500–5000 دولار+. النصيحة الجيدة لا يجب أن تكون حكرًا على الأثرياء.",
     "problem.p3.title": "المواعيد النهائية تباغتك",
     "problem.p3.body": "حين يجد معظم الطلاب الجامعات المناسبة، تكون نوافذ التقديم قد فاتت بالفعل.",
     "problem.quote": "QuestCampus هو الأخ الأكبر الذي خاض التجربة — ورسم خارطة كي لا تبحر وحدك.",
@@ -422,7 +466,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "howit.s2.title": "ذكاؤنا الاصطناعي يجد أفضل التطابقات",
     "howit.s2.body": "نطابق درجاتك وأهدافك ومنحك وتفضيلاتك الجغرافية مع آلاف الجامعات حول العالم.",
     "howit.s3.title": "احصل على قائمة مرتبة وقابلة للتنفيذ",
-    "howit.s3.body": "الجامعات مرتبة أولًا حسب تطابق المنح ثم حسب الملاءمة، مع شرح واضح لسبب الاختيار.",
+    "howit.s3.body":
+      "الجامعات مرتبة أولًا حسب تطابق المنح ثم حسب الملاءمة، مع شرح واضح لسبب الاختيار.",
     "howit.teaser.progress": "الفصل 3 من 7 — أحلامك وطموحاتك",
     "howit.teaser.matching": "نبحث عن أفضل التطابقات…",
     "howit.teaser.match": "تطابق {percent}%",
@@ -443,7 +488,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "ابدأ مجانًا ←",
     "pricing.paid.badge": "الأكثر شيوعًا",
     "pricing.paid.title": "احصل على الصورة الكاملة",
-    "pricing.paid.subtitle": "دفعة واحدة · ليست اشتراكًا",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ مع مستشار خاص",
     "pricing.paid.f1": "كل ما في الباقة المجانية",
     "pricing.paid.f2": "قائمة كاملة آمن / هدف / طموح",
@@ -451,7 +496,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "روابط تقديم مباشرة",
     "pricing.paid.f5": "دعم أولوية",
     "pricing.paid.cta": "احصل على الوصول الكامل ←",
-    "pricing.waitlist.text": "تنضم لقائمة الانتظار؟ احصل على {discount}% خصمًا عند الإطلاق — وخصم إضافي {refDiscount}% عن كل صديق تدعوه. شارة العضو المؤسس مشمولة.",
+    "pricing.waitlist.text":
+      "تنضم لقائمة الانتظار؟ احصل على {discount}% خصمًا عند الإطلاق — وخصم إضافي {refDiscount}% عن كل صديق تدعوه. شارة العضو المؤسس مشمولة.",
     "pricing.waitlist.link": "انضم لقائمة الانتظار ←",
 
     "roadmap.eyebrow": "قريبًا",
@@ -469,7 +515,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "roadmap.r5.body": "يملأ ويرسل الطلبات نيابةً عنك. الهدف النهائي.",
     "roadmap.status.soon": "قريبًا",
     "roadmap.status.later": "لاحقًا",
-    "roadmap.waitlistText": "مستخدمو قائمة الانتظار يحصلون على {discount}% خصمًا على المنتج الكامل ({price_full}) عند إطلاقه. كل دعوة تضيف {refDiscount}% — يمكن أن يصل إلى مجاني 100%.",
+    "roadmap.waitlistText":
+      "مستخدمو قائمة الانتظار يحصلون على {discount}% خصمًا على المنتج الكامل ({price_full}) عند إطلاقه. كل دعوة تضيف {refDiscount}% — يمكن أن يصل إلى مجاني 100%.",
     "roadmap.cta": "انضم لقائمة الانتظار ←",
 
     "final.heading": "قائمة جامعاتك بانتظارك.",
@@ -498,27 +545,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "Combinação universitária com IA",
     "hero.titleA": "Encontre universidades que",
     "hero.titleB": "querem alguém como você.",
-    "hero.subtitle": "Responda algumas perguntas. Receba em minutos uma lista personalizada de universidades que combinam com suas notas, metas e necessidades de bolsa.",
+    "hero.subtitle":
+      "Responda algumas perguntas. Receba em minutos uma lista personalizada de universidades que combinam com suas notas, metas e necessidades de bolsa.",
     "hero.cta": "Encontrar minhas universidades →",
     "hero.note": "Leva 4–6 minutos · Não precisa de conta para começar",
 
     "problem.heading": "O processo de candidatura universitária não foi pensado para você.",
     "problem.p1.title": "Sem ponto de partida claro",
-    "problem.p1.body": "Milhares de universidades, zero orientação sobre quais realmente combinam com seu perfil e metas.",
+    "problem.p1.body":
+      "Milhares de universidades, zero orientação sobre quais realmente combinam com seu perfil e metas.",
     "problem.p2.title": "Consultores custam milhares",
-    "problem.p2.body": "Consultores privados cobram $1.500–$5.000+. Isso não deveria definir quem recebe bons conselhos.",
+    "problem.p2.body":
+      "Consultores privados cobram $1.500–$5.000+. Isso não deveria definir quem recebe bons conselhos.",
     "problem.p3.title": "Os prazos chegam rápido",
-    "problem.p3.body": "Quando a maioria dos alunos encontra as escolas certas, os prazos já passaram.",
-    "problem.quote": "O QuestCampus é o irmão mais velho que já passou por isso — e construiu um mapa para você não se perder sozinho.",
+    "problem.p3.body":
+      "Quando a maioria dos alunos encontra as escolas certas, os prazos já passaram.",
+    "problem.quote":
+      "O QuestCampus é o irmão mais velho que já passou por isso — e construiu um mapa para você não se perder sozinho.",
 
     "howit.eyebrow": "Como funciona",
     "howit.heading": "Da dúvida à confiança em 4 minutos.",
     "howit.s1.title": "Responda um questionário amigável",
-    "howit.s1.body": "7 capítulos, 22 perguntas — pensado como uma conversa, não um formulário. 4–6 minutos.",
+    "howit.s1.body":
+      "7 capítulos, 22 perguntas — pensado como uma conversa, não um formulário. 4–6 minutos.",
     "howit.s2.title": "Nossa IA encontra suas melhores combinações",
-    "howit.s2.body": "Comparamos suas notas, metas, bolsas e preferências de localização com milhares de universidades pelo mundo.",
+    "howit.s2.body":
+      "Comparamos suas notas, metas, bolsas e preferências de localização com milhares de universidades pelo mundo.",
     "howit.s3.title": "Receba uma lista classificada e prática",
-    "howit.s3.body": "Universidades ordenadas primeiro pela bolsa, depois pelo encaixe. Cada uma com uma explicação clara.",
+    "howit.s3.body":
+      "Universidades ordenadas primeiro pela bolsa, depois pelo encaixe. Cada uma com uma explicação clara.",
     "howit.teaser.progress": "Capítulo 3 de 7 — Seus sonhos e ambições",
     "howit.teaser.matching": "Buscando suas melhores combinações…",
     "howit.teaser.match": "{percent}% de combinação",
@@ -539,7 +594,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Começar grátis →",
     "pricing.paid.badge": "Mais popular",
     "pricing.paid.title": "Veja o quadro completo",
-    "pricing.paid.subtitle": "pagamento único · não é assinatura",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ com um consultor privado",
     "pricing.paid.f1": "Tudo do plano Grátis",
     "pricing.paid.f2": "Lista completa de seguras / alvos / aspiracionais",
@@ -547,14 +602,17 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Links diretos de candidatura",
     "pricing.paid.f5": "Suporte prioritário",
     "pricing.paid.cta": "Obter acesso completo →",
-    "pricing.waitlist.text": "Entrando na lista de espera? Ganhe {discount}% de desconto no lançamento — mais {refDiscount}% por cada amigo indicado. Selo de Membro Fundador incluso.",
+    "pricing.waitlist.text":
+      "Entrando na lista de espera? Ganhe {discount}% de desconto no lançamento — mais {refDiscount}% por cada amigo indicado. Selo de Membro Fundador incluso.",
     "pricing.waitlist.link": "Entrar na lista de espera →",
 
     "roadmap.eyebrow": "Em breve",
     "roadmap.heading": "Isto é só o começo.",
-    "roadmap.subtitle": "O QuestCampus está construindo toda ferramenta que um aluno precisa — da primeira busca à entrega final.",
+    "roadmap.subtitle":
+      "O QuestCampus está construindo toda ferramenta que um aluno precisa — da primeira busca à entrega final.",
     "roadmap.r1.title": "Assistente de redação",
-    "roadmap.r1.body": "Carta de motivação e ensaios suplementares guiados por IA para cada universidade.",
+    "roadmap.r1.body":
+      "Carta de motivação e ensaios suplementares guiados por IA para cada universidade.",
     "roadmap.r2.title": "Gestor de atividades extracurriculares",
     "roadmap.r2.body": "Rastreie e apresente suas atividades de forma estratégica.",
     "roadmap.r3.title": "Assistente de documentos",
@@ -565,7 +623,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "roadmap.r5.body": "Preenche e envia suas candidaturas sozinho. O objetivo final.",
     "roadmap.status.soon": "Em breve",
     "roadmap.status.later": "Depois",
-    "roadmap.waitlistText": "Usuários da lista ganham {discount}% de desconto no produto completo ({price_full}) no lançamento. Cada indicação soma {refDiscount}% — pode chegar a 100% grátis.",
+    "roadmap.waitlistText":
+      "Usuários da lista ganham {discount}% de desconto no produto completo ({price_full}) no lançamento. Cada indicação soma {refDiscount}% — pode chegar a 100% grátis.",
     "roadmap.cta": "Entrar na lista de espera →",
 
     "final.heading": "Sua lista de universidades está esperando.",
@@ -594,27 +653,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "Подбор университетов с ИИ",
     "hero.titleA": "Найди университеты,",
     "hero.titleB": "которым нужен именно ты.",
-    "hero.subtitle": "Ответь на несколько вопросов. За пару минут получи персональный список университетов, подходящих под твои оценки, цели и потребности в стипендии.",
+    "hero.subtitle":
+      "Ответь на несколько вопросов. За пару минут получи персональный список университетов, подходящих под твои оценки, цели и потребности в стипендии.",
     "hero.cta": "Найти мои университеты →",
     "hero.note": "4–6 минут · Аккаунт для старта не нужен",
 
     "problem.heading": "Процесс поступления в университет был придуман не для тебя.",
     "problem.p1.title": "Нет понятной точки старта",
-    "problem.p1.body": "Тысячи университетов и ноль подсказок, какие действительно подходят твоему профилю и целям.",
+    "problem.p1.body":
+      "Тысячи университетов и ноль подсказок, какие действительно подходят твоему профилю и целям.",
     "problem.p2.title": "Консультанты стоят тысячи",
-    "problem.p2.body": "Частные консультанты берут $1 500–$5 000+. Хороший совет не должен зависеть от кошелька.",
+    "problem.p2.body":
+      "Частные консультанты берут $1 500–$5 000+. Хороший совет не должен зависеть от кошелька.",
     "problem.p3.title": "Дедлайны подкрадываются незаметно",
-    "problem.p3.body": "Пока большинство находят подходящие вузы, окна подачи документов уже закрываются.",
-    "problem.quote": "QuestCampus — это старший брат, который уже всё это прошёл и нарисовал карту, чтобы ты не блуждал в одиночку.",
+    "problem.p3.body":
+      "Пока большинство находят подходящие вузы, окна подачи документов уже закрываются.",
+    "problem.quote":
+      "QuestCampus — это старший брат, который уже всё это прошёл и нарисовал карту, чтобы ты не блуждал в одиночку.",
 
     "howit.eyebrow": "Как это работает",
     "howit.heading": "От растерянности к уверенности за 4 минуты.",
     "howit.s1.title": "Ответь на дружелюбную анкету",
-    "howit.s1.body": "7 глав, 22 вопроса — это похоже на разговор, а не на форму. Займёт 4–6 минут.",
+    "howit.s1.body":
+      "7 глав, 22 вопроса — это похоже на разговор, а не на форму. Займёт 4–6 минут.",
     "howit.s2.title": "Наш ИИ находит лучшие совпадения",
-    "howit.s2.body": "Мы сопоставляем твои оценки, цели, стипендии и предпочтения по странам с тысячами вузов по всему миру.",
+    "howit.s2.body":
+      "Мы сопоставляем твои оценки, цели, стипендии и предпочтения по странам с тысячами вузов по всему миру.",
     "howit.s3.title": "Получи ранжированный, понятный список",
-    "howit.s3.body": "Университеты сначала по совпадению со стипендией, затем по подходящести. К каждому — объяснение простым языком.",
+    "howit.s3.body":
+      "Университеты сначала по совпадению со стипендией, затем по подходящести. К каждому — объяснение простым языком.",
     "howit.teaser.progress": "Глава 3 из 7 — Твои мечты и амбиции",
     "howit.teaser.matching": "Ищем лучшие совпадения…",
     "howit.teaser.match": "{percent}% совпадение",
@@ -635,7 +702,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Начать бесплатно →",
     "pricing.paid.badge": "Самый популярный",
     "pricing.paid.title": "Полный список",
-    "pricing.paid.subtitle": "разовая оплата · не подписка",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ у частного консультанта",
     "pricing.paid.f1": "Всё из бесплатного плана",
     "pricing.paid.f2": "Полный список: safety / target / reach",
@@ -643,14 +710,17 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Прямые ссылки на подачу",
     "pricing.paid.f5": "Приоритетная поддержка",
     "pricing.paid.cta": "Получить полный доступ →",
-    "pricing.waitlist.text": "Записываешься в лист ожидания? Получи {discount}% скидки на запуске — плюс ещё {refDiscount}% за каждого приглашённого друга. Бейдж основателя в подарок.",
+    "pricing.waitlist.text":
+      "Записываешься в лист ожидания? Получи {discount}% скидки на запуске — плюс ещё {refDiscount}% за каждого приглашённого друга. Бейдж основателя в подарок.",
     "pricing.waitlist.link": "Записаться в лист ожидания →",
 
     "roadmap.eyebrow": "Скоро",
     "roadmap.heading": "Это только начало.",
-    "roadmap.subtitle": "QuestCampus строит каждый инструмент, нужный студенту — от первого поиска до финальной подачи.",
+    "roadmap.subtitle":
+      "QuestCampus строит каждый инструмент, нужный студенту — от первого поиска до финальной подачи.",
     "roadmap.r1.title": "Помощник по эссе",
-    "roadmap.r1.body": "AI-сопровождение для личного заявления и дополнительных эссе под каждый вуз.",
+    "roadmap.r1.body":
+      "AI-сопровождение для личного заявления и дополнительных эссе под каждый вуз.",
     "roadmap.r2.title": "Менеджер внеучебной активности",
     "roadmap.r2.body": "Веди и подавай свои активности стратегически, чтобы усилить заявку.",
     "roadmap.r3.title": "Помощник по документам",
@@ -661,7 +731,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "roadmap.r5.body": "Заполняет и отправляет заявки сам. Конечная цель.",
     "roadmap.status.soon": "Скоро",
     "roadmap.status.later": "Позже",
-    "roadmap.waitlistText": "Пользователи листа ожидания получают {discount}% скидки на полный продукт ({price_full}) на запуске. Каждый реферал добавляет ещё {refDiscount}% — может дойти до 100% бесплатно.",
+    "roadmap.waitlistText":
+      "Пользователи листа ожидания получают {discount}% скидки на полный продукт ({price_full}) на запуске. Каждый реферал добавляет ещё {refDiscount}% — может дойти до 100% бесплатно.",
     "roadmap.cta": "Записаться в лист ожидания →",
 
     "final.heading": "Твой список университетов уже ждёт.",
@@ -690,27 +761,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "Mise en relation universitaire par IA",
     "hero.titleA": "Trouve des universités qui",
     "hero.titleB": "veulent quelqu'un comme toi.",
-    "hero.subtitle": "Réponds à quelques questions. Obtiens en quelques minutes une liste personnalisée d'universités correspondant à tes notes, objectifs et besoins de bourse.",
+    "hero.subtitle":
+      "Réponds à quelques questions. Obtiens en quelques minutes une liste personnalisée d'universités correspondant à tes notes, objectifs et besoins de bourse.",
     "hero.cta": "Trouver mes universités →",
     "hero.note": "4–6 minutes · Aucun compte requis pour commencer",
 
     "problem.heading": "Le processus d'admission universitaire n'a pas été conçu pour toi.",
     "problem.p1.title": "Pas de point de départ clair",
-    "problem.p1.body": "Des milliers d'universités, zéro indication sur celles qui correspondent vraiment à ton profil et tes objectifs.",
+    "problem.p1.body":
+      "Des milliers d'universités, zéro indication sur celles qui correspondent vraiment à ton profil et tes objectifs.",
     "problem.p2.title": "Les conseillers coûtent des milliers",
-    "problem.p2.body": "Les conseillers privés facturent 1 500–5 000 $+. Ça ne devrait pas décider qui reçoit de bons conseils.",
+    "problem.p2.body":
+      "Les conseillers privés facturent 1 500–5 000 $+. Ça ne devrait pas décider qui reçoit de bons conseils.",
     "problem.p3.title": "Les délais arrivent vite",
-    "problem.p3.body": "Le temps que la plupart trouvent les bonnes écoles, les fenêtres de candidature sont déjà fermées.",
-    "problem.quote": "QuestCampus est le grand frère qui est passé par là — et qui a dessiné une carte pour que tu ne sois plus seul.",
+    "problem.p3.body":
+      "Le temps que la plupart trouvent les bonnes écoles, les fenêtres de candidature sont déjà fermées.",
+    "problem.quote":
+      "QuestCampus est le grand frère qui est passé par là — et qui a dessiné une carte pour que tu ne sois plus seul.",
 
     "howit.eyebrow": "Comment ça marche",
     "howit.heading": "De la confusion à la confiance en 4 minutes.",
     "howit.s1.title": "Réponds à un questionnaire convivial",
-    "howit.s1.body": "7 chapitres, 22 questions — pensé comme une conversation, pas un formulaire. 4–6 minutes.",
+    "howit.s1.body":
+      "7 chapitres, 22 questions — pensé comme une conversation, pas un formulaire. 4–6 minutes.",
     "howit.s2.title": "Notre IA trouve tes meilleures correspondances",
-    "howit.s2.body": "Nous comparons tes notes, objectifs, bourses et préférences géographiques avec des milliers d'universités.",
+    "howit.s2.body":
+      "Nous comparons tes notes, objectifs, bourses et préférences géographiques avec des milliers d'universités.",
     "howit.s3.title": "Reçois une liste classée et exploitable",
-    "howit.s3.body": "Universités triées d'abord par bourse, puis par adéquation. Chacune avec une explication en clair.",
+    "howit.s3.body":
+      "Universités triées d'abord par bourse, puis par adéquation. Chacune avec une explication en clair.",
     "howit.teaser.progress": "Chapitre 3 sur 7 — Tes rêves et ambitions",
     "howit.teaser.matching": "Recherche de tes meilleures correspondances…",
     "howit.teaser.match": "{percent}% correspondance",
@@ -731,7 +810,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Commencer gratuitement →",
     "pricing.paid.badge": "Le plus populaire",
     "pricing.paid.title": "Obtiens la liste complète",
-    "pricing.paid.subtitle": "paiement unique · pas un abonnement",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ avec un conseiller privé",
     "pricing.paid.f1": "Tout du plan Gratuit",
     "pricing.paid.f2": "Liste complète safety / target / reach",
@@ -739,16 +818,20 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Liens de candidature directs",
     "pricing.paid.f5": "Support prioritaire",
     "pricing.paid.cta": "Obtenir l'accès complet →",
-    "pricing.waitlist.text": "Tu rejoins la liste d'attente ? Obtiens {discount}% au lancement — plus {refDiscount}% par ami parrainé. Badge Membre Fondateur inclus.",
+    "pricing.waitlist.text":
+      "Tu rejoins la liste d'attente ? Obtiens {discount}% au lancement — plus {refDiscount}% par ami parrainé. Badge Membre Fondateur inclus.",
     "pricing.waitlist.link": "Rejoindre la liste d'attente →",
 
     "roadmap.eyebrow": "Bientôt",
     "roadmap.heading": "Ce n'est que le début.",
-    "roadmap.subtitle": "QuestCampus construit chaque outil dont un étudiant a besoin — de la première recherche à l'envoi final.",
+    "roadmap.subtitle":
+      "QuestCampus construit chaque outil dont un étudiant a besoin — de la première recherche à l'envoi final.",
     "roadmap.r1.title": "Assistant de rédaction d'essais",
-    "roadmap.r1.body": "Lettre de motivation et essais supplémentaires guidés par IA pour chaque université.",
+    "roadmap.r1.body":
+      "Lettre de motivation et essais supplémentaires guidés par IA pour chaque université.",
     "roadmap.r2.title": "Gestion des activités extrascolaires",
-    "roadmap.r2.body": "Suis et présente tes activités de façon stratégique pour renforcer ta candidature.",
+    "roadmap.r2.body":
+      "Suis et présente tes activités de façon stratégique pour renforcer ta candidature.",
     "roadmap.r3.title": "Assistant de documents",
     "roadmap.r3.body": "Checklists, modèles et relecture IA pour relevés, lettres et portfolios.",
     "roadmap.r4.title": "Suivi des candidatures",
@@ -757,7 +840,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "roadmap.r5.body": "Remplit et soumet tes candidatures tout seul. L'objectif ultime.",
     "roadmap.status.soon": "Bientôt",
     "roadmap.status.later": "Plus tard",
-    "roadmap.waitlistText": "Les inscrits à la liste obtiennent {discount}% sur le produit complet ({price_full}) au lancement. Chaque parrainage ajoute {refDiscount}% — peut atteindre 100% gratuit.",
+    "roadmap.waitlistText":
+      "Les inscrits à la liste obtiennent {discount}% sur le produit complet ({price_full}) au lancement. Chaque parrainage ajoute {refDiscount}% — peut atteindre 100% gratuit.",
     "roadmap.cta": "Rejoindre la liste d'attente →",
 
     "final.heading": "Ta liste d'universités t'attend.",
@@ -786,27 +870,35 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "KI-gestütztes Uni-Matching",
     "hero.titleA": "Finde Universitäten, die",
     "hero.titleB": "jemanden wie dich wollen.",
-    "hero.subtitle": "Beantworte ein paar Fragen. Erhalte in Minuten eine persönliche Liste von Universitäten, die zu deinen Noten, Zielen und Stipendienbedürfnissen passen.",
+    "hero.subtitle":
+      "Beantworte ein paar Fragen. Erhalte in Minuten eine persönliche Liste von Universitäten, die zu deinen Noten, Zielen und Stipendienbedürfnissen passen.",
     "hero.cta": "Meine Universitäten finden →",
     "hero.note": "4–6 Minuten · Kein Konto zum Start nötig",
 
     "problem.heading": "Der Uni-Bewerbungsprozess wurde nicht für dich gemacht.",
     "problem.p1.title": "Kein klarer Startpunkt",
-    "problem.p1.body": "Tausende Universitäten, null Orientierung, welche wirklich zu dir und deinen Zielen passen.",
+    "problem.p1.body":
+      "Tausende Universitäten, null Orientierung, welche wirklich zu dir und deinen Zielen passen.",
     "problem.p2.title": "Berater kosten Tausende",
-    "problem.p2.body": "Private Studienberater verlangen 1.500–5.000 $+. Das sollte nicht bestimmen, wer guten Rat bekommt.",
+    "problem.p2.body":
+      "Private Studienberater verlangen 1.500–5.000 $+. Das sollte nicht bestimmen, wer guten Rat bekommt.",
     "problem.p3.title": "Fristen kommen schnell",
-    "problem.p3.body": "Wenn die meisten die richtigen Unis finden, sind die Bewerbungsfenster oft schon zu.",
-    "problem.quote": "QuestCampus ist der ältere Bruder, der schon durch war — und eine Karte gezeichnet hat, damit du nicht alleine suchen musst.",
+    "problem.p3.body":
+      "Wenn die meisten die richtigen Unis finden, sind die Bewerbungsfenster oft schon zu.",
+    "problem.quote":
+      "QuestCampus ist der ältere Bruder, der schon durch war — und eine Karte gezeichnet hat, damit du nicht alleine suchen musst.",
 
     "howit.eyebrow": "So funktioniert es",
     "howit.heading": "In 4 Minuten von verwirrt zu selbstsicher.",
     "howit.s1.title": "Beantworte einen freundlichen Fragebogen",
-    "howit.s1.body": "7 Kapitel, 22 Fragen — wie ein Gespräch, nicht wie ein Formular. 4–6 Minuten.",
+    "howit.s1.body":
+      "7 Kapitel, 22 Fragen — wie ein Gespräch, nicht wie ein Formular. 4–6 Minuten.",
     "howit.s2.title": "Unsere KI findet deine besten Matches",
-    "howit.s2.body": "Wir gleichen Noten, Ziele, Stipendien und Ortspräferenzen mit tausenden Unis weltweit ab.",
+    "howit.s2.body":
+      "Wir gleichen Noten, Ziele, Stipendien und Ortspräferenzen mit tausenden Unis weltweit ab.",
     "howit.s3.title": "Erhalte eine sortierte, umsetzbare Liste",
-    "howit.s3.body": "Universitäten sortiert zuerst nach Stipendien-Match, dann nach Passung. Jede mit klarer Begründung.",
+    "howit.s3.body":
+      "Universitäten sortiert zuerst nach Stipendien-Match, dann nach Passung. Jede mit klarer Begründung.",
     "howit.teaser.progress": "Kapitel 3 von 7 — Deine Träume & Ambitionen",
     "howit.teaser.matching": "Suche deine besten Matches…",
     "howit.teaser.match": "{percent}% Match",
@@ -827,7 +919,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Kostenlos starten →",
     "pricing.paid.badge": "Am beliebtesten",
     "pricing.paid.title": "Sieh das ganze Bild",
-    "pricing.paid.subtitle": "Einmalzahlung · kein Abo",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "{anchor}+ bei einem privaten Berater",
     "pricing.paid.f1": "Alles aus Kostenlos",
     "pricing.paid.f2": "Komplette Safety- / Target- / Reach-Liste",
@@ -835,25 +927,30 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Direkte Bewerbungslinks",
     "pricing.paid.f5": "Prioritäts-Support",
     "pricing.paid.cta": "Vollzugriff freischalten →",
-    "pricing.waitlist.text": "Trittst du der Warteliste bei? Erhalte {discount}% Rabatt zum Launch — plus {refDiscount}% pro geworbenem Freund. Founding-Member-Abzeichen inklusive.",
+    "pricing.waitlist.text":
+      "Trittst du der Warteliste bei? Erhalte {discount}% Rabatt zum Launch — plus {refDiscount}% pro geworbenem Freund. Founding-Member-Abzeichen inklusive.",
     "pricing.waitlist.link": "Der Warteliste beitreten →",
 
     "roadmap.eyebrow": "Demnächst",
     "roadmap.heading": "Das ist erst der Anfang.",
-    "roadmap.subtitle": "QuestCampus baut jedes Tool, das ein Student braucht — von der ersten Suche bis zur Abgabe.",
+    "roadmap.subtitle":
+      "QuestCampus baut jedes Tool, das ein Student braucht — von der ersten Suche bis zur Abgabe.",
     "roadmap.r1.title": "Essay-Schreibassistent",
-    "roadmap.r1.body": "KI-geführtes Motivationsschreiben und Zusatzessays, abgestimmt auf jede Universität.",
+    "roadmap.r1.body":
+      "KI-geführtes Motivationsschreiben und Zusatzessays, abgestimmt auf jede Universität.",
     "roadmap.r2.title": "Extracurricular-Manager",
     "roadmap.r2.body": "Tracke und präsentiere deine Aktivitäten strategisch.",
     "roadmap.r3.title": "Dokumentenhelfer",
-    "roadmap.r3.body": "Checklisten, Vorlagen und KI-Review für Zeugnisse, Empfehlungen und Portfolios.",
+    "roadmap.r3.body":
+      "Checklisten, Vorlagen und KI-Review für Zeugnisse, Empfehlungen und Portfolios.",
     "roadmap.r4.title": "Bewerbungs-Tracker",
     "roadmap.r4.body": "Fristen, Status und Notizen pro Uni — kein Fenster verpasst.",
     "roadmap.r5.title": "Auto-Apply-Agent",
     "roadmap.r5.body": "Füllt und reicht Bewerbungen selbst ein. Das große Ziel.",
     "roadmap.status.soon": "Demnächst",
     "roadmap.status.later": "Später",
-    "roadmap.waitlistText": "Warteliste-Nutzer erhalten {discount}% Rabatt auf das Vollprodukt ({price_full}) beim Launch. Jede Empfehlung gibt weitere {refDiscount}% — bis zu 100% gratis.",
+    "roadmap.waitlistText":
+      "Warteliste-Nutzer erhalten {discount}% Rabatt auf das Vollprodukt ({price_full}) beim Launch. Jede Empfehlung gibt weitere {refDiscount}% — bis zu 100% gratis.",
     "roadmap.cta": "Der Warteliste beitreten →",
 
     "final.heading": "Deine Uni-Liste wartet.",
@@ -882,7 +979,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "hero.badge": "ЖИ көмегімен университет таңдау",
     "hero.titleA": "Саған дәл сондай",
     "hero.titleB": "студент керек университеттерді тап.",
-    "hero.subtitle": "Бірнеше сұраққа жауап бер. Бағаларыңа, мақсаттарыңа және стипендия қажеттіліктеріңе сай университеттердің жеке тізімін бірнеше минутта ал.",
+    "hero.subtitle":
+      "Бірнеше сұраққа жауап бер. Бағаларыңа, мақсаттарыңа және стипендия қажеттіліктеріңе сай университеттердің жеке тізімін бірнеше минутта ал.",
     "hero.cta": "Менің университеттерімді тап →",
     "hero.note": "4–6 минут · Бастау үшін аккаунт қажет емес",
 
@@ -890,19 +988,23 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "problem.p1.title": "Бастау нүктесі түсініксіз",
     "problem.p1.body": "Мыңдаған университет, бірақ қайсысы саған сай келетінін ешкім айтпайды.",
     "problem.p2.title": "Кеңесшілер мыңдаған долларға тұрады",
-    "problem.p2.body": "Жеке кеңесшілер $1 500–$5 000+ алады. Жақсы кеңес тек ауқатты адамдарға арналмауы керек.",
+    "problem.p2.body":
+      "Жеке кеңесшілер $1 500–$5 000+ алады. Жақсы кеңес тек ауқатты адамдарға арналмауы керек.",
     "problem.p3.title": "Мерзімдер жылдам жетеді",
     "problem.p3.body": "Көпшілік оқу орнын тапқанша, өтінім қабылдау уақыты аяқталып қалады.",
-    "problem.quote": "QuestCampus — мұның бәрін бастан өткерген үлкен ағаң іспетті, ол саған жалғыз адасып қалмауың үшін карта сызып берді.",
+    "problem.quote":
+      "QuestCampus — мұның бәрін бастан өткерген үлкен ағаң іспетті, ол саған жалғыз адасып қалмауың үшін карта сызып берді.",
 
     "howit.eyebrow": "Қалай жұмыс істейді",
     "howit.heading": "4 минутта сасқалақтан сенімдіге.",
     "howit.s1.title": "Жайлы сауалнамаға жауап бер",
     "howit.s1.body": "7 тарау, 22 сұрақ — формаға емес, әңгімеге ұқсайды. 4–6 минут алады.",
     "howit.s2.title": "ЖИ ең үздік сәйкестіктерді табады",
-    "howit.s2.body": "Біз сенің бағаларыңды, мақсаттарыңды, стипендияларды және орналасу қалауыңды әлемдегі мыңдаған университетпен салыстырамыз.",
+    "howit.s2.body":
+      "Біз сенің бағаларыңды, мақсаттарыңды, стипендияларды және орналасу қалауыңды әлемдегі мыңдаған университетпен салыстырамыз.",
     "howit.s3.title": "Реттелген, нақты тізім ал",
-    "howit.s3.body": "Университеттер алдымен стипендияға, содан кейін сәйкестікке қарай реттеледі. Әрқайсысында түсінікті түсіндірме бар.",
+    "howit.s3.body":
+      "Университеттер алдымен стипендияға, содан кейін сәйкестікке қарай реттеледі. Әрқайсысында түсінікті түсіндірме бар.",
     "howit.teaser.progress": "3-тарау / 7 — Сенің армандарың мен мақсаттарың",
     "howit.teaser.matching": "Ең үздік сәйкестіктерді іздеп жатырмыз…",
     "howit.teaser.match": "{percent}% сәйкестік",
@@ -923,7 +1025,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Тегін бастау →",
     "pricing.paid.badge": "Ең танымал",
     "pricing.paid.title": "Толық суретті ал",
-    "pricing.paid.subtitle": "бір реттік төлем · жазылым емес",
+    "pricing.paid.subtitle": "$15/month subscription",
     "pricing.paid.compare": "Жеке кеңесшіде {anchor}+",
     "pricing.paid.f1": "Тегін жоспардың бәрі",
     "pricing.paid.f2": "Толық safety / target / reach тізімі",
@@ -931,25 +1033,30 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f4": "Тікелей өтінім сілтемелері",
     "pricing.paid.f5": "Басым қолдау",
     "pricing.paid.cta": "Толық қолжетімдік алу →",
-    "pricing.waitlist.text": "Күту тізіміне жазыласың ба? Іске қосылғанда {discount}% жеңілдік — әр шақырған досқа қосымша {refDiscount}%. Founding Member белгісі қоса беріледі.",
+    "pricing.waitlist.text":
+      "Күту тізіміне жазыласың ба? Іске қосылғанда {discount}% жеңілдік — әр шақырған досқа қосымша {refDiscount}%. Founding Member белгісі қоса беріледі.",
     "pricing.waitlist.link": "Күту тізіміне қосылу →",
 
     "roadmap.eyebrow": "Жақын арада",
     "roadmap.heading": "Бұл тек бастамасы.",
-    "roadmap.subtitle": "QuestCampus студентке қажет әр құралды жасап жатыр — алғашқы іздеуден соңғы өтінімге дейін.",
+    "roadmap.subtitle":
+      "QuestCampus студентке қажет әр құралды жасап жатыр — алғашқы іздеуден соңғы өтінімге дейін.",
     "roadmap.r1.title": "Эссе жазу көмекшісі",
-    "roadmap.r1.body": "Әр университеттің сұрақтарына бейімделген ЖИ-көмекті жеке мәлімдеме мен қосымша эсселер.",
+    "roadmap.r1.body":
+      "Әр университеттің сұрақтарына бейімделген ЖИ-көмекті жеке мәлімдеме мен қосымша эсселер.",
     "roadmap.r2.title": "Қосымша іс-шара менеджері",
     "roadmap.r2.body": "Өтінішіңді күшейту үшін іс-шараларыңды стратегиялық жүргіз.",
     "roadmap.r3.title": "Құжат көмекшісі",
-    "roadmap.r3.body": "Транскрипттер, ұсыныс хаттары мен портфолио үшін чек-парақтар, үлгілер және ЖИ-тексеру.",
+    "roadmap.r3.body":
+      "Транскрипттер, ұсыныс хаттары мен портфолио үшін чек-парақтар, үлгілер және ЖИ-тексеру.",
     "roadmap.r4.title": "Өтінім трекері",
     "roadmap.r4.body": "Әр оқу орнының мерзімі, мәртебесі мен жазбалары — енді терезе өткізбейсің.",
     "roadmap.r5.title": "Авто-өтінім агенті",
     "roadmap.r5.body": "Өтінімді өзі толтырып, өзі жібереді. Соңғы мақсат.",
     "roadmap.status.soon": "Жақын арада",
     "roadmap.status.later": "Кейінірек",
-    "roadmap.waitlistText": "Күту тізіміндегілер толық өнімге ({price_full}) іске қосылғанда {discount}% жеңілдік алады. Әр шақыру қосымша {refDiscount}% қосады — 100% тегінге дейін жетуі мүмкін.",
+    "roadmap.waitlistText":
+      "Күту тізіміндегілер толық өнімге ({price_full}) іске қосылғанда {discount}% жеңілдік алады. Әр шақыру қосымша {refDiscount}% қосады — 100% тегінге дейін жетуі мүмкін.",
     "roadmap.cta": "Күту тізіміне қосылу →",
 
     "final.heading": "Сенің университет тізімің күтіп тұр.",

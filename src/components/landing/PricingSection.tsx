@@ -24,7 +24,9 @@ const PAID_KEYS = [
 
 function Check() {
   return (
-    <span aria-hidden className="mt-0.5 shrink-0 text-primary">✓</span>
+    <span aria-hidden className="mt-0.5 shrink-0 text-primary">
+      ✓
+    </span>
   );
 }
 
@@ -52,8 +54,7 @@ export function PricingSection() {
             {t("pricing.heading1", { anchor })}
           </h2>
           <p className="mt-3 text-display-lg-mobile text-primary">
-            {t("pricing.heading2")}{" "}
-            <AmberUnderline>{t("pricing.wrong")}</AmberUnderline>.
+            {t("pricing.heading2")} <AmberUnderline>{t("pricing.wrong")}</AmberUnderline>.
           </p>
         </Reveal>
 
@@ -64,9 +65,7 @@ export function PricingSection() {
               <span className="self-start rounded-full bg-surface-container-high px-3 py-1 text-label-sm font-semibold uppercase text-on-surface-variant">
                 {t("pricing.free.badge")}
               </span>
-              <h3 className="mt-4 text-headline-sm text-on-surface">
-                {t("pricing.free.title")}
-              </h3>
+              <h3 className="mt-4 text-headline-sm text-on-surface">{t("pricing.free.title")}</h3>
               <p className="mt-2 text-display-lg-mobile font-bold text-on-surface">$0</p>
               <ul className="mt-5 flex-1 space-y-3">
                 {FREE_KEYS.map((k) => (
@@ -91,13 +90,10 @@ export function PricingSection() {
               <span className="self-start rounded-full bg-secondary-container px-3 py-1 text-label-sm font-semibold uppercase text-on-secondary-container">
                 {t("pricing.paid.badge")}
               </span>
-              <h3 className="mt-4 text-headline-sm text-on-surface">
-                {t("pricing.paid.title")}
-              </h3>
+              <h3 className="mt-4 text-headline-sm text-on-surface">{t("pricing.paid.title")}</h3>
               <div className="mt-2">
-                <span className="text-display-lg font-bold text-primary">
-                  {fmtUsd(PRICE_MVP)}
-                </span>
+                <span className="text-display-lg font-bold text-primary">{fmtUsd(PRICE_MVP)}</span>
+                <span className="ml-1 text-label-md font-semibold text-primary">/month</span>
                 <p className="mt-1 text-label-sm text-on-surface-variant">
                   {t("pricing.paid.subtitle")}
                 </p>
