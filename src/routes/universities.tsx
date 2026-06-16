@@ -178,12 +178,17 @@ function UniversitiesPage() {
     [recommend, sessionId, token],
   );
 
+  // Free users load free recommendations; paid users skip free entirely.
   useEffect(() => {
-    if (sessionId) void loadFree();
-  }, [sessionId, loadFree]);
+    if (!sessionId) return;
+    if (isPaid) return;
+    void loadFree();
+  }, [sessionId, isPaid, loadFree]);
 
+  // Paid users load cached paid matches (no force — backend serves from cache).
   useEffect(() => {
-    if (isPaid && !paid && paidStatus !== "loading") void loadPaid(true);
+    if (!isPaid || paid || paidStatus === "loading") return;
+    void loadPaid();
   }, [isPaid, paid, paidStatus, loadPaid]);
 
   // Dismissed matches (per user/session)
