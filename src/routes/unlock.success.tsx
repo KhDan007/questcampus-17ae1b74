@@ -35,7 +35,7 @@ function UnlockSuccessPage() {
   const { isAdmin } = useAuth();
   const entitlement = useQuery(
     api.payments.entitlement,
-    token ? { token, _retry: retryTick } : "skip",
+    token ? { token } : "skip",
   ) as { paid: boolean } | undefined;
   const isPaid = isAdmin || entitlement?.paid === true;
 
