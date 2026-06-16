@@ -21,6 +21,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SaveToggle } from "@/components/universities/SaveToggle";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
+import { EnrichmentDetails } from "@/components/profile/EnrichmentDetails";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
@@ -992,11 +993,7 @@ function CompactMatchCard({
               {card.why}
             </p>
           )}
-          {bullets.length === 0 && !card.why ? (
-            <p className="text-body-sm text-on-surface-variant">
-              No additional details available yet.
-            </p>
-          ) : bullets.length > 0 ? (
+          {bullets.length > 0 && (
             <ul className="space-y-1.5 text-body-sm text-on-surface">
               {bullets.map((b) => (
                 <li key={b} className="flex min-w-0 items-start gap-2 break-words">
@@ -1008,7 +1005,8 @@ function CompactMatchCard({
                 </li>
               ))}
             </ul>
-          ) : null}
+          )}
+          <EnrichmentDetails externalId={card.externalId} website={card.website} />
         </div>
       )}
     </motion.li>
