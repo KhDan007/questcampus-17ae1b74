@@ -107,10 +107,10 @@ export function RecommendationsSection({
     void loadFree();
   }, [loadFree]);
 
-  // When entitlement flips to paid, fetch the full list (force=true to bypass cache).
+  // When entitlement flips to paid, load saved paid matches from cache (no force).
   useEffect(() => {
     if (isPaid && !paid && paidStatus !== "loading") {
-      void loadPaid(true);
+      void loadPaid();
     }
   }, [isPaid, paid, paidStatus, loadPaid]);
 
