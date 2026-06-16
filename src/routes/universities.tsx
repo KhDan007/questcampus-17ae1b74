@@ -16,7 +16,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SaveToggle } from "@/components/universities/SaveToggle";
-import { useSavedUniversities, type SavedUniversity } from "@/lib/universities/savedClient";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
