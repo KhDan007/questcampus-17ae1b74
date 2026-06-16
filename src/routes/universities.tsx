@@ -548,119 +548,112 @@ function UniversitiesPage() {
               </section>
             )}
 
-            {/* Matches */}
-            <section>
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <h2 className="font-display text-headline-md font-bold text-on-surface">
-                    {isPaid ? (
-                      <>
-                        <Sparkles className="mr-1 inline h-5 w-5 text-primary" />
-                        Your matches
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-1 inline h-5 w-5 text-primary" />
-                        Your matches (free preview)
-                      </>
+            {/* Matches tab */}
+            {tab === "matches" && (
+              <section>
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <h2 className="font-display text-headline-md font-bold text-on-surface">
+                      <Sparkles className="mr-1 inline h-5 w-5 text-primary" />
+                      {isPaid ? "Your matches" : "Your matches (free preview)"}
+                    </h2>
+                    <p className="mt-1 text-body-md text-on-surface-variant">
+                      {matchesLoading
+                        ? "Loading your matches…"
+                        : isPaid
+                          ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
+                          : "Top picks across Safety, Target, and Reach — unlock the full list."}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hiddenCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={restoreAll}
+                        className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Restore hidden ({hiddenCount})
+                      </button>
                     )}
-                  </h2>
-                  <p className="mt-1 text-body-md text-on-surface-variant">
-                    {matchesLoading
-                      ? isPaid
-                        ? "Loading saved matches…"
-                        : "Loading your matches…"
-                      : isPaid
-                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
-                        : "Top 3 preview — unlock the full list."}
-                  </p>
+                    {(freeStatus === "ready" || paidStatus === "ready") && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isPaid) void loadPaid(true);
+                          else void loadFree(true);
+                        }}
+                        className="text-label-md text-on-surface-variant hover:text-primary"
+                        title={isPaid && paidStatus === "loading" ? "Refreshing matches…" : "Refresh"}
+                      >
+                        {isPaid && paidStatus === "loading" ? "Refreshing…" : "Refresh"}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {hiddenCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={restoreAll}
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                      Restore hidden ({hiddenCount})
-                    </button>
-                  )}
-                  {(freeStatus === "ready" || paidStatus === "ready") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (isPaid) void loadPaid(true);
-                        else void loadFree(true);
-                      }}
-                      className="text-label-md text-on-surface-variant hover:text-primary"
-                      title={isPaid && paidStatus === "loading" ? "Refreshing matches…" : "Refresh"}
-                    >
-                      {isPaid && paidStatus === "loading" ? "Refreshing…" : "Refresh"}
-                    </button>
-                  )}
-                </div>
-              </div>
 
-              {matchesLoading ? (
-                <MatchesSkeleton />
-              ) : visibleMatches.length === 0 && matchesToRender.length === 0 ? (
-                <EmptyHint>
-                  Complete the onboarding quiz on the homepage to generate AI matches.
-                </EmptyHint>
-              ) : visibleMatches.length === 0 ? (
-                <EmptyHint>
-                  You hid all current matches. Use "Restore hidden" to bring them back.
-                </EmptyHint>
-              ) : isPaid && visibleBuckets ? (
-                <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                  <MatchColumn
-                    title="Safety"
-                    subtitle="Likely admits"
-                    tone="safety"
-                    items={visibleBuckets.safety}
-                    reduce={!!reduce}
-                    onDismiss={(k) => dismissMatch(k)}
-                  />
-                  <MatchColumn
-                    title="Target"
-                    subtitle="Strong fit"
-                    tone="target"
-                    items={visibleBuckets.target}
-                    reduce={!!reduce}
-                    onDismiss={(k) => dismissMatch(k)}
-                  />
-                  <MatchColumn
-                    title="Reach"
-                    subtitle="Ambitious picks"
-                    tone="reach"
-                    items={visibleBuckets.reach}
-                    reduce={!!reduce}
-                    onDismiss={(k) => dismissMatch(k)}
-                  />
-                </div>
-              ) : (
-                <div className="mt-6 grid gap-5">
-                  {visibleMatches.map((card, i) => (
-                    <UniversityCard
-                      key={universityKey(card)}
-                      card={card}
-                      index={i}
+                {matchesLoading ? (
+                  <MatchesSkeleton />
+                ) : visibleMatches.length === 0 && matchesToRender.length === 0 ? (
+                  <EmptyHint>
+                    Complete the onboarding quiz on the homepage to generate AI matches.
+                  </EmptyHint>
+                ) : visibleMatches.length === 0 ? (
+                  <EmptyHint>
+                    You hid all current matches. Use "Restore hidden" to bring them back.
+                  </EmptyHint>
+                ) : visibleBuckets ? (
+                  <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                    <MatchColumn
+                      title="Safety"
+                      subtitle="Likely admits"
+                      tone="safety"
+                      items={visibleBuckets.safety}
                       reduce={!!reduce}
-                      onDismiss={() => dismissMatch(universityKey(card))}
+                      onDismiss={(k) => dismissMatch(k)}
                     />
-                  ))}
-                </div>
-              )}
+                    <MatchColumn
+                      title="Target"
+                      subtitle="Strong fit"
+                      tone="target"
+                      items={visibleBuckets.target}
+                      reduce={!!reduce}
+                      onDismiss={(k) => dismissMatch(k)}
+                    />
+                    <MatchColumn
+                      title="Reach"
+                      subtitle="Ambitious picks"
+                      tone="reach"
+                      items={visibleBuckets.reach}
+                      reduce={!!reduce}
+                      onDismiss={(k) => dismissMatch(k)}
+                    />
+                  </div>
+                ) : (
+                  <div className="mt-6 grid gap-5">
+                    {visibleMatches.map((card, i) => (
+                      <UniversityCard
+                        key={universityKey(card)}
+                        card={card}
+                        index={i}
+                        reduce={!!reduce}
+                        onDismiss={() => dismissMatch(universityKey(card))}
+                      />
+                    ))}
+                  </div>
+                )}
 
-              {/* Paywall for free users */}
-              {!isPaid && !matchesLoading && (
-                <Paywall token={token ?? undefined} paidStatus={paidStatus} />
-              )}
-            </section>
+                {/* Paywall for free users */}
+                {!isPaid && !matchesLoading && (
+                  <Paywall token={token ?? undefined} paidStatus={paidStatus} />
+                )}
+              </section>
+            )}
 
-            {/* Saved universities panel */}
-            <SavedPanel saved={saved} onRemove={removeById} />
+            {/* Saved tab */}
+            {tab === "saved" && (
+              <SavedTab saved={saved} onRemove={removeById} reduce={!!reduce} />
+            )}
           </div>
         </div>
 
