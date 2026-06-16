@@ -59,7 +59,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.free.cta": "Start for free →",
     "pricing.paid.badge": "Most popular",
     "pricing.paid.title": "Get the full picture",
-    "pricing.paid.subtitle": "$15/month · no subscription",
+    "pricing.paid.subtitle": "$15/month · cancel anytime",
     "pricing.paid.compare": "{anchor}+ with a private counselor",
     "pricing.paid.f1": "Everything in Free",
     "pricing.paid.f2": "Full safety / target / reach list",

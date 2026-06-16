@@ -141,7 +141,7 @@ export const UI_EN: Record<string, string> = {
 
   // Unlock
   "unlock.title": "Unlock your full match list",
-  "unlock.subtitle": "${price} one-time unlock. Cancel anytime. Full list unlocked — every match sorted into safety, target, and reach.",
+  "unlock.subtitle": "${price}/month subscription. Cancel anytime. Full list unlocked — every match sorted into safety, target, and reach.",
   "unlock.perk1": "Every safety school where you're a likely admit",
   "unlock.perk2": "Target schools matched to your grades and goals",
   "unlock.perk3": "Reach schools worth aiming for — with the why",
