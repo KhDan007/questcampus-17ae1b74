@@ -965,3 +965,136 @@ function RecommendationSaveIcon({ source, externalId }: { source: string; extern
     />
   );
 }
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options?: string[];
+}) {
+  return (
+    <label className="block">
+      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-2 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
+      >
+        <option value="">Any</option>
+        {(options ?? []).map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function FilterNumber({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder?: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        {label}
+      </span>
+      <input
+        type="number"
+        inputMode="numeric"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
+      />
+    </label>
+  );
+}
+
+function SavedPanel({
+  saved,
+  onRemove,
+}: {
+  saved: ReturnType<typeof useSavedUniversities>["saved"];
+  onRemove: (id: string) => Promise<void> | void;
+}) {
+  return (
+    <section id="saved-panel" className="mt-12 scroll-mt-24">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            Saved universities
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            {saved?.length ?? 0} saved · stays here as you research.
+          </p>
+        </div>
+      </div>
+      {saved === undefined ? (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm">
+          <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
+          <span className="text-body-sm text-on-surface-variant">Loading your saved list…</span>
+        </div>
+      ) : saved.length === 0 ? (
+        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+          <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
+          <p className="mt-3 text-body-md text-on-surface-variant">
+            Search for universities you already know, or save schools from your matches.
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {saved.map((u) => {
+            const location = [u.city, u.state, u.country].filter(Boolean).join(", ");
+            return (
+              <li
+                key={u.id}
+                className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-3 qc-hard-shadow-sm"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
+                  <GraduationCap className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                    {u.name}
+                  </p>
+                  {location && (
+                    <p className="mt-0.5 truncate text-label-sm text-on-surface-variant">
+                      {location}
+                    </p>
+                  )}
+                  <p className="mt-1 truncate text-label-sm uppercase tracking-wider text-on-surface-variant">
+                    Added from {u.origin}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Remove from saved"
+                  onClick={() => void onRemove(u.id)}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
