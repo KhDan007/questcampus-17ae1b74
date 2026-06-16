@@ -407,10 +407,12 @@ function UniversitiesPage() {
                   </h2>
                   <p className="mt-1 text-body-md text-on-surface-variant">
                     {matchesLoading
-                      ? "Loading your matches…"
+                      ? isPaid
+                        ? "Loading saved matches…"
+                        : "Loading your matches…"
                       : isPaid
-                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"} unlocked${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
-                        : "Top 3 teaser — unlock the full list for the complete ranking."}
+                        ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
+                        : "Top 3 preview — unlock the full list."}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -428,12 +430,13 @@ function UniversitiesPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        void loadFree(true);
                         if (isPaid) void loadPaid(true);
+                        else void loadFree(true);
                       }}
                       className="text-label-md text-on-surface-variant hover:text-primary"
+                      title={isPaid && paidStatus === "loading" ? "Refreshing matches…" : "Refresh"}
                     >
-                      Refresh
+                      {isPaid && paidStatus === "loading" ? "Refreshing…" : "Refresh"}
                     </button>
                   )}
                 </div>
@@ -449,6 +452,33 @@ function UniversitiesPage() {
                 <EmptyHint>
                   You hid all current matches. Use "Restore hidden" to bring them back.
                 </EmptyHint>
+              ) : isPaid && visibleBuckets ? (
+                <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                  <MatchColumn
+                    title="Safety"
+                    subtitle="Likely admits"
+                    tone="safety"
+                    items={visibleBuckets.safety}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                  <MatchColumn
+                    title="Target"
+                    subtitle="Strong fit"
+                    tone="target"
+                    items={visibleBuckets.target}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                  <MatchColumn
+                    title="Reach"
+                    subtitle="Ambitious picks"
+                    tone="reach"
+                    items={visibleBuckets.reach}
+                    reduce={!!reduce}
+                    onDismiss={(k) => dismissMatch(k)}
+                  />
+                </div>
               ) : (
                 <div className="mt-6 grid gap-5">
                   {visibleMatches.map((card, i) => (
