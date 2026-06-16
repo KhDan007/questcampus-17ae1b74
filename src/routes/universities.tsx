@@ -317,10 +317,12 @@ function UniversitiesPage() {
               Universities
             </p>
             <h1 className="mt-2 font-display text-display-md text-on-surface">
-              Your matches, search, and saved list
+              Universities
             </h1>
             <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
-              Browse your AI matches and add schools you already know — all in one workspace.
+              {isPaid
+                ? `${matchesToRender.length} matches. Search and save schools.`
+                : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md text-on-surface qc-hard-shadow-sm">
