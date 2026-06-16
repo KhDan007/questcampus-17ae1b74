@@ -153,7 +153,7 @@ function UnlockPage() {
                       ${PRICE_MVP}
                     </span>
                     <span className="pb-2 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                      per month
+                      one-time
                     </span>
                   </>
                 )}
