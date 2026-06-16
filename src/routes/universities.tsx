@@ -350,6 +350,17 @@ function UniversitiesPage() {
     return grouped;
   }, [isPaid, paid]);
 
+  const freeBuckets = useMemo(() => {
+    if (isPaid || !free?.results?.length) return null;
+    const grouped = { safety: [] as RecCard[], target: [] as RecCard[], reach: [] as RecCard[] };
+    for (const r of free.results) grouped[r.bucket]?.push(r);
+    return {
+      safety: grouped.safety.slice(0, 1),
+      target: grouped.target.slice(0, 1),
+      reach: grouped.reach.slice(0, 1),
+    };
+  }, [isPaid, free]);
+
   const rawMatches: RecCard[] = useMemo(() => {
     if (isPaid && paid) {
       if (paid.results?.length) return paid.results;
@@ -365,17 +376,20 @@ function UniversitiesPage() {
   const hiddenCount = matchesToRender.length - visibleMatches.length;
 
   const visibleBuckets = useMemo(() => {
-    if (!paidBuckets) return null;
+    const src = paidBuckets ?? freeBuckets;
+    if (!src) return null;
     const filter = (list: RecCard[]) => list.filter((m) => !dismissed.has(universityKey(m)));
     return {
-      safety: filter(paidBuckets.safety ?? []),
-      target: filter(paidBuckets.target ?? []),
-      reach: filter(paidBuckets.reach ?? []),
+      safety: filter(src.safety ?? []),
+      target: filter(src.target ?? []),
+      reach: filter(src.reach ?? []),
     };
-  }, [paidBuckets, dismissed]);
+  }, [paidBuckets, freeBuckets, dismissed]);
 
   const { saved, removeById } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
+
+  const [tab, setTab] = useState<"matches" | "saved">("matches");
 
   const matchesLoading =
     (!isPaid && freeStatus === "loading") || (isPaid && paidStatus === "loading" && !paid);
