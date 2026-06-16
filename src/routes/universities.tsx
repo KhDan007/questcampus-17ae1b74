@@ -21,6 +21,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SaveToggle } from "@/components/universities/SaveToggle";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
+import { EnrichmentDetails } from "@/components/profile/EnrichmentDetails";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
