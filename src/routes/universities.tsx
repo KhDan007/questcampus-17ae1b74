@@ -12,7 +12,7 @@ import {
   Lock,
   Undo2,
   RotateCcw,
-  Trash2,
+  
   Loader2,
   X,
 } from "lucide-react";
