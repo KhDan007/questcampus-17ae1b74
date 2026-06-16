@@ -32,7 +32,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "$15/month subscriptions your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
+          "$15 one-time unlock for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
       },
     ],
   }),
