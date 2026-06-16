@@ -369,6 +369,7 @@ function ProfilePage() {
           </p>
         )}
       </main>
+      </DashboardShell>
 
       <WaitlistPopup
         open={waitlistOpen}
