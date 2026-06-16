@@ -451,41 +451,6 @@ function ActionCard({
   );
 }
 
-function SavedMatchCard({ match, delay = 0 }: { match: SavedMatch; delay?: number }) {
-  const style = BUCKET_STYLES[match.bucket] ?? BUCKET_STYLES.Target;
-  const Icon = style.icon;
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay }}
-      whileHover={{ y: -3 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow transition-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)]"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`inline-flex items-center gap-1 rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-bold ${style.chip}`}
-        >
-          <Icon className="h-3.5 w-3.5" />
-          {match.bucket}
-        </span>
-        <div className="flex items-baseline gap-0.5">
-          <span className="font-display text-headline-md font-bold text-primary">
-            {match.match}
-          </span>
-          <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/80">
-            %
-          </span>
-        </div>
-      </div>
-      <h3 className="mt-3 font-display text-headline-sm font-bold text-on-surface">{match.name}</h3>
-      <p className="mt-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-        {match.location}
-      </p>
-      <p className="mt-3 flex-1 text-body-md text-on-surface/80">{match.why}</p>
-    </motion.article>
-  );
-}
 
 function UpcomingTile({
   Icon,
