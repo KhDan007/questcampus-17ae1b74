@@ -11,7 +11,6 @@ import {
   UserCircle2,
   Compass,
   Bookmark,
-  
 } from "lucide-react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -19,6 +18,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
@@ -133,6 +133,7 @@ function ProfilePage() {
   return (
     <>
       <LivingBackground />
+      <DashboardShell>
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
