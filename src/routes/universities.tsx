@@ -117,24 +117,88 @@ function UniversitiesPage() {
   const [query, setQuery] = useState(initial.q);
   const [country, setCountry] = useState(initial.country);
   const [region, setRegion] = useState(initial.region);
+  const [source, setSource] = useState(initial.source);
+  const [sizeBucket, setSizeBucket] = useState(initial.sizeBucket);
+  const [field, setField] = useState(initial.field);
+  const [language, setLanguage] = useState(initial.language);
+  const [maxGlobalRank, setMaxGlobalRank] = useState(initial.maxGlobalRank);
+  const [maxAcceptanceRate, setMaxAcceptanceRate] = useState(initial.maxAcceptanceRate);
+  const [maxTuition, setMaxTuition] = useState(initial.maxTuition);
   const debouncedQuery = useDebounced(query.trim(), 250);
   const canSearch = debouncedQuery.length >= 2;
 
   useEffect(() => {
-    void navigate({ search: { q: query, country, region }, replace: true });
-  }, [query, country, region, navigate]);
+    void navigate({
+      search: {
+        q: query,
+        country,
+        region,
+        source,
+        sizeBucket,
+        field,
+        language,
+        maxGlobalRank,
+        maxAcceptanceRate,
+        maxTuition,
+      },
+      replace: true,
+    });
+  }, [
+    query,
+    country,
+    region,
+    source,
+    sizeBucket,
+    field,
+    language,
+    maxGlobalRank,
+    maxAcceptanceRate,
+    maxTuition,
+    navigate,
+  ]);
 
-  const results = useQuery(
-    api.universitySearch.search,
-    canSearch
-      ? {
-          query: debouncedQuery,
-          country: country || undefined,
-          region: region || undefined,
-          limit: 10,
-        }
-      : "skip",
-  ) as UniversitySearchResult[] | undefined;
+  const filterOptions = useQuery(api.universitySearch.filterOptions, {}) as
+    | FilterOptions
+    | undefined;
+
+  const numOrUndef = (s: string): number | undefined => {
+    const n = Number(s);
+    return s !== "" && Number.isFinite(n) && n > 0 ? n : undefined;
+  };
+
+  const searchArgs = canSearch
+    ? {
+        query: debouncedQuery,
+        country: country || undefined,
+        region: region || undefined,
+        source: source || undefined,
+        sizeBucket: sizeBucket || undefined,
+        field: field || undefined,
+        language: language || undefined,
+        maxGlobalRank: numOrUndef(maxGlobalRank),
+        maxAcceptanceRate: numOrUndef(maxAcceptanceRate),
+        maxTuition: numOrUndef(maxTuition),
+        limit: 15,
+      }
+    : "skip";
+
+  const results = useQuery(api.universitySearch.search, searchArgs) as
+    | UniversitySearchResult[]
+    | undefined;
+
+  const clearFilters = () => {
+    setCountry("");
+    setRegion("");
+    setSource("");
+    setSizeBucket("");
+    setField("");
+    setLanguage("");
+    setMaxGlobalRank("");
+    setMaxAcceptanceRate("");
+    setMaxTuition("");
+  };
+  const hasActiveFilters =
+    !!(country || region || source || sizeBucket || field || language || maxGlobalRank || maxAcceptanceRate || maxTuition);
 
   // Matches
   const recommend = useAction(api.rag.recommend.recommend);
