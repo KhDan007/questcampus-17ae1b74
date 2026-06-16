@@ -372,7 +372,7 @@ function UniversitiesPage() {
     };
   }, [paidBuckets, dismissed]);
 
-  const { saved } = useSavedUniversities();
+  const { saved, removeById } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
 
   const matchesLoading =
