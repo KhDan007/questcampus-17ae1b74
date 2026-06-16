@@ -1206,9 +1206,9 @@ function errorMessage(e: EssayError["error"]): string {
     case "not_logged_in":
       return "Your session expired. Please sign in again.";
     case "no_profile":
-      return `Generating a personal statement is a paid feature ($${PRICE_MVP}/month subscription). Unlock and your essay generates instantly from your answers - no quiz required.`;
+      return `Generating a personal statement is a paid feature ($${PRICE_MVP} one-time unlock). Unlock and your essay generates instantly from your answers - no quiz required.`;
     case "trial_used":
-      return `You've used your free generation. Unlock for $${PRICE_MVP} to generate again. Cancel anytime.`;
+      return `You've used your free generation. Unlock for $${PRICE_MVP} (one-time) to generate again.`;
     case "generation_failed":
       return "The model hiccuped. Try generating again.";
   }
