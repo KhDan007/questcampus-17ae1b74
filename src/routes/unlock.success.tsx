@@ -1,10 +1,10 @@
 "use client";
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useQuery, useAction } from "convex/react";
-import { ArrowRight, PartyPopper, Loader2 } from "lucide-react";
+import { useQuery, useAction, useConvex } from "convex/react";
+import { ArrowRight, PartyPopper, Loader2, RefreshCw } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
