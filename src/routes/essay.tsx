@@ -498,7 +498,7 @@ function EssayPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
             Grounded in what you actually told us — never invented. The opening is
-            free. Unlock the full essay for ${PRICE_MVP}/month (cancel anytime, also unlocks all
+            free. Unlock the full essay for ${PRICE_MVP} one-time (also unlocks all
             your university matches).
           </p>
         </motion.div>
