@@ -391,7 +391,7 @@ function DashboardPage() {
                     </h2>
                     <p className="mt-1.5 max-w-2xl text-body-md text-on-surface/80">
                       Grounded in what you told us — zero invented facts. First
-                      generation is free; a $15/month subscription reveals the full
+                      generation is free; a $15 one-time unlock reveals the full
                       essay plus your full match list.
                     </p>
                   </div>
