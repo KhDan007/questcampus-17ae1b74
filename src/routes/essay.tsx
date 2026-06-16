@@ -2100,7 +2100,7 @@ function FreeTrialScoreBanner({
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
             />
             <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              Also unlocks every university match. Monthly subscription. Cancel anytime.
+              Also unlocks every university match. One payment. Full list unlocked.
             </span>
           </div>
         </div>
