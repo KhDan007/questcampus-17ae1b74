@@ -20,7 +20,7 @@ import { auth } from "@/lib/auth/client";
 import { useAuth } from "@/lib/auth/useAuth";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { TiltCard } from "@/components/payments/TiltCard";
-import { InviteFriendsPanel } from "@/components/referrals/InviteFriendsPanel";
+
 import { SIGNIN_PATH } from "@/lib/routes";
 import { PRICE_MVP } from "@/lib/config";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -49,16 +49,8 @@ function UnlockPage() {
     | undefined;
   const alreadyPaid = isAdmin || entitlement?.paid === true;
 
-  const referral = useQuery(api.referrals.summary, token ? { token } : "skip") as
-    | { discountPercent: number; maxPercent: number; perReferralPercent: number }
-    | null
-    | undefined;
-  const discountPct = Math.min(referral?.discountPercent ?? 0, referral?.maxPercent ?? 50);
-  const discountedPrice = discountPct > 0 ? (PRICE_MVP * (100 - discountPct)) / 100 : null;
-  const formattedDiscounted =
-    discountedPrice !== null
-      ? `$${discountedPrice.toFixed(discountedPrice % 1 === 0 ? 0 : 2)}`
-      : null;
+  const discountPct = 0;
+  const formattedDiscounted: string | null = null;
 
   const perks = [
     { Icon: LifeBuoy, text: t("unlock.perk1") },
@@ -269,17 +261,8 @@ function UnlockPage() {
             </div>
           </motion.div>
 
-          {/* Referral panel */}
-          {token && !alreadyPaid && (
-            <motion.div
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-10"
-            >
-              <InviteFriendsPanel token={token} variant="inline" />
-            </motion.div>
-          )}
+
+
 
           <div className="mt-12 text-center">
             <Link
