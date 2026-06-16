@@ -835,7 +835,7 @@ function MatchColumn({
   tone: "safety" | "target" | "reach";
   items: RecCard[];
   reduce: boolean;
-  onDismiss: (key: string) => void;
+  onDismiss?: (key: string) => void;
 }) {
   return (
     <div className="flex min-w-0 flex-col rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
@@ -862,7 +862,7 @@ function MatchColumn({
               card={card}
               index={i}
               reduce={reduce}
-              onDismiss={() => onDismiss(universityKey(card))}
+              onDismiss={onDismiss ? () => onDismiss(universityKey(card)) : undefined}
             />
           ))}
         </ul>
@@ -887,7 +887,7 @@ function CompactMatchCard({
   card: RecCard;
   index: number;
   reduce: boolean;
-  onDismiss: () => void;
+  onDismiss?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const location = [card.city, card.country].filter(Boolean).join(", ");
@@ -923,7 +923,7 @@ function CompactMatchCard({
             {card.name}
           </p>
           {location && <p className="truncate text-label-sm text-on-surface-variant">{location}</p>}
-          {card.why && (
+          {card.why && !open && (
             <p className="mt-1.5 line-clamp-2 break-words text-body-sm text-on-surface">
               {card.why}
             </p>
@@ -955,21 +955,29 @@ function CompactMatchCard({
             Visit ↗
           </a>
         )}
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="ml-auto rounded-md px-2 py-1 text-label-sm text-on-surface-variant hover:bg-error-container hover:text-on-error-container"
-        >
-          Hide
-        </button>
+        {onDismiss && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="ml-auto rounded-md px-2 py-1 text-label-sm text-on-surface-variant hover:bg-error-container hover:text-on-error-container"
+          >
+            Hide
+          </button>
+        )}
       </div>
       {open && (
-        <div className="mt-3 border-t border-on-surface/10 pt-3">
-          {bullets.length === 0 ? (
+        <div className="mt-3 space-y-3 border-t border-on-surface/10 pt-3">
+          {card.why && (
+            <p className="break-words text-body-sm leading-relaxed text-on-surface">
+              <span className="mr-1.5" aria-hidden>✨</span>
+              {card.why}
+            </p>
+          )}
+          {bullets.length === 0 && !card.why ? (
             <p className="text-body-sm text-on-surface-variant">
               No additional details available yet.
             </p>
-          ) : (
+          ) : bullets.length > 0 ? (
             <ul className="space-y-1.5 text-body-sm text-on-surface">
               {bullets.map((b) => (
                 <li key={b} className="flex min-w-0 items-start gap-2 break-words">
@@ -981,7 +989,7 @@ function CompactMatchCard({
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </div>
       )}
     </motion.li>
