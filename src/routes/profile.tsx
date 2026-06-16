@@ -51,13 +51,58 @@ const BUCKET_LABEL: Record<NonNullable<RecRow["bucket"]>, { label: string; chip:
 
 function ProfilePage() {
   const reduce = useReducedMotion();
-  const { user, isAuthenticated } = useAuth();
-  const [saved, setSaved] = useState<SavedPayload | null>(null);
+  const { user, isAuthenticated, isAdmin, token } = useAuth();
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [recs, setRecs] = useState<RecRow[] | null>(null);
+  const [recStatus, setRecStatus] = useState<"idle" | "loading" | "ready" | "error" | "locked">(
+    "idle",
+  );
 
   useEffect(() => {
-    setSaved(loadSaved());
+    setSessionId(getSessionId());
   }, []);
+
+  const recommend = useAction(api.rag.recommend.recommend);
+  const loadRecs = useCallback(async () => {
+    if (!sessionId) return;
+    setRecStatus("loading");
+    try {
+      // Try paid first if signed in; fall back to free.
+      if (token) {
+        const paid = (await recommend({ sessionId, token, plan: "paid", force: false })) as
+          | PaidPayload
+          | { error: string; results: never[] };
+        if (!("error" in paid)) {
+          const all = paid.buckets
+            ? [...paid.buckets.safety, ...paid.buckets.target, ...paid.buckets.reach]
+            : paid.results;
+          setRecs(all.slice(0, 20));
+          setRecStatus("ready");
+          return;
+        }
+      }
+      const free = (await recommend({
+        sessionId,
+        token: token ?? undefined,
+        plan: "free",
+        force: false,
+      })) as FreePayload | { error: string; results: never[] };
+      if ("error" in free) {
+        setRecStatus("error");
+        return;
+      }
+      setRecs(free.results.slice(0, 20));
+      setRecStatus("ready");
+    } catch {
+      setRecStatus("error");
+    }
+  }, [recommend, sessionId, token]);
+
+  useEffect(() => {
+    void loadRecs();
+  }, [loadRecs]);
+  void isAdmin;
 
   const firstName = useMemo(() => {
     const n = user?.name?.trim();
