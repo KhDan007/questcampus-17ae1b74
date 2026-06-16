@@ -757,16 +757,16 @@ function MatchColumn({
   onDismiss: (key: string) => void;
 }) {
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="font-display text-headline-sm font-bold text-on-surface">
+    <div className="flex min-w-0 flex-col rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
+        <h3 className="min-w-0 truncate font-display text-headline-sm font-bold text-on-surface">
           {title}{" "}
           <span className="font-[var(--font-label)] text-label-md font-normal text-on-surface-variant">
             {items.length}
           </span>
         </h3>
         <span
-          className={`rounded-full border px-2 py-0.5 text-label-sm font-medium ${TONE_BADGE[tone]}`}
+          className={`shrink-0 rounded-full border px-2 py-0.5 text-label-sm font-medium ${TONE_BADGE[tone]}`}
         >
           {subtitle}
         </span>
@@ -774,7 +774,7 @@ function MatchColumn({
       {items.length === 0 ? (
         <p className="mt-4 text-body-sm text-on-surface-variant">No matches in this bucket.</p>
       ) : (
-        <ul className="mt-3 grid gap-2.5">
+        <ul className="mt-3 grid min-w-0 gap-2.5">
           {items.map((card, i) => (
             <CompactMatchCard
               key={universityKey(card)}
@@ -790,6 +790,13 @@ function MatchColumn({
   );
 }
 
+function pctLabel(n?: number): string | null {
+  return n == null ? null : `${Math.round(n * 100)}%`;
+}
+function moneyLabel(n?: number): string | null {
+  return n == null ? null : `$${Math.round(n).toLocaleString()}`;
+}
+
 function CompactMatchCard({
   card,
   index,
@@ -803,19 +810,31 @@ function CompactMatchCard({
 }) {
   const [open, setOpen] = useState(false);
   const location = [card.city, card.country].filter(Boolean).join(", ");
-  const facts: string[] = [];
-  if (card.globalRank) facts.push(`#${card.globalRank}`);
-  if (card.acceptanceRate != null) facts.push(`${Math.round(card.acceptanceRate * 100)}% accept`);
-  if (card.ieltsOverall) facts.push(`IELTS ${card.ieltsOverall}`);
-  else if (card.toeflIbt) facts.push(`TOEFL ${card.toeflIbt}`);
+
+  const bullets: string[] = [];
+  if (card.acceptanceRate != null) bullets.push(`${pctLabel(card.acceptanceRate)} acceptance rate`);
+  if (card.globalRank) bullets.push(`Global rank #${card.globalRank}`);
+  if (card.satAvg) bullets.push(`SAT average ${card.satAvg}`);
+  if (card.actMidpoint) bullets.push(`ACT midpoint ${card.actMidpoint}`);
+  if (card.ieltsOverall) bullets.push(`IELTS ${card.ieltsOverall}+ required`);
+  else if (card.toeflIbt) bullets.push(`TOEFL iBT ${card.toeflIbt}+ required`);
+  if (card.intlTuition && card.intlTuitionCurrency)
+    bullets.push(`Intl tuition ~${card.intlTuition.toLocaleString()} ${card.intlTuitionCurrency}/yr`);
+  else if (card.tuitionOutState) bullets.push(`Tuition ${moneyLabel(card.tuitionOutState)}/yr`);
+  if (card.costAttendance) bullets.push(`Total cost ${moneyLabel(card.costAttendance)}/yr`);
+  if (card.sizeBucket)
+    bullets.push(`${card.sizeBucket[0].toUpperCase()}${card.sizeBucket.slice(1)} student body`);
+  if (card.languageOfInstruction?.length)
+    bullets.push(`Taught in ${card.languageOfInstruction.slice(0, 3).join(", ")}`);
+
   return (
     <motion.li
       initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: Math.min(index, 6) * 0.03 }}
-      className="rounded-lg border border-on-surface/15 bg-surface-container-lowest p-3"
+      className="min-w-0 overflow-hidden rounded-lg border border-on-surface/15 bg-surface-container-lowest p-3"
     >
-      <div className="flex items-start gap-2">
+      <div className="flex min-w-0 items-start gap-2">
         <div className="min-w-0 flex-1">
           <p className="truncate font-display text-label-lg font-bold text-on-surface">
             {card.name}
@@ -824,11 +843,8 @@ function CompactMatchCard({
             <p className="truncate text-label-sm text-on-surface-variant">{location}</p>
           )}
           {card.why && (
-            <p className="mt-1.5 line-clamp-2 text-body-sm text-on-surface">{card.why}</p>
-          )}
-          {facts.length > 0 && (
-            <p className="mt-1.5 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              {facts.join(" · ")}
+            <p className="mt-1.5 line-clamp-2 break-words text-body-sm text-on-surface">
+              {card.why}
             </p>
           )}
         </div>
@@ -836,14 +852,25 @@ function CompactMatchCard({
           <RecommendationSaveIcon source={card.source ?? "scorecard"} externalId={card.externalId} />
         </div>
       </div>
-      <div className="mt-2 flex items-center gap-1.5">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
           className="rounded-md border border-on-surface/20 px-2 py-1 text-label-sm text-on-surface hover:bg-surface-container"
         >
-          {open ? "Hide" : "Details"}
+          {open ? "Hide details" : "Details"}
         </button>
+        {card.website && (
+          <a
+            href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-md border border-on-surface/20 px-2 py-1 text-label-sm text-on-surface hover:bg-surface-container"
+          >
+            Visit ↗
+          </a>
+        )}
         <button
           type="button"
           onClick={onDismiss}
@@ -854,7 +881,20 @@ function CompactMatchCard({
       </div>
       {open && (
         <div className="mt-3 border-t border-on-surface/10 pt-3">
-          <UniversityCard card={card} index={0} reduce={reduce} />
+          {bullets.length === 0 ? (
+            <p className="text-body-sm text-on-surface-variant">
+              No additional details available yet.
+            </p>
+          ) : (
+            <ul className="space-y-1.5 text-body-sm text-on-surface">
+              {bullets.map((b) => (
+                <li key={b} className="flex min-w-0 items-start gap-2 break-words">
+                  <span aria-hidden className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span className="min-w-0 flex-1 break-words">{b}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </motion.li>
