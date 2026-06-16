@@ -12,6 +12,9 @@ import {
   Lock,
   Undo2,
   RotateCcw,
+  Trash2,
+  Loader2,
+  X,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
