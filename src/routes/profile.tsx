@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   Award,
-  GraduationCap,
   ArrowRight,
   PenLine,
   Mail,
@@ -12,58 +11,98 @@ import {
   UserCircle2,
   Compass,
   Bookmark,
+  
 } from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import { getSessionId } from "@/lib/onboarding/session";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Your profile — QuestCampus" }] }),
   component: ProfilePage,
 });
 
-type Bucket = "Safety" | "Target" | "Reach";
-type SavedMatch = {
+type RecRow = {
+  externalId: string;
   name: string;
-  location: string;
-  match: number;
-  bucket: Bucket;
-  why: string;
-  tag: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  bucket?: "safety" | "target" | "reach";
 };
-type SavedPayload = { matches: SavedMatch[]; at: number };
-
-const BUCKET_STYLES: Record<Bucket, { chip: string; icon: typeof Award }> = {
-  Safety: { chip: "bg-[#bcf0ae] text-[#073707]", icon: GraduationCap },
-  Target: { chip: "bg-[#c7d8f0] text-[#0d2240]", icon: Sparkles },
-  Reach: { chip: "bg-[#f0c7e6] text-[#3a0e2e]", icon: Award },
+type FreePayload = { plan: "free"; results: RecRow[] };
+type PaidPayload = {
+  plan: "paid";
+  buckets?: { safety: RecRow[]; target: RecRow[]; reach: RecRow[] };
+  results: RecRow[];
 };
 
-function loadSaved(): SavedPayload | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem("qc.landing.matches");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as SavedPayload;
-    if (!Array.isArray(parsed?.matches)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
+const BUCKET_LABEL: Record<NonNullable<RecRow["bucket"]>, { label: string; chip: string }> = {
+  safety: { label: "Safety", chip: "bg-[#bcf0ae] text-[#073707]" },
+  target: { label: "Target", chip: "bg-[#c7d8f0] text-[#0d2240]" },
+  reach: { label: "Reach", chip: "bg-[#f0c7e6] text-[#3a0e2e]" },
+};
 
 function ProfilePage() {
   const reduce = useReducedMotion();
-  const { user, isAuthenticated } = useAuth();
-  const [saved, setSaved] = useState<SavedPayload | null>(null);
+  const { user, isAuthenticated, isAdmin, token } = useAuth();
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [recs, setRecs] = useState<RecRow[] | null>(null);
+  const [recStatus, setRecStatus] = useState<"idle" | "loading" | "ready" | "error" | "locked">(
+    "idle",
+  );
 
   useEffect(() => {
-    setSaved(loadSaved());
+    setSessionId(getSessionId());
   }, []);
+
+  const recommend = useAction(api.rag.recommend.recommend);
+  const loadRecs = useCallback(async () => {
+    if (!sessionId) return;
+    setRecStatus("loading");
+    try {
+      // Try paid first if signed in; fall back to free.
+      if (token) {
+        const paid = (await recommend({ sessionId, token, plan: "paid", force: false })) as
+          | PaidPayload
+          | { error: string; results: never[] };
+        if (!("error" in paid)) {
+          const all = paid.buckets
+            ? [...paid.buckets.safety, ...paid.buckets.target, ...paid.buckets.reach]
+            : paid.results;
+          setRecs(all.slice(0, 20));
+          setRecStatus("ready");
+          return;
+        }
+      }
+      const free = (await recommend({
+        sessionId,
+        token: token ?? undefined,
+        plan: "free",
+        force: false,
+      })) as FreePayload | { error: string; results: never[] };
+      if ("error" in free) {
+        setRecStatus("error");
+        return;
+      }
+      setRecs(free.results.slice(0, 20));
+      setRecStatus("ready");
+    } catch {
+      setRecStatus("error");
+    }
+  }, [recommend, sessionId, token]);
+
+  useEffect(() => {
+    void loadRecs();
+  }, [loadRecs]);
+  void isAdmin;
 
   const firstName = useMemo(() => {
     const n = user?.name?.trim();
@@ -159,8 +198,8 @@ function ProfilePage() {
             {/* Quick stats */}
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               <Stat
-                label="Saved matches"
-                value={String(saved?.matches.length ?? 0)}
+                label="Your matches"
+                value={String(recs?.length ?? 0)}
                 tone="primary"
               />
               <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
@@ -188,41 +227,86 @@ function ProfilePage() {
           />
         </section>
 
-        {/* Saved matches */}
+        {/* Your matches — names-only list */}
         <section className="mt-14">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                Saved university matches
+                Your university matches
               </h2>
               <p className="mt-1 text-body-md text-on-surface-variant">
-                {saved
-                  ? `From your quiz · ${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
-                  : "Take the 60-second quiz to fill this in."}
+                {recs && recs.length > 0
+                  ? `${recs.length} matches · open the full list for details`
+                  : "Run the quiz to generate your matches."}
               </p>
             </div>
             <Link
-              to="/"
-              className="hidden shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
+              to="/universities"
+              className="hidden shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
             >
-              {saved ? "Retake quiz" : "Take quiz"}
+              See full list <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          {saved && saved.matches.length > 0 ? (
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {saved.matches.map((m, i) => (
-                <SavedMatchCard key={`${m.name}-${i}`} match={m} delay={i * 0.06} />
+          {recStatus === "loading" && (
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-11 animate-pulse rounded-lg border-2 border-on-surface/10 bg-surface/60"
+                />
               ))}
             </div>
-          ) : (
+          )}
+
+          {recStatus === "ready" && recs && recs.length > 0 && (
+            <ol className="mt-6 grid gap-2 sm:grid-cols-2">
+              {recs.map((r, i) => {
+                const loc = [r.city, r.state, r.country].filter(Boolean).join(", ");
+                const bucket = r.bucket ? BUCKET_LABEL[r.bucket] : null;
+                return (
+                  <li
+                    key={r.externalId}
+                    className="flex min-w-0 items-center gap-3 overflow-hidden rounded-lg border-2 border-on-surface bg-surface/85 px-3 py-2.5 qc-hard-shadow-sm"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 font-[var(--font-label)] text-label-sm font-bold text-primary">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-display text-label-lg font-semibold text-on-surface">
+                        {r.name}
+                      </p>
+                      {loc && (
+                        <p className="truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                          {loc}
+                        </p>
+                      )}
+                    </div>
+                    {bucket && (
+                      <span
+                        className={`shrink-0 rounded-md px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-bold ${bucket.chip}`}
+                      >
+                        {bucket.label}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+
+          {(recStatus === "error" || (recStatus === "ready" && (!recs || recs.length === 0))) && (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-              <p className="text-body-lg text-on-surface-variant">No saved matches yet.</p>
+              <p className="text-body-lg text-on-surface-variant">
+                {recStatus === "error"
+                  ? "Couldn't load your matches — try again."
+                  : "No matches yet."}
+              </p>
               <Link
-                to="/"
+                to="/universities"
                 className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
-                Start the quiz <ArrowRight className="h-4 w-4" />
+                Open universities <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           )}
@@ -367,41 +451,6 @@ function ActionCard({
   );
 }
 
-function SavedMatchCard({ match, delay = 0 }: { match: SavedMatch; delay?: number }) {
-  const style = BUCKET_STYLES[match.bucket] ?? BUCKET_STYLES.Target;
-  const Icon = style.icon;
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay }}
-      whileHover={{ y: -3 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow transition-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)]"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`inline-flex items-center gap-1 rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-bold ${style.chip}`}
-        >
-          <Icon className="h-3.5 w-3.5" />
-          {match.bucket}
-        </span>
-        <div className="flex items-baseline gap-0.5">
-          <span className="font-display text-headline-md font-bold text-primary">
-            {match.match}
-          </span>
-          <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/80">
-            %
-          </span>
-        </div>
-      </div>
-      <h3 className="mt-3 font-display text-headline-sm font-bold text-on-surface">{match.name}</h3>
-      <p className="mt-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-        {match.location}
-      </p>
-      <p className="mt-3 flex-1 text-body-md text-on-surface/80">{match.why}</p>
-    </motion.article>
-  );
-}
 
 function UpcomingTile({
   Icon,
