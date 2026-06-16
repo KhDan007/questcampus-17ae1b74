@@ -734,3 +734,152 @@ function MatchesSkeleton() {
     </div>
   );
 }
+
+const TONE_BADGE: Record<"safety" | "target" | "reach", string> = {
+  safety: "bg-tertiary-container/40 text-tertiary border-tertiary/40",
+  target: "bg-primary-fixed text-primary border-primary/40",
+  reach: "bg-secondary-container/40 text-secondary border-secondary/40",
+};
+
+function MatchColumn({
+  title,
+  subtitle,
+  tone,
+  items,
+  reduce,
+  onDismiss,
+}: {
+  title: string;
+  subtitle: string;
+  tone: "safety" | "target" | "reach";
+  items: RecCard[];
+  reduce: boolean;
+  onDismiss: (key: string) => void;
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="font-display text-headline-sm font-bold text-on-surface">
+          {title}{" "}
+          <span className="font-[var(--font-label)] text-label-md font-normal text-on-surface-variant">
+            {items.length}
+          </span>
+        </h3>
+        <span
+          className={`rounded-full border px-2 py-0.5 text-label-sm font-medium ${TONE_BADGE[tone]}`}
+        >
+          {subtitle}
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-4 text-body-sm text-on-surface-variant">No matches in this bucket.</p>
+      ) : (
+        <ul className="mt-3 grid gap-2.5">
+          {items.map((card, i) => (
+            <CompactMatchCard
+              key={universityKey(card)}
+              card={card}
+              index={i}
+              reduce={reduce}
+              onDismiss={() => onDismiss(universityKey(card))}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function CompactMatchCard({
+  card,
+  index,
+  reduce,
+  onDismiss,
+}: {
+  card: RecCard;
+  index: number;
+  reduce: boolean;
+  onDismiss: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const location = [card.city, card.country].filter(Boolean).join(", ");
+  const facts: string[] = [];
+  if (card.globalRank) facts.push(`#${card.globalRank}`);
+  if (card.acceptanceRate != null) facts.push(`${Math.round(card.acceptanceRate * 100)}% accept`);
+  if (card.ieltsOverall) facts.push(`IELTS ${card.ieltsOverall}`);
+  else if (card.toeflIbt) facts.push(`TOEFL ${card.toeflIbt}`);
+  return (
+    <motion.li
+      initial={reduce ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, delay: Math.min(index, 6) * 0.03 }}
+      className="rounded-lg border border-on-surface/15 bg-surface-container-lowest p-3"
+    >
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display text-label-lg font-bold text-on-surface">
+            {card.name}
+          </p>
+          {location && (
+            <p className="truncate text-label-sm text-on-surface-variant">{location}</p>
+          )}
+          {card.why && (
+            <p className="mt-1.5 line-clamp-2 text-body-sm text-on-surface">{card.why}</p>
+          )}
+          {facts.length > 0 && (
+            <p className="mt-1.5 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {facts.join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <RecommendationSaveIcon source={card.source ?? "scorecard"} externalId={card.externalId} />
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="rounded-md border border-on-surface/20 px-2 py-1 text-label-sm text-on-surface hover:bg-surface-container"
+        >
+          {open ? "Hide" : "Details"}
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="ml-auto rounded-md px-2 py-1 text-label-sm text-on-surface-variant hover:bg-error-container hover:text-on-error-container"
+        >
+          Hide
+        </button>
+      </div>
+      {open && (
+        <div className="mt-3 border-t border-on-surface/10 pt-3">
+          <UniversityCard card={card} index={0} reduce={reduce} />
+        </div>
+      )}
+    </motion.li>
+  );
+}
+
+function RecommendationSaveIcon({ source, externalId }: { source: string; externalId: string }) {
+  const { isSaved, isAuthenticated, requireAuth, addFromRecommendation, removeByUniversity } =
+    useSavedUniversities();
+  const saved = isSaved(source, externalId);
+  return (
+    <SaveToggle
+      variant="icon"
+      saved={saved}
+      onAdd={async () => {
+        if (!isAuthenticated) {
+          requireAuth();
+          return;
+        }
+        await addFromRecommendation(source, externalId);
+      }}
+      onRemove={async () => {
+        if (!isAuthenticated) return;
+        await removeByUniversity(source, externalId);
+      }}
+    />
+  );
+}
