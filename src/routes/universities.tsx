@@ -607,6 +607,9 @@ function UniversitiesPage() {
                 <Paywall token={token ?? undefined} paidStatus={paidStatus} />
               )}
             </section>
+
+            {/* Saved universities panel */}
+            <SavedPanel saved={saved} onRemove={removeById} />
           </div>
 
         </div>
