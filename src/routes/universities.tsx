@@ -679,9 +679,27 @@ function SearchRow({
           )}
           {result.globalRank ? <span>#{result.globalRank} global</span> : null}
           {result.acceptanceRate != null ? (
-            <span>{Math.round(result.acceptanceRate * 100)}% accept</span>
+            <span>
+              {Math.round(
+                result.acceptanceRate > 1
+                  ? result.acceptanceRate
+                  : result.acceptanceRate * 100,
+              )}
+              % accept
+            </span>
           ) : null}
           {result.sizeBucket ? <span className="capitalize">{result.sizeBucket}</span> : null}
+          {result.tuitionOutState
+            ? <span>${Math.round(result.tuitionOutState).toLocaleString()}/yr tuition</span>
+            : result.costAttendance
+              ? <span>${Math.round(result.costAttendance).toLocaleString()}/yr total</span>
+              : null}
+          {result.languageOfInstruction?.length
+            ? <span>{result.languageOfInstruction.slice(0, 2).join(", ")}</span>
+            : null}
+          {result.fields?.length
+            ? <span className="truncate">{result.fields.slice(0, 2).join(" · ")}</span>
+            : null}
         </p>
       </div>
       <SaveToggle
