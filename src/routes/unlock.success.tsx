@@ -131,7 +131,7 @@ function UnlockSuccessPage() {
   );
 }
 
-function WaitingState() {
+function WaitingState({ slow, onRetry }: { slow: boolean; onRetry: () => void }) {
   const { t } = useI18n();
   return (
     <div>
@@ -139,11 +139,22 @@ function WaitingState() {
         <Loader2 className="h-6 w-6 animate-spin" />
       </span>
       <h1 className="mt-6 font-display text-2xl font-black tracking-tight text-on-surface sm:text-3xl">
-        {t("unlockOk.waiting")}
+        {slow ? "Still finalizing payment" : t("unlockOk.waiting")}
       </h1>
       <p className="mt-3 text-body-md text-on-surface-variant">
-        {t("unlockOk.waitingBody")}
+        {slow
+          ? "This usually takes a few seconds. If it's stuck, try again."
+          : t("unlockOk.waitingBody")}
       </p>
+      {slow && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-5 inline-flex items-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <RefreshCw className="h-4 w-4" /> Retry
+        </button>
+      )}
     </div>
   );
 }
