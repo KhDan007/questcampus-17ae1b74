@@ -11,7 +11,7 @@ import {
   UserCircle2,
   Compass,
   Bookmark,
-  GraduationCap,
+  
 } from "lucide-react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
