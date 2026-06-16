@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Answer 5 questions. Get a personalized ranked list of universities — Safety, Target, Reach — with scholarships and deadlines. AI-matched in under a minute. Free to start, $15/month to unlock all 20.",
+          "Answer 5 questions. Get a personalized ranked list of universities — Safety, Target, Reach — with scholarships and deadlines. AI-matched in under a minute. Free to start, $15 one-time unlock for all 20.",
       },
       { property: "og:title", content: "QuestCampus — Find the universities that actually fit you" },
       {
