@@ -485,19 +485,15 @@ function UniversitiesPage() {
                 <h2 className="font-display text-headline-md font-bold text-on-surface">
                   Search results
                 </h2>
-                {results === undefined ? (
-                  <LoadingHint />
-                ) : results.length === 0 ? (
-                  <EmptyHint>
-                    No matching universities found. Try a shorter name.
-                  </EmptyHint>
-                ) : (
-                  <ul className="mt-4 grid gap-3">
-                    {results.map((r, i) => (
-                      <SearchRow key={r.id} result={r} index={i} reduce={!!reduce} />
-                    ))}
-                  </ul>
-                )}
+                <SilentErrorBoundary
+                  fallback={
+                    <EmptyHint>
+                      Search is temporarily unavailable. Try again in a moment.
+                    </EmptyHint>
+                  }
+                >
+                  <SearchResults args={searchArgs} reduce={!!reduce} />
+                </SilentErrorBoundary>
               </section>
             )}
 
