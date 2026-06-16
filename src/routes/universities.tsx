@@ -253,7 +253,15 @@ function UniversitiesPage() {
     setLastDismissed(null);
   }, [persistDismissed]);
 
-  // Resolve matches per plan
+  // Resolve matches per plan. For paid, prefer buckets and fall back to grouping results.
+  const paidBuckets = useMemo(() => {
+    if (!isPaid || !paid) return null;
+    if (paid.buckets) return paid.buckets;
+    const grouped = { safety: [] as RecCard[], target: [] as RecCard[], reach: [] as RecCard[] };
+    for (const r of paid.results ?? []) grouped[r.bucket]?.push(r);
+    return grouped;
+  }, [isPaid, paid]);
+
   const rawMatches: RecCard[] = useMemo(() => {
     if (isPaid && paid) {
       if (paid.results?.length) return paid.results;
@@ -268,11 +276,21 @@ function UniversitiesPage() {
   const visibleMatches = matchesToRender.filter((m) => !dismissed.has(universityKey(m)));
   const hiddenCount = matchesToRender.length - visibleMatches.length;
 
+  const visibleBuckets = useMemo(() => {
+    if (!paidBuckets) return null;
+    const filter = (list: RecCard[]) => list.filter((m) => !dismissed.has(universityKey(m)));
+    return {
+      safety: filter(paidBuckets.safety ?? []),
+      target: filter(paidBuckets.target ?? []),
+      reach: filter(paidBuckets.reach ?? []),
+    };
+  }, [paidBuckets, dismissed]);
+
   const { saved } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
 
   const matchesLoading =
-    freeStatus === "loading" || (isPaid && paidStatus === "loading" && !paid);
+    (!isPaid && freeStatus === "loading") || (isPaid && paidStatus === "loading" && !paid);
 
   return (
     <>
