@@ -441,20 +441,35 @@ function UniversitiesPage() {
               />
             </div>
           </label>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <input
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="Country (optional)"
-              className="h-11 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-md text-on-surface qc-hard-shadow-sm focus:-translate-y-0.5 focus:translate-x-0.5 focus:shadow-none focus:outline-none"
-            />
-            <input
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              placeholder="Region (optional)"
-              className="h-11 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-md text-on-surface qc-hard-shadow-sm focus:-translate-y-0.5 focus:translate-x-0.5 focus:shadow-none focus:outline-none"
-            />
+
+          {/* Filters */}
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <FilterSelect label="Country" value={country} onChange={setCountry} options={filterOptions?.countries} />
+            <FilterSelect label="Region" value={region} onChange={setRegion} options={filterOptions?.regions} />
+            <FilterSelect label="Dataset" value={source} onChange={setSource} options={filterOptions?.sources} />
+            <FilterSelect label="Size" value={sizeBucket} onChange={setSizeBucket} options={filterOptions?.sizeBuckets} />
+            <FilterSelect label="Field" value={field} onChange={setField} options={filterOptions?.fields} />
+            <FilterSelect label="Language" value={language} onChange={setLanguage} options={filterOptions?.languages} />
+            <FilterNumber label="Max global rank" placeholder="e.g. 200" value={maxGlobalRank} onChange={setMaxGlobalRank} />
+            <FilterNumber label="Max acceptance %" placeholder="e.g. 20" value={maxAcceptanceRate} onChange={setMaxAcceptanceRate} />
+            <FilterNumber label="Max tuition (USD)" placeholder="e.g. 30000" value={maxTuition} onChange={setMaxTuition} />
           </div>
+          {hasActiveFilters && (
+            <div className="mt-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-medium text-on-surface hover:bg-surface-container"
+              >
+                <X className="h-3.5 w-3.5" /> Clear filters
+              </button>
+            </div>
+          )}
+          {filterOptions && !filterOptions.complete && (
+            <p className="mt-2 text-label-sm text-on-surface-variant">
+              Showing filter options from {filterOptions.scanned.toLocaleString()} indexed schools.
+            </p>
+          )}
         </section>
 
         <div className="mt-10">
