@@ -73,7 +73,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "Monthly subscription · cancel anytime" },
+    { Icon: Sparkles, label: "One-time payment" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
