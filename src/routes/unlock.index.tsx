@@ -115,7 +115,7 @@ function UnlockPage() {
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned
               to your profile — plus polished essay drafts and every premium
-              feature we ship. Cancel anytime. Full list unlocked.
+              feature we ship. One payment. Full list unlocked.
             </p>
           </motion.div>
 
