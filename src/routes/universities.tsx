@@ -60,16 +60,6 @@ export type UniversitySearchResult = {
   languageOfInstruction?: string[];
 };
 
-type FilterOptions = {
-  countries: string[];
-  regions: string[];
-  sources: string[];
-  sizeBuckets: string[];
-  fields: string[];
-  languages: string[];
-  complete: boolean;
-  scanned: number;
-};
 
 type FreePayload = { plan: "free"; firstName?: string; results: RecCard[] };
 type PaidPayload = {
