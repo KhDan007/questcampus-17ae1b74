@@ -112,77 +112,17 @@ function UniversitiesPage() {
 
   useEffect(() => {
     void navigate({
-      search: {
-        q: query,
-        country,
-        region,
-        source,
-        sizeBucket,
-        field,
-        language,
-        maxGlobalRank,
-        maxAcceptanceRate,
-        maxTuition,
-      },
+      search: { q: query },
       replace: true,
     });
-  }, [
-    query,
-    country,
-    region,
-    source,
-    sizeBucket,
-    field,
-    language,
-    maxGlobalRank,
-    maxAcceptanceRate,
-    maxTuition,
-    navigate,
-  ]);
-
-  const numOrUndef = (s: string): number | undefined => {
-    const n = Number(s);
-    return s !== "" && Number.isFinite(n) && n > 0 ? n : undefined;
-  };
+  }, [query, navigate]);
 
   const searchArgs = canSearch
     ? {
         query: debouncedQuery,
-        country: country || undefined,
-        region: region || undefined,
-        source: source || undefined,
-        sizeBucket: sizeBucket || undefined,
-        field: field || undefined,
-        language: language || undefined,
-        maxGlobalRank: numOrUndef(maxGlobalRank),
-        maxAcceptanceRate: numOrUndef(maxAcceptanceRate),
-        maxTuition: numOrUndef(maxTuition),
         limit: 15,
       }
     : null;
-
-  const clearFilters = () => {
-    setCountry("");
-    setRegion("");
-    setSource("");
-    setSizeBucket("");
-    setField("");
-    setLanguage("");
-    setMaxGlobalRank("");
-    setMaxAcceptanceRate("");
-    setMaxTuition("");
-  };
-  const hasActiveFilters = !!(
-    country ||
-    region ||
-    source ||
-    sizeBucket ||
-    field ||
-    language ||
-    maxGlobalRank ||
-    maxAcceptanceRate ||
-    maxTuition
-  );
 
   // Matches
   const recommend = useAction(api.rag.recommend.recommend);
