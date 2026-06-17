@@ -12,9 +12,7 @@ import {
   Lock,
   Undo2,
   RotateCcw,
-  
   Loader2,
-  X,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -39,15 +37,6 @@ export const Route = createFileRoute("/universities")({
   }),
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s.q === "string" ? s.q : "",
-    country: typeof s.country === "string" ? s.country : "",
-    region: typeof s.region === "string" ? s.region : "",
-    source: typeof s.source === "string" ? s.source : "",
-    sizeBucket: typeof s.sizeBucket === "string" ? s.sizeBucket : "",
-    field: typeof s.field === "string" ? s.field : "",
-    language: typeof s.language === "string" ? s.language : "",
-    maxGlobalRank: typeof s.maxGlobalRank === "string" ? s.maxGlobalRank : "",
-    maxAcceptanceRate: typeof s.maxAcceptanceRate === "string" ? s.maxAcceptanceRate : "",
-    maxTuition: typeof s.maxTuition === "string" ? s.maxTuition : "",
   }),
   component: UniversitiesPage,
 });
@@ -71,16 +60,6 @@ export type UniversitySearchResult = {
   languageOfInstruction?: string[];
 };
 
-type FilterOptions = {
-  countries: string[];
-  regions: string[];
-  sources: string[];
-  sizeBuckets: string[];
-  fields: string[];
-  languages: string[];
-  complete: boolean;
-  scanned: number;
-};
 
 type FreePayload = { plan: "free"; firstName?: string; results: RecCard[] };
 type PaidPayload = {
@@ -118,91 +97,22 @@ function UniversitiesPage() {
 
   // Search state
   const [query, setQuery] = useState(initial.q);
-  const [country, setCountry] = useState(initial.country);
-  const [region, setRegion] = useState(initial.region);
-  const [source, setSource] = useState(initial.source);
-  const [sizeBucket, setSizeBucket] = useState(initial.sizeBucket);
-  const [field, setField] = useState(initial.field);
-  const [language, setLanguage] = useState(initial.language);
-  const [maxGlobalRank, setMaxGlobalRank] = useState(initial.maxGlobalRank);
-  const [maxAcceptanceRate, setMaxAcceptanceRate] = useState(initial.maxAcceptanceRate);
-  const [maxTuition, setMaxTuition] = useState(initial.maxTuition);
   const debouncedQuery = useDebounced(query.trim(), 250);
   const canSearch = debouncedQuery.length >= 2;
 
   useEffect(() => {
     void navigate({
-      search: {
-        q: query,
-        country,
-        region,
-        source,
-        sizeBucket,
-        field,
-        language,
-        maxGlobalRank,
-        maxAcceptanceRate,
-        maxTuition,
-      },
+      search: { q: query },
       replace: true,
     });
-  }, [
-    query,
-    country,
-    region,
-    source,
-    sizeBucket,
-    field,
-    language,
-    maxGlobalRank,
-    maxAcceptanceRate,
-    maxTuition,
-    navigate,
-  ]);
-
-  const numOrUndef = (s: string): number | undefined => {
-    const n = Number(s);
-    return s !== "" && Number.isFinite(n) && n > 0 ? n : undefined;
-  };
+  }, [query, navigate]);
 
   const searchArgs = canSearch
     ? {
         query: debouncedQuery,
-        country: country || undefined,
-        region: region || undefined,
-        source: source || undefined,
-        sizeBucket: sizeBucket || undefined,
-        field: field || undefined,
-        language: language || undefined,
-        maxGlobalRank: numOrUndef(maxGlobalRank),
-        maxAcceptanceRate: numOrUndef(maxAcceptanceRate),
-        maxTuition: numOrUndef(maxTuition),
         limit: 15,
       }
     : null;
-
-  const clearFilters = () => {
-    setCountry("");
-    setRegion("");
-    setSource("");
-    setSizeBucket("");
-    setField("");
-    setLanguage("");
-    setMaxGlobalRank("");
-    setMaxAcceptanceRate("");
-    setMaxTuition("");
-  };
-  const hasActiveFilters = !!(
-    country ||
-    region ||
-    source ||
-    sizeBucket ||
-    field ||
-    language ||
-    maxGlobalRank ||
-    maxAcceptanceRate ||
-    maxTuition
-  );
 
   // Matches
   const recommend = useAction(api.rag.recommend.recommend);
@@ -471,63 +381,6 @@ function UniversitiesPage() {
             </div>
           </label>
 
-          {/* Filters (wrapped: if backend filterOptions is unavailable, render basic selects only) */}
-          <SilentErrorBoundary
-            fallback={
-              <BasicFilters
-                country={country}
-                setCountry={setCountry}
-                region={region}
-                setRegion={setRegion}
-                source={source}
-                setSource={setSource}
-                sizeBucket={sizeBucket}
-                setSizeBucket={setSizeBucket}
-                field={field}
-                setField={setField}
-                language={language}
-                setLanguage={setLanguage}
-                maxGlobalRank={maxGlobalRank}
-                setMaxGlobalRank={setMaxGlobalRank}
-                maxAcceptanceRate={maxAcceptanceRate}
-                setMaxAcceptanceRate={setMaxAcceptanceRate}
-                maxTuition={maxTuition}
-                setMaxTuition={setMaxTuition}
-              />
-            }
-          >
-            <FiltersWithOptions
-              country={country}
-              setCountry={setCountry}
-              region={region}
-              setRegion={setRegion}
-              source={source}
-              setSource={setSource}
-              sizeBucket={sizeBucket}
-              setSizeBucket={setSizeBucket}
-              field={field}
-              setField={setField}
-              language={language}
-              setLanguage={setLanguage}
-              maxGlobalRank={maxGlobalRank}
-              setMaxGlobalRank={setMaxGlobalRank}
-              maxAcceptanceRate={maxAcceptanceRate}
-              setMaxAcceptanceRate={setMaxAcceptanceRate}
-              maxTuition={maxTuition}
-              setMaxTuition={setMaxTuition}
-            />
-          </SilentErrorBoundary>
-          {hasActiveFilters && (
-            <div className="mt-3 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-medium text-on-surface hover:bg-surface-container"
-              >
-                <X className="h-3.5 w-3.5" /> Clear filters
-              </button>
-            </div>
-          )}
         </section>
 
         <div className="mt-10">
@@ -1036,65 +889,6 @@ function RecommendationSaveIcon({ source, externalId }: { source: string; extern
   );
 }
 
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options?: string[];
-}) {
-  return (
-    <label className="block">
-      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-2 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
-      >
-        <option value="">Any</option>
-        {(options ?? []).map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function FilterNumber({
-  label,
-  placeholder,
-  value,
-  onChange,
-}: {
-  label: string;
-  placeholder?: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <label className="block">
-      <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-        {label}
-      </span>
-      <input
-        type="number"
-        inputMode="numeric"
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 h-10 w-full rounded-md border-2 border-on-surface bg-surface px-3 text-body-sm text-on-surface qc-hard-shadow-sm focus:outline-none"
-      />
-    </label>
-  );
-}
 
 function SavedTab({
   saved,
@@ -1164,103 +958,6 @@ function SavedTab({
   );
 }
 
-type FilterProps = {
-  country: string;
-  setCountry: (v: string) => void;
-  region: string;
-  setRegion: (v: string) => void;
-  source: string;
-  setSource: (v: string) => void;
-  sizeBucket: string;
-  setSizeBucket: (v: string) => void;
-  field: string;
-  setField: (v: string) => void;
-  language: string;
-  setLanguage: (v: string) => void;
-  maxGlobalRank: string;
-  setMaxGlobalRank: (v: string) => void;
-  maxAcceptanceRate: string;
-  setMaxAcceptanceRate: (v: string) => void;
-  maxTuition: string;
-  setMaxTuition: (v: string) => void;
-};
-
-function FilterGrid({ p, options }: { p: FilterProps; options?: FilterOptions }) {
-  return (
-    <>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        <FilterSelect
-          label="Country"
-          value={p.country}
-          onChange={p.setCountry}
-          options={options?.countries}
-        />
-        <FilterSelect
-          label="Region"
-          value={p.region}
-          onChange={p.setRegion}
-          options={options?.regions}
-        />
-        <FilterSelect
-          label="Dataset"
-          value={p.source}
-          onChange={p.setSource}
-          options={options?.sources}
-        />
-        <FilterSelect
-          label="Size"
-          value={p.sizeBucket}
-          onChange={p.setSizeBucket}
-          options={options?.sizeBuckets}
-        />
-        <FilterSelect
-          label="Field"
-          value={p.field}
-          onChange={p.setField}
-          options={options?.fields}
-        />
-        <FilterSelect
-          label="Language"
-          value={p.language}
-          onChange={p.setLanguage}
-          options={options?.languages}
-        />
-        <FilterNumber
-          label="Max global rank"
-          placeholder="e.g. 200"
-          value={p.maxGlobalRank}
-          onChange={p.setMaxGlobalRank}
-        />
-        <FilterNumber
-          label="Max acceptance %"
-          placeholder="e.g. 20"
-          value={p.maxAcceptanceRate}
-          onChange={p.setMaxAcceptanceRate}
-        />
-        <FilterNumber
-          label="Max tuition (USD)"
-          placeholder="e.g. 30000"
-          value={p.maxTuition}
-          onChange={p.setMaxTuition}
-        />
-      </div>
-      {options && !options.complete && (
-        <p className="mt-2 text-label-sm text-on-surface-variant">
-          Showing filter options from {options.scanned.toLocaleString()} indexed schools.
-        </p>
-      )}
-    </>
-  );
-}
-
-function BasicFilters(p: FilterProps) {
-  return <FilterGrid p={p} />;
-}
-
-function FiltersWithOptions(p: FilterProps) {
-  const options = useQuery(api.universitySearch.filterOptions, {}) as FilterOptions | undefined;
-  return <FilterGrid p={p} options={options} />;
-}
 
 function SearchResults({
   args,
@@ -1268,15 +965,6 @@ function SearchResults({
 }: {
   args: {
     query: string;
-    country?: string;
-    region?: string;
-    source?: string;
-    sizeBucket?: string;
-    field?: string;
-    language?: string;
-    maxGlobalRank?: number;
-    maxAcceptanceRate?: number;
-    maxTuition?: number;
     limit: number;
   } | null;
   reduce: boolean;
