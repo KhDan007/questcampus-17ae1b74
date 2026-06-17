@@ -965,15 +965,6 @@ function SearchResults({
 }: {
   args: {
     query: string;
-    country?: string;
-    region?: string;
-    source?: string;
-    sizeBucket?: string;
-    field?: string;
-    language?: string;
-    maxGlobalRank?: number;
-    maxAcceptanceRate?: number;
-    maxTuition?: number;
     limit: number;
   } | null;
   reduce: boolean;
