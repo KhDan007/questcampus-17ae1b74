@@ -107,15 +107,6 @@ function UniversitiesPage() {
 
   // Search state
   const [query, setQuery] = useState(initial.q);
-  const [country, setCountry] = useState(initial.country);
-  const [region, setRegion] = useState(initial.region);
-  const [source, setSource] = useState(initial.source);
-  const [sizeBucket, setSizeBucket] = useState(initial.sizeBucket);
-  const [field, setField] = useState(initial.field);
-  const [language, setLanguage] = useState(initial.language);
-  const [maxGlobalRank, setMaxGlobalRank] = useState(initial.maxGlobalRank);
-  const [maxAcceptanceRate, setMaxAcceptanceRate] = useState(initial.maxAcceptanceRate);
-  const [maxTuition, setMaxTuition] = useState(initial.maxTuition);
   const debouncedQuery = useDebounced(query.trim(), 250);
   const canSearch = debouncedQuery.length >= 2;
 
