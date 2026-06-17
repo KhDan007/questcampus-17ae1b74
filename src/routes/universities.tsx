@@ -391,63 +391,6 @@ function UniversitiesPage() {
             </div>
           </label>
 
-          {/* Filters (wrapped: if backend filterOptions is unavailable, render basic selects only) */}
-          <SilentErrorBoundary
-            fallback={
-              <BasicFilters
-                country={country}
-                setCountry={setCountry}
-                region={region}
-                setRegion={setRegion}
-                source={source}
-                setSource={setSource}
-                sizeBucket={sizeBucket}
-                setSizeBucket={setSizeBucket}
-                field={field}
-                setField={setField}
-                language={language}
-                setLanguage={setLanguage}
-                maxGlobalRank={maxGlobalRank}
-                setMaxGlobalRank={setMaxGlobalRank}
-                maxAcceptanceRate={maxAcceptanceRate}
-                setMaxAcceptanceRate={setMaxAcceptanceRate}
-                maxTuition={maxTuition}
-                setMaxTuition={setMaxTuition}
-              />
-            }
-          >
-            <FiltersWithOptions
-              country={country}
-              setCountry={setCountry}
-              region={region}
-              setRegion={setRegion}
-              source={source}
-              setSource={setSource}
-              sizeBucket={sizeBucket}
-              setSizeBucket={setSizeBucket}
-              field={field}
-              setField={setField}
-              language={language}
-              setLanguage={setLanguage}
-              maxGlobalRank={maxGlobalRank}
-              setMaxGlobalRank={setMaxGlobalRank}
-              maxAcceptanceRate={maxAcceptanceRate}
-              setMaxAcceptanceRate={setMaxAcceptanceRate}
-              maxTuition={maxTuition}
-              setMaxTuition={setMaxTuition}
-            />
-          </SilentErrorBoundary>
-          {hasActiveFilters && (
-            <div className="mt-3 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-medium text-on-surface hover:bg-surface-container"
-              >
-                <X className="h-3.5 w-3.5" /> Clear filters
-              </button>
-            </div>
-          )}
         </section>
 
         <div className="mt-10">
