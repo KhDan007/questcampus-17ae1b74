@@ -11,10 +11,11 @@ export function FooterV2() {
         </div>
 
         <nav className="flex flex-wrap items-center gap-x-7 gap-y-3 font-[var(--font-label)] text-label-md text-on-surface-variant">
-          <a href="#how" className="hover:text-on-surface">How it works</a>
-          <a href="#roadmap" className="hover:text-on-surface">Roadmap</a>
-          <a href="#waitlist" className="hover:text-on-surface">Waitlist</a>
+          <a href="/#how" className="hover:text-on-surface">How it works</a>
+          <a href="/#roadmap" className="hover:text-on-surface">Roadmap</a>
+          <a href="/#waitlist" className="hover:text-on-surface">Waitlist</a>
           <a href="/signin" className="hover:text-on-surface">Sign in</a>
+          <a href="/tos" className="hover:text-on-surface">Terms</a>
         </nav>
 
         <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
