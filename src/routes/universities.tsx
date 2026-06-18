@@ -312,12 +312,19 @@ function UniversitiesPage() {
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
       >
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              window.history.back();
+            } else {
+              window.location.href = "/";
+            }
+          }}
           className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface/70 hover:text-on-surface"
         >
-          <ArrowLeft className="h-4 w-4" /> Back home
-        </Link>
+          <ArrowLeft className="h-4 w-4" /> Back
+        </button>
 
         <motion.header
           initial={reduce ? false : { opacity: 0, y: 14 }}
