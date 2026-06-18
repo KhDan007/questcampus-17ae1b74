@@ -61,13 +61,14 @@ export function WaitlistV2() {
                 Founding access
               </p>
               <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
-                Be first when the rest of QuestCampus opens.
+                Be first when the full admissions workspace opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
-                Essay Assistant, Application Tracker, Auto-Apply — waitlist members get them first
-                with <strong className="text-primary">30% off monthly access</strong>. The Essay
-                Assistant launches at <strong className="text-on-surface">$15/month</strong> —
-                waitlist price <strong className="text-primary">$10.50/month</strong>.
+                Application Tracker, Essay Assistant, Document Hub, and the Auto-Apply Agent —
+                waitlist members unlock them first with{" "}
+                <strong className="text-primary">30% off monthly access</strong>. Essay Assistant
+                launches at <strong className="text-on-surface">$15/month</strong> — waitlist price{" "}
+                <strong className="text-primary">$10.50/month</strong>.
               </p>
 
               <div className="mt-6 flex items-center gap-4">

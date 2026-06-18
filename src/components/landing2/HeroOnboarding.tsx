@@ -42,8 +42,8 @@ export function HeroOnboarding() {
               transition={{ duration: 0.7, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 text-display-lg-mobile text-on-surface sm:text-display-lg lg:text-[clamp(3rem,5.5vw,4.75rem)] lg:leading-[1.02]"
             >
-              Find the universities <br className="hidden sm:block" />
-              that <span className="qc-text-gradient">actually fit you.</span>
+              Your entire admissions journey, <br className="hidden sm:block" />
+              <span className="qc-text-gradient">in one place.</span>
             </motion.h1>
 
             <motion.p
@@ -52,9 +52,9 @@ export function HeroOnboarding() {
               transition={{ duration: 0.6, delay: 0.18 }}
               className="mt-6 max-w-xl text-body-lg text-on-surface-variant"
             >
-              Not a generic college search. A 60-second conversation that ranks 11,000+ universities
-              against your real grades, goals, money, and geography —{" "}
-              <strong className="text-on-surface">free to start.</strong>
+              Search 11,000+ universities, get an AI-matched shortlist, and build every
+              application from one workspace — purpose-built for international and domestic
+              applicants. <strong className="text-on-surface">Free to start.</strong>
             </motion.p>
 
             <motion.div
@@ -64,13 +64,13 @@ export function HeroOnboarding() {
               className="mt-6 flex flex-wrap items-center gap-4 font-[var(--font-label)] text-label-md text-on-surface-variant"
             >
               <span className="inline-flex items-center gap-2">
-                <Dot /> No signup to start
+                <Dot /> Search & shortlist
               </span>
               <span className="inline-flex items-center gap-2">
-                <Dot /> 3 free matches
+                <Dot /> AI-matched fit
               </span>
               <span className="inline-flex items-center gap-2">
-                <Dot /> $15/month unlocks all 20
+                <Dot /> Application builder
               </span>
             </motion.div>
 
@@ -89,7 +89,7 @@ export function HeroOnboarding() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <p className="mt-2 text-body-sm text-on-surface-variant">
-                Already have schools in mind? Search and build your list.
+                Browse the full catalog or jump straight to schools you already know.
               </p>
             </motion.div>
           </div>
