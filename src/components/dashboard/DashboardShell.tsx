@@ -73,8 +73,21 @@ const TOP_ITEMS: Item[] = [
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { hasPaidAccess } = useAuth();
+  const { user, hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
+
+  const token = auth.getSession()?.token;
+  const entitlement = useQuery(
+    api.payments.entitlement,
+    token ? { token } : "skip",
+  ) as { paid: boolean } | undefined;
+  const livePaid = entitlement?.paid === true;
+
+  useEffect(() => {
+    if (livePaid && !hasPaidAccess && user) {
+      auth.updateUser({ ...user, paid: true });
+    }
+  }, [livePaid, hasPaidAccess, user]);
 
   return (
     <>
