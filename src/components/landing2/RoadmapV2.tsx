@@ -137,8 +137,8 @@ export function RoadmapV2() {
               </div>
               <h3 className="mt-5 text-headline-lg sm:text-display-lg-mobile">Auto-Apply Agent</h3>
               <p className="mt-3 max-w-xl text-body-lg text-inverse-on-surface/80">
-                One profile. Every application filled, formatted, and submitted — autonomously, with
-                you in the loop only when it matters.
+                One profile, every application. The agent fills, formats, and submits each one for
+                you — with human approval where it matters. Currently in development.
               </p>
             </div>
             <a
