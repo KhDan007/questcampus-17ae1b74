@@ -131,7 +131,7 @@ export function ParallaxShowcase() {
             transition={{ duration: 0.5 }}
             className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-secondary-container"
           >
-            The galaxy of dream schools
+            One workspace, every university
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -140,9 +140,9 @@ export function ParallaxShowcase() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="mt-4 text-display-lg-mobile sm:text-display-lg"
           >
-            From{" "}
+            Search{" "}
             <span className="qc-text-gradient">11,000+ universities</span> worldwide —<br />
-            we find your 20.
+            shortlist, match, and apply from one place.
           </motion.h2>
         </div>
 
