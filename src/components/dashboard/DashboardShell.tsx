@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useReducedMotion, motion } from "framer-motion";
+import { useQuery } from "convex/react";
 import {
   GraduationCap,
   PenLine,
@@ -14,8 +15,10 @@ import {
   Crown,
   Lock,
 } from "lucide-react";
+import { api } from "@/convex/_generated/api";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
+import { auth } from "@/lib/auth/client";
 
 type Item =
   | {
@@ -70,8 +73,21 @@ const TOP_ITEMS: Item[] = [
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { hasPaidAccess } = useAuth();
+  const { user, hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
+
+  const token = auth.getSession()?.token;
+  const entitlement = useQuery(
+    api.payments.entitlement,
+    token ? { token } : "skip",
+  ) as { paid: boolean } | undefined;
+  const livePaid = entitlement?.paid === true;
+
+  useEffect(() => {
+    if (livePaid && !hasPaidAccess && user) {
+      auth.updateUser({ ...user, paid: true });
+    }
+  }, [livePaid, hasPaidAccess, user]);
 
   return (
     <>
