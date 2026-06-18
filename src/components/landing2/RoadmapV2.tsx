@@ -5,30 +5,30 @@ import { PenLine, Activity, FileText, CalendarClock, Bot } from "lucide-react";
 
 const FEATURES = [
   {
+    icon: CalendarClock,
+    title: "Application Tracker",
+    body: "Every deadline, requirement, and submission status per school — never miss a window again.",
+    badge: "Coming soon",
+    badgeTone: "soon" as const,
+  },
+  {
     icon: PenLine,
     title: "Essay Writing Assistant",
-    body: "AI-guided personal statement + supplemental essays tailored to each university's prompts.",
+    body: "AI-guided personal statements and supplementals, tailored to each university's prompts.",
+    badge: "Coming soon",
+    badgeTone: "soon" as const,
+  },
+  {
+    icon: FileText,
+    title: "Document Hub",
+    body: "Store transcripts, recommendations, and portfolios. Reuse them across every application.",
     badge: "Coming soon",
     badgeTone: "soon" as const,
   },
   {
     icon: Activity,
     title: "Extracurricular Manager",
-    body: "Track, organize and present your ECs strategically to strengthen your application narrative.",
-    badge: "Coming soon",
-    badgeTone: "soon" as const,
-  },
-  {
-    icon: FileText,
-    title: "Document Helper",
-    body: "Checklists, templates & AI review for transcripts, recommendation letters, and portfolios.",
-    badge: "Coming soon",
-    badgeTone: "soon" as const,
-  },
-  {
-    icon: CalendarClock,
-    title: "Application Tracker",
-    body: "Deadlines, status & notes per school — never miss a window again.",
+    body: "Organize your activities and awards into a strategic narrative that strengthens every app.",
     badge: "Coming soon",
     badgeTone: "soon" as const,
   },
@@ -49,11 +49,12 @@ export function RoadmapV2() {
             What's coming
           </p>
           <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
-            Matching is just the start. <br />
-            <span className="qc-text-gradient">Then we apply for you.</span>
+            Search and matching are live. <br />
+            <span className="qc-text-gradient">The full application stack is next.</span>
           </h2>
           <p className="mt-4 text-body-lg text-on-surface-variant">
-            Waitlist members get founding access — and monthly discounts on the Essay Assistant.
+            Tracker, essays, documents, and an Auto-Apply agent — all landing inside the same
+            workspace. Founding members lock in launch pricing.
           </p>
         </motion.div>
 
