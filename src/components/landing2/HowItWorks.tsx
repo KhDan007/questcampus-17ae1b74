@@ -1,23 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ListChecks, Sparkles, Trophy } from "lucide-react";
+import { Search, Sparkles, FilePlus2 } from "lucide-react";
 
 const STEPS = [
   {
-    icon: ListChecks,
-    title: "Answer 5 questions",
-    body: "A 60-second conversation about you — grades, goals, money, geography. No essays, no account.",
+    icon: Search,
+    title: "Search & shortlist",
+    body: "Browse 11,000+ universities, save the ones you care about, and keep every option in one organized list.",
   },
   {
     icon: Sparkles,
-    title: "AI matches you",
-    body: "We scan 11,000+ universities and rank the ones that actually want a profile like yours.",
+    title: "Get matched",
+    body: "Tell us about your grades, goals, and budget — we rank Safety, Target, and Reach universities that actually fit.",
   },
   {
-    icon: Trophy,
-    title: "Unlock your full list",
-    body: "Get all 20 Safety, Target & Reach matches — with scholarships, deadlines, and why each fits.",
+    icon: FilePlus2,
+    title: "Build your applications",
+    body: "Track deadlines, draft essays, and assemble every requirement per school — no more spreadsheets or scattered tabs.",
   },
 ];
 
@@ -36,7 +36,7 @@ export function HowItWorks() {
             How it works
           </p>
           <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
-            Three steps. <span className="qc-text-gradient">One honest list.</span>
+            Three steps. <span className="qc-text-gradient">One admissions workspace.</span>
           </h2>
         </motion.div>
 
