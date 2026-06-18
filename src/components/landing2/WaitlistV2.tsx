@@ -64,10 +64,10 @@ export function WaitlistV2() {
                 Be first when the full admissions workspace opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">
-                Application Tracker, Essay Assistant, Document Hub, and the Auto-Apply Agent —
-                waitlist members unlock them first with{" "}
-                <strong className="text-primary">30% off monthly access</strong>. Essay Assistant
-                launches at <strong className="text-on-surface">$15/month</strong> — waitlist price{" "}
+                Essay Assistant is live now. Application Tracker, Document Hub, and the Auto-Apply
+                Agent are next — waitlist members unlock them first with{" "}
+                <strong className="text-primary">30% off monthly access</strong>. Full access at{" "}
+                <strong className="text-on-surface">$15/month</strong> — waitlist price{" "}
                 <strong className="text-primary">$10.50/month</strong>.
               </p>
 

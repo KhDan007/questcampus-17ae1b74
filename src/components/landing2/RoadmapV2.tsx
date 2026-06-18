@@ -15,8 +15,8 @@ const FEATURES = [
     icon: PenLine,
     title: "Essay Writing Assistant",
     body: "AI-guided personal statements and supplementals, tailored to each university's prompts.",
-    badge: "Coming soon",
-    badgeTone: "soon" as const,
+    badge: "Live",
+    badgeTone: "live" as const,
   },
   {
     icon: FileText,
@@ -155,11 +155,13 @@ export function RoadmapV2() {
   );
 }
 
-function Badge({ tone, children }: { tone: "soon" | "later"; children: React.ReactNode }) {
+function Badge({ tone, children }: { tone: "soon" | "later" | "live"; children: React.ReactNode }) {
   const cls =
-    tone === "soon"
-      ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
-      : "bg-secondary-container text-on-secondary-container";
+    tone === "live"
+      ? "bg-primary text-white"
+      : tone === "soon"
+        ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+        : "bg-secondary-container text-on-secondary-container";
   return (
     <span
       className={`rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider ${cls}`}
