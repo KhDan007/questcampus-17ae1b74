@@ -89,7 +89,7 @@ export function HeroOnboarding() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <p className="mt-2 text-body-sm text-on-surface-variant">
-                Already have schools in mind? Search and build your list.
+                Browse the full catalog or jump straight to schools you already know.
               </p>
             </motion.div>
           </div>
