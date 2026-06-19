@@ -19,6 +19,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
+import { fillPlaceholdersWithMocks, hasPlaceholders } from "@/lib/essays/mockStories";
 
 // -----------------------------------------------------------------------------
 // Types
