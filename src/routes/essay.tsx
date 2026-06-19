@@ -1440,6 +1440,37 @@ function ResultView({
 
   const bodyText = renderText(result);
   const edited = undoBuf !== null || saveState === "saved";
+  const hasPlaceholders = (result.placeholders?.length ?? 0) > 0;
+
+  // Per-placeholder editor popup ([ADD: …] click target).
+  const [placeholderEdit, setPlaceholderEdit] = useState<{
+    placeholder: string;
+    occurrence: number;
+    draft: string;
+  } | null>(null);
+
+  const replacePlaceholderOccurrence = useCallback(
+    (placeholder: string, occurrence: number, replacement: string) => {
+      const full = result.fullText ?? "";
+      let i = -1;
+      let from = 0;
+      for (let n = 0; n <= occurrence; n++) {
+        i = full.indexOf(placeholder, from);
+        if (i < 0) return;
+        from = i + placeholder.length;
+      }
+      const next = full.slice(0, i) + replacement + full.slice(i + placeholder.length);
+      void doSave(next);
+    },
+    [result.fullText, doSave],
+  );
+
+  const autofillAllMocks = useCallback(() => {
+    const full = result.fullText ?? "";
+    const { text, count } = fillPlaceholdersWithMocks(full);
+    if (count === 0) return;
+    void doSave(text);
+  }, [result.fullText, doSave]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
