@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "@tanstack/react-router";
 import { LogOut, Sparkles, UserRound } from "lucide-react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
