@@ -449,6 +449,7 @@ function EssayPage() {
       setResult(res);
       setGenStatus("ready");
       setStep("result");
+      markProgress("essayDrafted", true);
       setReviewPromptOpen(true);
       try {
         await clearDraft({ sessionId, token });
