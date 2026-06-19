@@ -5,6 +5,7 @@ import { ParallaxShowcase } from "@/components/landing2/ParallaxShowcase";
 import { HowItWorks } from "@/components/landing2/HowItWorks";
 import { RoadmapV2 } from "@/components/landing2/RoadmapV2";
 import { WaitlistV2 } from "@/components/landing2/WaitlistV2";
+import { MidPageCTA } from "@/components/landing2/MidPageCTA";
 import { FooterV2 } from "@/components/landing2/FooterV2";
 
 export const Route = createFileRoute("/")({

@@ -33,7 +33,7 @@ export function HeroOnboarding() {
 
   return (
     <>
-      <section className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
+      <section id="onboarding" className="relative isolate px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-36">
         <div className="mx-auto grid max-w-(--container-content) gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
             <motion.h1
