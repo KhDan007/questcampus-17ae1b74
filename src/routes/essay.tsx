@@ -695,6 +695,7 @@ function EssayPage() {
         onConfirm={() => {
           if (result) setAutoReviewEssayId(result.essayId);
           setView("review");
+          markProgress("essayReviewed", true);
           setReviewPromptOpen(false);
           if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
         }}
