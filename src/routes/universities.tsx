@@ -24,6 +24,8 @@ import { UnlockButton } from "@/components/payments/UnlockButton";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
+import { RefineRecommendationsCard } from "@/components/universities/RefineRecommendationsCard";
+import { useProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/universities")({
   head: () => ({
@@ -87,7 +89,8 @@ function UniversitiesPage() {
   const reduce = useReducedMotion();
   const initial = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { user, token, isAdmin } = useAuth();
+  const { user, token, isAdmin, isAuthenticated } = useAuth();
+  const progress = useProgress();
 
   // Entitlement (live)
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
@@ -370,6 +373,10 @@ function UniversitiesPage() {
             </button>
           </div>
         </motion.header>
+
+        {progress.refined && (
+          <RefineRecommendationsCard isAuthenticated={isAuthenticated} />
+        )}
 
         {/* Search box */}
         <section className="mt-8 rounded-2xl border-2 border-on-surface bg-surface/85 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">

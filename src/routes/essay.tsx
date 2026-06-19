@@ -35,6 +35,7 @@ import { getSessionId } from "@/lib/onboarding/session";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
 import type { RecCard } from "@/components/profile/UniversityCard";
+import { markProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/essay")({
   head: () => ({ meta: [{ title: "Personal statement — QuestCampus" }] }),
@@ -448,6 +449,7 @@ function EssayPage() {
       setResult(res);
       setGenStatus("ready");
       setStep("result");
+      markProgress("essayDrafted", true);
       setReviewPromptOpen(true);
       try {
         await clearDraft({ sessionId, token });
@@ -539,7 +541,10 @@ function EssayPage() {
                   <button
                     key={t.k}
                     type="button"
-                    onClick={() => setView(t.k)}
+                    onClick={() => {
+                      setView(t.k);
+                      if (t.k === "review") markProgress("essayReviewed", true);
+                    }}
                     className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
                       active
                         ? "bg-primary text-white qc-hard-shadow-sm"
@@ -690,6 +695,7 @@ function EssayPage() {
         onConfirm={() => {
           if (result) setAutoReviewEssayId(result.essayId);
           setView("review");
+          markProgress("essayReviewed", true);
           setReviewPromptOpen(false);
           if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
         }}
