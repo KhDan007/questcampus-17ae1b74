@@ -236,7 +236,8 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
                     key={opt.value}
                     type="button"
                     onClick={() => choose(opt.value)}
-                    className={`group relative flex items-start gap-3 rounded-lg border-2 px-4 py-3.5 text-left transition-all ${
+                    disabled={locked}
+                    className={`group relative flex items-start gap-3 rounded-lg border-2 px-4 py-3.5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-70 ${
                       selected
                         ? "border-primary bg-primary-fixed text-on-primary-fixed"
                         : "border-on-surface/15 bg-surface-container-low hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-[2px_2px_0_0_var(--color-on-surface)]"
