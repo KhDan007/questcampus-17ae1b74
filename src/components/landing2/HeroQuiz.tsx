@@ -274,7 +274,7 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
               >
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={advanceMulti}
                   className="group inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-4 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
                 >
                   Continue
