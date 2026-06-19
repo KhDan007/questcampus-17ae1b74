@@ -2151,23 +2151,44 @@ function FreeTrialScoreBanner({ essayId, token }: { essayId: string; token: stri
   );
 }
 
-function EssayBody({ text }: { text: string }) {
-  // Highlight [ADD: …] placeholders inline.
+function EssayBody({
+  text,
+  onPlaceholderClick,
+}: {
+  text: string;
+  onPlaceholderClick?: (placeholder: string, occurrenceIndex: number) => void;
+}) {
+  // Highlight [ADD: …] placeholders inline; make them clickable when a
+  // handler is provided so the user can fill each moment one at a time.
   const parts = text.split(/(\[ADD:[^\]]+\])/g);
+  let occurrence = -1;
   return (
     <article className="mt-6 whitespace-pre-wrap text-body-lg leading-relaxed text-on-surface">
-      {parts.map((p, i) =>
-        p.startsWith("[ADD:") ? (
-          <mark
+      {parts.map((p, i) => {
+        if (!p.startsWith("[ADD:")) return <span key={i}>{p}</span>;
+        occurrence += 1;
+        const myOcc = occurrence;
+        const className =
+          "rounded-md bg-secondary-container px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface";
+        if (!onPlaceholderClick) {
+          return (
+            <mark key={i} className={className}>
+              {p}
+            </mark>
+          );
+        }
+        return (
+          <button
             key={i}
-            className="rounded-md bg-secondary-container px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface"
+            type="button"
+            onClick={() => onPlaceholderClick(p, myOcc)}
+            className={`${className} cursor-pointer border-2 border-on-surface/30 underline decoration-dotted underline-offset-4 transition-colors hover:border-on-surface hover:bg-primary hover:text-white`}
+            title="Click to fill this moment in"
           >
             {p}
-          </mark>
-        ) : (
-          <span key={i}>{p}</span>
-        ),
-      )}
+          </button>
+        );
+      })}
     </article>
   );
 }
