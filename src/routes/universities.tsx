@@ -89,7 +89,7 @@ function UniversitiesPage() {
   const reduce = useReducedMotion();
   const initial = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { user, token, isAdmin } = useAuth();
+  const { user, token, isAdmin, isAuthenticated } = useAuth();
   const progress = useProgress();
 
   // Entitlement (live)
