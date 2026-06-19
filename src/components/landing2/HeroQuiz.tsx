@@ -103,6 +103,8 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const reduce = useReducedMotion();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
+  const [locked, setLocked] = useState(false);
+  const completedRef = React.useRef(false);
   const total = QUESTIONS.length;
   const q = QUESTIONS[step];
   const isLast = step === total - 1;
@@ -116,7 +118,18 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const MULTI_SELECT_KEYS: (keyof QuizAnswers)[] = ["interests"];
   const isMultiSelect = MULTI_SELECT_KEYS.includes(q.key);
 
+  const TRANSITION_MS = 420;
+
+  function safeComplete(payload: QuizAnswers) {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setLocked(true);
+    onComplete(payload);
+  }
+
   function choose(value: string) {
+    if (locked) return;
+
     if (q.key === "country") {
       if (value === "custom") {
         setAnswers((a) => ({ ...a, country: "custom" }));
@@ -124,7 +137,7 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
       }
       const next = { ...answers, country: value, countries: undefined } as Partial<QuizAnswers>;
       setAnswers(next);
-      onComplete(next as QuizAnswers);
+      safeComplete(next as QuizAnswers);
       return;
     }
 
@@ -140,10 +153,23 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
     const next = { ...answers, [q.key]: value } as Partial<QuizAnswers>;
     setAnswers(next);
     if (isLast) {
-      onComplete(next as QuizAnswers);
+      safeComplete(next as QuizAnswers);
     } else {
-      setTimeout(() => setStep((s) => s + 1), 160);
+      setLocked(true);
+      window.setTimeout(() => {
+        setStep((s) => s + 1);
+        setLocked(false);
+      }, TRANSITION_MS);
     }
+  }
+
+  function advanceMulti() {
+    if (locked) return;
+    setLocked(true);
+    window.setTimeout(() => {
+      setStep((s) => s + 1);
+      setLocked(false);
+    }, TRANSITION_MS);
   }
 
   function toggleCountry(value: string) {
