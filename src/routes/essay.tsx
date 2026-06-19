@@ -1728,7 +1728,127 @@ function ResultView({
           </ul>
         </div>
       </aside>
+
+      <AnimatePresence>
+        {placeholderEdit && (
+          <PlaceholderEditor
+            placeholder={placeholderEdit.placeholder}
+            initialDraft={placeholderEdit.draft}
+            onClose={() => setPlaceholderEdit(null)}
+            onSave={(text) => {
+              replacePlaceholderOccurrence(
+                placeholderEdit.placeholder,
+                placeholderEdit.occurrence,
+                text,
+              );
+              setPlaceholderEdit(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function PlaceholderEditor({
+  placeholder,
+  initialDraft,
+  onClose,
+  onSave,
+}: {
+  placeholder: string;
+  initialDraft: string;
+  onClose: () => void;
+  onSave: (text: string) => void;
+}) {
+  const hint = placeholder.replace(/^\[ADD:\s*/, "").replace(/\]$/, "").trim();
+  const [draft, setDraft] = useState(initialDraft);
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    taRef.current?.focus();
+  }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const fillMock = () => setDraft(mockForHint(placeholder));
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 8, opacity: 0 }}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
+              Fill this moment
+            </p>
+            <h3 className="mt-1 font-display text-headline-sm font-bold text-on-surface">{hint}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-on-surface-variant transition-colors hover:bg-secondary-container hover:text-on-surface"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="mt-2 text-body-sm text-on-surface-variant">
+          Write this moment in your own words with our prompt as a guide — or drop in a mock story
+          to see the shape and edit later.
+        </p>
+        <textarea
+          ref={taRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={5}
+          placeholder={`e.g. ${mockForHint(placeholder)}`}
+          className="mt-4 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 font-serif text-body-md leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+        />
+        <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={fillMock}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Use mock story
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => draft.trim() && onSave(draft.trim())}
+            disabled={!draft.trim()}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" /> Save into essay
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body,
   );
 }
 
