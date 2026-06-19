@@ -58,7 +58,6 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageSwitcher compact />
           {isAuthenticated && user ? (
             <UserMenu user={user} />
           ) : variant === "landing" ? (
