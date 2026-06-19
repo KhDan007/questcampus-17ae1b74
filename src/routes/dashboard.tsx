@@ -252,42 +252,8 @@ function DashboardPage() {
           </motion.section>
 
           {/* Recommended next step */}
-          <motion.section
-            initial={reduce ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-            className="mt-10"
-          >
-            <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-secondary-container p-6 qc-hard-shadow sm:p-8">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-4">
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm">
-                    <Compass className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
-                      Recommended next step · 1 of 3
-                    </p>
-                    <h2 className="mt-1 font-display text-headline-md font-bold text-on-surface">
-                      Refine your recommendations
-                    </h2>
-                    <p className="mt-1.5 max-w-xl text-body-md text-on-surface/80">
-                      Answer a few more questions about your goals, learning style, and constraints
-                      — we'll re-rank your matches with much more precision.
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  to={isAuthenticated ? "/onboarding" : "/signin"}
-                  search={isAuthenticated ? undefined : ({ redirect: "/onboarding" } as never)}
-                  className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  Refine now
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </div>
-            </div>
-          </motion.section>
+          <NextStepCard isAuthenticated={isAuthenticated} />
+
 
           {/* Matches */}
           <section className="mt-14">
