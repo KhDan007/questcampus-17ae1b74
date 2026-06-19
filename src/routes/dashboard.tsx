@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Lock,
   Loader2,
-  Loader2,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
