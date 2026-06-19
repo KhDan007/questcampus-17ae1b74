@@ -541,7 +541,10 @@ function EssayPage() {
                   <button
                     key={t.k}
                     type="button"
-                    onClick={() => setView(t.k)}
+                    onClick={() => {
+                      setView(t.k);
+                      if (t.k === "review") markProgress("essayReviewed", true);
+                    }}
                     className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
                       active
                         ? "bg-primary text-white qc-hard-shadow-sm"
