@@ -374,6 +374,10 @@ function UniversitiesPage() {
           </div>
         </motion.header>
 
+        {progress.refined && (
+          <RefineRecommendationsCard isAuthenticated={!!token} />
+        )}
+
         {/* Search box */}
         <section className="mt-8 rounded-2xl border-2 border-on-surface bg-surface/85 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
           <label className="block">
