@@ -35,6 +35,7 @@ import { getSessionId } from "@/lib/onboarding/session";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
 import type { RecCard } from "@/components/profile/UniversityCard";
+import { markProgress } from "@/lib/progress";
 
 export const Route = createFileRoute("/essay")({
   head: () => ({ meta: [{ title: "Personal statement — QuestCampus" }] }),
