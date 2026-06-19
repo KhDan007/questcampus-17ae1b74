@@ -595,13 +595,17 @@ function ResultCard({
   const updateEssay = useAction(api.essays.updateEssay);
   const persistTimer = useRef<number | null>(null);
 
-  // Reset working state when originalBody (source) changes.
+  // Reset working state only when a *new* review arrives. Tying this to
+  // `originalBody` caused Convex query refetches (after we persist an applied
+  // rewrite) to silently revert workingText and clear appliedIdx — which made
+  // the Apply / Apply all buttons look like they did nothing.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setWorkingText(originalBody);
     setUndoStack([]);
     setAppliedIdx(new Set());
     setMissMsg(null);
-  }, [originalBody, result.reviewId]);
+  }, [result.reviewId]);
 
   // Persist applied edits to the saved essay (if it's a picked draft).
   useEffect(() => {
