@@ -1637,7 +1637,15 @@ function ResultView({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.22, ease: "easeOut" }}
               >
-                <EssayBody text={bodyText} />
+                <EssayBody
+                  text={bodyText}
+                  onPlaceholderClick={
+                    editable
+                      ? (placeholder, occurrence) =>
+                          setPlaceholderEdit({ placeholder, occurrence, draft: "" })
+                      : undefined
+                  }
+                />
               </motion.div>
             </AnimatePresence>
             {revising && (
