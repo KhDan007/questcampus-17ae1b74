@@ -176,6 +176,7 @@ function DashboardPage() {
         }
         setServerStatus("ready");
         if (force) {
+          markProgress("refined", true);
           setJustRefreshed(true);
           // Clear the ?refresh flag from the URL after a moment.
           window.setTimeout(() => {
