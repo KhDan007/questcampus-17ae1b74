@@ -19,6 +19,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
+import { fillPlaceholdersWithMocks, hasPlaceholders } from "@/lib/essays/mockStories";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -157,16 +158,43 @@ function locateQuote(text: string, quote: string): [string, string, string] | nu
   return null;
 }
 
+// Normalize curly quotes, en/em dashes, non-breaking spaces, ellipsis so that
+// rewrite passages produced by the model still match the user's pasted text
+// even when one side uses "smart" typography and the other doesn't.
+function normalizeTypography(s: string): string {
+  return s
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ");
+}
+
 function applyRewriteToText(text: string, before: string, after: string): string | null {
   if (!before.trim()) return null;
+
+  // 1) Exact match — fastest path.
   const i = text.indexOf(before);
   if (i >= 0) return text.slice(0, i) + after + text.slice(i + before.length);
+
+  // 2) Whitespace-tolerant match against the raw text.
   const norm = before.trim().replace(/\s+/g, " ");
-  const re = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
-  const m = text.match(re);
-  if (m && m.index != null) {
-    return text.slice(0, m.index) + after + text.slice(m.index + m[0].length);
+  const reWS = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
+  const mWS = text.match(reWS);
+  if (mWS && mWS.index != null) {
+    return text.slice(0, mWS.index) + after + text.slice(mWS.index + mWS[0].length);
   }
+
+  // 3) Typography-tolerant match: compare on a normalized projection but splice
+  // back into the original text using the matched length.
+  const projText = normalizeTypography(text);
+  const projBefore = normalizeTypography(before).trim().replace(/\s+/g, " ");
+  const reProj = new RegExp(escapeReg(projBefore).replace(/ /g, "\\s+"), "i");
+  const mProj = projText.match(reProj);
+  if (mProj && mProj.index != null) {
+    return text.slice(0, mProj.index) + after + text.slice(mProj.index + mProj[0].length);
+  }
+
   return null;
 }
 
@@ -568,13 +596,17 @@ function ResultCard({
   const updateEssay = useAction(api.essays.updateEssay);
   const persistTimer = useRef<number | null>(null);
 
-  // Reset working state when originalBody (source) changes.
+  // Reset working state only when a *new* review arrives. Tying this to
+  // `originalBody` caused Convex query refetches (after we persist an applied
+  // rewrite) to silently revert workingText and clear appliedIdx — which made
+  // the Apply / Apply all buttons look like they did nothing.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setWorkingText(originalBody);
     setUndoStack([]);
     setAppliedIdx(new Set());
     setMissMsg(null);
-  }, [originalBody, result.reviewId]);
+  }, [result.reviewId]);
 
   // Persist applied edits to the saved essay (if it's a picked draft).
   useEffect(() => {
@@ -694,6 +726,26 @@ function ResultCard({
         </p>
         {paid && !locked && (
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            {hasPlaceholders(workingText) && (
+              <button
+                type="button"
+                onClick={() => {
+                  const { text, count } = fillPlaceholdersWithMocks(workingText);
+                  if (count === 0) return;
+                  setUndoStack((s) => [
+                    ...s,
+                    { text: workingText, label: `Autofill ${count} placeholder${count === 1 ? "" : "s"}` },
+                  ]);
+                  setWorkingText(text);
+                  setMissMsg(`Filled ${count} placeholder${count === 1 ? "" : "s"} with mock stories — edit any to make it yours.`);
+                  window.setTimeout(() => setMissMsg(null), 4000);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                title="Replace every [ADD: …] placeholder with a plausible mock sentence"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Autofill mock stories
+              </button>
+            )}
             <button
               type="button"
               onClick={applyAll}

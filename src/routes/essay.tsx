@@ -24,6 +24,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { formatVersionTime, type EssayVersion } from "@/lib/essays/history";
+import { fillPlaceholdersWithMocks, mockForHint } from "@/lib/essays/mockStories";
 import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -1439,6 +1440,37 @@ function ResultView({
 
   const bodyText = renderText(result);
   const edited = undoBuf !== null || saveState === "saved";
+  const hasPlaceholders = (result.placeholders?.length ?? 0) > 0;
+
+  // Per-placeholder editor popup ([ADD: …] click target).
+  const [placeholderEdit, setPlaceholderEdit] = useState<{
+    placeholder: string;
+    occurrence: number;
+    draft: string;
+  } | null>(null);
+
+  const replacePlaceholderOccurrence = useCallback(
+    (placeholder: string, occurrence: number, replacement: string) => {
+      const full = result.fullText ?? "";
+      let i = -1;
+      let from = 0;
+      for (let n = 0; n <= occurrence; n++) {
+        i = full.indexOf(placeholder, from);
+        if (i < 0) return;
+        from = i + placeholder.length;
+      }
+      const next = full.slice(0, i) + replacement + full.slice(i + placeholder.length);
+      void doSave(next);
+    },
+    [result.fullText, doSave],
+  );
+
+  const autofillAllMocks = useCallback(() => {
+    const full = result.fullText ?? "";
+    const { text, count } = fillPlaceholdersWithMocks(full);
+    if (count === 0) return;
+    void doSave(text);
+  }, [result.fullText, doSave]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -1567,6 +1599,16 @@ function ResultView({
                 </AnimatePresence>
               </div>
             )}
+            {editable && hasPlaceholders && (
+              <button
+                type="button"
+                onClick={autofillAllMocks}
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                title="Replace every [ADD: …] placeholder with a plausible mock story you can edit later"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Autofill mock stories
+              </button>
+            )}
             <button
               type="button"
               onClick={onRegenerate}
@@ -1595,7 +1637,15 @@ function ResultView({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.22, ease: "easeOut" }}
               >
-                <EssayBody text={bodyText} />
+                <EssayBody
+                  text={bodyText}
+                  onPlaceholderClick={
+                    editable
+                      ? (placeholder, occurrence) =>
+                          setPlaceholderEdit({ placeholder, occurrence, draft: "" })
+                      : undefined
+                  }
+                />
               </motion.div>
             </AnimatePresence>
             {revising && (
@@ -1678,7 +1728,127 @@ function ResultView({
           </ul>
         </div>
       </aside>
+
+      <AnimatePresence>
+        {placeholderEdit && (
+          <PlaceholderEditor
+            placeholder={placeholderEdit.placeholder}
+            initialDraft={placeholderEdit.draft}
+            onClose={() => setPlaceholderEdit(null)}
+            onSave={(text) => {
+              replacePlaceholderOccurrence(
+                placeholderEdit.placeholder,
+                placeholderEdit.occurrence,
+                text,
+              );
+              setPlaceholderEdit(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function PlaceholderEditor({
+  placeholder,
+  initialDraft,
+  onClose,
+  onSave,
+}: {
+  placeholder: string;
+  initialDraft: string;
+  onClose: () => void;
+  onSave: (text: string) => void;
+}) {
+  const hint = placeholder.replace(/^\[ADD:\s*/, "").replace(/\]$/, "").trim();
+  const [draft, setDraft] = useState(initialDraft);
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    taRef.current?.focus();
+  }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const fillMock = () => setDraft(mockForHint(placeholder));
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 8, opacity: 0 }}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
+              Fill this moment
+            </p>
+            <h3 className="mt-1 font-display text-headline-sm font-bold text-on-surface">{hint}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-on-surface-variant transition-colors hover:bg-secondary-container hover:text-on-surface"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="mt-2 text-body-sm text-on-surface-variant">
+          Write this moment in your own words with our prompt as a guide — or drop in a mock story
+          to see the shape and edit later.
+        </p>
+        <textarea
+          ref={taRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={5}
+          placeholder={`e.g. ${mockForHint(placeholder)}`}
+          className="mt-4 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 font-serif text-body-md leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+        />
+        <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={fillMock}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Use mock story
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => draft.trim() && onSave(draft.trim())}
+            disabled={!draft.trim()}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" /> Save into essay
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body,
   );
 }
 
@@ -2150,23 +2320,44 @@ function FreeTrialScoreBanner({ essayId, token }: { essayId: string; token: stri
   );
 }
 
-function EssayBody({ text }: { text: string }) {
-  // Highlight [ADD: …] placeholders inline.
+function EssayBody({
+  text,
+  onPlaceholderClick,
+}: {
+  text: string;
+  onPlaceholderClick?: (placeholder: string, occurrenceIndex: number) => void;
+}) {
+  // Highlight [ADD: …] placeholders inline; make them clickable when a
+  // handler is provided so the user can fill each moment one at a time.
   const parts = text.split(/(\[ADD:[^\]]+\])/g);
+  let occurrence = -1;
   return (
     <article className="mt-6 whitespace-pre-wrap text-body-lg leading-relaxed text-on-surface">
-      {parts.map((p, i) =>
-        p.startsWith("[ADD:") ? (
-          <mark
+      {parts.map((p, i) => {
+        if (!p.startsWith("[ADD:")) return <span key={i}>{p}</span>;
+        occurrence += 1;
+        const myOcc = occurrence;
+        const className =
+          "rounded-md bg-secondary-container px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface";
+        if (!onPlaceholderClick) {
+          return (
+            <mark key={i} className={className}>
+              {p}
+            </mark>
+          );
+        }
+        return (
+          <button
             key={i}
-            className="rounded-md bg-secondary-container px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface"
+            type="button"
+            onClick={() => onPlaceholderClick(p, myOcc)}
+            className={`${className} cursor-pointer border-2 border-on-surface/30 underline decoration-dotted underline-offset-4 transition-colors hover:border-on-surface hover:bg-primary hover:text-white`}
+            title="Click to fill this moment in"
           >
             {p}
-          </mark>
-        ) : (
-          <span key={i}>{p}</span>
-        ),
-      )}
+          </button>
+        );
+      })}
     </article>
   );
 }
