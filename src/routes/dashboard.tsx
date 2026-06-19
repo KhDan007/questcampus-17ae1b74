@@ -12,7 +12,7 @@ import {
   Send,
   TrendingUp,
   Lock,
-  Compass,
+  Loader2,
   Loader2,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
