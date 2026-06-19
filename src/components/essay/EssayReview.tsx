@@ -157,16 +157,43 @@ function locateQuote(text: string, quote: string): [string, string, string] | nu
   return null;
 }
 
+// Normalize curly quotes, en/em dashes, non-breaking spaces, ellipsis so that
+// rewrite passages produced by the model still match the user's pasted text
+// even when one side uses "smart" typography and the other doesn't.
+function normalizeTypography(s: string): string {
+  return s
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ");
+}
+
 function applyRewriteToText(text: string, before: string, after: string): string | null {
   if (!before.trim()) return null;
+
+  // 1) Exact match — fastest path.
   const i = text.indexOf(before);
   if (i >= 0) return text.slice(0, i) + after + text.slice(i + before.length);
+
+  // 2) Whitespace-tolerant match against the raw text.
   const norm = before.trim().replace(/\s+/g, " ");
-  const re = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
-  const m = text.match(re);
-  if (m && m.index != null) {
-    return text.slice(0, m.index) + after + text.slice(m.index + m[0].length);
+  const reWS = new RegExp(escapeReg(norm).replace(/ /g, "\\s+"));
+  const mWS = text.match(reWS);
+  if (mWS && mWS.index != null) {
+    return text.slice(0, mWS.index) + after + text.slice(mWS.index + mWS[0].length);
   }
+
+  // 3) Typography-tolerant match: compare on a normalized projection but splice
+  // back into the original text using the matched length.
+  const projText = normalizeTypography(text);
+  const projBefore = normalizeTypography(before).trim().replace(/\s+/g, " ");
+  const reProj = new RegExp(escapeReg(projBefore).replace(/ /g, "\\s+"), "i");
+  const mProj = projText.match(reProj);
+  if (mProj && mProj.index != null) {
+    return text.slice(0, mProj.index) + after + text.slice(mProj.index + mProj[0].length);
+  }
+
   return null;
 }
 
