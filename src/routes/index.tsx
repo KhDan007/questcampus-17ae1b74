@@ -41,6 +41,7 @@ function LandingPage() {
         <ParallaxShowcase />
         <HowItWorks />
         <RoadmapV2 />
+        <MidPageCTA />
         <WaitlistV2 />
       </main>
       <FooterV2 />
