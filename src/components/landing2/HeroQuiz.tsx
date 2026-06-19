@@ -104,7 +104,7 @@ export function HeroQuiz({ onComplete }: { onComplete: (answers: QuizAnswers) =>
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
   const [locked, setLocked] = useState(false);
-  const completedRef = React.useRef(false);
+  const completedRef = useRef(false);
   const total = QUESTIONS.length;
   const q = QUESTIONS[step];
   const isLast = step === total - 1;
