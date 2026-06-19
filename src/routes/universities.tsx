@@ -375,7 +375,7 @@ function UniversitiesPage() {
         </motion.header>
 
         {progress.refined && (
-          <RefineRecommendationsCard isAuthenticated={!!token} />
+          <RefineRecommendationsCard isAuthenticated={isAuthenticated} />
         )}
 
         {/* Search box */}
