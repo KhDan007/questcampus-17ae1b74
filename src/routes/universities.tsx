@@ -90,6 +90,7 @@ function UniversitiesPage() {
   const initial = Route.useSearch();
   const navigate = Route.useNavigate();
   const { user, token, isAdmin } = useAuth();
+  const progress = useProgress();
 
   // Entitlement (live)
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
