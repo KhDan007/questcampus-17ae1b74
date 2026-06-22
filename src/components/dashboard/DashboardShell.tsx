@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
+import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 
