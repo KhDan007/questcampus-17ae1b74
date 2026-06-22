@@ -1,0 +1,197 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
+import { Crown, X, Loader2, ShieldCheck } from "lucide-react";
+import { auth } from "@/lib/auth/client";
+
+function siteBase(): string {
+  const explicit = import.meta.env.VITE_CONVEX_SITE_URL as string | undefined;
+  const cloud = import.meta.env.VITE_CONVEX_URL as string | undefined;
+  const url = explicit ?? cloud?.replace(".convex.cloud", ".convex.site");
+  if (!url) throw new Error("VITE_CONVEX_URL is not set");
+  return url.replace(/\/$/, "");
+}
+
+async function cancelSubscription(token: string): Promise<{ ok: boolean; message?: string }> {
+  try {
+    const res = await fetch(`${siteBase()}/api/payments/cancel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: "{}",
+    });
+    if (res.ok) return { ok: true };
+    let body: { error?: string } = {};
+    try {
+      body = await res.json();
+    } catch {}
+    return { ok: false, message: body.error ?? `Cancel failed (${res.status})` };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Network error" };
+  }
+}
+
+export function PlanDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [confirming, setConfirming] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  if (typeof document === "undefined") return null;
+
+  const handleCancel = async () => {
+    const token = auth.getSession()?.token;
+    if (!token) {
+      setMsg("You must be signed in.");
+      return;
+    }
+    setLoading(true);
+    setMsg(null);
+    const r = await cancelSubscription(token);
+    setLoading(false);
+    if (r.ok) {
+      setDone(true);
+      setMsg("Your subscription is set to cancel at the end of the billing period.");
+    } else {
+      setMsg(r.message ?? "Could not cancel. Please contact support.");
+    }
+  };
+
+  const close = () => {
+    setConfirming(false);
+    setMsg(null);
+    setDone(false);
+    setLoading(false);
+    onClose();
+  };
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[10000]" role="dialog" aria-modal="true">
+          <motion.button
+            type="button"
+            aria-label="Close"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 h-full w-full bg-black/50"
+            onClick={close}
+          />
+          <div className="absolute inset-0 grid place-items-center p-4">
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="relative w-full max-w-md rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow-sm"
+            >
+              <button
+                type="button"
+                onClick={close}
+                aria-label="Close"
+                className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-md border-2 border-on-surface/15 bg-surface text-on-surface/70 hover:border-on-surface hover:text-on-surface"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-lg border-2 border-on-surface bg-secondary-container text-on-surface">
+                  <Crown className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface/70">
+                    Your plan
+                  </p>
+                  <p className="font-display text-headline-sm font-bold text-on-surface">
+                    QuestCampus Full Access
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-xl border-2 border-on-surface/15 bg-secondary-container/40 p-4">
+                <div className="flex items-baseline justify-between">
+                  <p className="font-display text-display-sm font-bold text-on-surface">$15</p>
+                  <p className="text-label-sm text-on-surface/70">per month</p>
+                </div>
+                <ul className="mt-3 space-y-1.5 text-label-sm text-on-surface/80">
+                  <li className="flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-on-surface/60" /> Full ranked
+                    university shortlist
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-on-surface/60" /> Polished essay drafts
+                    & AI review
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-on-surface/60" /> Every premium
+                    feature we ship
+                  </li>
+                </ul>
+              </div>
+
+              {msg && (
+                <p
+                  className={`mt-4 text-label-sm ${
+                    done ? "text-on-surface/80" : "text-red-600"
+                  }`}
+                >
+                  {msg}
+                </p>
+              )}
+
+              <div className="mt-5 flex flex-col gap-2">
+                {!confirming && !done && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirming(true)}
+                    className="rounded-lg border-2 border-on-surface bg-surface px-3 py-2 text-label-md font-semibold text-on-surface transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  >
+                    Cancel subscription
+                  </button>
+                )}
+                {confirming && !done && (
+                  <div className="flex flex-col gap-2 rounded-lg border-2 border-on-surface/15 bg-surface p-3">
+                    <p className="text-label-sm text-on-surface/80">
+                      Cancel your subscription? You'll keep access until the end of the current
+                      billing period.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={() => setConfirming(false)}
+                        className="flex-1 rounded-lg border-2 border-on-surface/20 bg-surface px-3 py-2 text-label-md font-semibold text-on-surface/80 hover:border-on-surface hover:text-on-surface disabled:opacity-50"
+                      >
+                        Keep plan
+                      </button>
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={handleCancel}
+                        className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-on-surface bg-on-surface px-3 py-2 text-label-md font-semibold text-surface transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+                      >
+                        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                        Confirm cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={close}
+                  className="rounded-lg px-3 py-2 text-label-sm text-on-surface/70 hover:text-on-surface"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}

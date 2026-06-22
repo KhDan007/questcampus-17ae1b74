@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
+import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 
@@ -87,6 +88,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
+  const [planOpen, setPlanOpen] = useState(false);
 
   const [width, setWidth] = useState<number>(DEFAULT_W);
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -203,6 +205,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             hasPaidAccess={hasPaidAccess}
             collapsed={collapsed}
             onToggleCollapsed={() => setCollapsed((c) => !c)}
+            onOpenPlan={() => setPlanOpen(true)}
           />
 
           {/* Resize handle */}
@@ -278,6 +281,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     hasPaidAccess={hasPaidAccess}
                     collapsed={false}
                     onToggleCollapsed={() => {}}
+                    onOpenPlan={() => {
+                      setPlanOpen(true);
+                      setMobileOpen(false);
+                    }}
                     hideCollapseToggle
                   />
                 </motion.aside>
@@ -294,6 +301,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         body="Join the waitlist to be first in line and lock in 30% off monthly access."
         feature={waitlist ?? undefined}
       />
+
+      <PlanDialog open={planOpen} onClose={() => setPlanOpen(false)} />
     </>
   );
 }
@@ -304,6 +313,7 @@ function SidebarBody({
   hasPaidAccess,
   collapsed,
   onToggleCollapsed,
+  onOpenPlan,
   hideCollapseToggle,
 }: {
   pathname: string;
@@ -311,6 +321,7 @@ function SidebarBody({
   hasPaidAccess: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  onOpenPlan: () => void;
   hideCollapseToggle?: boolean;
 }) {
   const reduce = useReducedMotion();
@@ -385,14 +396,21 @@ function SidebarBody({
       <div className="flex shrink-0 flex-col gap-2 pt-4">
         {hasPaidAccess ? (
           collapsed ? (
-            <div
-              className="mx-auto grid h-10 w-10 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container/70 text-on-surface"
-              title="Full access unlocked"
+            <button
+              type="button"
+              onClick={onOpenPlan}
+              aria-label="Your plan"
+              title="Your plan"
+              className="mx-auto grid h-10 w-10 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container/70 text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
             >
               <Crown className="h-4 w-4" />
-            </div>
+            </button>
           ) : (
-            <div className="rounded-xl border-2 border-on-surface bg-secondary-container/70 p-3">
+            <button
+              type="button"
+              onClick={onOpenPlan}
+              className="group w-full rounded-xl border-2 border-on-surface bg-secondary-container/70 p-3 text-left transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+            >
               <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface">
                 <Crown className="h-3.5 w-3.5" /> Your plan
               </p>
@@ -400,9 +418,9 @@ function SidebarBody({
                 Full access unlocked
               </p>
               <p className="mt-0.5 text-label-sm text-on-surface/75">
-                Monthly subscription. All current features unlocked.
+                Monthly subscription · manage or cancel
               </p>
-            </div>
+            </button>
           )
         ) : (
           <Link
