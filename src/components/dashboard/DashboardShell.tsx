@@ -205,6 +205,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             hasPaidAccess={hasPaidAccess}
             collapsed={collapsed}
             onToggleCollapsed={() => setCollapsed((c) => !c)}
+            onOpenPlan={() => setPlanOpen(true)}
           />
 
           {/* Resize handle */}
