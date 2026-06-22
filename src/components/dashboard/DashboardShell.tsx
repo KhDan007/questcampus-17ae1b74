@@ -88,6 +88,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
+  const [planOpen, setPlanOpen] = useState(false);
 
   const [width, setWidth] = useState<number>(DEFAULT_W);
   const [collapsed, setCollapsed] = useState<boolean>(false);
