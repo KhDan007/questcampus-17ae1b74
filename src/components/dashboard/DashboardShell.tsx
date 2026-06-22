@@ -301,6 +301,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         body="Join the waitlist to be first in line and lock in 30% off monthly access."
         feature={waitlist ?? undefined}
       />
+
+      <PlanDialog open={planOpen} onClose={() => setPlanOpen(false)} />
     </>
   );
 }
