@@ -281,6 +281,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     hasPaidAccess={hasPaidAccess}
                     collapsed={false}
                     onToggleCollapsed={() => {}}
+                    onOpenPlan={() => {
+                      setPlanOpen(true);
+                      setMobileOpen(false);
+                    }}
                     hideCollapseToggle
                   />
                 </motion.aside>
