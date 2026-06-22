@@ -311,6 +311,7 @@ function SidebarBody({
   hasPaidAccess,
   collapsed,
   onToggleCollapsed,
+  onOpenPlan,
   hideCollapseToggle,
 }: {
   pathname: string;
@@ -318,6 +319,7 @@ function SidebarBody({
   hasPaidAccess: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  onOpenPlan: () => void;
   hideCollapseToggle?: boolean;
 }) {
   const reduce = useReducedMotion();
