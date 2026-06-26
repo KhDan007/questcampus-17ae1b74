@@ -60,6 +60,7 @@ export function MyUniversitiesSection() {
         </div>
         <Link
           to="/universities"
+          search={{ q: "" }}
           className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
           Manage universities <ArrowRight className="h-3.5 w-3.5" />
@@ -83,6 +84,7 @@ export function MyUniversitiesSection() {
             </p>
             <Link
               to="/universities"
+              search={{ q: "" }}
               className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
             >
               Open universities <ArrowRight className="h-3.5 w-3.5" />
@@ -104,6 +106,7 @@ export function MyUniversitiesSection() {
             {remaining > 0 && (
               <Link
                 to="/universities"
+                search={{ q: "" }}
                 className="mt-4 inline-flex items-center gap-1.5 text-label-md font-semibold text-primary hover:underline"
               >
                 + {remaining} more — manage all <ArrowRight className="h-3.5 w-3.5" />

@@ -82,6 +82,7 @@ export function HeroOnboarding() {
             >
               <Link
                 to="/universities"
+                search={{ q: "" }}
                 className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
                 <Search className="h-4 w-4" />

@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
 import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
+import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
 
 const UniversitiesRoute = UniversitiesRouteImport.update({
   id: '/universities',
@@ -82,6 +83,11 @@ const UnlockCancelRoute = UnlockCancelRouteImport.update({
   path: '/unlock/cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock': typeof UnlockIndexRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/tos'
     | '/universities'
+    | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/tos'
     | '/universities'
+    | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/tos'
     | '/universities'
+    | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   TosRoute: typeof TosRoute
   UniversitiesRoute: typeof UniversitiesRoute
+  OauthCallbackRoute: typeof OauthCallbackRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
   UnlockIndexRoute: typeof UnlockIndexRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnlockCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   TosRoute: TosRoute,
   UniversitiesRoute: UniversitiesRoute,
+  OauthCallbackRoute: OauthCallbackRoute,
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,
   UnlockIndexRoute: UnlockIndexRoute,
@@ -292,3 +313,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

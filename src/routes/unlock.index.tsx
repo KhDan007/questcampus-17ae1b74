@@ -169,6 +169,7 @@ function UnlockPage() {
                     </p>
                     <Link
                       to="/universities"
+                      search={{ q: "" }}
                       className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none"
                     >
                       {t("unlock.seeList")}
@@ -267,6 +268,7 @@ function UnlockPage() {
           <div className="mt-12 text-center">
             <Link
               to="/universities"
+              search={{ q: "" }}
               className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />

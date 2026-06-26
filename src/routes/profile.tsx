@@ -243,6 +243,7 @@ function ProfilePage() {
             </div>
             <Link
               to="/universities"
+              search={{ q: "" }}
               className="hidden shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
             >
               See full list <ArrowRight className="h-4 w-4" />
@@ -305,6 +306,7 @@ function ProfilePage() {
               </p>
               <Link
                 to="/universities"
+                search={{ q: "" }}
                 className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
                 Open universities <ArrowRight className="h-4 w-4" />

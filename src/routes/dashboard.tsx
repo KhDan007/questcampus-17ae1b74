@@ -336,6 +336,7 @@ function DashboardPage() {
             <div className="mt-5">
               <Link
                 to="/universities"
+                search={{ q: "" }}
                 className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md font-semibold text-primary hover:underline"
               >
                 Open full universities workspace
