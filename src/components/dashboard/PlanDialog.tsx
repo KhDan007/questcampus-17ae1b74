@@ -47,12 +47,24 @@ const CANCEL_REASONS = [
 ];
 
 export function PlanDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [confirming, setConfirming] = useState(false);
+  const [stage, setStage] = useState<Stage>("idle");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  const [otherReason, setOtherReason] = useState("");
 
   if (typeof document === "undefined") return null;
+
+  const done = stage === "done";
+
+  const resolvedReason = (): string => {
+    if (selectedReason === "Other") return otherReason.trim();
+    return selectedReason ?? "";
+  };
+
+  const canSubmit =
+    selectedReason !== null &&
+    (selectedReason !== "Other" || otherReason.trim().length > 0);
 
   const handleCancel = async () => {
     const token = auth.getSession()?.token;
@@ -62,10 +74,10 @@ export function PlanDialog({ open, onClose }: { open: boolean; onClose: () => vo
     }
     setLoading(true);
     setMsg(null);
-    const r = await cancelSubscription(token);
+    const r = await cancelSubscription(token, resolvedReason());
     setLoading(false);
     if (r.ok) {
-      setDone(true);
+      setStage("done");
       setMsg("Your subscription is set to cancel at the end of the billing period.");
     } else {
       setMsg(r.message ?? "Could not cancel. Please contact support.");
@@ -73,10 +85,11 @@ export function PlanDialog({ open, onClose }: { open: boolean; onClose: () => vo
   };
 
   const close = () => {
-    setConfirming(false);
+    setStage("idle");
     setMsg(null);
-    setDone(false);
     setLoading(false);
+    setSelectedReason(null);
+    setOtherReason("");
     onClose();
   };
 
