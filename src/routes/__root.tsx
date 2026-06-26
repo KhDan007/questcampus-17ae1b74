@@ -17,7 +17,10 @@ import { NavV2 } from "@/components/landing2/NavV2";
 
 import appCss from "../styles.css?url";
 import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
+import ogImageAsset from "@/assets/questcampus-og.jpg.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const OG_IMAGE_URL = `https://questcampus.space${ogImageAsset.url}`;
 
 function NotFoundComponent() {
   return (
@@ -92,12 +95,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:title", content: "QuestCampus" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "QuestCampus" },
-      { property: "og:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
-      { name: "twitter:description", content: "QuestCampus front is a web application for user onboarding and authentication." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aec448e7-0839-42f5-8bbb-53aae96b8cc6/id-preview-608e99aa--a2be596c-1a32-48dd-b3dc-34e3242da808.lovable.app-1780666475149.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aec448e7-0839-42f5-8bbb-53aae96b8cc6/id-preview-608e99aa--a2be596c-1a32-48dd-b3dc-34e3242da808.lovable.app-1780666475149.png" },
+      { property: "og:description", content: "Search 11,000+ universities, get an AI-matched shortlist, and build every application from one workspace." },
+      { name: "twitter:description", content: "Search 11,000+ universities, get an AI-matched shortlist, and build every application from one workspace." },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
