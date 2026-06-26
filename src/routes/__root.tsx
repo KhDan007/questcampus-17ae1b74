@@ -17,7 +17,10 @@ import { NavV2 } from "@/components/landing2/NavV2";
 
 import appCss from "../styles.css?url";
 import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
+import ogImageAsset from "@/assets/questcampus-og.jpg.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const OG_IMAGE_URL = `https://questcampus.space${ogImageAsset.url}`;
 
 function NotFoundComponent() {
   return (
