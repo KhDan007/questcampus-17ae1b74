@@ -14,12 +14,15 @@ function siteBase(): string {
   return url.replace(/\/$/, "");
 }
 
-async function cancelSubscription(token: string): Promise<{ ok: boolean; message?: string }> {
+async function cancelSubscription(
+  token: string,
+  reason: string,
+): Promise<{ ok: boolean; message?: string }> {
   try {
     const res = await fetch(`${siteBase()}/api/payments/cancel`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: "{}",
+      body: JSON.stringify({ reason }),
     });
     if (res.ok) return { ok: true };
     let body: { error?: string } = {};
@@ -31,6 +34,17 @@ async function cancelSubscription(token: string): Promise<{ ok: boolean; message
     return { ok: false, message: e instanceof Error ? e.message : "Network error" };
   }
 }
+
+type Stage = "idle" | "warn" | "reason" | "done";
+
+const CANCEL_REASONS = [
+  "Too expensive",
+  "Not using it enough",
+  "Missing features I need",
+  "Found a better alternative",
+  "Just exploring / not ready yet",
+  "Technical issues or bugs",
+];
 
 export function PlanDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [confirming, setConfirming] = useState(false);
