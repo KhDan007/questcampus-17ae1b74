@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { Crown, X, Loader2, ShieldCheck } from "lucide-react";
+import { Crown, X, Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
 import { auth } from "@/lib/auth/client";
 
 function siteBase(): string {
