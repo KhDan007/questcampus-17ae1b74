@@ -843,6 +843,11 @@ function CompactMatchCard({
             Visit ↗
           </a>
         )}
+        <ApplyButton
+          source={card.source ?? "scorecard"}
+          externalId={card.externalId}
+          targetName={card.name}
+        />
         {onDismiss && (
           <button
             type="button"
