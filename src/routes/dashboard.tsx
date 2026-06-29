@@ -255,7 +255,11 @@ function DashboardPage() {
           <NextStepCard isAuthenticated={isAuthenticated} />
 
           {/* Resume in-progress application */}
-          {isAuthenticated && <ActiveApplyResumeCard />}
+          {isAuthenticated && (
+            <SilentErrorBoundary>
+              <ActiveApplyResumeCard />
+            </SilentErrorBoundary>
+          )}
 
 
 
