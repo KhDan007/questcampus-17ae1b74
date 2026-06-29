@@ -26,6 +26,7 @@ import { getSessionId } from "@/lib/onboarding/session";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { RefineRecommendationsCard } from "@/components/universities/RefineRecommendationsCard";
 import { useProgress } from "@/lib/progress";
+import { ApplyButton } from "@/components/apply/ApplyButton";
 
 export const Route = createFileRoute("/universities")({
   head: () => ({
