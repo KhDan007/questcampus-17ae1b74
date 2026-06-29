@@ -70,9 +70,17 @@ function ApplyHubPage() {
         </header>
 
         <div className="mt-8 space-y-8">
-          {token && <ActiveJobsList token={token} />}
-          <DocumentManager />
-          <SavedReady />
+          {token && (
+            <SilentErrorBoundary>
+              <ActiveJobsList token={token} />
+            </SilentErrorBoundary>
+          )}
+          <SilentErrorBoundary>
+            <DocumentManager />
+          </SilentErrorBoundary>
+          <SilentErrorBoundary>
+            <SavedReady />
+          </SilentErrorBoundary>
         </div>
       </main>
     </DashboardShell>
