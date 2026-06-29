@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useCallback, useEffect, useState } from "react";
+import { useConvex, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 
@@ -78,10 +78,34 @@ export function useApplyJob(jobId: string | undefined) {
 
 export function useActiveApplyJob() {
   const { token } = useAuth();
-  return useQuery(
-    api.applyQueue.myActiveJob,
-    token ? { token } : "skip",
-  ) as ApplyJob | null | undefined;
+  const client = useConvex();
+  const [job, setJob] = useState<ApplyJob | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!token) {
+      setJob(null);
+      return;
+    }
+
+    let cancelled = false;
+    setJob(undefined);
+
+    client
+      .query(api.applyQueue.myActiveJob, { token })
+      .then((result) => {
+        if (!cancelled) setJob((result as ApplyJob | null | undefined) ?? null);
+      })
+      .catch((error) => {
+        console.warn("Unable to load active application job", error);
+        if (!cancelled) setJob(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [client, token]);
+
+  return job;
 }
 
 export function useApplicationDocuments() {
