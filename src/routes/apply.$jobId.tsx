@@ -16,7 +16,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LiveCanvas } from "@/components/apply/LiveCanvas";
 import { useAuth } from "@/lib/auth/useAuth";
-import { useApplyActions, useApplyJob } from "@/lib/applyQueue/client";
+import { useApplyActions, useApplyJob, type ApplyJobCheckpoint } from "@/lib/applyQueue/client";
 
 export const Route = createFileRoute("/apply/$jobId")({
   head: () => ({
