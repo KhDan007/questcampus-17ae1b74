@@ -74,7 +74,14 @@ const TOP_ITEMS: Item[] = [
     icon: CalendarClock,
     feature: "Deadline tracker",
   },
-  { kind: "waitlist", key: "autoapply", label: "Auto-Apply", icon: Send, feature: "Auto-Apply" },
+  {
+    kind: "link",
+    key: "autoapply",
+    label: "Auto-Apply",
+    to: "/apply",
+    icon: Send,
+    match: (p) => p.startsWith("/apply"),
+  },
 ];
 
 const MIN_W = 200;
