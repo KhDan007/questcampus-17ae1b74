@@ -280,11 +280,7 @@ function CheckpointModal({
   onConfirm,
   busy,
 }: {
-  checkpoint: NonNullable<ReturnType<typeof useApplyJob> extends infer J
-    ? J extends { checkpoint?: infer C }
-      ? C
-      : never
-    : never>;
+  checkpoint: ApplyJobCheckpoint;
   onConfirm: (kind: string, value?: unknown) => Promise<void>;
   busy: boolean;
 }) {
