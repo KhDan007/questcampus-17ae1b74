@@ -253,6 +253,11 @@ function DashboardPage() {
           {/* Recommended next step */}
           <NextStepCard isAuthenticated={isAuthenticated} />
 
+          {/* Resume in-progress application */}
+          {isAuthenticated && <ActiveApplyResumeCard />}
+
+
+
 
           {/* Matches */}
           <section className="mt-14">
