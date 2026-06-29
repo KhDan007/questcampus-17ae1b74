@@ -550,7 +550,6 @@ function ToolTile({
 }
 
 function ActiveApplyResumeCard() {
-  const { useActiveApplyJob } = require("@/lib/applyQueue/client") as typeof import("@/lib/applyQueue/client");
   const job = useActiveApplyJob();
   if (!job) return null;
   return (
