@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { ApplyButton } from "@/components/apply/ApplyButton";
 import type { ApplyJob } from "@/lib/applyQueue/client";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/apply")({
   head: () => ({
