@@ -25,6 +25,7 @@ import { UniversitySearchSection } from "@/components/universities/UniversitySea
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { markProgress } from "@/lib/progress";
+import { useActiveApplyJob } from "@/lib/applyQueue/client";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
@@ -252,6 +253,11 @@ function DashboardPage() {
 
           {/* Recommended next step */}
           <NextStepCard isAuthenticated={isAuthenticated} />
+
+          {/* Resume in-progress application */}
+          {isAuthenticated && <ActiveApplyResumeCard />}
+
+
 
 
           {/* Matches */}
@@ -540,5 +546,33 @@ function ToolTile({
       </div>
       <ArrowRight className="h-5 w-5 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
     </motion.button>
+  );
+}
+
+function ActiveApplyResumeCard() {
+  const job = useActiveApplyJob();
+  if (!job) return null;
+  return (
+    <Link
+      to="/apply/$jobId"
+      params={{ jobId: job.jobId }}
+      className="mt-6 flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-4 backdrop-blur-md qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5"
+    >
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white">
+        <Send className="h-5 w-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-primary">
+          Application in progress
+        </p>
+        <p className="truncate font-display text-headline-sm font-bold text-on-surface">
+          {job.targetName ?? job.externalId ?? "Resume application"}
+        </p>
+        <p className="truncate text-label-sm text-on-surface-variant">
+          {job.progress?.message ?? job.status}
+        </p>
+      </div>
+      <ArrowRight className="h-5 w-5 shrink-0 text-on-surface/60" />
+    </Link>
   );
 }
