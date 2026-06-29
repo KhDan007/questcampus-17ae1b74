@@ -79,37 +79,30 @@ function ApplyHubPage() {
 }
 
 function ActiveJobsList({ token }: { token: string }) {
-  const jobs = useQuery(api.applyQueue.myActiveJobs, { token }) as ApplyJob[] | undefined;
-  const list = jobs ?? [];
-  if (list.length === 0) return null;
+  const job = useQuery(api.applyQueue.myActiveJob, { token }) as ApplyJob | null | undefined;
+  if (!job) return null;
   return (
     <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
       <h2 className="font-display text-headline-sm font-bold text-on-surface">In progress</h2>
-      <ul className="mt-3 grid gap-2">
-        {list.map((j) => (
-          <li key={j.jobId}>
-            <Link
-              to="/apply/$jobId"
-              params={{ jobId: j.jobId }}
-              className="flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-4 py-3 transition-transform hover:-translate-y-0.5 hover:translate-x-0.5"
-            >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
-                <GraduationCap className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-label-lg font-bold text-on-surface">
-                  {j.targetName ?? j.externalId ?? "Application"}
-                </p>
-                <p className="text-label-sm text-on-surface-variant">
-                  {STATUS_LABEL[j.status] ?? j.status}
-                  {j.progress?.message ? ` · ${j.progress.message}` : ""}
-                </p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-on-surface/60" />
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <Link
+        to="/apply/$jobId"
+        params={{ jobId: job.jobId }}
+        className="mt-3 flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-4 py-3 transition-transform hover:-translate-y-0.5 hover:translate-x-0.5"
+      >
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+          <GraduationCap className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display text-label-lg font-bold text-on-surface">
+            {job.targetName ?? job.externalId ?? "Application"}
+          </p>
+          <p className="text-label-sm text-on-surface-variant">
+            {STATUS_LABEL[job.status] ?? job.status}
+            {job.progress?.message ? ` · ${job.progress.message}` : ""}
+          </p>
+        </div>
+        <ArrowRight className="h-4 w-4 text-on-surface/60" />
+      </Link>
     </section>
   );
 }
