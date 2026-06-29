@@ -25,6 +25,7 @@ import { UniversitySearchSection } from "@/components/universities/UniversitySea
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { markProgress } from "@/lib/progress";
+import { useActiveApplyJob } from "@/lib/applyQueue/client";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
