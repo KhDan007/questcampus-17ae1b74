@@ -58,15 +58,10 @@ function makeTiles(scale: number): Tile[] {
   });
 }
 
-// Synchronously read mobile state on first render to avoid mounting the
-// expensive desktop tree on phones for a frame.
-function getInitialIsMobile() {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia("(max-width: 1279px)").matches;
-}
-
 function useIsMobile() {
-  const [m, setM] = useState<boolean>(getInitialIsMobile);
+  // Always start with `false` so SSR and the initial client render match.
+  // Then flip to the real value after mount to avoid hydration mismatches.
+  const [m, setM] = useState<boolean>(false);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1279px)");
     const on = () => setM(mq.matches);
