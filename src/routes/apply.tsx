@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { ApplyButton } from "@/components/apply/ApplyButton";
 import type { ApplyJob } from "@/lib/applyQueue/client";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/apply")({
   head: () => ({
@@ -69,9 +70,17 @@ function ApplyHubPage() {
         </header>
 
         <div className="mt-8 space-y-8">
-          {token && <ActiveJobsList token={token} />}
-          <DocumentManager />
-          <SavedReady />
+          {token && (
+            <SilentErrorBoundary>
+              <ActiveJobsList token={token} />
+            </SilentErrorBoundary>
+          )}
+          <SilentErrorBoundary>
+            <DocumentManager />
+          </SilentErrorBoundary>
+          <SilentErrorBoundary>
+            <SavedReady />
+          </SilentErrorBoundary>
         </div>
       </main>
     </DashboardShell>
