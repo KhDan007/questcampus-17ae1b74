@@ -83,6 +83,26 @@ export function PrepWizard() {
         exit: { opacity: 0, x: -24 },
       };
 
+  if (items.length === 0) {
+    return (
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border-2 border-dashed border-on-surface/30 bg-surface/80 p-8 text-center qc-hard-shadow-sm">
+        <h2 className="font-display text-headline-md font-bold text-on-surface">
+          Pick universities first
+        </h2>
+        <p className="mt-2 text-body-md text-on-surface-variant">
+          Head back to your shortlist, select one or more universities, then come back to prep your details and deep-research them all at once.
+        </p>
+        <button
+          type="button"
+          onClick={() => void navigate({ to: "/apply" })}
+          className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <ArrowLeft className="h-4 w-4" /> Choose universities
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="mb-6">
