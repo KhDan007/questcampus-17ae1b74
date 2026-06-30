@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Search, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckSquare, Search, Send, Square } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
@@ -96,7 +96,7 @@ function ApplyHubPage() {
 
 function SavedToPick() {
   const { saved } = useSavedUniversities();
-  const { count } = useApplySelection();
+  const { count, items, toggle, clear } = useApplySelection();
 
   if (!saved || saved.length === 0) {
     return (
@@ -105,8 +105,7 @@ function SavedToPick() {
           Start by saving a few universities
         </p>
         <p className="mt-2 text-body-md text-on-surface-variant">
-          Browse your AI matches or search to build a shortlist — then come back to apply to them
-          in one batch.
+          Browse your AI matches or search to build a shortlist — then come back to deep-research and apply in one batch.
         </p>
         <Link
           to="/universities"
@@ -118,6 +117,20 @@ function SavedToPick() {
     );
   }
 
+  const allSelected = items.length === saved.length && saved.length > 0;
+  const selectAll = () => {
+    if (allSelected) {
+      clear();
+      return;
+    }
+    const selectedKeys = new Set(items.map((i) => `${i.source}::${i.externalId}`));
+    for (const u of saved) {
+      if (!selectedKeys.has(`${u.source}::${u.externalId}`)) {
+        toggle({ source: u.source, externalId: u.externalId, name: u.name });
+      }
+    }
+  };
+
   return (
     <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -126,15 +139,24 @@ function SavedToPick() {
             Your shortlist · {saved.length}
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            Tap any card to select. Apply to one, three, or all of them at once.
+            Pick the ones you want. Deep-research them all at once, or jump straight into applying.
           </p>
         </div>
-        {count === 0 && (
-          <span className="rounded-full border-2 border-on-surface/20 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
-            Select to continue
-          </span>
-        )}
+        <button
+          type="button"
+          onClick={selectAll}
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+          {allSelected ? "Clear all" : "Select all"}
+        </button>
       </header>
+
+      {count === 0 && (
+        <p className="mt-3 rounded-md border-2 border-dashed border-on-surface/20 bg-surface-container-lowest px-3 py-2 text-label-sm text-on-surface-variant">
+          Tip: select one or more universities below, then choose <span className="font-semibold text-on-surface">Deep research</span> or <span className="font-semibold text-on-surface">Apply</span> from the action bar.
+        </p>
+      )}
 
       <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {saved.map((u) => (
