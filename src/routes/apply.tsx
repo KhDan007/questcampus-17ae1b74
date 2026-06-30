@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Search, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckSquare, Search, Send, Square } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
