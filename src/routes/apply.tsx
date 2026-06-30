@@ -174,25 +174,3 @@ function SavedToPick() {
     </section>
   );
 }
-          <span className="rounded-full border-2 border-on-surface/20 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
-            Select to continue
-          </span>
-        )}
-      </header>
-
-      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {saved.map((u) => (
-          <li key={u.id}>
-            <SelectableUniCard
-              source={u.source}
-              externalId={u.externalId}
-              name={u.name}
-              city={u.city}
-              country={u.country}
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
