@@ -37,7 +37,7 @@ function ApplyHubPage() {
       <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-32 pt-28 sm:px-8 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-28 sm:px-8 sm:pb-32 lg:px-12"
       >
         <Link
           to="/dashboard"
