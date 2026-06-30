@@ -1,54 +1,83 @@
-# Onboarding v2 + Live Match Cards
+# Apply Flow Redesign
 
-The spec replaces the placeholder "Refine now" → waitlist flow on the dashboard with a real **single-page onboarding** that saves to Convex and produces **much more accurate matches**. Match cards already have a dropdown that calls `enrich.onOpen` — they just need a few small additions to match the spec exactly.
+The current Apply experience hides the primary CTA inside a small icon button on saved-uni cards, has no multi-select, no guided onboarding for the user's own data, and dumps the user on a waiting screen while deep research runs. We'll rebuild it as a four-stage flow with the same backend.
 
-## 1. New route: `/onboarding` (single-page form, signed-in only)
+## The four stages
 
-Create `src/routes/onboarding.tsx`:
+```text
+1. Pick      →  2. Prep         →  3. Research          →  4. Apply
+   Multi-      Guided profile +    Background w/        Live browser
+   select      doc onboarding      productive work         + submit
+```
 
-- **Auth-gated**: in `beforeLoad` / on mount, if `!isAuthenticated`, redirect to `/signin?redirect=/onboarding`. Anonymous users hitting the URL never see the form.
-- Hero header matching landing2 style ("Tell us more — we'll re-rank your matches.")
-- One scrollable page, visually grouped into 4 sections:
-  1. **You** — `firstName`, `home.country`, `lifeStage.choice`
-  2. **Where & what you want to study** — `targetCountries.selected` (★), `fields.selected` (★), `subjects.selected`
-  3. **Academics** — `grades` (with optional exact GPA + scale), `tests` (sat/act/none, score band or exact)
-  4. **Money, fit & future** — `financialNeed`, `budget`, `uniSize`, `campusVibe`, `priorities` (max 3), `futureSelf`
-- Send values **verbatim** as listed in the spec (e.g. `hs-junior`, `engineering`, `under_10k`, etc.).
-- Auto-save (debounced ~600 ms) via `api.onboarding.saveProgress({ sessionId, token, answers, currentStep })` where `currentStep` = count of filled fields.
-- Prefill via `useQuery(api.onboarding.getActive, { sessionId, token })`.
-- "Anywhere / open" target-countries pill sends `{ selected: [] }`.
-- Submit button: `api.onboarding.complete({ sessionId, token, answers, completedAt })` → navigate to `/dashboard?refresh=1`.
+The user moves linearly but can re-enter any stage from a left-rail stepper at the top of `/apply`.
 
-## 2. Dashboard wiring
+## 1. Pick — intuitive Apply confirmation + multi-select
 
-`src/routes/dashboard.tsx`:
-- "Refine now" button → `<Link to="/onboarding">` instead of opening the waitlist popup. (If somehow shown to an anonymous user, the route guard handles redirect.)
-- After landing from `/onboarding` (presence of `?refresh=1`), call `api.rag.recommend.recommend({ sessionId, token, plan: "free", force: true })` and render results inline with `UniversityCard` (replacing the old "Your university matches" stored in localStorage). Keep the existing localStorage card view as a fallback when no Convex data exists.
+- On the saved-uni grid (`/apply` and `MyUniversitiesSection`), every card becomes a **selectable tile** with a visible checkbox in the top-right corner and a giant primary "Start application" pill across the bottom of each card. No more 12px "Apply" icon buttons.
+- A persistent **bottom action bar** appears the moment ≥1 card is checked: "Apply to N universities" + secondary "Deep-research only". This is the multi-select confirm step.
+- On `/universities` matches view: every match card gets the same checkbox + "Add to apply queue" action so the user can build the batch from anywhere.
+- Hitting "Apply to N" goes to stage 2 with the selected IDs in route search params.
 
-## 3. Match-card additions (small)
+## 2. Prep — guided one-question-at-a-time onboarding
 
-`src/components/profile/UniversityCard.tsx`:
-- Extend `RecCard` with `id`, `source`, `region`, `globalRank`, `languageOfInstruction`, `intlTuition`, `intlTuitionCurrency`, `ieltsOverall`, `toeflIbt`, `fields` (all optional).
-- Pass `id` (preferred) to `EnrichmentDetails`.
-- Always show the **Official website** link when `website` is present (already done).
+A new route `/apply/prep` shows a single-column wizard, one prompt per screen, with progress dots at top:
 
-`src/components/profile/EnrichmentDetails.tsx`:
-- Add `insights: Array<{ category, text, sourceUrl }>` to the type and render them grouped at the bottom of the dropdown. Each insight: verbatim text + small "source" link. Fallback "Not listed — check official site" already exists.
+```text
+Your name → Date of birth → Citizenship → High school → GPA →
+Test scores → Activities → Documents (transcript, PS, recs, passport, resume) →
+Review & confirm
+```
 
-## 4. Cleanup
+Each step:
+- One big question in display type, a clear input, "Continue" pill, "Back" link.
+- Inline helper text ("This is what universities ask for. You can edit later.").
+- Document steps wrap `DocumentManager` rows one at a time with skip option.
+- Skipped or missing fields surface a small "3 fields still needed" chip on every later screen.
+- The whole wizard auto-saves to the existing applicant-profile mutation after each step (no "save" button).
 
-- Remove the dashboard's "Refined recommendations" upcoming-waitlist tile — onboarding is now live.
-- Keep the existing `linkOnLogin` call unchanged.
+The same backend doc + profile mutations are reused; only the UI is new.
 
-## Out of scope
+## 3. Research — kick off + redirect to productive work
 
-- No backend changes (spec says backend is already deployed).
-- No payment-flow changes — `recommend({ plan: "paid" })` keeps the existing unlock gate.
-- The landing-page mini-quiz (`HeroQuiz`) stays as-is — it's the lightweight funnel; `/onboarding` is the deep, signed-in-only one.
+When the user finishes prep (or clicks "Deep-research only" from stage 1):
+- We enqueue an apply job **per selected uni** and immediately navigate to `/apply` hub showing a **Research dock** at the top: small live progress chips for each uni driven by `api.ingest.deepResearch.deepResearchProgress({ system, externalId })`.
+- The hero of `/apply` switches to a **"While we research, do this"** card with 2–3 suggested productive actions ranked by progress signals: finish profile gaps, upload missing doc, draft personal statement (link to `/essay`), refine recommendations. Each is a single primary CTA, not a list.
+- Status states render per spec: `researching_deep` → compact progress with stage/message, `ready` → green check + "Open application", `paywalled` → amber chip with copy, `error` → muted chip "Couldn't finish — public requirements still available". Never block the page.
 
-## Technical notes
+## 4. Apply — already exists, only entry-point changes
 
-- Auth gate uses the existing `useAuth()` hook + `<Navigate to="/signin" />`, mirroring the pattern already used elsewhere (no new `_authenticated` layout needed for one route).
-- Convex calls via `useMutation` / `useAction` / `useQuery` from `convex/react` (already wired via `ConvexClientProvider`).
-- Form state stored in a single `answers` object so save/load is one shape.
-- Country list reused from `HeroQuiz` (extract to `src/lib/onboarding/countries-v2.ts`).
+When a uni flips to `ready`, the progress chip's CTA routes into the existing `/apply/$jobId` live-browser flow. No changes there.
+
+## Files
+
+New:
+- `src/routes/apply.prep.tsx` — guided wizard route
+- `src/components/apply/PrepWizard.tsx` — step engine + one-question-per-screen UI
+- `src/components/apply/ApplyStepper.tsx` — Pick/Prep/Research/Apply rail used on apply screens
+- `src/components/apply/SelectableUniCard.tsx` — checkbox + big CTA card used in saved + matches views
+- `src/components/apply/BatchActionBar.tsx` — sticky bottom bar shown when selection > 0
+- `src/components/apply/ResearchDock.tsx` — live progress chips for in-flight jobs
+- `src/components/apply/NextProductiveAction.tsx` — single-CTA "while we research" card
+- `src/lib/applyQueue/selection.ts` — small zustand-free hook (`useApplySelection`) for the cross-page selection set, persisted in `sessionStorage`
+- `src/lib/applyQueue/deepResearch.ts` — `useDeepResearchProgress({ system, externalId })` wrapping the Convex query
+
+Modified:
+- `src/routes/apply.tsx` — new layout: stepper, Research dock, NextProductiveAction, then docs, then `SelectableUniCard` grid + `BatchActionBar`
+- `src/routes/universities.tsx` — wrap each result/match card with selectable wrapper; show `BatchActionBar`
+- `src/components/profile/MyUniversitiesSection.tsx` — use `SelectableUniCard`
+- `src/components/apply/ApplyButton.tsx` — keep for single-uni quick-apply, restyle to match new visual weight (full-width primary inside card)
+- `src/components/apply/DocumentManager.tsx` — expose a "compact step" variant the wizard reuses
+
+Backend: zero changes. Reuses `enqueueApply`, `liveTicket`, `deepResearchProgress`, existing doc + profile mutations.
+
+## Design register
+
+Product UI (per Impeccable product register). Carry over the project's existing tokens (`bg-surface`, `border-on-surface`, `qc-hard-shadow`, primary/tertiary). Motion is restrained: one-question wizard slides horizontally with `motion` x-transition + opacity, progress chips animate the percent bar only. Reduced-motion fallback: crossfade.
+
+## Out of scope this pass
+
+- Backend changes
+- Per-uni custom essays (different feature)
+- Reordering the application queue (can add later if asked)
+- Visual redesign of the existing `/apply/$jobId` live-browser page
