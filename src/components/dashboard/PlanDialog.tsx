@@ -8,8 +8,10 @@ import { auth } from "@/lib/auth/client";
 
 function siteBase(): string {
   const explicit = import.meta.env.VITE_CONVEX_SITE_URL as string | undefined;
-  const cloud = import.meta.env.VITE_CONVEX_URL as string | undefined;
-  const url = explicit ?? cloud?.replace(".convex.cloud", ".convex.site");
+  const base = import.meta.env.VITE_CONVEX_URL as string | undefined;
+  const url =
+    explicit ??
+    base?.replace(".convex.cloud", ".convex.site").replace("convex.", "api.");
   if (!url) throw new Error("VITE_CONVEX_URL is not set");
   return url.replace(/\/$/, "");
 }
