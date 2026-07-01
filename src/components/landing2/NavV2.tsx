@@ -9,6 +9,7 @@ import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function NavV2() {
   const reduce = useReducedMotion();
@@ -121,6 +122,7 @@ export function NavV2() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             )}
+            <ThemeToggle />
             {!isUnlock && <ProfileMenu />}
           </div>
         </nav>
