@@ -146,72 +146,215 @@
 
 /* ============================================================
    QuestCampus design tokens — Illuminated Path (Electric Coral)
+   Light default + Midnight Coral dark. Tokens are defined as CSS
+   variables on :root / .dark so the .dark class can override them,
+   then mapped into Tailwind utilities via @theme inline.
    Fonts loaded via Google Fonts <link> in __root.tsx.
    ============================================================ */
 @theme {
   --font-display: "Epilogue", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
   --font-label: "Geist", ui-sans-serif, system-ui, sans-serif;
+}
 
-  --color-surface: #fdf9f5;
-  --color-surface-dim: #ddd9d6;
-  --color-surface-bright: #fdf9f5;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f7f3ef;
-  --color-surface-container: #f1ede9;
-  --color-surface-container-high: #ebe7e4;
-  --color-surface-container-highest: #e5e2de;
-  --color-surface-variant: #e5e2de;
-  --color-surface-tint: #b3272c;
+@theme inline {
+  --color-surface: var(--qc-surface);
+  --color-surface-dim: var(--qc-surface-dim);
+  --color-surface-bright: var(--qc-surface-bright);
+  --color-surface-container-lowest: var(--qc-surface-container-lowest);
+  --color-surface-container-low: var(--qc-surface-container-low);
+  --color-surface-container: var(--qc-surface-container);
+  --color-surface-container-high: var(--qc-surface-container-high);
+  --color-surface-container-highest: var(--qc-surface-container-highest);
+  --color-surface-variant: var(--qc-surface-variant);
+  --color-surface-tint: var(--qc-surface-tint);
 
-  --color-on-surface: #1c1c19;
-  --color-on-surface-variant: #5a413f;
-  --color-background: #fdf9f5;
-  --color-on-background: #1c1c19;
+  --color-on-surface: var(--qc-on-surface);
+  --color-on-surface-variant: var(--qc-on-surface-variant);
+  --color-background: var(--qc-background);
+  --color-on-background: var(--qc-on-background);
 
-  --color-inverse-surface: #31302e;
-  --color-inverse-on-surface: #f4f0ec;
-  --color-inverse-primary: #ffb3ae;
+  --color-inverse-surface: var(--qc-inverse-surface);
+  --color-inverse-on-surface: var(--qc-inverse-on-surface);
+  --color-inverse-primary: var(--qc-inverse-primary);
 
-  --color-outline: #8d706e;
-  --color-outline-variant: #e2bebc;
+  --color-outline: var(--qc-outline);
+  --color-outline-variant: var(--qc-outline-variant);
 
-  --color-primary: #b3272c;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #ff5f5d;
-  --color-on-primary-container: #64000b;
+  --color-primary: var(--qc-primary);
+  --color-on-primary: var(--qc-on-primary);
+  --color-primary-container: var(--qc-primary-container);
+  --color-on-primary-container: var(--qc-on-primary-container);
 
-  --color-secondary: #7c5800;
-  --color-on-secondary: #ffffff;
-  --color-secondary-container: #feb700;
-  --color-on-secondary-container: #6b4b00;
+  --color-secondary: var(--qc-secondary);
+  --color-on-secondary: var(--qc-on-secondary);
+  --color-secondary-container: var(--qc-secondary-container);
+  --color-on-secondary-container: var(--qc-on-secondary-container);
 
-  --color-tertiary: #3b6934;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #71a267;
-  --color-on-tertiary-container: #073707;
+  --color-tertiary: var(--qc-tertiary);
+  --color-on-tertiary: var(--qc-on-tertiary);
+  --color-tertiary-container: var(--qc-tertiary-container);
+  --color-on-tertiary-container: var(--qc-on-tertiary-container);
 
-  --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-error: var(--qc-error);
+  --color-on-error: var(--qc-on-error);
+  --color-error-container: var(--qc-error-container);
+  --color-on-error-container: var(--qc-on-error-container);
 
-  --color-primary-fixed: #ffdad7;
-  --color-primary-fixed-dim: #ffb3ae;
-  --color-on-primary-fixed: #410005;
-  --color-on-primary-fixed-variant: #910818;
-  --color-secondary-fixed: #ffdea8;
-  --color-secondary-fixed-dim: #ffba20;
-  --color-on-secondary-fixed: #271900;
-  --color-on-secondary-fixed-variant: #5e4200;
-  --color-tertiary-fixed: #bcf0ae;
-  --color-tertiary-fixed-dim: #a1d494;
-  --color-on-tertiary-fixed: #002201;
-  --color-on-tertiary-fixed-variant: #23501e;
+  --color-primary-fixed: var(--qc-primary-fixed);
+  --color-primary-fixed-dim: var(--qc-primary-fixed-dim);
+  --color-on-primary-fixed: var(--qc-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--qc-on-primary-fixed-variant);
+  --color-secondary-fixed: var(--qc-secondary-fixed);
+  --color-secondary-fixed-dim: var(--qc-secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--qc-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--qc-on-secondary-fixed-variant);
+  --color-tertiary-fixed: var(--qc-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--qc-tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--qc-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--qc-on-tertiary-fixed-variant);
 
-  --color-bucket-safety: #3b6934;
-  --color-bucket-target: #2e4a7a;
-  --color-bucket-reach: #5e2150;
+  --color-bucket-safety: var(--qc-bucket-safety);
+  --color-bucket-target: var(--qc-bucket-target);
+  --color-bucket-reach: var(--qc-bucket-reach);
+}
+
+:root {
+  /* Light — Illuminated Path (default) */
+  --qc-surface: #fdf9f5;
+  --qc-surface-dim: #ddd9d6;
+  --qc-surface-bright: #fdf9f5;
+  --qc-surface-container-lowest: #ffffff;
+  --qc-surface-container-low: #f7f3ef;
+  --qc-surface-container: #f1ede9;
+  --qc-surface-container-high: #ebe7e4;
+  --qc-surface-container-highest: #e5e2de;
+  --qc-surface-variant: #e5e2de;
+  --qc-surface-tint: #b3272c;
+
+  --qc-on-surface: #1c1c19;
+  --qc-on-surface-variant: #5a413f;
+  --qc-background: #fdf9f5;
+  --qc-on-background: #1c1c19;
+
+  --qc-inverse-surface: #31302e;
+  --qc-inverse-on-surface: #f4f0ec;
+  --qc-inverse-primary: #ffb3ae;
+
+  --qc-outline: #8d706e;
+  --qc-outline-variant: #e2bebc;
+
+  --qc-primary: #b3272c;
+  --qc-on-primary: #ffffff;
+  --qc-primary-container: #ff5f5d;
+  --qc-on-primary-container: #64000b;
+
+  --qc-secondary: #7c5800;
+  --qc-on-secondary: #ffffff;
+  --qc-secondary-container: #feb700;
+  --qc-on-secondary-container: #6b4b00;
+
+  --qc-tertiary: #3b6934;
+  --qc-on-tertiary: #ffffff;
+  --qc-tertiary-container: #71a267;
+  --qc-on-tertiary-container: #073707;
+
+  --qc-error: #ba1a1a;
+  --qc-on-error: #ffffff;
+  --qc-error-container: #ffdad6;
+  --qc-on-error-container: #93000a;
+
+  --qc-primary-fixed: #ffdad7;
+  --qc-primary-fixed-dim: #ffb3ae;
+  --qc-on-primary-fixed: #410005;
+  --qc-on-primary-fixed-variant: #910818;
+  --qc-secondary-fixed: #ffdea8;
+  --qc-secondary-fixed-dim: #ffba20;
+  --qc-on-secondary-fixed: #271900;
+  --qc-on-secondary-fixed-variant: #5e4200;
+  --qc-tertiary-fixed: #bcf0ae;
+  --qc-tertiary-fixed-dim: #a1d494;
+  --qc-on-tertiary-fixed: #002201;
+  --qc-on-tertiary-fixed-variant: #23501e;
+
+  --qc-bucket-safety: #3b6934;
+  --qc-bucket-target: #2e4a7a;
+  --qc-bucket-reach: #5e2150;
+
+  --qc-grain-color: 28, 28, 25;
+  --qc-shadow-color: 28, 28, 25;
+  --qc-shadow-strength: 1;
+}
+
+.dark {
+  /* Midnight Coral — warm near-black, coral + amber accents */
+  --qc-surface: #0e0b0a;
+  --qc-surface-dim: #080706;
+  --qc-surface-bright: #1a1513;
+  --qc-surface-container-lowest: #060403;
+  --qc-surface-container-low: #131010;
+  --qc-surface-container: #1a1513;
+  --qc-surface-container-high: #221c19;
+  --qc-surface-container-highest: #2b2320;
+  --qc-surface-variant: #2b2320;
+  --qc-surface-tint: #ff5f5d;
+
+  --qc-on-surface: #f4ece6;
+  --qc-on-surface-variant: #c9b8b0;
+  --qc-background: #0e0b0a;
+  --qc-on-background: #f4ece6;
+
+  --qc-inverse-surface: #f4ece6;
+  --qc-inverse-on-surface: #1c1c19;
+  --qc-inverse-primary: #b3272c;
+
+  --qc-outline: #7a635e;
+  --qc-outline-variant: #3a2f2c;
+
+  --qc-primary: #ff7a6b;
+  --qc-on-primary: #3a0004;
+  --qc-primary-container: #b3272c;
+  --qc-on-primary-container: #ffdad7;
+
+  --qc-secondary: #ffc84a;
+  --qc-on-secondary: #2b1c00;
+  --qc-secondary-container: #7c5800;
+  --qc-on-secondary-container: #ffdea8;
+
+  --qc-tertiary: #a1d494;
+  --qc-on-tertiary: #0e2a09;
+  --qc-tertiary-container: #3b6934;
+  --qc-on-tertiary-container: #bcf0ae;
+
+  --qc-error: #ffb4ab;
+  --qc-on-error: #690005;
+  --qc-error-container: #93000a;
+  --qc-on-error-container: #ffdad6;
+
+  --qc-primary-fixed: #ffdad7;
+  --qc-primary-fixed-dim: #ffb3ae;
+  --qc-on-primary-fixed: #410005;
+  --qc-on-primary-fixed-variant: #910818;
+  --qc-secondary-fixed: #ffdea8;
+  --qc-secondary-fixed-dim: #ffba20;
+  --qc-on-secondary-fixed: #271900;
+  --qc-on-secondary-fixed-variant: #5e4200;
+  --qc-tertiary-fixed: #bcf0ae;
+  --qc-tertiary-fixed-dim: #a1d494;
+  --qc-on-tertiary-fixed: #002201;
+  --qc-on-tertiary-fixed-variant: #23501e;
+
+  --qc-bucket-safety: #7fb473;
+  --qc-bucket-target: #7ba4dd;
+  --qc-bucket-reach: #d089c0;
+
+  --qc-grain-color: 255, 235, 220;
+  --qc-shadow-color: 0, 0, 0;
+  --qc-shadow-strength: 1.6;
+}
+
+@theme {
+
 
   --radius-sm: 0.25rem;
   --radius-DEFAULT: 0.5rem;
