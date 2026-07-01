@@ -42,9 +42,6 @@ export function useTheme(): ThemeCtx {
 export const THEME_INIT_SCRIPT = `
 (function(){try{
   var s = localStorage.getItem(${JSON.stringify(STORAGE_KEY)});
-  var m = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  var dark = s ? s === 'dark' : false; /* default light regardless of OS */
-  if (dark) document.documentElement.classList.add('dark');
-  document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+  if (s === 'dark') { document.documentElement.classList.add('dark'); }
 }catch(e){}})();
 `;
