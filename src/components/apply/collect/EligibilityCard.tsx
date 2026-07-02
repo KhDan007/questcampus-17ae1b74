@@ -47,7 +47,7 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
               A few eligibility questions
             </h3>
             <p className="mt-0.5 text-body-sm text-on-surface-variant">
-              {questions.length > 0
+              {showQuestions && questions.length > 0
                 ? `${questions.length} quick ${questions.length === 1 ? "question" : "questions"} to confirm fit.`
                 : "Confirm your fit for each university."}
               {ineligible.length > 0 && ` · ${ineligible.length} may not be a match.`}
