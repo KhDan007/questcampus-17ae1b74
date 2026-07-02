@@ -23,6 +23,8 @@ import type {
   IntakePlan,
 } from "@/lib/apply/intake";
 import { useApplicationDocuments, type DocType } from "@/lib/applyQueue/client";
+import { useGuides } from "@/lib/apply/guidance";
+import { GuideBlock } from "@/components/apply/GuideBlock";
 import { RequirementsZone } from "./RequirementsZone";
 import { IntakeItemField } from "./RequirementField";
 
