@@ -56,7 +56,8 @@ export function AssistantSidebar() {
 function SidebarPanel({ onClose }: { onClose: () => void }) {
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
-  const activeThreadId = selectedId ?? threads?.[0]?._id;
+  const [forceNew, setForceNew] = useState(false);
+  const activeThreadId = forceNew ? undefined : (selectedId ?? threads?.[0]?._id);
   const messages = useThreadMessages(activeThreadId);
   const send = useSendChat();
   const [input, setInput] = useState("");
@@ -81,8 +82,9 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
     setInput("");
     setSending(true);
     try {
-      const res = await send(t, activeThreadId);
-      if (!activeThreadId) setSelectedId(res.threadId);
+    const res = await send(t, activeThreadId);
+      setForceNew(false);
+      setSelectedId(res.threadId);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to send");
     } finally {
@@ -91,16 +93,11 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   }
 
   function newChat() {
+    setForceNew(true);
     setSelectedId(undefined);
-    // Force "no active thread" until user sends first message. Threads list
-    // is reactive; on send, server creates a new thread and we pin it.
-    // A hack: pass an impossible id so useThreadMessages returns undefined.
-    setSelectedId("__new__");
   }
 
-  const showEmpty = activeThreadId === "__new__" || (messages && messages.length === 0);
-  const effectiveMessages =
-    activeThreadId === "__new__" ? [] : (messages ?? []);
+  const showEmpty = !activeThreadId || messages?.length === 0;
 
   return (
     <aside
@@ -147,7 +144,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         ) : (
-          effectiveMessages.map((m) => <MessageRow key={m._id} message={m} />)
+          messages.map((m) => <MessageRow key={m._id} message={m} />)
         )}
       </div>
 
