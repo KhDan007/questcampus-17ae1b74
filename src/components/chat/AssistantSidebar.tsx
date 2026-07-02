@@ -42,8 +42,9 @@ export function AssistantSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open assistant"
-          className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-primary px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-surface px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
+          <span className="h-2 w-2 rounded-full bg-primary" />
           <MessageCircle className="h-5 w-5" />
           Ask AI
         </button>
