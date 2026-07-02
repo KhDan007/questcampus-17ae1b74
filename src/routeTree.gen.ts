@@ -23,7 +23,6 @@ import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
 import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
-import { Route as ApplyPrepRouteImport } from './routes/apply.prep'
 import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
 import { Route as ApplicationSystemExternalIdRouteImport } from './routes/application.$system.$externalId'
 
@@ -97,11 +96,6 @@ const OauthCallbackRoute = OauthCallbackRouteImport.update({
   path: '/oauth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApplyPrepRoute = ApplyPrepRouteImport.update({
-  id: '/prep',
-  path: '/prep',
-  getParentRoute: () => ApplyRoute,
-} as any)
 const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
   id: '/$jobId',
   path: '/$jobId',
@@ -126,7 +120,6 @@ export interface FileRoutesByFullPath {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
-  '/apply/prep': typeof ApplyPrepRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -145,7 +138,6 @@ export interface FileRoutesByTo {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
-  '/apply/prep': typeof ApplyPrepRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -165,7 +157,6 @@ export interface FileRoutesById {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
-  '/apply/prep': typeof ApplyPrepRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -186,7 +177,6 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
-    | '/apply/prep'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -205,7 +195,6 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
-    | '/apply/prep'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -224,7 +213,6 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
-    | '/apply/prep'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -350,13 +338,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apply/prep': {
-      id: '/apply/prep'
-      path: '/prep'
-      fullPath: '/apply/prep'
-      preLoaderRoute: typeof ApplyPrepRouteImport
-      parentRoute: typeof ApplyRoute
-    }
     '/apply/$jobId': {
       id: '/apply/$jobId'
       path: '/$jobId'
@@ -376,12 +357,10 @@ declare module '@tanstack/react-router' {
 
 interface ApplyRouteChildren {
   ApplyJobIdRoute: typeof ApplyJobIdRoute
-  ApplyPrepRoute: typeof ApplyPrepRoute
 }
 
 const ApplyRouteChildren: ApplyRouteChildren = {
   ApplyJobIdRoute: ApplyJobIdRoute,
-  ApplyPrepRoute: ApplyPrepRoute,
 }
 
 const ApplyRouteWithChildren = ApplyRoute._addFileChildren(ApplyRouteChildren)

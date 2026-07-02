@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   PenLine,
   Sparkles,
-  Lock,
   AlertCircle,
   RefreshCw,
   Loader2,
