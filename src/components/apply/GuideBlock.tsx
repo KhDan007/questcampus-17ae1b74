@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, ChevronDown, Loader2, Sparkles } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import {
+  AlertTriangle,
+  BookOpen,
+  ChevronDown,
+  Clock,
+  Loader2,
+  Pencil,
+  Sparkles,
+} from "lucide-react";
+import { useCreateDocument } from "@/lib/documents";
 import {
   useExplainItem,
   type ExplainArgs,
@@ -24,7 +35,10 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
   const [asking, setAsking] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const explain = useExplainItem();
+  const navigate = useNavigate();
+  const createDocument = useCreateDocument();
 
   async function ask() {
     setAsking(true);
@@ -36,6 +50,27 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
       setError(e instanceof Error ? e.message : "Couldn't reach AI");
     } finally {
       setAsking(false);
+    }
+  }
+
+  async function handleWriteHere() {
+    if (!guide?.writable) return;
+    if (guide.editor === "essay") {
+      navigate({ to: "/essay" });
+    } else {
+      setCreating(true);
+      try {
+        const docId = await createDocument({
+          docKind: guide.editorKind ?? "other",
+          system: explainArgs.system,
+          externalId: explainArgs.externalId,
+        });
+        navigate({ to: "/documents/$id", params: { id: docId } });
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to create draft");
+      } finally {
+        setCreating(false);
+      }
     }
   }
 
@@ -71,16 +106,43 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
           )}
           {answer ? "Ask again" : "Ask AI"}
         </button>
+        {guide?.writable && (
+          <button
+            type="button"
+            onClick={handleWriteHere}
+            disabled={creating}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-white qc-hard-shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {creating ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Pencil className="h-3.5 w-3.5" />
+            )}
+            Write it here
+          </button>
+        )}
       </div>
 
       {hasGuide && open && guide && (
         <div className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-3">
-          <p className="font-display text-label-md font-bold text-on-surface">
+          <p className="font-display text-label-md font-bold text-on-surface flex flex-wrap items-center gap-2">
             {guide.title}
+            {guide.timeEstimate && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-1.5 py-0.5 text-label-sm text-on-surface-variant">
+                <Clock className="h-3 w-3" />
+                {guide.timeEstimate}
+              </span>
+            )}
           </p>
           {guide.whatItIs && (
             <p className="mt-1 text-body-sm text-on-surface-variant">
               {guide.whatItIs}
+            </p>
+          )}
+          {guide.whereExactly && (
+            <p className="mt-1 text-body-sm text-on-surface-variant">
+              <span className="font-semibold text-on-surface">Where:</span>{" "}
+              {guide.whereExactly}
             </p>
           )}
           {Array.isArray(guide.howToGet) && guide.howToGet.length > 0 && (
@@ -102,6 +164,19 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
                 <li key={i}>{t}</li>
               ))}
             </ul>
+          )}
+          {Array.isArray(guide.commonMistakes) && guide.commonMistakes.length > 0 && (
+            <div className="mt-2">
+              <p className="inline-flex items-center gap-1 text-label-sm font-semibold text-on-surface">
+                <AlertTriangle className="h-3.5 w-3.5 text-error" />
+                Common mistakes
+              </p>
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-label-sm text-on-surface-variant">
+                {guide.commonMistakes.map((m, i) => (
+                  <li key={i}>{m}</li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}

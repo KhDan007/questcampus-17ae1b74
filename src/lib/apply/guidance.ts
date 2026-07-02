@@ -12,6 +12,12 @@ export type Guide = {
   howToGet: string[];
   format?: string;
   tips?: string[];
+  whereExactly?: string;
+  timeEstimate?: string;
+  commonMistakes?: string[];
+  writable?: boolean;
+  editor?: "essay" | "document";
+  editorKind?: string;
 };
 
 export type GuideRow = {
