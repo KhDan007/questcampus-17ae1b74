@@ -78,6 +78,16 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // When every target is ready, auto-advance the user to the prep stage.
+  useEffect(() => {
+    if (!open || !allDone) return;
+    const t = setTimeout(() => {
+      onClose();
+      void navigate({ to: "/dashboard" });
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [open, allDone, onClose, navigate]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -218,7 +228,9 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
 
             <div className="flex flex-col items-stretch gap-2 border-t-2 border-on-surface/15 bg-surface-container-lowest p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-label-sm text-on-surface-variant">
-                Research keeps running if you close this — track it on your dashboard.
+                {allDone
+                  ? "All set — taking you to the prep stage."
+                  : "Research keeps running if you close this — track it on your dashboard."}
               </p>
               <button
                 type="button"
@@ -228,7 +240,7 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
                 }}
                 className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
               >
-                Go to dashboard <ArrowRight className="h-4 w-4" />
+                Continue to prep <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </motion.div>
