@@ -14,6 +14,7 @@ import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
+import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
 
 
 import appCss from "../styles.css?url";
@@ -155,6 +156,8 @@ function RootComponent() {
             <Outlet />
           </RouteTransitions>
           <EmailVerifyGate />
+          <AssistantSidebar />
+
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
