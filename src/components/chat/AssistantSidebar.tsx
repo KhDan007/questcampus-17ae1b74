@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
+import { Markdown } from "@/components/common/Markdown";
 import {
   useChatThreads,
   useThreadMessages,
@@ -237,12 +238,16 @@ function MessageRow({ message }: { message: ChatMessage }) {
             : "border-on-surface/15 bg-surface text-on-surface"
         }`}
       >
-        <p className="whitespace-pre-wrap break-words">
-          {message.content}
-          {message.streaming && (
-            <span className="ml-0.5 inline-block h-3 w-[2px] animate-pulse bg-current align-middle" />
-          )}
-        </p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        ) : (
+          <div className="break-words">
+            <Markdown>{message.content}</Markdown>
+            {message.streaming && (
+              <span className="ml-0.5 inline-block h-3 w-[2px] animate-pulse bg-current align-middle" />
+            )}
+          </div>
+        )}
         {!isUser && message.actions && message.actions.length > 0 && (
           <div className="mt-2 space-y-1.5">
             {message.actions.map((a) => (
