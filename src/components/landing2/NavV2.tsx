@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, Menu, X, GraduationCap, PenLine, Settings as SettingsIcon, Home, Sparkles } from "lucide-react";
+import { ArrowRight, Menu, X, GraduationCap, PenLine, Settings as SettingsIcon, Home, Sparkles, FileText } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
@@ -106,6 +106,7 @@ export function NavV2() {
             ) : isAuthenticated ? (
               <>
                 <NavLink href="/universities">Universities</NavLink>
+                <NavLink href="/documents">Documents</NavLink>
                 <NavLink href="/dashboard">Dashboard</NavLink>
               </>
             ) : null}
@@ -167,7 +168,11 @@ export function NavV2() {
                   <MobileLink to="/" icon={Home} label="Home" active={isLanding} onClick={() => setMobileOpen(false)} />
                   <MobileLink to="/universities" icon={GraduationCap} label="Universities" active={pathname.startsWith("/universities")} onClick={() => setMobileOpen(false)} />
                   <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} onClick={() => setMobileOpen(false)} />
+                  {isAuthenticated && (
+                    <MobileLink to="/documents" icon={FileText} label="Documents" active={pathname.startsWith("/documents")} onClick={() => setMobileOpen(false)} />
+                  )}
                   <MobileLink to="/profile" icon={SettingsIcon} label="Settings" active={pathname.startsWith("/profile")} onClick={() => setMobileOpen(false)} />
+
                   {isLanding && (
                     <>
                       <MobileAnchor href="/#how" label="How it works" onClick={() => setMobileOpen(false)} />
