@@ -35,7 +35,7 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
             Ranked by affordability + need-based aid, from your saved schools.
           </p>
         </div>
-        <span className="hidden shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-tertiary px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm sm:inline-flex">
+        <span className="hidden shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-on-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-surface qc-hard-shadow-sm sm:inline-flex">
           <PiggyBank className="h-3.5 w-3.5" /> Aid-ranked
         </span>
       </header>
