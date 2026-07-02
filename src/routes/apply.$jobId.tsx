@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "convex/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useConvex } from "convex/react";
 import {
   ArrowLeft,
   Loader2,
@@ -64,16 +64,45 @@ function ApplyRunPage() {
 function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const job = useApplyJob(jobId);
   const navigate = useNavigate();
+  const convex = useConvex();
   const { cancelJob, confirm, startApply } = useApplyActions();
   const [acting, setActing] = useState(false);
-  const [ticketNonce, setTicketNonce] = useState(0);
+  const [liveTicket, setLiveTicket] = useState<{ wsUrl: string; ticket: string } | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const terminal = !!job && (job.status === "done" || job.status === "cancelled" || job.status === "error");
 
-  // Reactive WS ticket — only fetched once wsEndpoint is published.
-  // `ticketNonce` lets us refresh after 1006/1008 close events.
-  const liveTicket = useQuery(
-    api.applyQueue.liveTicket,
-    job?.wsEndpoint ? ({ token, jobId, _n: ticketNonce } as never) : "skip",
-  ) as { wsUrl: string; ticket: string } | undefined;
+  const fetchTicket = useCallback(async () => {
+    if (!job?.wsEndpoint || terminal) return;
+    try {
+      const t = (await convex.query(api.applyQueue.liveTicket, { token, jobId })) as
+        | { wsUrl: string; ticket: string }
+        | null;
+      setLiveTicket(t ?? null);
+    } catch (e) {
+      console.warn("liveTicket fetch failed", e);
+    }
+  }, [convex, jobId, token, job?.wsEndpoint, terminal]);
+
+  // Fetch ticket once wsEndpoint appears.
+  useEffect(() => {
+    if (job?.wsEndpoint && !terminal && !liveTicket) void fetchTicket();
+  }, [job?.wsEndpoint, terminal, liveTicket, fetchTicket]);
+
+  // Terminal → drop the ticket so the canvas force-disconnects.
+  useEffect(() => {
+    if (terminal) setLiveTicket(null);
+  }, [terminal]);
+
+  const onCanvasClose = useCallback(
+    (code: number) => {
+      // 1006 = abnormal, 1008 = policy (ticket expired). Re-fetch and reconnect.
+      if (!terminal && (code === 1006 || code === 1008)) {
+        setLiveTicket(null);
+        void fetchTicket();
+      }
+    },
+    [fetchTicket, terminal],
+  );
 
   // Auto-scroll activity feed
   const feedRef = useRef<HTMLOListElement>(null);
