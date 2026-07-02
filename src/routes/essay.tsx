@@ -1800,25 +1800,17 @@ function PlaceholderEditor({
           </button>
         </div>
         <p className="mt-2 text-body-sm text-on-surface-variant">
-          Write this moment in your own words with our prompt as a guide — or drop in a mock story
-          to see the shape and edit later.
+          Write this moment in your own words with our prompt as a guide.
         </p>
         <textarea
           ref={taRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={5}
-          placeholder={`e.g. ${mockForHint(placeholder)}`}
+          placeholder="Write a specific, sensory memory in your own words"
           className="mt-4 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 font-serif text-body-md leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
         />
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={fillMock}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            <Sparkles className="h-3.5 w-3.5" /> Use mock story
-          </button>
           <button
             type="button"
             onClick={onClose}
