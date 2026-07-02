@@ -1,5 +1,14 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CheckSquare, Search, Send, Square } from "lucide-react";
+import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckSquare,
+  Loader2,
+  Play,
+  Search,
+  Send,
+  Square,
+} from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
@@ -12,8 +21,9 @@ import { BatchActionBar } from "@/components/apply/BatchActionBar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
+import { useApplyActions } from "@/lib/applyQueue/client";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/apply")({
