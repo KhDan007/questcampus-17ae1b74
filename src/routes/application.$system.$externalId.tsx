@@ -31,6 +31,15 @@ import {
   type IntakeItem,
   type EligibilityPerTarget,
 } from "@/lib/apply/intake";
+import {
+  useUniFacts,
+  useUniScholarships,
+  useResearchProgress,
+  type UniFacts,
+  type UniDeadline,
+  type Scholarship,
+  type ResearchProgress,
+} from "@/lib/apply/uniData";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
@@ -151,6 +160,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const researchedTargets = useMemo(() => (found ? targets : []), [found, targets]);
   const elig = useEligibility(researchedTargets);
   const checklist = useChecklist(researchedTargets);
+  const facts = useUniFacts(system, externalId);
+  const scholarships = useUniScholarships(system, externalId);
+  const research = useResearchProgress(system, externalId);
   const specific = (plan?.specific ?? []).find(
     (s) => s.system === system && s.externalId === externalId,
   );
@@ -221,8 +233,8 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           {/* Left / main column */}
           <div className="space-y-5 lg:col-span-2">
-            <GeneralInfoCard uni={uni} />
-            <DeadlinesCard />
+            <GeneralInfoCard facts={facts} />
+            <DeadlinesCard facts={facts} />
             <EligibilityCardSection eligibility={eligPer} found={found} />
             <RequirementsList
               id="documents"
@@ -236,6 +248,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               items={documents}
               emptyLabel="No document uploads required."
               found={found}
+              research={research}
             />
             <RequirementsList
               id="essays"
@@ -245,6 +258,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               items={essays}
               emptyLabel="No essays required."
               found={found}
+              research={research}
             />
             {videos.length > 0 && (
               <RequirementsList
@@ -255,6 +269,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 items={videos}
                 emptyLabel="No videos required."
                 found={found}
+                research={research}
               />
             )}
             {fields.length > 0 && (
@@ -266,16 +281,16 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 items={fields}
                 emptyLabel="No extra questions."
                 found={found}
+                research={research}
               />
             )}
-            <ScholarshipsCard />
+            <ScholarshipsCard scholarships={scholarships} />
           </div>
 
           {/* Right rail */}
           <aside className="space-y-5">
             <ReadinessCard ready={ready} found={found} checklistPer={checklistPer} />
             <QuickLinks uni={uni} />
-            <MockNoticeCard />
           </aside>
         </div>
     </main>
@@ -300,13 +315,6 @@ function BackLink() {
   );
 }
 
-function MockBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-amber-700">
-      Mock
-    </span>
-  );
-}
 
 function StatusPill({ found, ready }: { found: boolean; ready: boolean }) {
   if (ready) {
@@ -411,27 +419,79 @@ function SectionCard({
   );
 }
 
-function GeneralInfoCard({ uni }: { uni?: { city?: string; country?: string; name?: string } }) {
-  // MOCK: general facts. Real values will come from backend enrichment.
+function formatUsd(n: number | null | undefined): string | null {
+  if (n == null || !Number.isFinite(n)) return null;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+function titleCase(s: string): string {
+  return s
+    .toLowerCase()
+    .split(/[\s_-]+/)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
+function GeneralInfoCard({ facts }: { facts: UniFacts | null | undefined }) {
+  if (facts === undefined) {
+    return (
+      <SectionCard id="general" icon={<Info className="h-4 w-4" />} title="General info">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+          ))}
+        </div>
+      </SectionCard>
+    );
+  }
+  if (facts === null) return null;
+
+  const rows: { label: string; value: string }[] = [];
+  if (facts.ownership) rows.push({ label: "Type", value: titleCase(facts.ownership) });
+  if (facts.studentSize != null)
+    rows.push({ label: "Undergraduate enrollment", value: facts.studentSize.toLocaleString("en-US") });
+  if (facts.admissionRate != null)
+    rows.push({ label: "Acceptance rate", value: `${(facts.admissionRate * 100).toFixed(1)}%` });
+  if (facts.satAvg != null) rows.push({ label: "SAT avg", value: String(facts.satAvg) });
+  if (facts.actMidpoint != null) rows.push({ label: "ACT mid", value: String(facts.actMidpoint) });
+
+  const cost =
+    facts.costAttendance != null
+      ? { label: "Cost of attendance", value: formatUsd(facts.costAttendance)! }
+      : facts.tuitionOutState != null
+        ? { label: "Tuition (out-of-state)", value: formatUsd(facts.tuitionOutState)! }
+        : facts.tuitionInState != null
+          ? { label: "Tuition (in-state)", value: formatUsd(facts.tuitionInState)! }
+          : facts.fees?.amount != null
+            ? {
+                label: "Tuition & fees",
+                value: `${facts.fees.amount.toLocaleString("en-US")}${facts.fees.currency ? ` ${facts.fees.currency}` : ""}`,
+              }
+            : null;
+  if (cost) rows.push(cost);
+
+  const loc = [facts.city, facts.state, facts.country].filter(Boolean).join(", ");
+  if (loc) rows.push({ label: "Location", value: loc });
+  if (facts.globalRank != null) rows.push({ label: "Global rank", value: `#${facts.globalRank}` });
+
+  if (rows.length === 0) return null;
+
   return (
     <SectionCard
       id="general"
       icon={<Info className="h-4 w-4" />}
       title="General info"
       subtitle="Overview and facts about this university."
-      right={<MockBadge />}
     >
       <dl className="grid gap-3 sm:grid-cols-2">
-        <Fact label="Type" value="Private research university" />
-        <Fact label="Founded" value="1885" />
-        <Fact label="Undergraduate enrollment" value="~7,600" />
-        <Fact label="Acceptance rate" value="~4%" />
-        <Fact label="Tuition (est.)" value="$62,000 / yr" />
-        <Fact label="Setting" value={uni?.city ? `${uni.city} — suburban` : "Suburban campus"} />
+        {rows.map((r) => (
+          <Fact key={r.label} label={r.label} value={r.value} />
+        ))}
       </dl>
-      <p className="mt-4 text-body-sm text-on-surface-variant">
-        Replace this section with backend-provided university facts once the enrichment pipeline exposes them.
-      </p>
     </SectionCard>
   );
 }
@@ -447,35 +507,96 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DeadlinesCard() {
-  // MOCK
-  const rows = [
-    { label: "Early Action", date: "Nov 1, 2026", note: "Non-binding" },
-    { label: "Regular Decision", date: "Jan 5, 2027", note: "Final application deadline" },
-    { label: "Financial aid (CSS Profile)", date: "Feb 15, 2027", note: "Priority" },
-    { label: "Decision released", date: "Late March 2027", note: "" },
-  ];
+function DeadlinesCard({ facts }: { facts: UniFacts | null | undefined }) {
+  const loading = facts === undefined;
+  const raw = facts?.deadlines ?? [];
+
+  // Dedupe by (isoDate || dateText)
+  const seen = new Set<string>();
+  const deduped: UniDeadline[] = [];
+  for (const d of raw) {
+    const key = d.isoDate || d.dateText;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(d);
+  }
+  // Sort: with isoDate ascending first, then the rest
+  deduped.sort((a, b) => {
+    if (a.isoDate && b.isoDate) return a.isoDate.localeCompare(b.isoDate);
+    if (a.isoDate) return -1;
+    if (b.isoDate) return 1;
+    return 0;
+  });
+  const rows = deduped.slice(0, 8);
+
   return (
     <SectionCard
       id="deadlines"
       icon={<CalendarClock className="h-4 w-4" />}
       title="Deadlines"
       subtitle="Key dates for this application cycle."
-      right={<MockBadge />}
     >
-      <ul className="divide-y divide-on-surface/10">
-        {rows.map((r) => (
-          <li key={r.label} className="flex items-center justify-between gap-3 py-2.5">
-            <div className="min-w-0">
-              <p className="font-display text-label-md font-bold text-on-surface">{r.label}</p>
-              {r.note && <p className="text-label-sm text-on-surface-variant">{r.note}</p>}
-            </div>
-            <p className="shrink-0 font-[var(--font-label)] text-label-md font-semibold text-on-surface">
-              {r.date}
-            </p>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+      ) : rows.length === 0 ? (
+        <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+          We don&apos;t have structured deadlines for this school yet.
+          {facts?.website && (
+            <>
+              {" "}
+              <a
+                href={facts.website}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+              >
+                Check the official deadlines page <ExternalLink className="h-3 w-3" />
+              </a>
+            </>
+          )}
+        </div>
+      ) : (
+        <ul className="divide-y divide-on-surface/10">
+          {rows.map((d, i) => {
+            const primary =
+              d.dateText ||
+              (d.isoDate
+                ? new Date(d.isoDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "");
+            return (
+              <li key={`${d.isoDate || d.dateText}-${i}`} className="flex items-start justify-between gap-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-label-md font-bold text-on-surface">{primary}</p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                    {d.intake && (
+                      <span className="text-label-sm text-on-surface-variant">{d.intake}</span>
+                    )}
+                    {d.category === "admission" && (
+                      <span className="rounded-full border border-on-surface/20 bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                        admission
+                      </span>
+                    )}
+                    {d.sourceUrl && (
+                      <a
+                        href={d.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                      >
+                        Source <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </SectionCard>
   );
 }
@@ -588,6 +709,7 @@ function RequirementsList({
   items,
   emptyLabel,
   found,
+  research,
 }: {
   id: string;
   icon: React.ReactNode;
@@ -596,13 +718,24 @@ function RequirementsList({
   items: IntakeItem[];
   emptyLabel: string;
   found: boolean;
+  research?: ResearchProgress | null;
 }) {
   return (
-    <SectionCard id={id} icon={icon} title={title} subtitle={subtitle}>
+    <SectionCard
+      id={id}
+      icon={icon}
+      title={title}
+      subtitle={subtitle}
+      right={
+        found && research?.status === "ready" && research.coverage ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+            {research.coverage} coverage
+          </span>
+        ) : undefined
+      }
+    >
       {!found ? (
-        <div className="flex items-center gap-2 rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
-          <Loader2 className="h-4 w-4 animate-spin" /> Researching — this list will populate live.
-        </div>
+        <ResearchProgressBlock research={research} />
       ) : items.length === 0 ? (
         <p className="text-body-sm text-on-surface-variant">{emptyLabel}</p>
       ) : (
@@ -653,49 +786,99 @@ function RequirementsList({
   );
 }
 
-function ScholarshipsCard() {
-  // MOCK
-  const items = [
-    {
-      name: "Need-based financial aid",
-      award: "Up to full tuition",
-      note: "Automatically considered for all admitted students.",
-    },
-    {
-      name: "International Merit Award",
-      award: "$5,000 – $20,000 / yr",
-      note: "Considered for international applicants with strong academics.",
-    },
-    {
-      name: "STEM Excellence Scholarship",
-      award: "$10,000 / yr",
-      note: "Requires separate application by Dec 15.",
-    },
-  ];
+function ResearchProgressBlock({ research }: { research?: ResearchProgress | null }) {
+  const p = research?.progress ?? null;
+  const percent =
+    p?.percent != null ? Math.max(0, Math.min(100, Math.round(p.percent))) : null;
+  const message = p?.message ?? "Researching — this list will populate live.";
+  return (
+    <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4">
+      <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>{message}</span>
+      </div>
+      {percent != null && (
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+          <div
+            className="h-full bg-primary transition-[width] duration-300"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ScholarshipsCard({ scholarships }: { scholarships: Scholarship[] | undefined }) {
+  const loading = scholarships === undefined;
+  const items = scholarships ?? [];
   return (
     <SectionCard
       id="scholarships"
       icon={<Trophy className="h-4 w-4" />}
       title="Scholarships & aid"
       subtitle="Financial support programs offered by this school."
-      right={<MockBadge />}
     >
-      <ul className="space-y-2">
-        {items.map((s) => (
-          <li
-            key={s.name}
-            className="rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
-          >
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="font-display text-label-md font-bold text-on-surface">{s.name}</p>
-              <p className="font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
-                {s.award}
-              </p>
-            </div>
-            <p className="mt-0.5 text-body-sm text-on-surface-variant">{s.note}</p>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+      ) : items.length === 0 ? (
+        <p className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+          No scholarship data for this school yet — we surface aid programs as we research them.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {items.map((s) => {
+            const tag = s.category || s.type;
+            return (
+              <li
+                key={s._id}
+                className="rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-display text-label-md font-bold text-on-surface">
+                    {s.name}
+                    {s.provider && (
+                      <span className="ml-1.5 font-[var(--font-label)] text-label-sm font-normal text-on-surface-variant">
+                        · {s.provider}
+                      </span>
+                    )}
+                  </p>
+                  {s.amount && (
+                    <p className="font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
+                      {s.amount}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  {tag && (
+                    <span className="rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+                      {tag}
+                    </span>
+                  )}
+                  {s.deadline && (
+                    <span className="text-label-sm text-on-surface-variant">
+                      Deadline: {s.deadline}
+                    </span>
+                  )}
+                </div>
+                {s.eligibility && (
+                  <p className="mt-1 text-body-sm text-on-surface-variant">{s.eligibility}</p>
+                )}
+                {s.url && (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                  >
+                    Details <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </SectionCard>
   );
 }
@@ -775,19 +958,6 @@ function QuickLinks({ uni }: { uni?: { website?: string; name: string } }) {
           </Link>
         </li>
       </ul>
-    </aside>
-  );
-}
-
-function MockNoticeCard() {
-  return (
-    <aside className="rounded-2xl border-2 border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-body-sm text-on-surface-variant">
-      <p className="font-display text-label-md font-bold text-on-surface">Heads up</p>
-      <p className="mt-1">
-        Sections labelled <MockBadge /> use placeholder values until the backend
-        surfaces real data for that school. The live requirement list, eligibility,
-        and readiness above are real.
-      </p>
     </aside>
   );
 }
