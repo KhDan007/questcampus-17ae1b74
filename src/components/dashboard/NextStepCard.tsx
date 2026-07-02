@@ -50,13 +50,6 @@ function stepIcon(kind: GuidedStep["kind"]): ComponentType<{ className?: string 
   }
 }
 
-function scrollToPrep() {
-  if (typeof document === "undefined") return;
-  const el = document.getElementById("dashboard-prep");
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
 
 function fallbackDef(step: NextStep, isAuthenticated: boolean): StepDef {
   if (step === "refine") {
