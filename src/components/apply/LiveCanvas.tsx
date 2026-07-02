@@ -86,7 +86,7 @@ export function LiveCanvas({
       }
       wsRef.current = null;
     };
-  }, [wsEndpoint, ticket]);
+  }, [wsEndpoint, ticket, disconnect, onClose]);
 
   // Scale page-coords -> source canvas coords (1280×800)
   function toSource(ev: { clientX: number; clientY: number }): { x: number; y: number } | null {
