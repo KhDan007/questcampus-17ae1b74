@@ -160,6 +160,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const researchedTargets = useMemo(() => (found ? targets : []), [found, targets]);
   const elig = useEligibility(researchedTargets);
   const checklist = useChecklist(researchedTargets);
+  const facts = useUniFacts(system, externalId);
+  const scholarships = useUniScholarships(system, externalId);
+  const research = useResearchProgress(system, externalId);
   const specific = (plan?.specific ?? []).find(
     (s) => s.system === system && s.externalId === externalId,
   );
