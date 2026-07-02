@@ -99,6 +99,18 @@ function ApplyHubPage() {
 function SavedToPick() {
   const { saved } = useSavedUniversities();
   const { count, items, toggle, clear } = useApplySelection();
+  const planTargets: BackendTarget[] = useMemo(
+    () => (saved ?? []).map((u) => ({ system: u.source, externalId: u.externalId, name: u.name })),
+    [saved],
+  );
+  const plan = useIntakePlan(planTargets);
+  const researchedSet = useMemo(() => {
+    const s = new Set<string>();
+    (plan?.targets ?? []).forEach((t) => {
+      if (t.found) s.add(`${t.system}::${t.externalId}`);
+    });
+    return s;
+  }, [plan]);
 
   if (!saved || saved.length === 0) {
     return (
