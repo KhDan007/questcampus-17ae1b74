@@ -62,7 +62,7 @@ export function CollectWorkspace({
       const e = eligibility?.perTarget.find(
         (x) => x.system === t.system && x.externalId === t.externalId,
       );
-      return (c?.checklist.ready ?? false) && e?.verdict !== "ineligible";
+      return (c?.checklist?.ready ?? false) && e?.verdict !== "ineligible";
     });
   }, [targets, checklist, eligibility]);
 

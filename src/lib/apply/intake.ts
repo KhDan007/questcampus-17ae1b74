@@ -85,7 +85,7 @@ export type ChecklistResult = {
     system: string;
     externalId: string;
     found: boolean;
-    checklist: { ready: boolean; [k: string]: unknown };
+    checklist: { ready: boolean; [k: string]: unknown } | null;
   }[];
 };
 
