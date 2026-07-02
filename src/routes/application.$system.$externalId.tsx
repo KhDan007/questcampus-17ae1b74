@@ -260,6 +260,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               emptyLabel="No document uploads required."
               found={found}
               research={research}
+              system={system}
+              externalId={externalId}
+              guideRows={guideRows}
             />
             <RequirementsList
               id="essays"
@@ -270,6 +273,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               emptyLabel="No essays required."
               found={found}
               research={research}
+              system={system}
+              externalId={externalId}
+              guideRows={guideRows}
             />
             {videos.length > 0 && (
               <RequirementsList
@@ -281,6 +287,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 emptyLabel="No videos required."
                 found={found}
                 research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
               />
             )}
             {fields.length > 0 && (
@@ -293,6 +302,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 emptyLabel="No extra questions."
                 found={found}
                 research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
               />
             )}
             <ScholarshipsCard scholarships={scholarships} />
