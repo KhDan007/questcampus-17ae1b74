@@ -1598,16 +1598,6 @@ function ResultView({
                 </AnimatePresence>
               </div>
             )}
-            {editable && hasPlaceholders && (
-              <button
-                type="button"
-                onClick={autofillAllMocks}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                title="Replace every [ADD: …] placeholder with a plausible mock story you can edit later"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Autofill mock stories
-              </button>
-            )}
             <button
               type="button"
               onClick={onRegenerate}
