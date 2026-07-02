@@ -44,6 +44,7 @@ import { useApplyActions } from "@/lib/applyQueue/client";
 import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
 import type { GuideRow } from "@/lib/apply/guidance";
+import { ApplicationPlanView } from "@/components/apply/ApplicationPlanView";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -191,6 +192,8 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
     })),
   );
 
+  const [tab, setTab] = useState<"requirements" | "plan">("requirements");
+
   return (
     <main
       id="main-content"
@@ -229,94 +232,135 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
             </div>
           </div>
 
-          {/* Sub-nav anchors */}
-          <nav className="mt-6 flex flex-wrap gap-2">
-            <Anchor href="#general">General</Anchor>
-            <Anchor href="#deadlines">Deadlines</Anchor>
-            <Anchor href="#eligibility">Eligibility</Anchor>
-            <Anchor href="#documents">Documents</Anchor>
-            <Anchor href="#essays">Essays</Anchor>
-            <Anchor href="#scholarships">Scholarships</Anchor>
-          </nav>
+          {tab === "requirements" && (
+            <nav className="mt-6 flex flex-wrap gap-2">
+              <Anchor href="#general">General</Anchor>
+              <Anchor href="#deadlines">Deadlines</Anchor>
+              <Anchor href="#eligibility">Eligibility</Anchor>
+              <Anchor href="#documents">Documents</Anchor>
+              <Anchor href="#essays">Essays</Anchor>
+              <Anchor href="#scholarships">Scholarships</Anchor>
+            </nav>
+          )}
         </header>
 
-        {/* Grid */}
-        <div className="mt-6 grid gap-5 lg:grid-cols-3">
-          {/* Left / main column */}
-          <div className="space-y-5 lg:col-span-2">
-            <GeneralInfoCard facts={facts} />
-            <DeadlinesCard facts={facts} />
-            <EligibilityCardSection eligibility={eligPer} found={found} />
-            <RequirementsList
-              id="documents"
-              icon={<FileText className="h-4 w-4" />}
-              title="Documents required"
-              subtitle={
-                found
-                  ? "Pulled from the school's official application."
-                  : "Researching this school right now — the exact document list will appear here."
-              }
-              items={documents}
-              emptyLabel="No document uploads required."
-              found={found}
-              research={research}
-              system={system}
-              externalId={externalId}
-              guideRows={guideRows}
-            />
-            <RequirementsList
-              id="essays"
-              icon={<ScrollText className="h-4 w-4" />}
-              title="Essays & short answers"
-              subtitle="Written prompts we'll help you draft."
-              items={essays}
-              emptyLabel="No essays required."
-              found={found}
-              research={research}
-              system={system}
-              externalId={externalId}
-              guideRows={guideRows}
-            />
-            {videos.length > 0 && (
-              <RequirementsList
-                id="videos"
-                icon={<Sparkles className="h-4 w-4" />}
-                title="Video responses"
-                subtitle="Recorded video prompts."
-                items={videos}
-                emptyLabel="No videos required."
-                found={found}
-                research={research}
-                system={system}
-                externalId={externalId}
-                guideRows={guideRows}
-              />
-            )}
-            {fields.length > 0 && (
-              <RequirementsList
-                id="fields"
-                icon={<Info className="h-4 w-4" />}
-                title="School-specific questions"
-                subtitle="Extra fields this university asks."
-                items={fields}
-                emptyLabel="No extra questions."
-                found={found}
-                research={research}
-                system={system}
-                externalId={externalId}
-                guideRows={guideRows}
-              />
-            )}
-            <ScholarshipsCard scholarships={scholarships} />
-          </div>
-
-          {/* Right rail */}
-          <aside className="space-y-5">
-            <ReadinessCard ready={ready} found={found} checklistPer={checklistPer} />
-            <QuickLinks uni={uni} />
-          </aside>
+        {/* Tabs */}
+        <div className="mt-6 flex gap-2" role="tablist" aria-label="Application view">
+          <TabButton active={tab === "requirements"} onClick={() => setTab("requirements")}>
+            Requirements
+          </TabButton>
+          <TabButton active={tab === "plan"} onClick={() => setTab("plan")}>
+            Plan
+          </TabButton>
         </div>
+
+        {tab === "requirements" ? (
+          <div className="mt-4 grid gap-5 lg:grid-cols-3">
+            {/* Left / main column */}
+            <div className="space-y-5 lg:col-span-2">
+              <GeneralInfoCard facts={facts} />
+              <DeadlinesCard facts={facts} />
+              <EligibilityCardSection eligibility={eligPer} found={found} />
+              <RequirementsList
+                id="documents"
+                icon={<FileText className="h-4 w-4" />}
+                title="Documents required"
+                subtitle={
+                  found
+                    ? "Pulled from the school's official application."
+                    : "Researching this school right now — the exact document list will appear here."
+                }
+                items={documents}
+                emptyLabel="No document uploads required."
+                found={found}
+                research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
+              />
+              <RequirementsList
+                id="essays"
+                icon={<ScrollText className="h-4 w-4" />}
+                title="Essays & short answers"
+                subtitle="Written prompts we'll help you draft."
+                items={essays}
+                emptyLabel="No essays required."
+                found={found}
+                research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
+              />
+              {videos.length > 0 && (
+                <RequirementsList
+                  id="videos"
+                  icon={<Sparkles className="h-4 w-4" />}
+                  title="Video responses"
+                  subtitle="Recorded video prompts."
+                  items={videos}
+                  emptyLabel="No videos required."
+                  found={found}
+                  research={research}
+                  system={system}
+                  externalId={externalId}
+                  guideRows={guideRows}
+                />
+              )}
+              {fields.length > 0 && (
+                <RequirementsList
+                  id="fields"
+                  icon={<Info className="h-4 w-4" />}
+                  title="School-specific questions"
+                  subtitle="Extra fields this university asks."
+                  items={fields}
+                  emptyLabel="No extra questions."
+                  found={found}
+                  research={research}
+                  system={system}
+                  externalId={externalId}
+                  guideRows={guideRows}
+                />
+              )}
+              <ScholarshipsCard scholarships={scholarships} />
+            </div>
+
+            {/* Right rail */}
+            <aside className="space-y-5">
+              <ReadinessCard ready={ready} found={found} checklistPer={checklistPer} />
+              <QuickLinks uni={uni} />
+            </aside>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <ApplicationPlanView system={system} externalId={externalId} />
+          </div>
+        )}
     </main>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={
+        "rounded-md border-2 border-on-surface px-4 py-1.5 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none " +
+        (active ? "bg-on-surface text-surface" : "bg-surface text-on-surface")
+      }
+    >
+      {children}
+    </button>
   );
 }
 
