@@ -105,7 +105,10 @@ export function useActiveApplyJob() {
     client
       .query(api.applyQueue.myActiveJob, { token })
       .then((result) => {
-        if (!cancelled) setJob((result as ApplyJob | null | undefined) ?? null);
+        if (!cancelled) {
+          const raw = result as (ApplyJob & { _id?: string }) | null | undefined;
+          setJob(raw ? normalizeJob(raw) : null);
+        }
       })
       .catch((error) => {
         console.warn("Unable to load active application job", error);
