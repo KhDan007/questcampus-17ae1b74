@@ -156,6 +156,8 @@ function RootComponent() {
             <Outlet />
           </RouteTransitions>
           <EmailVerifyGate />
+          <AssistantSidebar />
+
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
