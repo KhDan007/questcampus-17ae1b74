@@ -35,7 +35,10 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
   const [asking, setAsking] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const explain = useExplainItem();
+  const navigate = useNavigate();
+  const createDocument = useCreateDocument();
 
   async function ask() {
     setAsking(true);
