@@ -1,6 +1,9 @@
 "use client";
 
-import { Check, Loader2, CircleDashed, AlertTriangle } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Check, Loader2, CircleDashed, AlertTriangle, Send } from "lucide-react";
+import { useApplyActions, useActiveApplyJob } from "@/lib/applyQueue/client";
 import type { IntakeTarget, EligibilityPerTarget, ChecklistResult } from "@/lib/apply/intake";
 
 type Props = {
@@ -10,6 +13,26 @@ type Props = {
 };
 
 export function ReadinessRail({ targets, eligibility, checklist }: Props) {
+  const { startApply } = useApplyActions();
+  const activeJob = useActiveApplyJob();
+  const navigate = useNavigate();
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  async function applyOne(t: IntakeTarget) {
+    const key = `${t.system}::${t.externalId}`;
+    setBusyKey(key);
+    try {
+      const id = await startApply({
+        system: t.system,
+        externalId: t.externalId,
+        targetName: t.name,
+      });
+      void navigate({ to: "/apply/$jobId", params: { jobId: id } });
+    } catch {
+      setBusyKey(null);
+    }
+  }
+
   return (
     <aside className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
       <h3 className="font-display text-headline-sm font-bold text-on-surface">Your list</h3>
@@ -17,6 +40,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
 
       <ul className="mt-4 space-y-2">
         {targets.map((t) => {
+          const key = `${t.system}::${t.externalId}`;
           const e = eligibility?.find(
             (x) => x.system === t.system && x.externalId === t.externalId,
           );
@@ -24,12 +48,14 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
             (x) => x.system === t.system && x.externalId === t.externalId,
           );
           const researching = t.found === false || c?.found === false;
-          const ready = (c?.checklist.ready ?? false) && (e?.verdict !== "ineligible");
           const ineligible = e?.verdict === "ineligible";
+          const ready = (c?.checklist.ready ?? false) && !ineligible;
+          const inProgress =
+            activeJob?.system === t.system && activeJob?.externalId === t.externalId;
 
           return (
             <li
-              key={`${t.system}::${t.externalId}`}
+              key={key}
               className="flex items-center gap-3 rounded-lg border-2 border-on-surface/10 bg-surface px-3 py-2"
             >
               <div className="shrink-0">
@@ -54,13 +80,31 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
                 <p className="truncate text-label-sm text-on-surface-variant">
                   {researching
                     ? "researching requirements…"
-                    : ineligible
-                      ? `${e?.blockers.length ?? 0} to resolve`
-                      : ready
-                        ? "Ready to apply"
-                        : "In progress"}
+                    : inProgress
+                      ? "In progress"
+                      : ineligible
+                        ? "Not eligible"
+                        : ready
+                          ? "Ready to apply"
+                          : "In progress"}
                 </p>
               </div>
+              {ready && !inProgress && (
+                <button
+                  type="button"
+                  onClick={() => void applyOne(t)}
+                  disabled={busyKey === key}
+                  aria-label={`Auto-apply to ${t.name ?? t.externalId}`}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-50"
+                >
+                  {busyKey === key ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Send className="h-3 w-3" />
+                  )}
+                  Apply
+                </button>
+              )}
             </li>
           );
         })}

@@ -4,34 +4,38 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Send, Loader2, Lock } from "lucide-react";
 import { useApplyActions } from "@/lib/applyQueue/client";
-import { useApplySelection } from "@/lib/applyQueue/selection";
-import type { AutoApplyEntitlement } from "@/lib/apply/intake";
+import type { AutoApplyEntitlement, BackendTarget } from "@/lib/apply/intake";
 
 type Props = {
   entitlement: AutoApplyEntitlement | undefined;
   percent: number;
+  readyTargets: BackendTarget[];
 };
 
-export function LaunchBar({ entitlement, percent }: Props) {
+export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
   const navigate = useNavigate();
-  const { items, clear } = useApplySelection();
   const { startApply } = useApplyActions();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const gate = entitlement?.gate;
-  const enabled = gate === "ready_free" || gate === "ready_paid";
+  const gateEnabled = gate === "ready_free" || gate === "ready_paid";
   const needsPayment = gate === "needs_payment";
+  const readyCount = readyTargets.length;
+  const hasReady = readyCount > 0;
+  const enabled = gateEnabled && hasReady;
 
   const label = !entitlement
     ? "Checking readiness…"
     : gate === "not_ready"
       ? "Finish your requirements to continue"
-      : gate === "needs_payment"
+      : needsPayment
         ? "Unlock full auto-apply — $15/mo"
-        : gate === "ready_free"
-          ? `Start your free application (${items.length})`
-          : `Auto-apply to ${items.length} ${items.length === 1 ? "university" : "universities"}`;
+        : !hasReady
+          ? "Finish a university's requirements to apply"
+          : gate === "ready_free"
+            ? "Start your free application"
+            : `Auto-apply to ${readyCount} ready`;
 
   async function launch() {
     if (needsPayment) {
@@ -43,15 +47,18 @@ export function LaunchBar({ entitlement, percent }: Props) {
     setError(null);
     try {
       let firstJobId: string | null = null;
-      for (const it of items) {
+      for (const t of readyTargets) {
         try {
-          const id = await startApply({ system: it.source, externalId: it.externalId, targetName: it.name });
+          const id = await startApply({
+            system: t.system,
+            externalId: t.externalId,
+            targetName: t.name,
+          });
           if (!firstJobId) firstJobId = id;
         } catch (e) {
           setError(e instanceof Error ? e.message : "One application couldn't start");
         }
       }
-      clear();
       if (firstJobId) void navigate({ to: "/apply/$jobId", params: { jobId: firstJobId } });
       else void navigate({ to: "/apply" });
     } finally {
