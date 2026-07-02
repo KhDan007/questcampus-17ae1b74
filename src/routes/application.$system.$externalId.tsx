@@ -172,7 +172,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const checklistPer = checklist?.perTarget.find(
     (c) => c.system === system && c.externalId === externalId,
   );
-  const ready = !!checklistPer?.checklist.ready && eligPer?.verdict !== "ineligible";
+  const ready = !!checklistPer?.checklist?.ready && eligPer?.verdict !== "ineligible";
 
   const specItems = specific?.items ?? [];
   const documents = specItems.filter((i) => i.kind === "document");
@@ -890,7 +890,7 @@ function ReadinessCard({
 }: {
   ready: boolean;
   found: boolean;
-  checklistPer?: { checklist: { ready: boolean; [k: string]: unknown } };
+  checklistPer?: { checklist: { ready: boolean; [k: string]: unknown } | null };
 }) {
   const items = Object.entries(checklistPer?.checklist ?? {})
     .filter(([k]) => k !== "ready")

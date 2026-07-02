@@ -49,7 +49,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
           );
           const researching = t.found === false || c?.found === false;
           const ineligible = e?.verdict === "ineligible";
-          const ready = (c?.checklist.ready ?? false) && !ineligible;
+          const ready = (c?.checklist?.ready ?? false) && !ineligible;
           const inProgress =
             activeJob?.system === t.system && activeJob?.externalId === t.externalId;
 
