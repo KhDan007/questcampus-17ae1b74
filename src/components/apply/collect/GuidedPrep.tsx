@@ -389,6 +389,9 @@ function StepCard({
         ) : null}
       </div>
 
+      <StepGuidance step={step} />
+
+
       {/* Nav */}
       <div className="flex items-center justify-between gap-2 border-t-2 border-dashed border-on-surface/15 pt-4">
         <button
