@@ -79,8 +79,8 @@ export function useUniScholarships(system: string, externalId: string) {
 }
 
 export function useResearchProgress(system: string, externalId: string) {
-  return useQuery(
-    (api as any)["ingest/deepResearch"].deepResearchProgress,
-    { system, externalId } as never,
-  ) as ResearchProgress | null | undefined;
+  return useQuery(api.ingest.deepResearch.deepResearchProgress, { system, externalId } as never) as
+    | ResearchProgress
+    | null
+    | undefined;
 }
