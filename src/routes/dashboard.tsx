@@ -28,6 +28,8 @@ import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { CheckCircle2 } from "lucide-react";
 
 
 export const Route = createFileRoute("/dashboard")({
