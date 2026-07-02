@@ -597,3 +597,27 @@ function EssayStep() {
     </div>
   );
 }
+
+function StepGuidance({ step }: { step: GuidedStep }) {
+  const rows = useGuides([
+    {
+      kind: step.kind,
+      docType: step.docType ?? null,
+      conceptKey: step.conceptKey ?? null,
+      label: step.label ?? null,
+    },
+  ]);
+  const guide = rows?.[0]?.guide ?? null;
+  return (
+    <GuideBlock
+      guide={guide}
+      explainArgs={{
+        kind: step.kind,
+        docType: step.docType ?? null,
+        conceptKey: step.conceptKey ?? null,
+        label: step.label ?? null,
+        prompt: step.prompt ?? null,
+      }}
+    />
+  );
+}
