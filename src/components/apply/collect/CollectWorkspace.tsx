@@ -15,7 +15,6 @@ import {
   type BackendTarget,
   type IntakeTarget,
 } from "@/lib/apply/intake";
-import { RequirementsZone } from "./RequirementsZone";
 import { EligibilityCard } from "./EligibilityCard";
 import { ReadinessRail } from "./ReadinessRail";
 import { LaunchBar } from "./LaunchBar";
