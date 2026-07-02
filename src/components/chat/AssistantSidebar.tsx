@@ -107,7 +107,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
       className="fixed right-0 top-0 z-[80] flex h-[100dvh] w-full max-w-[380px] flex-col border-l-2 border-on-surface bg-surface qc-hard-shadow-sm"
     >
       {/* Header */}
-      <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-gradient-to-br from-primary/10 to-secondary/10 px-4 py-3">
+      <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 py-3">
         <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
           <Sparkles className="h-4 w-4" />
         </span>
@@ -233,7 +233,7 @@ function MessageRow({ message }: { message: ChatMessage }) {
       <div
         className={`max-w-[85%] rounded-lg border-2 px-3 py-2 text-body-sm ${
           isUser
-            ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
+            ? "border-on-surface bg-on-surface text-surface qc-hard-shadow-sm"
             : "border-on-surface/15 bg-surface text-on-surface"
         }`}
       >
