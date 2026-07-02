@@ -1,132 +1,134 @@
-# Auto-Apply: Inventory + Alignment Plan
+# Mock / Placeholder / Hardcoded Data Inventory
 
-## (A) Inventory — every file that touches auto-apply
-
-### Documents
-- `src/components/apply/DocumentManager.tsx` — grid of doc-type slots, upload/remove/download.
-- `src/lib/applyQueue/client.ts` → `useApplicationDocuments()` wraps:
-  - `api.applicationDocuments.list({ token })` ✅ matches contract
-  - `api.applicationDocuments.requestUploadTicket({ token, docType })` ✅
-  - upload POST to `${uploadUrl}?ticket=…` with raw file body ✅
-  - `api.applicationDocuments.record({ token, docType, oracleKey, fileName, mime, size })` ✅
-  - `api.applicationDocuments.remove({ token, id })` ✅
-  - `api.applicationDocuments.downloadUrl({ token, id })` — **diverges**: treated as a `useMutation` and unwraps `{ url }`; contract says it returns a signed URL **string | null**. Also should be a `query` (idempotent read).
-- Missing from UI: `hasFile` field on list rows (not surfaced), and no client-side ≤ 25 MiB pre-check.
-
-### Readiness / Collection / Intake
-- `src/components/apply/collect/CollectWorkspace.tsx` — orchestrates shared + specific fields, eligibility card, launch bar.
-- `src/components/apply/collect/RequirementsZone.tsx`, `RequirementField.tsx`, `ReadinessRail.tsx`, `EligibilityCard.tsx` — render intake plan groups and eligibility.
-- `src/components/apply/collect/LaunchBar.tsx` — CTA that calls `startApply` per target.
-- `src/lib/apply/intake.ts` hooks:
-  - `useIntakePlan` → `api.applications.intakePlan({ token, targets })` ✅
-  - `useEligibility` → `api.applications.eligibilityForTargets({ token, targets })` ✅
-  - `useChecklist` → `api.applications.checklistForTargets({ token, targets })` ✅
-  - `useAutoApplyEntitlement` → `api.applications.autoApplyEntitlement({ token, targets })` ✅
-  - `useSetAnswer` → `api.applications.setAnswer({ token, conceptKey, value })` ✅
-  - `useAnswerEligibility` → `api.applications.answerEligibility({ token, answers })` — **diverges from contract**: contract only lists `setAnswer` / `listAnswers`; there is no `answerEligibility` and no `listAnswers` hook. Eligibility answers should flow through `setAnswer(conceptKey, value)` using the `askKey`/`conceptKey` returned by the eligibility questions.
-  - No hook for `api.applications.listAnswers` — **missing**.
-
-### Apply launch + active jobs
-- `src/routes/apply.tsx` — "SavedToPick" batch selection + kicks off runs.
-- `src/routes/apply.prep.tsx` — prep/collection route wrapper.
-- `src/components/apply/BatchActionBar.tsx`, `SelectableUniCard.tsx`, `ApplyButton.tsx`, `ApplyStepper.tsx`, `NextProductiveAction.tsx`, `ResearchProgressModal.tsx` — selection + CTAs.
-- `src/components/apply/ResearchDock.tsx` — "in progress" strip; calls `api.applyQueue.myActiveJobs` (plural) with a fallback to `myActiveJob`. **Diverges**: contract only defines `myActiveJob` (singular, returns non-terminal job or null). The plural call is a phantom fallback we should drop.
-- `src/lib/applyQueue/client.ts`:
-  - `useApplyActions().startApply` → `api.applyQueue.enqueueApply({ token, system, externalId, targetName })` ✅ — but reads `{ jobId }`; contract returns `{ jobId, reused }` (we ignore `reused`). Errors from thrown mutations are not surfaced verbatim to the user (LaunchBar catches and shows a generic string).
-  - `cancelApply`, `confirmCheckpoint`, `getApplyJob`, `myActiveJob`, `liveTicket` ✅ names match.
-  - `confirmCheckpoint` is called with `kind` = `"logged_in" | "submitted"` in apply.$jobId.tsx ✅.
-
-### Live view (screencast + input)
-- `src/components/apply/LiveCanvas.tsx` — WebSocket to `wsEndpoint?ticket=…`, draws `frame` messages, sends `mouse`/`wheel`/`key`. **Diverges from contract in one place**: on typed text it only sends `keyDown`/`keyUp`. Contract also expects a `char` event (`{ t:"key", type:"char", text }`) for typed characters. Everything else (source 1280×800, event shapes) matches.
-- `src/routes/apply.$jobId.tsx` — subscribes to `getApplyJob`, opens `liveTicket` only once `job.wsEndpoint` is set ✅, teardown on terminal is implicit via canvas unmount but not proactive.
-
-### Route + gating misc
-- `src/routes/application.$system.$externalId.tsx` — per-uni detail page (uses `useIntakePlan` etc.).
-- `src/lib/auth/useAuth.ts` — provides `token`.
-- `.env` / Convex client — already pointed at the self-host prod.
-
-### Status field usage
-Route file whitelists `queued | claimed | awaiting_login | filling | awaiting_submit | done | cancelled | error` — matches the exact 8. `ApplyJobStatus` type in `client.ts` matches. No stray branches on `submitted`/`awaiting_confirm` in the codebase (grep clean).
+Grouped by area. "Real backend?" = whether a Convex query already exists we can wire in.
 
 ---
 
-## (B) Plan to fully implement the contract
+## 1. Application workspace — `src/routes/application.$system.$externalId.tsx`
 
-### 1. Fix diverging Convex calls (low risk, do first)
-1. `src/lib/applyQueue/client.ts` → convert `getDownloadUrl` to a plain `useQuery` **or** keep as mutation but treat the return value as `string | null`, not `{ url }`. Update `DocumentManager` accordingly.
-2. Remove `api.applyQueue.myActiveJobs` from `ResearchDock.tsx`; call only `myActiveJob` and render at most one active job (still fine as a list of length 0 or 1).
-3. Delete `useAnswerEligibility` (and its `api.applications.answerEligibility` binding). Route `CollectWorkspace` eligibility answers through the existing universal `useSetAnswer(conceptKey, value)` using the `askKey` returned in `eligibility.questions[]` (the backend has said askKey === conceptKey for the universal store). Empty string clears.
-4. Add `useListAnswers()` wrapping `api.applications.listAnswers({ token })` for pre-hydrating fields when the intake plan doesn't already include current values (used as a fallback + for optimistic UI).
-5. Consume `reused` from `enqueueApply` result — if `reused`, skip the "starting…" toast and just navigate.
+This is the biggest offender. There's even a `<MockNoticeCard/>` and reusable `<MockBadge/>` (lines 303, 782) so the UI already advertises which sections are fake.
 
-### 2. Documents Manager polish
-1. Client-side reject files > 25 MiB before requesting a ticket; show the exact backend limit in the error.
-2. Surface the `hasFile` flag from `list` — grey out download when false (edge case where record exists but bytes not yet on worker).
-3. Confirm upload POST body is the raw `File` (currently is ✅) and the ticket goes in the querystring (currently is ✅).
-4. Show a per-slot "Replace" affordance to make the "overwrite in place" behavior obvious.
+| Section | Line | Faked fields | Should show | Real backend? |
+|---|---|---|---|---|
+| `GeneralInfoCard` | 414–437 | Type = "Private research university", Founded = "1885", Undergraduate enrollment = "~7,600", Acceptance rate = "~4%", Tuition = "$62,000 / yr", Setting hardcoded | Real per-university enrichment: control (public/private), founded year, enrollment, acceptance rate, tuition/fees, campus setting | **No dedicated query.** `useSavedUniversities` returns basic saved fields (name, city, country, source, externalId, website) — no facts. Needs a new `api.universities.enrichment` / `api.universities.getFacts` (backend enrichment pipeline). |
+| `DeadlinesCard` | 450–481 | 4 hardcoded rows: Early Action Nov 1 2026, Regular Decision Jan 5 2027, CSS Profile Feb 15 2027, Decision late March 2027 — identical for every school | Per-university deadline list from the same deep-research pass that populates the intake plan | **Partial.** `useIntakePlan` already runs research per target — but doesn't currently return a `deadlines[]` array. Backend needs to expose deadlines on the intake result (or a sibling query). |
+| `ScholarshipsCard` | 656–701 | 3 hardcoded scholarships: "Need-based aid up to full tuition", "International Merit $5k–$20k", "STEM Excellence $10k / yr, Dec 15" | Per-school aid programs (name, award, notes, deadline, applyUrl) | **No.** Needs new backend query — probably `api.universities.scholarships` fed by the same research worker. |
+| `MockBadge` component | 303 | Renders literal text "Mock" | Should be deleted once the three sections above have real data | — |
+| `MockNoticeCard` | 782 | Amber banner announcing which sections are placeholder | Delete alongside `MockBadge` | — |
 
-### 3. Readiness / Collection screen
-1. Drive the "Apply" gate off `autoApplyEntitlement.gate` with these four labels exactly:
-   - `not_ready` → disabled "Finish your requirements"
-   - `ready_free` → "Apply — first one's free"
-   - `ready_paid` → "Apply"
-   - `needs_payment` → button routes to existing `/unlock` Polar flow (do not enqueue).
-2. Render `eligibility.perTarget[*].verdict === "ineligible"` as a **hard block** with the blocker list + evidence link (currently rendered but not blocking). Blocked targets must be removed from the `readyTargets` array we pass to `LaunchBar`.
-3. For `verdict === "unknown"`, render `questions[]` inline and wire answers through `setAnswer(askKey, value)` (see step 1.3).
-4. Show `manualNotes` (fee / recommender) as an amber advisory below the field lists.
-5. Percent bar uses `intakePlan.summary.answered / totalAskable`; already close, tighten to the contract fields.
+Sections on this route that are **already real** and should stay wired:
+- `EligibilityCardSection` (verdict/blockers/warnings/unknowns) — from `useEligibility`
+- `RequirementsList` (essays / documents / questions / recs) — from `useIntakePlan → items`
+- `ReadinessCard` — from `useChecklist`
+- `QuickLinks` — uses saved uni `website`
 
-### 4. Apply launch
-1. In `LaunchBar.launch`, when `enqueueApply` throws, display `error.message` **verbatim** (don't wrap in a generic sentence). The four known messages ("Application is not ready.", "Payment required.", "portal not found", "still gathering requirements") are already human-readable.
-2. On `Payment required.` error, redirect to `/unlock` automatically.
-3. On success, navigate straight to `/apply/$jobId`; if `reused` is true, replace history entry instead of pushing.
+---
 
-### 5. Live run page (`/apply/$jobId`)
-1. Add a **resume banner** on `/dashboard` and `/apply` that reads `useActiveApplyJob()` (already wraps `myActiveJob`) and links to `/apply/${jobId}` when non-null.
-2. Explicitly tear down the WebSocket on terminal status transitions (currently relies on unmount). Add a `useEffect` in `LiveCanvas` that closes when `interactive` flips false AND status is terminal, or expose a `disconnect` prop.
-3. Poll pattern: `liveTicket` is already gated by `wsEndpoint` presence — but tickets are short-lived; add a re-fetch when the WS closes with `1006`/`1008` (auth expiry) so users don't need to reload.
-4. Progress: use `progress.stage` as the small caption and `progress.message` as the big line; percent already correct.
-5. Activity: cap at last 50, colour by `type` (status/fill/unmatched/review) in addition to `level`.
-6. Error handling: when `status === "error"`, show `job.error` verbatim + a "Try again" button that calls `enqueueApply` again with the same `{system, externalId, targetName}` and navigates to the new jobId.
+## 2. Essay — `src/routes/essay.tsx` + `src/components/essay/EssayReview.tsx`
 
-### 6. Live canvas input (LiveCanvas.tsx)
-1. Add `char` events for typed characters: on `keydown` with a printable single-char `e.key`, additionally send `{ t:"key", type:"char", text: e.key }` after the `keyDown` event (portals like Common App need this for IME/composed input).
-2. Handle `compositionend` to send a `char` event with the composed text.
-3. Keep the source-coord scaling exactly as-is (1280×800 → canvas rect) ✅.
-4. Add a "Take over" hint overlay while `checkpoint.kind === "login"`.
+| Section | Line | Faked | Should show | Real backend? |
+|---|---|---|---|---|
+| `mockStories.ts` — `MOCK_SENTENCES` | 4–17 | 12 fake vignettes ("smell of stale chalk…", "grandmother's hands…") | Real user memories — either the user writes them, or the essay-generation backend proposes them | **Yes for real generation** (Convex `api.essays.*` returns real essay text with `[ADD: …]` placeholders). The mock-story feature is an *intentional* teaser fallback — decide if it stays as a UX gimmick or is removed. |
+| Autofill mock stories button | essay.tsx 1611–1615, EssayReview.tsx 729–746 | Uses `fillPlaceholdersWithMocks` to auto-fill blanks with the 12 canned lines | If mocks are removed from the product, delete these buttons | — |
+| `FreeTrialScoreBanner` — `scoreFor` / `weakAreasFor` | 2205–2245 | Deterministic pseudo-score (62–78) from a hash of the essayId + 3 canned "weak areas" (Hook / Specificity / Ending / Voice / Reflection) | Real essay-review score + AI-generated weak areas | **Partial.** There's a real review path (`EssayReview` uses backend review), but this teaser banner shown to *free-trial* users is entirely synthetic. Wire to a lightweight backend "score preview" or gate the real review behind it. |
 
-### 7. Checkpoints
-Already correct in shape. Two adjustments:
-1. Only render the modal for `checkpoint.kind === "login" | "submit"` — ignore any other kinds defensively (contract guarantees only these two).
-2. On `submit` checkpoint, read `payload.filled`, `payload.unmatched`, `payload.reachedReview`; if `reachedReview === false`, show a warning that the agent couldn't reach the portal's review screen and the user should navigate there manually before confirming.
+---
 
-### 8. Entitlement / paywall wiring
-1. Single source of truth: `autoApplyEntitlement.gate`. Delete any other client-side "paid" checks around apply (keep `hasPaidAccess` for non-apply features only).
-2. On `needs_payment`, the CTA links to `/unlock`; on return (`/unlock/success`) re-query `autoApplyEntitlement` and auto-continue.
+## 3. Dashboard — `src/routes/dashboard.tsx`
 
-### 9. Error handling — global rules
-- Convex mutations that throw: `error.message` is user-safe per contract; surface verbatim in a toast/inline notice.
-- WebSocket close before frame: LiveCanvas already shows "Live view disconnected" ✅.
-- `getApplyJob` returning `null` on a terminal jobId: keep the "not found" panel; add a link to `/apply`.
+| Section | Line | Faked | Should show | Real backend? |
+|---|---|---|---|---|
+| `COMING_SOON` tiles | 84–103 | 3 hardcoded "Deadline tracker", "Auto-Apply", "Scholarship matcher" — Auto-Apply is now LIVE, so this is misleading | Real feature status. Remove Auto-Apply. Deadline tracker + Scholarship matcher can stay as roadmap tiles | Auto-Apply already exists (`useActiveApplyJob`, `useApplyActions`). |
+| `qc.landing.matches` localStorage | 108, 155, essay.tsx 233 | Reads/writes matches to localStorage as a cache | Should read `saved` shortlist + recommendations directly from backend on every mount; localStorage is a leftover from the guest-onboarding path | `useSavedUniversities` + `api.rag.recommend.recommend` already exist. |
+| `ToolTile` "Coming soon" badge | 565 | Static badge | Same as above | — |
+| Waitlist "30% off monthly" copy | 428, 461 | Hardcoded pricing/discount string | Read from `WAITLIST_BASE_DISCOUNT` (already in `src/lib/config.ts`) instead of hardcoding "30%" inline | Already exported constant. |
 
-### 10. QA checklist to verify the contract end-to-end
-1. Upload each doc type; confirm overwrite behaves; confirm `downloadUrl` opens a signed URL.
-2. Build a target list with a mix of eligible/ineligible/unknown; verify blocking + questions.
-3. Cycle `gate` through all four values (admin toggle or via `applyCount` bumps).
-4. `enqueueApply` → observe status transitions `queued → claimed → awaiting_login → filling → awaiting_submit → done`; confirm no branch code hits an unknown status.
-5. Force a worker error to verify `error` + Try again path.
-6. Log into a portal via LiveCanvas; type into a field (verify `char` event lands); solve a captcha; confirm submit checkpoint.
-7. Cancel mid-run; confirm WS closes and route shows the cancelled banner.
+---
 
-### Files that will change
-- `src/lib/applyQueue/client.ts` (downloadUrl shape, drop assumptions)
-- `src/lib/apply/intake.ts` (drop `useAnswerEligibility`, add `useListAnswers`)
-- `src/components/apply/DocumentManager.tsx` (size guard, hasFile, replace UI, downloadUrl consumer)
-- `src/components/apply/ResearchDock.tsx` (drop `myActiveJobs`)
-- `src/components/apply/collect/CollectWorkspace.tsx` + `EligibilityCard.tsx` (route eligibility answers through `setAnswer`, block ineligible)
-- `src/components/apply/collect/LaunchBar.tsx` (verbatim errors, needs_payment routing, reused handling)
-- `src/components/apply/LiveCanvas.tsx` (add `char` + composition events, WS teardown)
-- `src/routes/apply.$jobId.tsx` (resume banner elsewhere, retry button, ticket refresh on WS drop, submit payload warnings)
-- `src/routes/apply.tsx` / `apply.prep.tsx` (resume banner surface if we add it here)
+## 4. Profile — `src/routes/profile.tsx`
 
-No backend changes — this is a pure client alignment pass.
+| Section | Line | Faked | Should show | Real backend? |
+|---|---|---|---|---|
+| Hero `Stat` cards | 203–208 | "Account = Active/Guest", **"Waitlist discount = 30% off"** hardcoded, "Your matches = recs.length" (real) | Waitlist stat should read `WAITLIST_BASE_DISCOUNT` from config, not a literal | Constant already exists. |
+| "Coming soon" tiles (`UpcomingTile`, section 322–362) | 322–362 | "Bookmark & compare" tile marked coming-soon; badges hardcoded to "Coming soon" | Real roadmap flags OR delete once shipped | No roadmap-status query. |
+| Copy: "30% off monthly access" | 184, 328, 380 | Hardcoded | Use config constant | — |
+
+---
+
+## 5. Apply flow — `src/routes/apply.tsx`, `apply.$jobId.tsx`, `apply.prep.tsx`, subcomponents
+
+Mostly real. Remaining stubs:
+
+| File | Line | Faked | Should show | Real backend? |
+|---|---|---|---|---|
+| `apply.prep.tsx` | 1–5 | Entire route is a `<Navigate to="/dashboard" />` stub — no prep UI | A real prep screen (documents + eligibility + readiness overview) OR delete the route and remove all links to `/apply/prep` (dashboard TaskRail line 851 still links to it) | Existing components (`CollectWorkspace`, `DocumentManager`, `ReadinessRail`) can compose this. |
+| `NextProductiveAction.tsx` | 21–47 | Hardcoded action ladder (profile → docs → essay). Links point to `/apply/prep` which is the stub route above | Real "next best action" driven by `useApplicantProfile` (already used) + real doc/essay counts | Signals are all real; the branching text just needs the target route to exist. |
+| `ResearchProgressModal.tsx` `SIDE_ACTIONS` | 25–47 | 3 hardcoded side tiles pointing to /dashboard, /essay, /apply | Fine as static shortcuts, but "Upload your transcript" should be gated on real doc state (`useApplicationDocuments`) rather than static | Docs query exists. |
+
+Sections that are **fully real**: `ResearchDock`, `ResumeBanner`, `SelectableUniCard`, `BatchActionBar`, `LiveCanvas`, `LaunchBar`, `CollectWorkspace`, `EligibilityCard`, `DocumentManager`, `ApplyStepper`.
+
+---
+
+## 6. Onboarding & Profile inputs — `src/lib/apply/profile.ts`, `src/lib/onboarding/steps.ts`
+
+Not mocks — these are legitimate **input placeholders** (empty-field hints like "Sofia", "3.8 / 4.0", "SAT 1480, TOEFL 108"). Keep as-is. Flagging so you can ignore them in the sweep.
+
+---
+
+## 7. Landing pages — `src/components/landing/*` and `src/components/landing2/*`
+
+Marketing content — mostly intentional showcase copy, not app data. Flag list only:
+
+| File | Line | Content | Verdict |
+|---|---|---|---|
+| `landing2/ResultsReveal.tsx` | 41–58 | `LOCKED_MATCHES` — 2 canned Trinity/NUS teaser cards behind the paywall | Intentional teaser. Keep OR pull 2 real cards from `recommend` with names blurred. |
+| `landing2/ResultsReveal.tsx` | 78–84 | `THINKING_STEPS` — 5 canned "Indexing… / Cross-referencing…" lines | Cosmetic loader copy. Keep. |
+| `landing2/ResultsReveal.tsx` | 244 | Inline `match: 82` in a demo card | Same as above. |
+| `landing2/ParallaxShowcase.tsx` | 7–9 | `ROW_A/B/C` hardcoded university names for the marquee | Cosmetic. Keep. |
+| `landing2/LivingBackground.tsx` | 16 | `UNIVERSITIES` decorative background list | Cosmetic. Keep. |
+| `landing2/HeroQuiz.tsx` | 16 | `COUNTRY_OPTIONS` for the quiz | Shared onboarding options — real UI data. Keep. |
+| `landing2/RoadmapV2.tsx` | 6–32 | `FEATURES` roadmap tiles all `badge: "Coming soon"` | Marketing roadmap — decide per row whether it's still coming soon (Auto-Apply is live). |
+| `landing2/HowItWorks.tsx`, `landing/HowItWorks.tsx`, `landing/ProblemSection.tsx`, `landing/PricingSection.tsx` | — | `STEPS`, `PAINS`, `FREE_KEYS`, `PAID_KEYS` | Marketing copy driven by i18n. Keep. |
+| `landing/PricingSection.tsx` + others | — | "30% off", "11,000+ universities", "First draft free" | Marketing constants. Use `WAITLIST_BASE_DISCOUNT` / config where present. |
+| `RecommendationsSection.tsx` | 32–40 | `TEASER` — 3 blurred fake cards behind the paid paywall | Intentional teaser. Keep. |
+
+---
+
+## 8. Universities / Search — `src/routes/universities.tsx`, `src/components/universities/*`
+
+Fully backed by real backend (`useSavedUniversities`, `api.universities.search`, `SaveToggle`). No mocks. The only strings are UI placeholder text ("e.g. Stanford, ETH…").
+
+---
+
+## 9. Cross-cutting hardcoded numbers to remove
+
+| Value | Files | Real source |
+|---|---|---|
+| `"11,000+"` universities | `UniversitySearchSection.tsx:29`, `dashboard.tsx:342`, `index.tsx:27`, `__root.tsx:101–102`, `tos.tsx:74`, `ParallaxShowcase.tsx:144`, `ResultsReveal.tsx:79`, `HeroOnboarding.tsx:55`, `HowItWorks.tsx:10` | Should be a single constant (or a `api.universities.count` query) — currently repeated ~9 times. |
+| `"30% off"` waitlist discount | dashboard, profile, signin | `WAITLIST_BASE_DISCOUNT` already exists in `src/lib/config.ts` — replace literals. |
+
+---
+
+# Sections already backed by real data (green — nothing to do)
+
+- **Auth / user**: `useAuth`, sign-in, email verify.
+- **Recommendations**: `RecommendationsSection`, `MyUniversitiesSection` — all via `api.rag.recommend.recommend`.
+- **Saved universities**: `useSavedUniversities`, `SaveToggle`.
+- **University search**: `UniversitySearchSection`, `universities` route.
+- **Application intake**: `useIntakePlan`, `useEligibility`, `useChecklist`, `useListAnswers`, `useAnswerEligibility`, `setAnswer`.
+- **Auto-apply queue**: `useApplyJob`, `useActiveApplyJob`, `useApplyActions`, `useApplicationDocuments`, `fetchLiveTicket`, live WebSocket canvas.
+- **Payments/entitlement**: `api.payments.entitlement`, `UnlockButton`.
+- **Waitlist / referrals**: `lib/waitlist/api.ts`, `lib/referral/client.ts`.
+- **Essay generation & review**: real `api.essays.*` (only the free-trial *score banner* and the mock-story autofill are synthetic).
+- **Task rail, ResumeBanner, StatBar** on dashboard.
+
+---
+
+# Suggested prioritization for wiring
+
+1. **`application.$system.$externalId.tsx`** — 3 fake sections (General info, Deadlines, Scholarships) + delete `MockBadge`/`MockNoticeCard`. Blocked on backend exposing university enrichment + per-target deadlines + scholarships.
+2. **`apply.prep.tsx`** — decide: build it or delete it. Currently dashboard TaskRail links to a `<Navigate>` stub.
+3. **`FreeTrialScoreBanner`** in `essay.tsx` — replace synthetic score with real (or gate behind paid review).
+4. **`mockStories.ts` autofill** — remove if you don't want fake user memories being pasted into real essays.
+5. **`COMING_SOON` on dashboard** — remove Auto-Apply tile (it's live).
+6. **Constants sweep** — replace hardcoded "30% off" and "11,000+" with config values.
