@@ -266,7 +266,12 @@ function DashboardPage() {
             </SilentErrorBoundary>
           )}
 
-
+          {/* Your picks — saved / researched universities */}
+          {isAuthenticated && (
+            <SilentErrorBoundary>
+              <YourPicksSection />
+            </SilentErrorBoundary>
+          )}
 
 
           {/* Matches */}
