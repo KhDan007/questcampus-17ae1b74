@@ -23,7 +23,6 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { formatVersionTime, type EssayVersion } from "@/lib/essays/history";
-import { fillPlaceholdersWithMocks, mockForHint } from "@/lib/essays/mockStories";
 import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
