@@ -62,12 +62,12 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
           type="button"
           onClick={ask}
           disabled={asking}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
         >
           {asking ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
           )}
           {answer ? "Ask again" : "Ask AI"}
         </button>
