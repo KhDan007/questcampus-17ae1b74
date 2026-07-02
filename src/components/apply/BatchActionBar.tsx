@@ -3,31 +3,39 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2, Search, X } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/lib/auth/useAuth";
 import { useApplySelection } from "@/lib/applyQueue/selection";
-import { useApplyActions } from "@/lib/applyQueue/client";
 
 export function BatchActionBar() {
   const { items, count, clear } = useApplySelection();
-  const { startApply } = useApplyActions();
+  const { token } = useAuth();
+  const addMut = useMutation(api.userUniversities.add);
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  async function researchAll() {
-    if (busy || items.length === 0) return;
+  async function addAll() {
+    if (busy || items.length === 0 || !token) return;
     setBusy(true);
     setErr(null);
     try {
       for (const it of items) {
         try {
-          await startApply({ system: it.source, externalId: it.externalId, targetName: it.name });
+          await addMut({
+            token,
+            source: it.source,
+            externalId: it.externalId,
+            origin: "manual",
+          } as never);
         } catch (e) {
-          setErr(e instanceof Error ? e.message : "Failed to start one job");
+          setErr(e instanceof Error ? e.message : "Failed to add one university");
         }
       }
       clear();
-      void navigate({ to: "/apply" });
+      void navigate({ to: "/dashboard" });
     } finally {
       setBusy(false);
     }
@@ -57,7 +65,7 @@ export function BatchActionBar() {
                 {count} {count === 1 ? "university" : "universities"} selected
               </p>
               <p className="truncate text-label-sm text-on-surface-variant">
-                {err ?? "Pick what to do next."}
+                {err ?? "We'll save them and start deep-researching each one in the background."}
               </p>
             </div>
           </div>
@@ -65,19 +73,11 @@ export function BatchActionBar() {
             <button
               type="button"
               disabled={busy}
-              onClick={researchAll}
-              className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60 sm:flex-none"
-            >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              Deep research
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => navigate({ to: "/apply/prep" })}
+              onClick={addAll}
               className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60 sm:flex-none sm:px-4"
             >
-              Apply to {count} <ArrowRight className="h-4 w-4" />
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Add to my list & research
             </button>
           </div>
         </motion.div>
