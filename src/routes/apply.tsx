@@ -75,6 +75,9 @@ function ApplyHubPage() {
             Select one or many. Prep your details once. We deep-research each portal, fill it in a
             live browser, and hand you the wheel before submit.
           </p>
+          <div className="mt-5">
+            <RunLiveDemoButton />
+          </div>
         </header>
 
         <div className="mt-8 space-y-8">
