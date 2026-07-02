@@ -233,8 +233,8 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           {/* Left / main column */}
           <div className="space-y-5 lg:col-span-2">
-            <GeneralInfoCard uni={uni} />
-            <DeadlinesCard />
+            <GeneralInfoCard facts={facts} />
+            <DeadlinesCard facts={facts} />
             <EligibilityCardSection eligibility={eligPer} found={found} />
             <RequirementsList
               id="documents"
@@ -248,6 +248,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               items={documents}
               emptyLabel="No document uploads required."
               found={found}
+              research={research}
             />
             <RequirementsList
               id="essays"
@@ -257,6 +258,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               items={essays}
               emptyLabel="No essays required."
               found={found}
+              research={research}
             />
             {videos.length > 0 && (
               <RequirementsList
@@ -267,6 +269,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 items={videos}
                 emptyLabel="No videos required."
                 found={found}
+                research={research}
               />
             )}
             {fields.length > 0 && (
@@ -278,16 +281,16 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 items={fields}
                 emptyLabel="No extra questions."
                 found={found}
+                research={research}
               />
             )}
-            <ScholarshipsCard />
+            <ScholarshipsCard scholarships={scholarships} />
           </div>
 
           {/* Right rail */}
           <aside className="space-y-5">
             <ReadinessCard ready={ready} found={found} checklistPer={checklistPer} />
             <QuickLinks uni={uni} />
-            <MockNoticeCard />
           </aside>
         </div>
     </main>
