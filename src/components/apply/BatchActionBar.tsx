@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Plus, Sparkles, X } from "lucide-react";
 import { useMutation } from "convex/react";
@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 import { ResearchProgressModal } from "@/components/apply/ResearchProgressModal";
-import type { BackendTarget } from "@/lib/apply/intake";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
 
 export function BatchActionBar() {
   const { items, count, clear } = useApplySelection();
@@ -19,15 +19,29 @@ export function BatchActionBar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTargets, setModalTargets] = useState<BackendTarget[]>([]);
 
+  const selectionTargets: BackendTarget[] = useMemo(
+    () => items.map((i) => ({ system: i.source, externalId: i.externalId, name: i.name })),
+    [items],
+  );
+  const plan = useIntakePlan(selectionTargets);
+  const foundSet = useMemo(() => {
+    const s = new Set<string>();
+    (plan?.targets ?? []).forEach((t) => {
+      if (t.found) s.add(`${t.system}::${t.externalId}`);
+    });
+    return s;
+  }, [plan]);
+  const researchedCount = selectionTargets.filter((t) =>
+    foundSet.has(`${t.system}::${t.externalId}`),
+  ).length;
+  const toResearch = selectionTargets.filter(
+    (t) => !foundSet.has(`${t.system}::${t.externalId}`),
+  );
+
   async function addAll() {
     if (busy || items.length === 0 || !token) return;
     setBusy(true);
     setErr(null);
-    const targets: BackendTarget[] = items.map((it) => ({
-      system: it.source,
-      externalId: it.externalId,
-      name: it.name,
-    }));
     try {
       for (const it of items) {
         try {
@@ -41,13 +55,17 @@ export function BatchActionBar() {
           setErr(e instanceof Error ? e.message : "Failed to add one university");
         }
       }
-      setModalTargets(targets);
-      setModalOpen(true);
+      // Only stream research progress for the ones that aren't already researched.
+      if (toResearch.length > 0) {
+        setModalTargets(toResearch);
+        setModalOpen(true);
+      }
       clear();
     } finally {
       setBusy(false);
     }
   }
+
 
   const isEmpty = count === 0;
 
