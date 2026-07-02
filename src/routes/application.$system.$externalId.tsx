@@ -961,16 +961,3 @@ function QuickLinks({ uni }: { uni?: { website?: string; name: string } }) {
     </aside>
   );
 }
-
-function MockNoticeCard() {
-  return (
-    <aside className="rounded-2xl border-2 border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-body-sm text-on-surface-variant">
-      <p className="font-display text-label-md font-bold text-on-surface">Heads up</p>
-      <p className="mt-1">
-        Sections labelled <MockBadge /> use placeholder values until the backend
-        surfaces real data for that school. The live requirement list, eligibility,
-        and readiness above are real.
-      </p>
-    </aside>
-  );
-}
