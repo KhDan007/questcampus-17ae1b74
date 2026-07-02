@@ -75,7 +75,7 @@ export function useUniFacts(system: string, externalId: string) {
 export function useUniScholarships(system: string, externalId: string) {
   return useQuery(api.ingest.scholarships.listForUniversity, { system, externalId } as never) as
     | Scholarship[]
-    | undefined.undefined;
+    | undefined;
 }
 
 export function useResearchProgress(system: string, externalId: string) {
