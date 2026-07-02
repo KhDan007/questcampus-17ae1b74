@@ -23,6 +23,8 @@ import type {
   IntakePlan,
 } from "@/lib/apply/intake";
 import { useApplicationDocuments, type DocType } from "@/lib/applyQueue/client";
+import { useGuides } from "@/lib/apply/guidance";
+import { GuideBlock } from "@/components/apply/GuideBlock";
 import { RequirementsZone } from "./RequirementsZone";
 import { IntakeItemField } from "./RequirementField";
 
@@ -387,6 +389,9 @@ function StepCard({
         ) : null}
       </div>
 
+      <StepGuidance step={step} />
+
+
       {/* Nav */}
       <div className="flex items-center justify-between gap-2 border-t-2 border-dashed border-on-surface/15 pt-4">
         <button
@@ -590,5 +595,29 @@ function EssayStep() {
         <Sparkles className="h-4 w-4" /> Open Essay Assistant
       </Link>
     </div>
+  );
+}
+
+function StepGuidance({ step }: { step: GuidedStep }) {
+  const rows = useGuides([
+    {
+      kind: step.kind,
+      docType: step.docType ?? null,
+      conceptKey: step.conceptKey ?? null,
+      label: step.label ?? null,
+    },
+  ]);
+  const guide = rows?.[0]?.guide ?? null;
+  return (
+    <GuideBlock
+      guide={guide}
+      explainArgs={{
+        kind: step.kind,
+        docType: step.docType ?? null,
+        conceptKey: step.conceptKey ?? null,
+        label: step.label ?? null,
+        prompt: step.prompt ?? null,
+      }}
+    />
   );
 }

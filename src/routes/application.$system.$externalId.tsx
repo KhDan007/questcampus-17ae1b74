@@ -41,6 +41,9 @@ import {
   type ResearchProgress,
 } from "@/lib/apply/uniData";
 import { useApplyActions } from "@/lib/applyQueue/client";
+import { useGuides } from "@/lib/apply/guidance";
+import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
+import type { GuideRow } from "@/lib/apply/guidance";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -179,6 +182,14 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const essays = specItems.filter((i) => i.kind === "essay");
   const videos = specItems.filter((i) => i.kind === "video");
   const fields = specItems.filter((i) => i.kind === "field");
+  const guideRows = useGuides(
+    specItems.map((i) => ({
+      kind: i.kind,
+      docType: i.docType ?? null,
+      conceptKey: i.conceptKey ?? null,
+      label: i.label ?? null,
+    })),
+  );
 
   return (
     <main
@@ -249,6 +260,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               emptyLabel="No document uploads required."
               found={found}
               research={research}
+              system={system}
+              externalId={externalId}
+              guideRows={guideRows}
             />
             <RequirementsList
               id="essays"
@@ -259,6 +273,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               emptyLabel="No essays required."
               found={found}
               research={research}
+              system={system}
+              externalId={externalId}
+              guideRows={guideRows}
             />
             {videos.length > 0 && (
               <RequirementsList
@@ -270,6 +287,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 emptyLabel="No videos required."
                 found={found}
                 research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
               />
             )}
             {fields.length > 0 && (
@@ -282,6 +302,9 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
                 emptyLabel="No extra questions."
                 found={found}
                 research={research}
+                system={system}
+                externalId={externalId}
+                guideRows={guideRows}
               />
             )}
             <ScholarshipsCard scholarships={scholarships} />
@@ -710,6 +733,9 @@ function RequirementsList({
   emptyLabel,
   found,
   research,
+  system,
+  externalId,
+  guideRows,
 }: {
   id: string;
   icon: React.ReactNode;
@@ -719,6 +745,9 @@ function RequirementsList({
   emptyLabel: string;
   found: boolean;
   research?: ResearchProgress | null;
+  system: string;
+  externalId: string;
+  guideRows: GuideRow[] | undefined;
 }) {
   return (
     <SectionCard
@@ -740,46 +769,71 @@ function RequirementsList({
         <p className="text-body-sm text-on-surface-variant">{emptyLabel}</p>
       ) : (
         <ul className="space-y-2">
-          {items.map((it) => (
-            <li
-              key={it.key}
-              className="flex items-start gap-3 rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
-            >
-              <span
-                className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md border-2 ${
-                  it.answered
-                    ? "border-on-surface bg-tertiary text-white"
-                    : "border-on-surface/40 bg-surface text-on-surface/40"
-                }`}
+          {items.map((it) => {
+            const guide = findGuide(guideRows, {
+              kind: it.kind,
+              docType: it.docType ?? null,
+              conceptKey: it.conceptKey ?? null,
+              label: it.label ?? null,
+            });
+            return (
+              <li
+                key={it.key}
+                className="rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
               >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-display text-label-md font-bold text-on-surface">
-                  {it.label}
-                  {it.required && (
-                    <span className="ml-1.5 font-[var(--font-label)] text-label-sm font-semibold text-error">
-                      required
-                    </span>
-                  )}
-                  {it.wordLimit && (
-                    <span className="ml-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                      · {it.wordLimit} words
-                    </span>
-                  )}
-                </p>
-                {it.prompt && (
-                  <p className="mt-0.5 text-body-sm text-on-surface-variant">{it.prompt}</p>
-                )}
-              </div>
-              <Link
-                to="/dashboard"
-                className="shrink-0 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
-              >
-                {it.answered ? "Edit" : "Fill in"}
-              </Link>
-            </li>
-          ))}
+                <div className="flex items-start gap-3">
+                  <span
+                    className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md border-2 ${
+                      it.answered
+                        ? "border-on-surface bg-tertiary text-white"
+                        : "border-on-surface/40 bg-surface text-on-surface/40"
+                    }`}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-label-md font-bold text-on-surface">
+                      {it.label}
+                      {it.required && (
+                        <span className="ml-1.5 font-[var(--font-label)] text-label-sm font-semibold text-error">
+                          required
+                        </span>
+                      )}
+                      {it.wordLimit && (
+                        <span className="ml-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                          · {it.wordLimit} words
+                        </span>
+                      )}
+                    </p>
+                    {it.prompt && (
+                      <p className="mt-0.5 text-body-sm text-on-surface-variant">{it.prompt}</p>
+                    )}
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    className="shrink-0 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                  >
+                    {it.answered ? "Edit" : "Fill in"}
+                  </Link>
+                </div>
+                <div className="pl-9">
+                  <GuideBlock
+                    guide={guide}
+                    explainArgs={{
+                      system,
+                      externalId,
+                      kind: it.kind,
+                      docType: it.docType ?? null,
+                      conceptKey: it.conceptKey ?? null,
+                      label: it.label ?? null,
+                      prompt: it.prompt ?? null,
+                    }}
+                    compact
+                  />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </SectionCard>
