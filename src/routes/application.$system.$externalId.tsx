@@ -315,13 +315,6 @@ function BackLink() {
   );
 }
 
-function MockBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-amber-700">
-      Mock
-    </span>
-  );
-}
 
 function StatusPill({ found, ready }: { found: boolean; ready: boolean }) {
   if (ready) {
