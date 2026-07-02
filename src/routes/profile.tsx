@@ -182,7 +182,7 @@ function ProfilePage() {
                 )}
                 <p className="mt-3 max-w-2xl text-body-md text-on-surface-variant">
                   Everything you've matched and built lives here. We'll keep adding tools as they
-                  ship — waitlist members get 30% off monthly access.
+                  ship — waitlist members get {WAITLIST_BASE_DISCOUNT}% off monthly access.
                 </p>
               </div>
 
