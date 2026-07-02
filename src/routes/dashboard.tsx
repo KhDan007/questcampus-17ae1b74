@@ -28,6 +28,8 @@ import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { CheckCircle2 } from "lucide-react";
 
 
 export const Route = createFileRoute("/dashboard")({
@@ -264,7 +266,12 @@ function DashboardPage() {
             </SilentErrorBoundary>
           )}
 
-
+          {/* Your picks — saved / researched universities */}
+          {isAuthenticated && (
+            <SilentErrorBoundary>
+              <YourPicksSection />
+            </SilentErrorBoundary>
+          )}
 
 
           {/* Matches */}
@@ -630,4 +637,97 @@ function DashboardPrepSection() {
   }
   return <CollectWorkspace targets={targets} />;
 }
+
+function YourPicksSection() {
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const plan = useIntakePlan(targets);
+
+  if (saved === undefined) return null;
+  if (targets.length === 0) return null;
+
+  const foundMap = new Map<string, boolean>(
+    (plan?.targets ?? []).map((t) => [`${t.system}::${t.externalId}`, t.found]),
+  );
+
+  return (
+    <section className="mt-10">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+            Main picks
+          </p>
+          <h2 className="mt-1 font-display text-headline-lg font-bold text-on-surface">
+            Your picks
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            {targets.length} universit{targets.length === 1 ? "y" : "ies"} you're
+            applying to — we're deep-researching each one.
+          </p>
+        </div>
+        <Link
+          to="/apply"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          Add more <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {(saved ?? []).map((s) => {
+          const key = `${s.source}::${s.externalId}`;
+          const found = foundMap.get(key);
+          const location = [s.city, s.state, s.country].filter(Boolean).join(", ");
+          return (
+            <li
+              key={s.id}
+              className="flex items-start gap-3 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+                <GraduationCap className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                  {s.name}
+                </p>
+                {location && (
+                  <p className="truncate text-label-sm text-on-surface-variant">
+                    {location}
+                  </p>
+                )}
+                <p
+                  className={`mt-1.5 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold ${
+                    found ? "text-tertiary" : "text-primary"
+                  }`}
+                >
+                  {found ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Research ready
+                    </>
+                  ) : plan === undefined ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading…
+                    </>
+                  ) : (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Researching…
+                    </>
+                  )}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 
