@@ -40,13 +40,14 @@ export const Route = createFileRoute("/documents")({
 
 function DocumentsHubPage() {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated)
-    return <Navigate to="/signin" search={{ redirect: "/documents" } as never} />;
-
   const docs = useDocuments();
   const remove = useRemoveDocument();
   const [picker, setPicker] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" search={{ redirect: "/documents" } as never} />;
+  }
 
   return (
     <DashboardShell>
