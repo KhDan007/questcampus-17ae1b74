@@ -8,6 +8,10 @@ type Props = {
   ticket: string | undefined;
   /** When false, input events are not forwarded. */
   interactive?: boolean;
+  /** When true, force-close the socket (e.g. terminal job status). */
+  disconnect?: boolean;
+  /** Called with the CloseEvent code so parent can re-fetch ticket on 1006/1008. */
+  onClose?: (code: number) => void;
 };
 
 const SRC_W = 1280;
@@ -17,7 +21,13 @@ const SRC_H = 800;
  * Renders the worker browser screencast and forwards mouse / wheel / keyboard
  * events back over the WebSocket. Coordinates are scaled to the 1280×800 source.
  */
-export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
+export function LiveCanvas({
+  wsEndpoint,
+  ticket,
+  interactive = true,
+  disconnect = false,
+  onClose,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<"idle" | "connecting" | "open" | "closed" | "error">(
@@ -27,7 +37,7 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
 
   // Connect WS
   useEffect(() => {
-    if (!wsEndpoint || !ticket) return;
+    if (!wsEndpoint || !ticket || disconnect) return;
     setStatus("connecting");
     setHasFrame(false);
 
@@ -43,7 +53,10 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
 
     ws.onopen = () => setStatus("open");
     ws.onerror = () => setStatus("error");
-    ws.onclose = () => setStatus("closed");
+    ws.onclose = (ev) => {
+      setStatus("closed");
+      onClose?.(ev.code);
+    };
 
     ws.onmessage = (e) => {
       let msg: { t?: string; data?: string } | null = null;
