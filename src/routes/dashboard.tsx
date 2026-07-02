@@ -453,7 +453,7 @@ function DashboardPage() {
         open={!!modal}
         onClose={() => setModal(null)}
         title={modal ? `${modal.title} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off monthly access."
+        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
         feature={modal?.title}
       />
 
