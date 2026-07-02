@@ -131,9 +131,10 @@ function DocumentEditorPage() {
   }
 
   async function copyText() {
+    const fmt = doc?.format;
     const text =
-      (doc.format && "formatted" in doc.format ? doc.format.formatted : null) ??
-      content;
+      (fmt && "formatted" in fmt ? fmt.formatted : null) ?? content;
+
     try {
       await navigator.clipboard.writeText(text);
       toast.success("Copied — paste into the portal");
