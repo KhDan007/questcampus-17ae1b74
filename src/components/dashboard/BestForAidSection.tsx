@@ -12,7 +12,7 @@ function formatUsdPerYear(n: number): string {
 
 export function BestForAidSection({ limit = 12 }: { limit?: number }) {
   const recs = useAidRecommendations(limit);
-  const saved = useSavedUniversities();
+  const { saved } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
 
   return (
