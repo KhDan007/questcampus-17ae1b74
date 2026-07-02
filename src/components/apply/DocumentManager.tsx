@@ -91,6 +91,7 @@ export function DocumentManager() {
 
               <UploadButton
                 busy={isBusy}
+                hasExisting={list.length > 0}
                 onSelect={async (file) => {
                   setError(null);
                   setBusy(t.value);
@@ -121,19 +122,23 @@ function DocRow({
   onDownload: () => Promise<void>;
 }) {
   const [working, setWorking] = useState(false);
+  const hasFile = doc.hasFile !== false; // default true if backend omits
   return (
     <li className="flex items-center gap-2 rounded-md border border-on-surface/10 bg-surface px-2.5 py-1.5">
       <FileText className="h-4 w-4 shrink-0 text-on-surface/60" aria-hidden />
       <div className="min-w-0 flex-1">
         <p className="truncate text-label-md text-on-surface">{doc.fileName}</p>
-        {doc.size ? (
-          <p className="text-label-sm text-on-surface-variant">{fmtBytes(doc.size)}</p>
-        ) : null}
+        <p className="text-label-sm text-on-surface-variant">
+          {doc.size ? fmtBytes(doc.size) : ""}
+          {!hasFile ? (doc.size ? " · " : "") + "Uploading…" : ""}
+        </p>
       </div>
       <button
         type="button"
         onClick={onDownload}
-        className="rounded p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+        disabled={!hasFile}
+        title={hasFile ? "Download" : "File not yet available"}
+        className="rounded p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         aria-label="Download"
       >
         <Download className="h-4 w-4" />
@@ -160,9 +165,11 @@ function DocRow({
 
 function UploadButton({
   busy,
+  hasExisting,
   onSelect,
 }: {
   busy: boolean;
+  hasExisting?: boolean;
   onSelect: (file: File) => Promise<void>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -190,10 +197,15 @@ function UploadButton({
           </>
         ) : (
           <>
-            <Upload className="h-3.5 w-3.5" /> Upload file
+            <Upload className="h-3.5 w-3.5" /> {hasExisting ? "Replace file" : "Upload file"}
           </>
         )}
       </button>
+      {hasExisting && !busy && (
+        <p className="mt-1 text-label-sm text-on-surface-variant">
+          Uploading a new file replaces the existing one.
+        </p>
+      )}
     </>
   );
 }

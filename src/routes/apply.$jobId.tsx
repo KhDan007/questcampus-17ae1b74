@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "convex/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useConvex } from "convex/react";
 import {
   ArrowLeft,
   Loader2,
@@ -64,14 +64,45 @@ function ApplyRunPage() {
 function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const job = useApplyJob(jobId);
   const navigate = useNavigate();
-  const { cancelJob, confirm } = useApplyActions();
+  const convex = useConvex();
+  const { cancelJob, confirm, startApply } = useApplyActions();
   const [acting, setActing] = useState(false);
+  const [liveTicket, setLiveTicket] = useState<{ wsUrl: string; ticket: string } | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const terminal = !!job && (job.status === "done" || job.status === "cancelled" || job.status === "error");
 
-  // Reactive WS ticket — only fetched once wsEndpoint is published.
-  const liveTicket = useQuery(
-    api.applyQueue.liveTicket,
-    job?.wsEndpoint ? { token, jobId } : "skip",
-  ) as { wsUrl: string; ticket: string } | undefined;
+  const fetchTicket = useCallback(async () => {
+    if (!job?.wsEndpoint || terminal) return;
+    try {
+      const t = (await convex.query(api.applyQueue.liveTicket, { token, jobId })) as
+        | { wsUrl: string; ticket: string }
+        | null;
+      setLiveTicket(t ?? null);
+    } catch (e) {
+      console.warn("liveTicket fetch failed", e);
+    }
+  }, [convex, jobId, token, job?.wsEndpoint, terminal]);
+
+  // Fetch ticket once wsEndpoint appears.
+  useEffect(() => {
+    if (job?.wsEndpoint && !terminal && !liveTicket) void fetchTicket();
+  }, [job?.wsEndpoint, terminal, liveTicket, fetchTicket]);
+
+  // Terminal → drop the ticket so the canvas force-disconnects.
+  useEffect(() => {
+    if (terminal) setLiveTicket(null);
+  }, [terminal]);
+
+  const onCanvasClose = useCallback(
+    (code: number) => {
+      // 1006 = abnormal, 1008 = policy (ticket expired). Re-fetch and reconnect.
+      if (!terminal && (code === 1006 || code === 1008)) {
+        setLiveTicket(null);
+        void fetchTicket();
+      }
+    },
+    [fetchTicket, terminal],
+  );
 
   // Auto-scroll activity feed
   const feedRef = useRef<HTMLOListElement>(null);
@@ -103,7 +134,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
     );
   }
 
-  const terminal = job.status === "done" || job.status === "cancelled" || job.status === "error";
+  // `terminal` is already computed above from the RunBody hook block.
 
   return (
     <>
@@ -159,6 +190,8 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
             wsEndpoint={job.wsEndpoint}
             ticket={liveTicket?.ticket}
             interactive={!terminal}
+            disconnect={terminal}
+            onClose={onCanvasClose}
           />
           <p className="mt-2 text-label-sm text-on-surface-variant">
             This is the agent&apos;s real browser. Click and type here to log in, solve captchas,
@@ -210,12 +243,42 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         />
       )}
       {job.status === "error" && (
-        <Banner
-          tone="error"
-          icon={<AlertTriangle className="h-5 w-5" />}
-          title="The agent hit a problem"
-          body={job.error ?? "Try again, or finish in the live browser above."}
-        />
+        <div className="mt-6 space-y-3">
+          <Banner
+            tone="error"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            title="The agent hit a problem"
+            body={job.error ?? "Something went wrong. Try again."}
+          />
+          <button
+            type="button"
+            disabled={retrying}
+            onClick={async () => {
+              if (!job.system || !job.externalId) return;
+              setRetrying(true);
+              try {
+                const res = await startApply({
+                  system: job.system,
+                  externalId: job.externalId,
+                  targetName: job.targetName,
+                });
+                void navigate({
+                  to: "/apply/$jobId",
+                  params: { jobId: res.jobId },
+                  replace: true,
+                });
+              } catch (e) {
+                console.warn("retry failed", e);
+              } finally {
+                setRetrying(false);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+          >
+            {retrying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Try again
+          </button>
+        </div>
       )}
       {job.status === "cancelled" && (
         <Banner
@@ -309,18 +372,34 @@ function CheckpointModal({
   }
 
   if (checkpoint.kind === "submit") {
-    const filled =
-      (checkpoint.payload as { filled?: Array<{ field: string; value?: string }> } | undefined)
-        ?.filled ?? [];
-    const unmatched =
-      (checkpoint.payload as { unmatched?: Array<{ field: string; reason?: string }> } | undefined)
-        ?.unmatched ?? [];
+    const payload = checkpoint.payload as
+      | {
+          filled?: Array<{ field: string; value?: string }>;
+          unmatched?: Array<{ field: string; reason?: string }>;
+          reachedReview?: boolean;
+        }
+      | undefined;
+    const filled = payload?.filled ?? [];
+    const unmatched = payload?.unmatched ?? [];
+    const reachedReview = payload?.reachedReview !== false; // default true if omitted
     return (
       <Modal title="Review and submit" icon={<Send className="h-5 w-5 text-primary" />}>
         <p className="text-body-md text-on-surface-variant">
           The form is filled. Look it over in the live browser, fix anything you want, then hit the
           portal&apos;s submit button. Tap below once it&apos;s sent.
         </p>
+
+        {!reachedReview && (
+          <div className="mt-3 rounded-md border-2 border-error/60 bg-error-container/50 p-3">
+            <p className="font-[var(--font-label)] text-label-sm font-semibold text-on-error-container">
+              Heads up: the agent couldn&apos;t reach the portal&apos;s review screen.
+            </p>
+            <p className="mt-0.5 text-body-sm text-on-error-container">
+              Navigate to the review/submit step yourself in the live browser above, then confirm below.
+            </p>
+          </div>
+        )}
+
 
         {filled.length > 0 && (
           <div className="mt-4">

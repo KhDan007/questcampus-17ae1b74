@@ -24,6 +24,7 @@ import type { RecCard } from "@/components/profile/UniversityCard";
 import { UniversitySearchSection } from "@/components/universities/UniversitySearchSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
+import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -244,6 +245,11 @@ function DashboardPage() {
               quizMatches={saved?.matches.length ?? 0}
             />
           </SilentErrorBoundary>
+
+          {/* Resume any live application first */}
+          <div className="mt-4">
+            <ResumeBanner />
+          </div>
 
           {/* Split hero: next-step (8) + task rail (4) */}
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">

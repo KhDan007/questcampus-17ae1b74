@@ -5,6 +5,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
 import { ApplyStepper } from "@/components/apply/ApplyStepper";
 import { ResearchDock } from "@/components/apply/ResearchDock";
+import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
@@ -67,6 +68,8 @@ function ApplyHubPage() {
         </header>
 
         <div className="mt-8 space-y-8">
+          <ResumeBanner />
+
           <SilentErrorBoundary>
             <ResearchDock />
           </SilentErrorBoundary>

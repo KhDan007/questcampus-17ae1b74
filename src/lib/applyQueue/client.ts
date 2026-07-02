@@ -20,7 +20,11 @@ export type ApplicationDocument = {
   mime?: string;
   size?: number;
   uploadedAt?: number;
+  hasFile?: boolean;
 };
+
+/** Backend upload cap. Files above this are rejected before requesting a ticket. */
+export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 export type ApplyJobStatus =
   | "queued"
@@ -117,11 +121,14 @@ export function useApplicationDocuments() {
   const requestTicket = useMutation(api.applicationDocuments.requestUploadTicket);
   const recordDoc = useMutation(api.applicationDocuments.record);
   const removeDoc = useMutation(api.applicationDocuments.remove);
-  const downloadUrlMut = useMutation(api.applicationDocuments.downloadUrl);
+  const convex = useConvex();
 
   const upload = useCallback(
     async (file: File, docType: DocType) => {
       if (!token) throw new Error("Sign in required");
+      if (file.size > MAX_UPLOAD_BYTES) {
+        throw new Error("File is too large. Max size is 25 MB.");
+      }
       const { uploadUrl, oracleKey, ticket } = (await requestTicket({
         token,
         docType,
@@ -156,12 +163,14 @@ export function useApplicationDocuments() {
   const getDownloadUrl = useCallback(
     async (id: string): Promise<string | null> => {
       if (!token) return null;
-      const res = (await downloadUrlMut({ token, id })) as { url?: string } | string | null;
-      if (!res) return null;
-      if (typeof res === "string") return res;
-      return res.url ?? null;
+      // downloadUrl is a QUERY that returns a bare URL string or null.
+      const res = (await convex.query(api.applicationDocuments.downloadUrl, {
+        token,
+        id,
+      })) as string | null;
+      return res ?? null;
     },
-    [token, downloadUrlMut],
+    [token, convex],
   );
 
   return { docs, upload, remove, getDownloadUrl };
@@ -176,8 +185,8 @@ export function useApplyActions() {
   const startApply = useCallback(
     async (args: { system: string; externalId: string; targetName?: string }) => {
       if (!token) throw new Error("Sign in required");
-      const res = (await enqueue({ token, ...args })) as { jobId: string };
-      return res.jobId;
+      const res = (await enqueue({ token, ...args })) as { jobId: string; reused?: boolean };
+      return { jobId: res.jobId, reused: res.reused ?? false };
     },
     [token, enqueue],
   );
