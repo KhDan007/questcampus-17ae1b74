@@ -41,6 +41,9 @@ import {
   type ResearchProgress,
 } from "@/lib/apply/uniData";
 import { useApplyActions } from "@/lib/applyQueue/client";
+import { useGuides } from "@/lib/apply/guidance";
+import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
+import type { GuideRow } from "@/lib/apply/guidance";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
