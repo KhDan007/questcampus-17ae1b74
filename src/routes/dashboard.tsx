@@ -90,12 +90,6 @@ const COMING_SOON = [
     icon: CalendarClock,
   },
   {
-    key: "autoapply",
-    title: "Auto-Apply",
-    desc: "One profile, every common application — pre-filled and submitted.",
-    icon: Send,
-  },
-  {
     key: "scholarships",
     title: "Scholarship matcher",
     desc: "Ranked scholarships you actually qualify for, with deadlines and effort scores.",
