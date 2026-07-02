@@ -372,6 +372,10 @@ function DashboardPage() {
               <SilentErrorBoundary>
                 <DashboardPrepSection />
               </SilentErrorBoundary>
+            </section>
+          )}
+
+
 
 
           {/* Personal statement — live feature, logged-in only */}
