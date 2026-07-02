@@ -329,7 +329,7 @@ function SectionCard({
   );
 }
 
-function GeneralInfoCard({ uni }: { uni: ReturnType<typeof useSavedUniversities>["saved"] extends (infer U)[] | undefined ? U : never | undefined }) {
+function GeneralInfoCard({ uni }: { uni?: { city?: string; country?: string; name?: string } }) {
   // MOCK: general facts. Real values will come from backend enrichment.
   return (
     <SectionCard
