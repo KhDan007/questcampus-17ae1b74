@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, GraduationCap, MapPin, Plus, X } from "lucide-react";
+import { Check, GraduationCap, MapPin, Plus, Sparkles, X } from "lucide-react";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 
 type Props = {
@@ -9,10 +9,11 @@ type Props = {
   name: string;
   city?: string;
   country?: string;
+  researched?: boolean;
   onApplyNow?: () => void;
 };
 
-export function SelectableUniCard({ source, externalId, name, city, country, onApplyNow }: Props) {
+export function SelectableUniCard({ source, externalId, name, city, country, researched, onApplyNow }: Props) {
   const { isSelected, toggle, remove } = useApplySelection();
   const selected = isSelected(source, externalId);
   const location = [city, country].filter(Boolean).join(", ");
