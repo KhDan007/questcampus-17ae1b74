@@ -73,15 +73,14 @@ export function useUniFacts(system: string, externalId: string) {
 }
 
 export function useUniScholarships(system: string, externalId: string) {
-  return useQuery(
-    (api as any)["ingest/scholarships"].listForUniversity,
-    { system, externalId } as never,
-  ) as Scholarship[] | undefined;
+  return useQuery(api.ingest.scholarships.listForUniversity, { system, externalId } as never) as
+    | Scholarship[]
+    | undefined;
 }
 
 export function useResearchProgress(system: string, externalId: string) {
-  return useQuery(
-    (api as any)["ingest/deepResearch"].deepResearchProgress,
-    { system, externalId } as never,
-  ) as ResearchProgress | null | undefined;
+  return useQuery(api.ingest.deepResearch.deepResearchProgress, { system, externalId } as never) as
+    | ResearchProgress
+    | null
+    | undefined;
 }
