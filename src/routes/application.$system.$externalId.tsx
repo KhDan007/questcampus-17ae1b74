@@ -419,27 +419,79 @@ function SectionCard({
   );
 }
 
-function GeneralInfoCard({ uni }: { uni?: { city?: string; country?: string; name?: string } }) {
-  // MOCK: general facts. Real values will come from backend enrichment.
+function formatUsd(n: number | null | undefined): string | null {
+  if (n == null || !Number.isFinite(n)) return null;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+function titleCase(s: string): string {
+  return s
+    .toLowerCase()
+    .split(/[\s_-]+/)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
+function GeneralInfoCard({ facts }: { facts: UniFacts | null | undefined }) {
+  if (facts === undefined) {
+    return (
+      <SectionCard id="general" icon={<Info className="h-4 w-4" />} title="General info">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+          ))}
+        </div>
+      </SectionCard>
+    );
+  }
+  if (facts === null) return null;
+
+  const rows: { label: string; value: string }[] = [];
+  if (facts.ownership) rows.push({ label: "Type", value: titleCase(facts.ownership) });
+  if (facts.studentSize != null)
+    rows.push({ label: "Undergraduate enrollment", value: facts.studentSize.toLocaleString("en-US") });
+  if (facts.admissionRate != null)
+    rows.push({ label: "Acceptance rate", value: `${(facts.admissionRate * 100).toFixed(1)}%` });
+  if (facts.satAvg != null) rows.push({ label: "SAT avg", value: String(facts.satAvg) });
+  if (facts.actMidpoint != null) rows.push({ label: "ACT mid", value: String(facts.actMidpoint) });
+
+  const cost =
+    facts.costAttendance != null
+      ? { label: "Cost of attendance", value: formatUsd(facts.costAttendance)! }
+      : facts.tuitionOutState != null
+        ? { label: "Tuition (out-of-state)", value: formatUsd(facts.tuitionOutState)! }
+        : facts.tuitionInState != null
+          ? { label: "Tuition (in-state)", value: formatUsd(facts.tuitionInState)! }
+          : facts.fees?.amount != null
+            ? {
+                label: "Tuition & fees",
+                value: `${facts.fees.amount.toLocaleString("en-US")}${facts.fees.currency ? ` ${facts.fees.currency}` : ""}`,
+              }
+            : null;
+  if (cost) rows.push(cost);
+
+  const loc = [facts.city, facts.state, facts.country].filter(Boolean).join(", ");
+  if (loc) rows.push({ label: "Location", value: loc });
+  if (facts.globalRank != null) rows.push({ label: "Global rank", value: `#${facts.globalRank}` });
+
+  if (rows.length === 0) return null;
+
   return (
     <SectionCard
       id="general"
       icon={<Info className="h-4 w-4" />}
       title="General info"
       subtitle="Overview and facts about this university."
-      right={<MockBadge />}
     >
       <dl className="grid gap-3 sm:grid-cols-2">
-        <Fact label="Type" value="Private research university" />
-        <Fact label="Founded" value="1885" />
-        <Fact label="Undergraduate enrollment" value="~7,600" />
-        <Fact label="Acceptance rate" value="~4%" />
-        <Fact label="Tuition (est.)" value="$62,000 / yr" />
-        <Fact label="Setting" value={uni?.city ? `${uni.city} — suburban` : "Suburban campus"} />
+        {rows.map((r) => (
+          <Fact key={r.label} label={r.label} value={r.value} />
+        ))}
       </dl>
-      <p className="mt-4 text-body-sm text-on-surface-variant">
-        Replace this section with backend-provided university facts once the enrichment pipeline exposes them.
-      </p>
     </SectionCard>
   );
 }
@@ -455,35 +507,96 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DeadlinesCard() {
-  // MOCK
-  const rows = [
-    { label: "Early Action", date: "Nov 1, 2026", note: "Non-binding" },
-    { label: "Regular Decision", date: "Jan 5, 2027", note: "Final application deadline" },
-    { label: "Financial aid (CSS Profile)", date: "Feb 15, 2027", note: "Priority" },
-    { label: "Decision released", date: "Late March 2027", note: "" },
-  ];
+function DeadlinesCard({ facts }: { facts: UniFacts | null | undefined }) {
+  const loading = facts === undefined;
+  const raw = facts?.deadlines ?? [];
+
+  // Dedupe by (isoDate || dateText)
+  const seen = new Set<string>();
+  const deduped: UniDeadline[] = [];
+  for (const d of raw) {
+    const key = d.isoDate || d.dateText;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(d);
+  }
+  // Sort: with isoDate ascending first, then the rest
+  deduped.sort((a, b) => {
+    if (a.isoDate && b.isoDate) return a.isoDate.localeCompare(b.isoDate);
+    if (a.isoDate) return -1;
+    if (b.isoDate) return 1;
+    return 0;
+  });
+  const rows = deduped.slice(0, 8);
+
   return (
     <SectionCard
       id="deadlines"
       icon={<CalendarClock className="h-4 w-4" />}
       title="Deadlines"
       subtitle="Key dates for this application cycle."
-      right={<MockBadge />}
     >
-      <ul className="divide-y divide-on-surface/10">
-        {rows.map((r) => (
-          <li key={r.label} className="flex items-center justify-between gap-3 py-2.5">
-            <div className="min-w-0">
-              <p className="font-display text-label-md font-bold text-on-surface">{r.label}</p>
-              {r.note && <p className="text-label-sm text-on-surface-variant">{r.note}</p>}
-            </div>
-            <p className="shrink-0 font-[var(--font-label)] text-label-md font-semibold text-on-surface">
-              {r.date}
-            </p>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+      ) : rows.length === 0 ? (
+        <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+          We don&apos;t have structured deadlines for this school yet.
+          {facts?.website && (
+            <>
+              {" "}
+              <a
+                href={facts.website}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+              >
+                Check the official deadlines page <ExternalLink className="h-3 w-3" />
+              </a>
+            </>
+          )}
+        </div>
+      ) : (
+        <ul className="divide-y divide-on-surface/10">
+          {rows.map((d, i) => {
+            const primary =
+              d.dateText ||
+              (d.isoDate
+                ? new Date(d.isoDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "");
+            return (
+              <li key={`${d.isoDate || d.dateText}-${i}`} className="flex items-start justify-between gap-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-label-md font-bold text-on-surface">{primary}</p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                    {d.intake && (
+                      <span className="text-label-sm text-on-surface-variant">{d.intake}</span>
+                    )}
+                    {d.category === "admission" && (
+                      <span className="rounded-full border border-on-surface/20 bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                        admission
+                      </span>
+                    )}
+                    {d.sourceUrl && (
+                      <a
+                        href={d.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                      >
+                        Source <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </SectionCard>
   );
 }
