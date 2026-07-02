@@ -25,6 +25,7 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 type Item =
   | {
