@@ -25,6 +25,7 @@ import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
 import { Route as ApplyPrepRouteImport } from './routes/apply.prep'
 import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
+import { Route as ApplicationSystemExternalIdRouteImport } from './routes/application.$system.$externalId'
 
 const UniversitiesRoute = UniversitiesRouteImport.update({
   id: '/universities',
@@ -106,6 +107,12 @@ const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
   path: '/$jobId',
   getParentRoute: () => ApplyRoute,
 } as any)
+const ApplicationSystemExternalIdRoute =
+  ApplicationSystemExternalIdRouteImport.update({
+    id: '/application/$system/$externalId',
+    path: '/application/$system/$externalId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
+  '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock': typeof UnlockIndexRoute
+  '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
   '/unlock/': typeof UnlockIndexRoute
+  '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
+    | '/application/$system/$externalId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock'
+    | '/application/$system/$externalId'
   id:
     | '__root__'
     | '/'
@@ -217,6 +229,7 @@ export interface FileRouteTypes {
     | '/unlock/cancel'
     | '/unlock/success'
     | '/unlock/'
+    | '/application/$system/$externalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -234,6 +247,7 @@ export interface RootRouteChildren {
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
   UnlockIndexRoute: typeof UnlockIndexRoute
+  ApplicationSystemExternalIdRoute: typeof ApplicationSystemExternalIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -350,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplyJobIdRouteImport
       parentRoute: typeof ApplyRoute
     }
+    '/application/$system/$externalId': {
+      id: '/application/$system/$externalId'
+      path: '/application/$system/$externalId'
+      fullPath: '/application/$system/$externalId'
+      preLoaderRoute: typeof ApplicationSystemExternalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -380,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,
   UnlockIndexRoute: UnlockIndexRoute,
+  ApplicationSystemExternalIdRoute: ApplicationSystemExternalIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

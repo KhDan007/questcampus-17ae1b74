@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Plus, Sparkles, X } from "lucide-react";
 import { useMutation } from "convex/react";
@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 import { ResearchProgressModal } from "@/components/apply/ResearchProgressModal";
-import type { BackendTarget } from "@/lib/apply/intake";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
 
 export function BatchActionBar() {
   const { items, count, clear } = useApplySelection();
@@ -19,15 +19,29 @@ export function BatchActionBar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTargets, setModalTargets] = useState<BackendTarget[]>([]);
 
+  const selectionTargets: BackendTarget[] = useMemo(
+    () => items.map((i) => ({ system: i.source, externalId: i.externalId, name: i.name })),
+    [items],
+  );
+  const plan = useIntakePlan(selectionTargets);
+  const foundSet = useMemo(() => {
+    const s = new Set<string>();
+    (plan?.targets ?? []).forEach((t) => {
+      if (t.found) s.add(`${t.system}::${t.externalId}`);
+    });
+    return s;
+  }, [plan]);
+  const researchedCount = selectionTargets.filter((t) =>
+    foundSet.has(`${t.system}::${t.externalId}`),
+  ).length;
+  const toResearch = selectionTargets.filter(
+    (t) => !foundSet.has(`${t.system}::${t.externalId}`),
+  );
+
   async function addAll() {
     if (busy || items.length === 0 || !token) return;
     setBusy(true);
     setErr(null);
-    const targets: BackendTarget[] = items.map((it) => ({
-      system: it.source,
-      externalId: it.externalId,
-      name: it.name,
-    }));
     try {
       for (const it of items) {
         try {
@@ -41,13 +55,17 @@ export function BatchActionBar() {
           setErr(e instanceof Error ? e.message : "Failed to add one university");
         }
       }
-      setModalTargets(targets);
-      setModalOpen(true);
+      // Only stream research progress for the ones that aren't already researched.
+      if (toResearch.length > 0) {
+        setModalTargets(toResearch);
+        setModalOpen(true);
+      }
       clear();
     } finally {
       setBusy(false);
     }
   }
+
 
   const isEmpty = count === 0;
 
@@ -86,7 +104,11 @@ export function BatchActionBar() {
                 ? err
                 : isEmpty
                   ? "Tick one or more schools below — we'll pull every requirement in the background."
-                  : "We'll save them and start deep-researching each one live."}
+                  : researchedCount === count
+                    ? `All ${count} already researched — we'll just save them to your list.`
+                    : researchedCount > 0
+                      ? `${researchedCount} already researched · ${toResearch.length} new to research.`
+                      : "We'll save them and start deep-researching each one live."}
             </p>
           </div>
         </div>
@@ -98,9 +120,14 @@ export function BatchActionBar() {
             className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-4"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            {isEmpty ? "Nothing selected" : "Deep research now"}
+            {isEmpty
+              ? "Nothing selected"
+              : toResearch.length === 0
+                ? `Save ${count} to my list`
+                : `Deep research ${toResearch.length}`}
           </button>
         </div>
+
       </motion.div>
 
       <ResearchProgressModal
