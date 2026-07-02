@@ -1764,7 +1764,7 @@ function PlaceholderEditor({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const fillMock = () => setDraft(mockForHint(placeholder));
+
 
   return createPortal(
     <motion.div
