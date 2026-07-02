@@ -12,6 +12,7 @@ import {
   useIntakePlan,
   useSetAnswer,
   useTargetsFromSelection,
+  type BackendTarget,
   type IntakeTarget,
 } from "@/lib/apply/intake";
 import { RequirementsZone } from "./RequirementsZone";
@@ -19,10 +20,17 @@ import { EligibilityCard } from "./EligibilityCard";
 import { ReadinessRail } from "./ReadinessRail";
 import { LaunchBar } from "./LaunchBar";
 
-export function CollectWorkspace() {
+
+export function CollectWorkspace({
+  targets: targetsProp,
+}: {
+  targets?: BackendTarget[];
+} = {}) {
   const navigate = useNavigate();
   const { items } = useApplySelection();
-  const targets = useTargetsFromSelection(items);
+  const selectionTargets = useTargetsFromSelection(items);
+  const targets = targetsProp ?? selectionTargets;
+  const targetCount = targets.length;
 
   const plan = useIntakePlan(targets);
   const eligibility = useEligibility(targets);
@@ -38,10 +46,16 @@ export function CollectWorkspace() {
 
   const planTargets: IntakeTarget[] = useMemo(() => {
     if (plan?.targets && plan.targets.length > 0) return plan.targets;
-    return items.map((i) => ({ system: i.source, externalId: i.externalId, name: i.name, found: true }));
-  }, [plan, items]);
+    return targets.map((t) => ({
+      system: t.system,
+      externalId: t.externalId,
+      name: t.name ?? "",
+      found: true,
+    }));
+  }, [plan, targets]);
 
-  if (items.length === 0) {
+  if (targetCount === 0) {
+
     return (
       <div className="mx-auto w-full max-w-2xl rounded-2xl border-2 border-dashed border-on-surface/30 bg-surface/80 p-8 text-center qc-hard-shadow-sm">
         <h2 className="font-display text-headline-md font-bold text-on-surface">
@@ -76,7 +90,7 @@ export function CollectWorkspace() {
                 Answer once, apply everywhere.
               </h2>
               <p className="mt-1 text-body-md text-on-surface-variant">
-                We only ask what your {items.length} {items.length === 1 ? "university needs" : "universities need"}. Everything saves as you type.
+                We only ask what your {targetCount} {targetCount === 1 ? "university needs" : "universities need"}. Everything saves as you type.
               </p>
             </div>
             <div className="hidden text-right sm:block">

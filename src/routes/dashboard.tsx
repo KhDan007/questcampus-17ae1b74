@@ -26,6 +26,9 @@ import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
+import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
@@ -355,6 +358,26 @@ function DashboardPage() {
             </div>
           </section>
 
+          {/* Prepare your applications — over saved unis */}
+          {isAuthenticated && (
+            <section className="mt-14">
+              <div className="mb-4">
+                <h2 className="font-display text-headline-lg font-bold text-on-surface">
+                  Prepare your applications
+                </h2>
+                <p className="mt-1 text-body-md text-on-surface-variant">
+                  Answer once — we apply it to every saved university.
+                </p>
+              </div>
+              <SilentErrorBoundary>
+                <DashboardPrepSection />
+              </SilentErrorBoundary>
+            </section>
+          )}
+
+
+
+
           {/* Personal statement — live feature, logged-in only */}
           {isAuthenticated && (
             <motion.section
@@ -580,3 +603,31 @@ function ActiveApplyResumeCard() {
     </Link>
   );
 }
+
+function DashboardPrepSection() {
+  const { saved } = useSavedUniversities();
+  const targets = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+
+  if (saved === undefined) {
+    return (
+      <div className="h-40 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+    );
+  }
+  if (targets.length === 0) {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-6 text-body-md text-on-surface-variant">
+        Save some universities first — we'll auto-research each one and surface the exact questions you need to answer.
+      </div>
+    );
+  }
+  return <CollectWorkspace targets={targets} />;
+}
+
