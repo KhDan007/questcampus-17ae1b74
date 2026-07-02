@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useCreateDocument } from "@/lib/documents";
+import { Markdown } from "@/components/common/Markdown";
 import {
   useExplainItem,
   type ExplainArgs,
