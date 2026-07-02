@@ -14,7 +14,7 @@ import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
-import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme/useTheme";
+
 
 import appCss from "../styles.css?url";
 import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
@@ -126,7 +126,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: "try{document.documentElement.classList.remove('dark')}catch(e){}" }} />
       </head>
       <body>
         <a href="#main-content" className="skip-link">
@@ -149,15 +149,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
-        <ThemeProvider>
-          <I18nProvider>
-            <NavV2 />
-            <RouteTransitions>
-              <Outlet />
-            </RouteTransitions>
-            <EmailVerifyGate />
-          </I18nProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <NavV2 />
+          <RouteTransitions>
+            <Outlet />
+          </RouteTransitions>
+          <EmailVerifyGate />
+        </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
   );
