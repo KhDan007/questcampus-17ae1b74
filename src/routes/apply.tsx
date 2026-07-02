@@ -11,6 +11,8 @@ import { BatchActionBar } from "@/components/apply/BatchActionBar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useMemo } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/apply")({
