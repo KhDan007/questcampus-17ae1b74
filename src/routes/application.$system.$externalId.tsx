@@ -179,6 +179,14 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const essays = specItems.filter((i) => i.kind === "essay");
   const videos = specItems.filter((i) => i.kind === "video");
   const fields = specItems.filter((i) => i.kind === "field");
+  const guideRows = useGuides(
+    specItems.map((i) => ({
+      kind: i.kind,
+      docType: i.docType ?? null,
+      conceptKey: i.conceptKey ?? null,
+      label: i.label ?? null,
+    })),
+  );
 
   return (
     <main
