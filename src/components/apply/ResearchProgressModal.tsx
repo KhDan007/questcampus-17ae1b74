@@ -78,6 +78,16 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // When every target is ready, auto-advance the user to the prep stage.
+  useEffect(() => {
+    if (!open || !allDone) return;
+    const t = setTimeout(() => {
+      onClose();
+      void navigate({ to: "/dashboard" });
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [open, allDone, onClose, navigate]);
+
   return (
     <AnimatePresence>
       {open && (
