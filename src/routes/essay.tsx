@@ -1650,7 +1650,7 @@ function ResultView({
           </div>
         )}
 
-        {!isPaid && <FreeTrialScoreBanner essayId={result.essayId} token={token} />}
+        
 
         {reviseErr && (
           <div className="mt-4 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm text-on-surface">
