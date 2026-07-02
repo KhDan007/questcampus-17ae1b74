@@ -32,6 +32,75 @@ import {
 } from "@/lib/apply/intake";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
+function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  const { system, externalId } = Route.useParams();
+  return (
+    <DashboardShell>
+      <LivingBackground />
+      <ApplicationFallback
+        target={{ system, externalId, name: "This university" }}
+        onRetry={() => {
+          void router.invalidate();
+          reset();
+        }}
+      />
+    </DashboardShell>
+  );
+}
+
+function ApplicationFallback({
+  target,
+  onRetry,
+}: {
+  target: BackendTarget;
+  onRetry?: () => void;
+}) {
+  return (
+    <main
+      id="main-content"
+      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12"
+    >
+      <BackLink />
+      <section className="mt-4 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow sm:p-8">
+        <div className="flex items-start gap-4">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-fixed text-primary">
+            <GraduationCap className="h-7 w-7" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              Application workspace
+            </p>
+            <h1 className="mt-1 font-display text-display-sm font-bold text-on-surface sm:text-display-md">
+              {target.name}
+            </h1>
+            <p className="mt-2 max-w-xl text-body-md text-on-surface-variant">
+              We couldn&apos;t load the live application details yet. You can still come back to your dashboard while research continues in the background.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  Try again
+                </button>
+              )}
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              >
+                Dashboard <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export const Route = createFileRoute("/application/$system/$externalId")({
   head: () => ({ meta: [{ title: "Application — QuestCampus" }] }),
   component: ApplicationDetailPage,
