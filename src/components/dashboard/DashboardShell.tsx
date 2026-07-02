@@ -306,7 +306,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         open={!!waitlist}
         onClose={() => setWaitlist(null)}
         title={waitlist ? `${waitlist} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off monthly access."
+        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
         feature={waitlist ?? undefined}
       />
 
