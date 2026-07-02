@@ -149,7 +149,7 @@ function ProfilePage() {
               <div
                 className="animate-aurora-1 absolute -left-20 -top-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
                 style={{
-                  background: "radial-gradient(circle, rgba(79,70,229,0.28), transparent 65%)",
+                  background: "radial-gradient(circle, rgba(179,39,44,0.28), transparent 65%)",
                 }}
               />
               <div

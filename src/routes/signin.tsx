@@ -58,7 +58,7 @@ function SignInPage() {
     if (doc?.completed) {
       navigate({ to: "/dashboard", replace: true });
     } else {
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/onboarding", replace: true });
     }
   }
 
@@ -266,7 +266,7 @@ function SignInPage() {
               <button
                 type="submit"
                 disabled={submitting || googleLoading}
-                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
