@@ -420,7 +420,7 @@ function DashboardPage() {
                 What's next
               </h2>
               <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                Tap to join the waitlist · 30% off monthly
+                Tap to join the waitlist · {WAITLIST_BASE_DISCOUNT}% off monthly
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
