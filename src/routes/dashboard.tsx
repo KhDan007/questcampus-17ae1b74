@@ -26,6 +26,9 @@ import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
+import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
