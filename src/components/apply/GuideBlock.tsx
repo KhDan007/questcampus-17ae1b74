@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, ChevronDown, Loader2, Sparkles } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import {
+  AlertTriangle,
+  BookOpen,
+  ChevronDown,
+  Clock,
+  Loader2,
+  Pencil,
+  Sparkles,
+} from "lucide-react";
+import { useCreateDocument } from "@/lib/documents";
 import {
   useExplainItem,
   type ExplainArgs,
