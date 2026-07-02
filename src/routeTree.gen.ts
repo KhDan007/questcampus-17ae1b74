@@ -16,6 +16,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EssayRouteImport } from './routes/essay'
+import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
 import { Route as ApplyRouteImport } from './routes/apply'
@@ -24,6 +25,7 @@ import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
 import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
+import { Route as DocumentsIdRouteImport } from './routes/documents.$id'
 import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
 import { Route as ApplicationSystemExternalIdRouteImport } from './routes/application.$system.$externalId'
 
@@ -60,6 +62,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const EssayRoute = EssayRouteImport.update({
   id: '/essay',
   path: '/essay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentsRoute = DocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -102,6 +109,11 @@ const OauthCallbackRoute = OauthCallbackRouteImport.update({
   path: '/oauth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentsIdRoute = DocumentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DocumentsRoute,
+} as any)
 const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
   id: '/$jobId',
   path: '/$jobId',
@@ -119,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/prep': typeof PrepRoute
@@ -127,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -138,6 +152,7 @@ export interface FileRoutesByTo {
   '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/prep': typeof PrepRoute
@@ -146,6 +161,7 @@ export interface FileRoutesByTo {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -158,6 +174,7 @@ export interface FileRoutesById {
   '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
+  '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
   '/prep': typeof PrepRoute
@@ -166,6 +183,7 @@ export interface FileRoutesById {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
@@ -179,6 +197,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/blank'
     | '/dashboard'
+    | '/documents'
     | '/essay'
     | '/onboarding'
     | '/prep'
@@ -187,6 +206,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -198,6 +218,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/blank'
     | '/dashboard'
+    | '/documents'
     | '/essay'
     | '/onboarding'
     | '/prep'
@@ -206,6 +227,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -217,6 +239,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/blank'
     | '/dashboard'
+    | '/documents'
     | '/essay'
     | '/onboarding'
     | '/prep'
@@ -225,6 +248,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
@@ -237,6 +261,7 @@ export interface RootRouteChildren {
   ApplyRoute: typeof ApplyRouteWithChildren
   BlankRoute: typeof BlankRoute
   DashboardRoute: typeof DashboardRoute
+  DocumentsRoute: typeof DocumentsRouteWithChildren
   EssayRoute: typeof EssayRoute
   OnboardingRoute: typeof OnboardingRoute
   PrepRoute: typeof PrepRoute
@@ -302,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EssayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/documents': {
+      id: '/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof DocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -358,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/documents/$id': {
+      id: '/documents/$id'
+      path: '/$id'
+      fullPath: '/documents/$id'
+      preLoaderRoute: typeof DocumentsIdRouteImport
+      parentRoute: typeof DocumentsRoute
+    }
     '/apply/$jobId': {
       id: '/apply/$jobId'
       path: '/$jobId'
@@ -385,11 +424,24 @@ const ApplyRouteChildren: ApplyRouteChildren = {
 
 const ApplyRouteWithChildren = ApplyRoute._addFileChildren(ApplyRouteChildren)
 
+interface DocumentsRouteChildren {
+  DocumentsIdRoute: typeof DocumentsIdRoute
+}
+
+const DocumentsRouteChildren: DocumentsRouteChildren = {
+  DocumentsIdRoute: DocumentsIdRoute,
+}
+
+const DocumentsRouteWithChildren = DocumentsRoute._addFileChildren(
+  DocumentsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApplyRoute: ApplyRouteWithChildren,
   BlankRoute: BlankRoute,
   DashboardRoute: DashboardRoute,
+  DocumentsRoute: DocumentsRouteWithChildren,
   EssayRoute: EssayRoute,
   OnboardingRoute: OnboardingRoute,
   PrepRoute: PrepRoute,
@@ -406,13 +458,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -320,7 +320,7 @@ function DocumentEditorPage() {
       </main>
 
       {/* Print-only view */}
-      <PrintView title={title || doc.title} content={content} />
+      <PrintView title={title} content={content} />
     </DashboardShell>
   );
 }
