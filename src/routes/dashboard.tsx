@@ -843,7 +843,7 @@ function TaskRail({ isAuthenticated }: { isAuthenticated: boolean }) {
       dot: "tertiary",
       title: `${ready} universit${ready === 1 ? "y" : "ies"} ready to prep`,
       subtitle: "Answer questions, then auto-apply",
-      to: "/apply/prep",
+      to: "/apply",
     });
   }
   if (isAuthenticated) {
