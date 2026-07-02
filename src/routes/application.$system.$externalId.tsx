@@ -709,6 +709,7 @@ function RequirementsList({
   items,
   emptyLabel,
   found,
+  research,
 }: {
   id: string;
   icon: React.ReactNode;
@@ -717,13 +718,24 @@ function RequirementsList({
   items: IntakeItem[];
   emptyLabel: string;
   found: boolean;
+  research?: ResearchProgress | null;
 }) {
   return (
-    <SectionCard id={id} icon={icon} title={title} subtitle={subtitle}>
+    <SectionCard
+      id={id}
+      icon={icon}
+      title={title}
+      subtitle={subtitle}
+      right={
+        found && research?.status === "ready" && research.coverage ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+            {research.coverage} coverage
+          </span>
+        ) : undefined
+      }
+    >
       {!found ? (
-        <div className="flex items-center gap-2 rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
-          <Loader2 className="h-4 w-4 animate-spin" /> Researching — this list will populate live.
-        </div>
+        <ResearchProgressBlock research={research} />
       ) : items.length === 0 ? (
         <p className="text-body-sm text-on-surface-variant">{emptyLabel}</p>
       ) : (
@@ -774,49 +786,99 @@ function RequirementsList({
   );
 }
 
-function ScholarshipsCard() {
-  // MOCK
-  const items = [
-    {
-      name: "Need-based financial aid",
-      award: "Up to full tuition",
-      note: "Automatically considered for all admitted students.",
-    },
-    {
-      name: "International Merit Award",
-      award: "$5,000 – $20,000 / yr",
-      note: "Considered for international applicants with strong academics.",
-    },
-    {
-      name: "STEM Excellence Scholarship",
-      award: "$10,000 / yr",
-      note: "Requires separate application by Dec 15.",
-    },
-  ];
+function ResearchProgressBlock({ research }: { research?: ResearchProgress | null }) {
+  const p = research?.progress ?? null;
+  const percent =
+    p?.percent != null ? Math.max(0, Math.min(100, Math.round(p.percent))) : null;
+  const message = p?.message ?? "Researching — this list will populate live.";
+  return (
+    <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4">
+      <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>{message}</span>
+      </div>
+      {percent != null && (
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+          <div
+            className="h-full bg-primary transition-[width] duration-300"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ScholarshipsCard({ scholarships }: { scholarships: Scholarship[] | undefined }) {
+  const loading = scholarships === undefined;
+  const items = scholarships ?? [];
   return (
     <SectionCard
       id="scholarships"
       icon={<Trophy className="h-4 w-4" />}
       title="Scholarships & aid"
       subtitle="Financial support programs offered by this school."
-      right={<MockBadge />}
     >
-      <ul className="space-y-2">
-        {items.map((s) => (
-          <li
-            key={s.name}
-            className="rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
-          >
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="font-display text-label-md font-bold text-on-surface">{s.name}</p>
-              <p className="font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
-                {s.award}
-              </p>
-            </div>
-            <p className="mt-0.5 text-body-sm text-on-surface-variant">{s.note}</p>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
+      ) : items.length === 0 ? (
+        <p className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+          No scholarship data for this school yet — we surface aid programs as we research them.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {items.map((s) => {
+            const tag = s.category || s.type;
+            return (
+              <li
+                key={s._id}
+                className="rounded-lg border border-on-surface/10 bg-surface-container-lowest p-3"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-display text-label-md font-bold text-on-surface">
+                    {s.name}
+                    {s.provider && (
+                      <span className="ml-1.5 font-[var(--font-label)] text-label-sm font-normal text-on-surface-variant">
+                        · {s.provider}
+                      </span>
+                    )}
+                  </p>
+                  {s.amount && (
+                    <p className="font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
+                      {s.amount}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  {tag && (
+                    <span className="rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+                      {tag}
+                    </span>
+                  )}
+                  {s.deadline && (
+                    <span className="text-label-sm text-on-surface-variant">
+                      Deadline: {s.deadline}
+                    </span>
+                  )}
+                </div>
+                {s.eligibility && (
+                  <p className="mt-1 text-body-sm text-on-surface-variant">{s.eligibility}</p>
+                )}
+                {s.url && (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                  >
+                    Details <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </SectionCard>
   );
 }
