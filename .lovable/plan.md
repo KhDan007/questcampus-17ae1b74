@@ -1,83 +1,99 @@
-# Apply Flow Redesign
 
-The current Apply experience hides the primary CTA inside a small icon button on saved-uni cards, has no multi-select, no guided onboarding for the user's own data, and dumps the user on a waiting screen while deep research runs. We'll rebuild it as a four-stage flow with the same backend.
+## Goal
+Replace the fixed-step `PrepWizard` with a **Collect workspace** whose entire content is derived from Convex (`intakePlan`, `eligibilityForTargets`, `checklistForTargets`, `autoApplyEntitlement`). No hardcoded field or document lists. Calm by default: everything collapsed, progressive disclosure, one clear next action.
 
-## The four stages
-
-```text
-1. Pick      →  2. Prep         →  3. Research          →  4. Apply
-   Multi-      Guided profile +    Background w/        Live browser
-   select      doc onboarding      productive work         + submit
-```
-
-The user moves linearly but can re-enter any stage from a left-rail stepper at the top of `/apply`.
-
-## 1. Pick — intuitive Apply confirmation + multi-select
-
-- On the saved-uni grid (`/apply` and `MyUniversitiesSection`), every card becomes a **selectable tile** with a visible checkbox in the top-right corner and a giant primary "Start application" pill across the bottom of each card. No more 12px "Apply" icon buttons.
-- A persistent **bottom action bar** appears the moment ≥1 card is checked: "Apply to N universities" + secondary "Deep-research only". This is the multi-select confirm step.
-- On `/universities` matches view: every match card gets the same checkbox + "Add to apply queue" action so the user can build the batch from anywhere.
-- Hitting "Apply to N" goes to stage 2 with the selected IDs in route search params.
-
-## 2. Prep — guided one-question-at-a-time onboarding
-
-A new route `/apply/prep` shows a single-column wizard, one prompt per screen, with progress dots at top:
+## Data flow
 
 ```text
-Your name → Date of birth → Citizenship → High school → GPA →
-Test scores → Activities → Documents (transcript, PS, recs, passport, resume) →
-Review & confirm
+useApplySelection() ──► targets[]
+        │
+        ├─► useIntakePlan(targets)          → { shared, specific, manualNotes, summary, targets }
+        ├─► useEligibility(targets)         → { overall, questions, perTarget }
+        ├─► useChecklist(targets)           → { perTarget, overallReady }
+        └─► useAutoApplyEntitlement(targets)→ gate for Launch
+
+Mutations:
+  useSetAnswer()           .setAnswer({conceptKey, value})   [debounced 500ms, optimistic]
+  useAnswerEligibility()   .answerEligibility({answers})     [batch, then refetch eligibility]
+  useApplicationDocuments() upload → satisfies kind=document|video via item.docType
+  useApplyActions().startApply()   Launch (per target)
 ```
 
-Each step:
-- One big question in display type, a clear input, "Continue" pill, "Back" link.
-- Inline helper text ("This is what universities ask for. You can edit later.").
-- Document steps wrap `DocumentManager` rows one at a time with skip option.
-- Skipped or missing fields surface a small "3 fields still needed" chip on every later screen.
-- The whole wizard auto-saves to the existing applicant-profile mutation after each step (no "save" button).
+All queries live in a new `src/lib/apply/intake.ts` — thin wrappers around `useQuery(api.applications.*)` with `{ token }` from `useAuth`, mirroring `applyQueue/client.ts` style. Debounce/optimism handled in `useSetAnswer` via a local `Map<conceptKey,value>` overlay merged over server data before render.
 
-The same backend doc + profile mutations are reused; only the UI is new.
+## Component structure
 
-## 3. Research — kick off + redirect to productive work
+New files under `src/components/apply/collect/`:
 
-When the user finishes prep (or clicks "Deep-research only" from stage 1):
-- We enqueue an apply job **per selected uni** and immediately navigate to `/apply` hub showing a **Research dock** at the top: small live progress chips for each uni driven by `api.ingest.deepResearch.deepResearchProgress({ system, externalId })`.
-- The hero of `/apply` switches to a **"While we research, do this"** card with 2–3 suggested productive actions ranked by progress signals: finish profile gaps, upload missing doc, draft personal statement (link to `/essay`), refine recommendations. Each is a single primary CTA, not a list.
-- Status states render per spec: `researching_deep` → compact progress with stage/message, `ready` → green check + "Open application", `paywalled` → amber chip with copy, `error` → muted chip "Couldn't finish — public requirements still available". Never block the page.
+```text
+CollectWorkspace.tsx        ← page-level container, replaces <PrepWizard/>
+├─ CollectHeader.tsx        ← progress ring/bar + "N left" + primary "Continue" (jump-to-next)
+├─ EligibilityCard.tsx      ← slim, collapsible; only rendered if overall !== "eligible"
+│   ├─ EligibilityQuestion.tsx     (select|number|text|boolean)
+│   └─ IneligibleChip.tsx           (chip + Popover "Why?" with blocker label + evidence link)
+├─ SharedRequirements.tsx   ← "Fill once" zone
+│   └─ RequirementGroup.tsx        (one per kind: Profile / Essays / Documents / Video)
+│       ├─ Accordion header: label + mini progress + "N left"
+│       ├─ RequirementRow.tsx      (renders IntakeItem)
+│       │   ├─ FieldInput          (text/email/date/number/tel/select/textarea+wordLimit)
+│       │   ├─ EssayInput          (textarea + wordLimit counter, uses same setAnswer)
+│       │   └─ DocumentSlot        (reuses DocumentManager filtered by docType)
+│       └─ "Show N completed" toggle → reveals collapsed ✓ rows
+├─ SpecificRequirements.tsx ← Accordion per uni, collapsed by default
+│   └─ RequirementGroup     (reused)
+├─ ManualNotesStrip.tsx     ← inline info banner (fee / recommender) — non-interactive
+├─ ReadinessRail.tsx        ← right rail on lg+, stacks below on mobile
+│   └─ UniReadinessCard.tsx (checklist bar + eligibility badge + "N left" + expand)
+└─ LaunchBar.tsx            ← sticky bottom; enabled when overallReady && eligible
+                              gated by autoApplyEntitlement; triggers existing startApply loop
+```
 
-## 4. Apply — already exists, only entry-point changes
+Reused as-is: `DocumentManager`, `useApplicationDocuments`, `useApplySelection`, `applyQueue/client`, `ApplyStepper`, `LiveCanvas`, ui/{accordion,collapsible,progress,popover,badge,input,textarea,select}.
 
-When a uni flips to `ready`, the progress chip's CTA routes into the existing `/apply/$jobId` live-browser flow. No changes there.
+## "Not overloading" mechanics
+- **Default state = collapsed.** Only the header + eligibility (if needed) + first incomplete group are open on mount.
+- **Auto-collapse** a group the moment it hits 100%.
+- **Completed rows hide** behind a "Show N completed" toggle inside each group.
+- **Compact ✓ summary** for answered rows: `✓ Date of birth — 2004-05-12`.
+- **One primary action** at a time: header "Continue" scrolls+focuses the next unanswered `conceptKey` (computed from merged shared+specific ordered list, respecting eligibility-first).
+- **Specific-to-one-uni** items live in a separate accordion so the shared list stays short.
+- **`manualNotes`** rendered as a passive strip, never as inputs.
+- **Ineligible unis** are visually muted in the ReadinessRail with a badge + Popover; excluded from Launch loop unless resolved.
 
-## Files
+## Rendering rules per IntakeItem
+| kind      | input                                                            | save                            |
+|-----------|------------------------------------------------------------------|---------------------------------|
+| field     | switch on `type` (text/email/date/number/tel/select/textarea)    | `setAnswer(conceptKey, value)`  |
+| essay     | textarea + live word counter vs `wordLimit`                      | `setAnswer(conceptKey, value)`  |
+| document  | DocumentSlot filtered by `docType`; ✓ when any file of that type | upload via useApplicationDocuments |
+| video     | same as document                                                 | same                            |
 
-New:
-- `src/routes/apply.prep.tsx` — guided wizard route
-- `src/components/apply/PrepWizard.tsx` — step engine + one-question-per-screen UI
-- `src/components/apply/ApplyStepper.tsx` — Pick/Prep/Research/Apply rail used on apply screens
-- `src/components/apply/SelectableUniCard.tsx` — checkbox + big CTA card used in saved + matches views
-- `src/components/apply/BatchActionBar.tsx` — sticky bottom bar shown when selection > 0
-- `src/components/apply/ResearchDock.tsx` — live progress chips for in-flight jobs
-- `src/components/apply/NextProductiveAction.tsx` — single-CTA "while we research" card
-- `src/lib/applyQueue/selection.ts` — small zustand-free hook (`useApplySelection`) for the cross-page selection set, persisted in `sessionStorage`
-- `src/lib/applyQueue/deepResearch.ts` — `useDeepResearchProgress({ system, externalId })` wrapping the Convex query
+`targetNames` shown as a muted caption: "Asked by Oxford +2" (Popover lists all on hover).
 
-Modified:
-- `src/routes/apply.tsx` — new layout: stepper, Research dock, NextProductiveAction, then docs, then `SelectableUniCard` grid + `BatchActionBar`
-- `src/routes/universities.tsx` — wrap each result/match card with selectable wrapper; show `BatchActionBar`
-- `src/components/profile/MyUniversitiesSection.tsx` — use `SelectableUniCard`
-- `src/components/apply/ApplyButton.tsx` — keep for single-uni quick-apply, restyle to match new visual weight (full-width primary inside card)
-- `src/components/apply/DocumentManager.tsx` — expose a "compact step" variant the wizard reuses
+## State
+- No global store. Local `useState` in `CollectWorkspace` for: openGroups Set, showCompleted per group, ineligibility card open, pending optimistic overlay.
+- Server data via Convex `useQuery` (live). Debounced writes: `useSetAnswer` keeps a ref of pending values, flushes 500 ms after last edit per key, and merges over the server value until the server echo matches.
+- `focusNext()` computed selector: eligibility questions first, then shared groups in kind order (Profile → Essays → Documents → Video), then specific by uni order.
 
-Backend: zero changes. Reuses `enqueueApply`, `liveTicket`, `deepResearchProgress`, existing doc + profile mutations.
+## Route wiring
+- `src/routes/apply.prep.tsx`: swap `<PrepWizard />` for `<CollectWorkspace />`. Header/subhead copy updated to match dynamic nature.
+- `src/components/apply/PrepWizard.tsx`: **delete** after migration.
+- `src/lib/apply/profile.ts` (`PROFILE_FIELDS`): **delete** if nothing else imports it (grep first; if referenced elsewhere, remove only the export used here and keep the file for other uses).
 
-## Design register
+## Files created
+- `src/lib/apply/intake.ts` (hooks: `useIntakePlan`, `useEligibility`, `useSetAnswer`, `useAnswerEligibility`, `useChecklist`, `useAutoApplyEntitlement`)
+- `src/components/apply/collect/*` (all files listed above)
 
-Product UI (per Impeccable product register). Carry over the project's existing tokens (`bg-surface`, `border-on-surface`, `qc-hard-shadow`, primary/tertiary). Motion is restrained: one-question wizard slides horizontally with `motion` x-transition + opacity, progress chips animate the percent bar only. Reduced-motion fallback: crossfade.
+## Files edited
+- `src/routes/apply.prep.tsx` (render `CollectWorkspace`, tweak header copy)
 
-## Out of scope this pass
+## Files removed
+- `src/components/apply/PrepWizard.tsx`
+- `src/lib/apply/profile.ts` (conditional on grep)
 
-- Backend changes
-- Per-uni custom essays (different feature)
-- Reordering the application queue (can add later if asked)
-- Visual redesign of the existing `/apply/$jobId` live-browser page
+## Out of scope
+- No changes to `LiveCanvas`, `apply.$jobId.tsx`, apply queue backend, selection store, or design tokens.
+- No new Convex functions (backend already exposes everything listed).
+
+## Open assumption (flag)
+- Assuming `api.applications.*` exists on the deployed Convex as specified. Since `_generated/api.ts` is an `anyApi` stub, we won't get compile-time checks — we'll defensively guard `useQuery` results (undefined/null → skeleton) and surface errors via existing `SilentErrorBoundary` pattern.
