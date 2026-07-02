@@ -701,7 +701,7 @@ function OnboardingPage() {
               </button>
             </div>
             {error && (
-              <p className="mt-3 text-body-sm text-red-600">{error}</p>
+              <p className="mt-3 text-body-sm text-error">{error}</p>
             )}
           </div>
         </div>
