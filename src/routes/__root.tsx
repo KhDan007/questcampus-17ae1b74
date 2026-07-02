@@ -14,7 +14,7 @@ import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
-import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme/useTheme";
+
 
 import appCss from "../styles.css?url";
 import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
