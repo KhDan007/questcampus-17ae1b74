@@ -134,7 +134,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
     );
   }
 
-  const terminal = job.status === "done" || job.status === "cancelled" || job.status === "error";
+  // `terminal` is already computed above from the RunBody hook block.
 
   return (
     <>
@@ -190,6 +190,8 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
             wsEndpoint={job.wsEndpoint}
             ticket={liveTicket?.ticket}
             interactive={!terminal}
+            disconnect={terminal}
+            onClose={onCanvasClose}
           />
           <p className="mt-2 text-label-sm text-on-surface-variant">
             This is the agent&apos;s real browser. Click and type here to log in, solve captchas,
