@@ -603,3 +603,31 @@ function ActiveApplyResumeCard() {
     </Link>
   );
 }
+
+function DashboardPrepSection() {
+  const { saved } = useSavedUniversities();
+  const targets = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+
+  if (saved === undefined) {
+    return (
+      <div className="h-40 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+    );
+  }
+  if (targets.length === 0) {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-6 text-body-md text-on-surface-variant">
+        Save some universities first — we'll auto-research each one and surface the exact questions you need to answer.
+      </div>
+    );
+  }
+  return <CollectWorkspace targets={targets} />;
+}
+
