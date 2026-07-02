@@ -647,65 +647,55 @@ function YourPicksSection() {
   );
 
   return (
-    <section className="mt-10">
-      <div className="mb-4 flex items-end justify-between gap-4">
+    <section className="mt-6">
+      <div className="mb-3 flex items-end justify-between gap-4">
         <div>
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-            Main picks
-          </p>
-          <h2 className="mt-1 font-display text-headline-lg font-bold text-on-surface">
-            Your picks
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            Your picks{" "}
+            <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant">
+              · {targets.length}
+            </span>
           </h2>
-          <p className="mt-1 text-body-md text-on-surface-variant">
-            {targets.length} universit{targets.length === 1 ? "y" : "ies"} you're
-            applying to — we're deep-researching each one.
+          <p className="text-body-sm text-on-surface-variant">
+            Deep-researched in the background — status updates live.
           </p>
         </div>
         <Link
           to="/apply"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
-          Add more <ArrowRight className="h-4 w-4" />
+          Add more <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {(saved ?? []).map((s) => {
           const key = `${s.source}::${s.externalId}`;
           const found = foundMap.get(key);
-          const location = [s.city, s.state, s.country].filter(Boolean).join(", ");
+          const location = [s.city, s.country].filter(Boolean).join(", ");
           return (
             <li
               key={s.id}
-              className="flex items-start gap-3 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm"
+              className="flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-3 py-2.5 qc-hard-shadow-sm"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
-                <GraduationCap className="h-5 w-5" />
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+                <GraduationCap className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                <p className="truncate font-display text-label-md font-bold text-on-surface">
                   {s.name}
                 </p>
-                {location && (
-                  <p className="truncate text-label-sm text-on-surface-variant">
-                    {location}
-                  </p>
-                )}
-                <p
-                  className={`mt-1.5 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold ${
-                    found ? "text-tertiary" : "text-primary"
-                  }`}
-                >
+                <p className="flex items-center gap-1.5 truncate text-label-sm text-on-surface-variant">
                   {found ? (
                     <>
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Research ready
-                    </>
-                  ) : plan === undefined ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading…
+                      <CheckCircle2 className="h-3 w-3 text-tertiary" />
+                      <span className="text-tertiary">Ready</span>
+                      {location && <span className="text-on-surface/40">· {location}</span>}
                     </>
                   ) : (
                     <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Researching…
+                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      <span className="text-primary">Researching</span>
+                      {location && <span className="text-on-surface/40">· {location}</span>}
                     </>
                   )}
                 </p>
@@ -717,5 +707,216 @@ function YourPicksSection() {
     </section>
   );
 }
+
+function StatBar({
+  firstName,
+  isAuthenticated,
+  quizMatches,
+}: {
+  firstName: string | null;
+  isAuthenticated: boolean;
+  quizMatches: number;
+}) {
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const plan = useIntakePlan(targets);
+  const picks = targets.length;
+  const ready = plan?.targets?.filter((t) => t.found).length ?? 0;
+
+  return (
+    <section className="grid grid-cols-1 items-center gap-3 rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 backdrop-blur-md qc-hard-shadow sm:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+          <Sparkles className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate font-display text-headline-md font-bold text-on-surface">
+            {firstName ? `Hey ${firstName} 👋` : "Welcome to QuestCampus"}
+          </h1>
+          <p className="truncate text-body-sm text-on-surface-variant">
+            {isAuthenticated
+              ? "Your admissions command center."
+              : "Sign in to save picks and drafts across devices."}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:justify-end">
+        <StatChip label="Picks" value={picks} />
+        <span className="hidden h-8 w-px bg-on-surface/15 sm:block" />
+        <StatChip
+          label="Researched"
+          value={ready}
+          tone={ready === picks && picks > 0 ? "success" : "default"}
+        />
+        <span className="hidden h-8 w-px bg-on-surface/15 sm:block" />
+        <StatChip label="Quiz matches" value={quizMatches} />
+      </div>
+    </section>
+  );
+}
+
+function StatChip({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success";
+}) {
+  return (
+    <div className="text-center">
+      <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">
+        {label}
+      </p>
+      <p
+        className={`font-display text-headline-sm font-bold leading-none ${
+          tone === "success" ? "text-tertiary" : "text-primary"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function TaskRail({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const job = useActiveApplyJob();
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const plan = useIntakePlan(targets);
+  const researching = (plan?.targets ?? []).filter((t) => !t.found).length;
+  const ready = (plan?.targets ?? []).filter((t) => t.found).length;
+
+  const items: Array<{
+    key: string;
+    dot: "primary" | "tertiary" | "muted";
+    title: string;
+    subtitle: string;
+    to: string;
+    params?: Record<string, string>;
+  }> = [];
+
+  if (job) {
+    items.push({
+      key: "active",
+      dot: "primary",
+      title: job.targetName ?? job.externalId ?? "Resume application",
+      subtitle: job.progress?.message ?? job.status,
+      to: "/apply/$jobId",
+      params: { jobId: job.jobId },
+    });
+  }
+  if (researching > 0) {
+    items.push({
+      key: "researching",
+      dot: "primary",
+      title: `${researching} deep-research${researching === 1 ? "" : "es"} in progress`,
+      subtitle: "Requirements pulled from each portal",
+      to: "/apply",
+    });
+  }
+  if (ready > 0) {
+    items.push({
+      key: "ready",
+      dot: "tertiary",
+      title: `${ready} universit${ready === 1 ? "y" : "ies"} ready to prep`,
+      subtitle: "Answer questions, then auto-apply",
+      to: "/apply/prep",
+    });
+  }
+  if (isAuthenticated) {
+    items.push({
+      key: "essay",
+      dot: "muted",
+      title: "Personal statement",
+      subtitle: "Draft or review with AI",
+      to: "/essay",
+    });
+  }
+  if (targets.length === 0 && isAuthenticated) {
+    items.push({
+      key: "pick",
+      dot: "primary",
+      title: "Pick your first universities",
+      subtitle: "Choose from matches or search",
+      to: "/apply",
+    });
+  }
+  if (!isAuthenticated) {
+    items.push({
+      key: "signin",
+      dot: "primary",
+      title: "Save your work",
+      subtitle: "Create a free account",
+      to: "/signin",
+    });
+  }
+
+  const dotColor = (d: "primary" | "tertiary" | "muted") =>
+    d === "tertiary" ? "bg-tertiary" : d === "muted" ? "bg-on-surface/30" : "bg-primary";
+
+  return (
+    <aside className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h3 className="font-display text-headline-sm font-bold text-on-surface">Task rail</h3>
+        <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+          Live
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="text-body-sm text-on-surface-variant">
+          You're all caught up — enjoy the calm.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {items.map((it) => (
+            <li key={it.key}>
+              <Link
+                to={it.to as never}
+                params={it.params as never}
+                className="group flex items-center gap-3 rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest px-3 py-2.5 transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface"
+              >
+                <span
+                  className={`relative grid h-2.5 w-2.5 shrink-0 place-items-center rounded-full ${dotColor(it.dot)}`}
+                >
+                  {it.dot === "primary" && (
+                    <span
+                      className={`absolute inset-0 animate-ping rounded-full ${dotColor(it.dot)} opacity-50`}
+                    />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-md font-bold text-on-surface">
+                    {it.title}
+                  </p>
+                  <p className="truncate text-label-sm text-on-surface-variant">{it.subtitle}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </aside>
+  );
+}
+
 
 
