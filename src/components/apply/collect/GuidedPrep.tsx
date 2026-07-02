@@ -6,13 +6,16 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  FileText,
+  HelpCircle,
   ListChecks,
   Loader2,
   PenLine,
+  ShieldCheck,
   Sparkles,
   Upload,
 } from "lucide-react";
-import { useGuidedSteps, type GuidedStep } from "@/lib/apply/guidedSteps";
+import { useGuidedSteps, type GuidedStep, type GuidedStepKind } from "@/lib/apply/guidedSteps";
 import type {
   BackendTarget,
   EligibilityResult,
@@ -29,6 +32,40 @@ type Props = {
   eligibility: EligibilityResult | undefined;
   onSetAnswer: (conceptKey: string, value: string) => void;
   onAnswerEligibility: (askKey: string, value: string) => void;
+};
+
+const KIND_META: Record<
+  GuidedStepKind,
+  { label: string; Icon: typeof ShieldCheck; tone: string; ring: string; chip: string }
+> = {
+  eligibility: {
+    label: "Eligibility",
+    Icon: ShieldCheck,
+    tone: "bg-secondary text-on-surface",
+    ring: "border-secondary/60",
+    chip: "bg-secondary/25 text-on-surface",
+  },
+  document: {
+    label: "Document",
+    Icon: FileText,
+    tone: "bg-primary text-white",
+    ring: "border-primary/50",
+    chip: "bg-primary/15 text-primary",
+  },
+  field: {
+    label: "Question",
+    Icon: HelpCircle,
+    tone: "bg-tertiary text-on-surface",
+    ring: "border-tertiary/60",
+    chip: "bg-tertiary/25 text-on-surface",
+  },
+  essay: {
+    label: "Essay",
+    Icon: PenLine,
+    tone: "bg-on-surface text-white",
+    ring: "border-on-surface/50",
+    chip: "bg-on-surface/10 text-on-surface",
+  },
 };
 
 export function GuidedPrep({
@@ -55,85 +92,178 @@ export function GuidedPrep({
 
   if (guided.loading) {
     return (
-      <div className="h-40 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+      <div className="space-y-3">
+        <div className="h-6 w-40 animate-pulse rounded bg-on-surface/10" />
+        <div className="h-48 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4" id="guided-prep">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">
-            Guided prep
-          </h3>
-          <p className="text-body-sm text-on-surface-variant">
-            {total === 0
-              ? "Nothing required yet — universities still researching."
-              : step
-                ? `Step ${done + 1} of ${total} · ${percent}% done`
-                : "All required items done. Ready to apply."}
-          </p>
+    <section
+      className="overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow-sm"
+      id="guided-prep"
+    >
+      {/* Header band */}
+      <header className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-tertiary/10 p-5 sm:p-6">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              Guided prep
+            </p>
+            <h3 className="mt-1 font-display text-headline-md font-bold text-on-surface sm:text-headline-lg">
+              {total === 0
+                ? "Nothing to do — universities still researching."
+                : step
+                  ? "One step at a time. We'll walk you through it."
+                  : "You're ready to apply."}
+            </h3>
+            <p className="mt-1 text-body-sm text-on-surface-variant">
+              {total === 0
+                ? "Your steps will appear here the moment requirements land."
+                : step
+                  ? `Step ${Math.min(done + 1, total)} of ${total} · ${percent}% complete`
+                  : "All required items are done — launch when ready."}
+            </p>
+          </div>
+          {total > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll((s) => !s)}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <ListChecks className="h-3.5 w-3.5" />
+              {showAll ? "Step-by-step" : "See all"}
+            </button>
+          )}
         </div>
+
         {total > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAll((s) => !s)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-          >
-            <ListChecks className="h-3.5 w-3.5" />
-            {showAll ? "Step-by-step" : "Show all requirements"}
-          </button>
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-label-sm text-on-surface-variant">
+              <span className="font-semibold text-on-surface">
+                {done} <span className="font-normal text-on-surface-variant">of {total} done</span>
+              </span>
+              <span className="font-[var(--font-label)] font-bold tabular-nums text-on-surface">
+                {percent}%
+              </span>
+            </div>
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface">
+              <div
+                className="h-full rounded-full bg-primary transition-[width] duration-500"
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+
+            {/* Step dots */}
+            {!showAll && guided.steps.length > 1 && guided.steps.length <= 24 && (
+              <StepDots
+                steps={guided.steps}
+                remaining={guided.remaining}
+                currentId={step?.id}
+                onJump={(idx) => setCursor(idx)}
+              />
+            )}
+          </div>
+        )}
+      </header>
+
+      {/* Body */}
+      <div className="border-t-2 border-on-surface/15 bg-surface p-5 sm:p-6">
+        {showAll ? (
+          <AllRequirements plan={plan} onChange={onSetAnswer} />
+        ) : step ? (
+          <StepCard
+            key={step.id}
+            step={step}
+            onAnswerEligibility={onAnswerEligibility}
+            onSetAnswer={onSetAnswer}
+            onBack={() => setCursor((c) => Math.max(0, c - 1))}
+            onSkip={() =>
+              setCursor((c) => Math.min(Math.max(0, remainingLen - 1), c + 1))
+            }
+            onNext={() =>
+              setCursor((c) => Math.min(Math.max(0, remainingLen - 1), c + 1))
+            }
+            hasBack={cursor > 0}
+            hasNext={cursor < remainingLen - 1}
+            position={done + 1}
+            total={total}
+          />
+        ) : total > 0 ? (
+          <ReadyState />
+        ) : (
+          <EmptyState />
         )}
       </div>
+    </section>
+  );
+}
 
-      {total > 0 && (
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
-          <div
-            className="h-full bg-primary transition-[width] duration-300"
-            style={{ width: `${percent}%` }}
+function StepDots({
+  steps,
+  remaining,
+  currentId,
+  onJump,
+}: {
+  steps: GuidedStep[];
+  remaining: GuidedStep[];
+  currentId?: string;
+  onJump: (remainingIndex: number) => void;
+}) {
+  return (
+    <div className="mt-3 flex flex-wrap gap-1.5">
+      {steps.map((s) => {
+        const isDone = s.satisfied;
+        const isCurrent = s.id === currentId;
+        const remIdx = remaining.findIndex((r) => r.id === s.id);
+        const cls = isCurrent
+          ? "bg-primary border-on-surface w-6"
+          : isDone
+            ? "bg-tertiary border-on-surface/60"
+            : "bg-surface border-on-surface/30 hover:border-on-surface";
+        return (
+          <button
+            key={s.id}
+            type="button"
+            disabled={isDone || remIdx < 0}
+            onClick={() => remIdx >= 0 && onJump(remIdx)}
+            aria-label={s.label}
+            className={`h-2.5 w-2.5 rounded-full border-2 transition-all ${cls}`}
           />
-        </div>
-      )}
+        );
+      })}
+    </div>
+  );
+}
 
-      {showAll ? (
-        <AllRequirements plan={plan} onChange={onSetAnswer} />
-      ) : step ? (
-        <StepCard
-          key={step.id}
-          step={step}
-          onAnswerEligibility={onAnswerEligibility}
-          onSetAnswer={onSetAnswer}
-          onBack={() => setCursor((c) => Math.max(0, c - 1))}
-          onSkip={() =>
-            setCursor((c) => Math.min(Math.max(0, remainingLen - 1), c + 1))
-          }
-          onNext={() =>
-            setCursor((c) => Math.min(Math.max(0, remainingLen - 1), c + 1))
-          }
-          hasBack={cursor > 0}
-          hasNext={cursor < remainingLen - 1}
-        />
-      ) : total > 0 ? (
-        <div className="rounded-2xl border-2 border-tertiary/40 bg-tertiary/10 p-5">
-          <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface">
-              <CheckCircle2 className="h-5 w-5" />
-            </span>
-            <div className="min-w-0">
-              <h4 className="font-display text-headline-sm font-bold text-on-surface">
-                You're ready to apply
-              </h4>
-              <p className="mt-0.5 text-body-sm text-on-surface-variant">
-                All required items are complete. Use the Apply bar below to launch.
-              </p>
-            </div>
-          </div>
+function EmptyState() {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4">
+      <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-on-surface-variant" />
+      <p className="text-body-sm text-on-surface-variant">
+        Requirements will populate as each university finishes researching. Nothing you need to do right now.
+      </p>
+    </div>
+  );
+}
+
+function ReadyState() {
+  return (
+    <div className="rounded-xl border-2 border-tertiary bg-tertiary/15 p-5 qc-hard-shadow-sm">
+      <div className="flex items-start gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface">
+          <CheckCircle2 className="h-6 w-6" />
+        </span>
+        <div className="min-w-0">
+          <h4 className="font-display text-headline-sm font-bold text-on-surface">
+            You're ready to apply
+          </h4>
+          <p className="mt-0.5 text-body-sm text-on-surface-variant">
+            All required items are complete. Use the Apply bar below to launch your applications.
+          </p>
         </div>
-      ) : (
-        <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-5 text-body-sm text-on-surface-variant">
-          Requirements will populate as each university finishes researching.
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -180,6 +310,8 @@ function StepCard({
   onNext,
   hasBack,
   hasNext,
+  position,
+  total,
 }: {
   step: GuidedStep;
   onSetAnswer: (conceptKey: string, value: string) => void;
@@ -189,37 +321,56 @@ function StepCard({
   onNext: () => void;
   hasBack: boolean;
   hasNext: boolean;
+  position: number;
+  total: number;
 }) {
-  const eyebrow =
-    step.kind === "eligibility"
-      ? "Eligibility"
-      : step.kind === "document"
-        ? "Document"
-        : step.kind === "field"
-          ? "Question"
-          : "Essay";
+  const meta = KIND_META[step.kind];
+  const Icon = meta.Icon;
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm">
-      <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
-        {eyebrow}
-        {step.targetName ? ` · ${step.targetName}` : ""}
-      </p>
-      <h4 className="mt-1 font-display text-headline-sm font-bold text-on-surface">
-        {step.label}
-      </h4>
-      {step.prompt && (
-        <p className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-3 py-2 text-body-sm text-on-surface-variant">
-          {step.prompt}
-        </p>
-      )}
+    <article className="space-y-5">
+      {/* Step head */}
+      <div className="flex items-start gap-4">
+        <span
+          className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface qc-hard-shadow-sm ${meta.tone}`}
+        >
+          <Icon className="h-6 w-6" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex items-center rounded-full border-2 border-on-surface/15 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide ${meta.chip}`}
+            >
+              {meta.label}
+            </span>
+            {step.targetName && (
+              <span className="inline-flex max-w-[16rem] items-center truncate rounded-full border-2 border-on-surface/15 bg-surface-container-lowest px-2 py-0.5 text-label-sm text-on-surface-variant">
+                {step.targetName}
+              </span>
+            )}
+            <span className="ml-auto font-[var(--font-label)] text-label-sm font-semibold tabular-nums text-on-surface-variant">
+              {position} / {total}
+            </span>
+          </div>
+          <h4 className="mt-1.5 font-display text-headline-sm font-bold leading-tight text-on-surface sm:text-headline-md">
+            {step.label}
+          </h4>
+          {step.prompt && (
+            <p className="mt-3 rounded-lg border-l-4 border-primary/60 bg-primary/5 px-3 py-2 text-body-sm italic text-on-surface-variant">
+              "{step.prompt}"
+              {step.wordLimit ? (
+                <span className="not-italic"> · {step.wordLimit} words</span>
+              ) : null}
+            </p>
+          )}
+        </div>
+      </div>
 
-      <div className="mt-4">
+      {/* Input */}
+      <div className={`rounded-xl border-2 ${meta.ring} bg-surface-container-lowest p-4`}>
         {step.kind === "eligibility" && step.question ? (
           <EligibilityInput
             q={step.question}
-            onChange={(v) =>
-              step.askKey && onAnswerEligibility(step.askKey, v)
-            }
+            onChange={(v) => step.askKey && onAnswerEligibility(step.askKey, v)}
           />
         ) : step.kind === "document" ? (
           <DocumentStep
@@ -231,41 +382,41 @@ function StepCard({
         ) : step.item ? (
           <IntakeItemField
             item={step.item}
-            onChange={(v) =>
-              step.conceptKey && onSetAnswer(step.conceptKey, v)
-            }
+            onChange={(v) => step.conceptKey && onSetAnswer(step.conceptKey, v)}
           />
         ) : null}
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-2">
+      {/* Nav */}
+      <div className="flex items-center justify-between gap-2 border-t-2 border-dashed border-on-surface/15 pt-4">
         <button
           type="button"
           onClick={onBack}
           disabled={!hasBack}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
+          <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onSkip}
-            disabled={!hasNext}
-            className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface disabled:opacity-40"
-          >
-            Skip
-          </button>
+          {hasNext && (
+            <button
+              type="button"
+              onClick={onSkip}
+              className="font-[var(--font-label)] text-label-md text-on-surface-variant underline underline-offset-4 hover:text-on-surface"
+            >
+              Skip for now
+            </button>
+          )}
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
-            Next <ArrowRight className="h-3.5 w-3.5" />
+            {hasNext ? "Next" : "Finish"} <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </div>
-    </section>
+    </article>
   );
 }
 
@@ -283,37 +434,47 @@ function EligibilityInput({
   };
   if (q.kind === "select") {
     return (
-      <select
-        value={value}
-        onChange={(e) => update(e.target.value)}
-        className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
-      >
-        <option value="">Select…</option>
-        {(q.options ?? []).map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
+      <div className="flex flex-wrap gap-2">
+        {(q.options ?? []).map((o) => {
+          const on = value === o;
+          return (
+            <button
+              key={o}
+              type="button"
+              onClick={() => update(o)}
+              className={`rounded-md border-2 px-3 py-2 font-[var(--font-label)] text-label-md capitalize transition-transform hover:-translate-y-0.5 ${
+                on
+                  ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
+                  : "border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
+              }`}
+            >
+              {o}
+            </button>
+          );
+        })}
+      </div>
     );
   }
   if (q.kind === "boolean") {
     return (
-      <div className="flex gap-2">
-        {["yes", "no"].map((opt) => {
-          const on = value === opt;
+      <div className="grid grid-cols-2 gap-2 sm:max-w-sm">
+        {[
+          { v: "yes", label: "Yes" },
+          { v: "no", label: "No" },
+        ].map((opt) => {
+          const on = value === opt.v;
           return (
             <button
-              key={opt}
+              key={opt.v}
               type="button"
-              onClick={() => update(opt)}
-              className={`rounded-md border-2 px-3 py-1.5 text-label-sm capitalize ${
+              onClick={() => update(opt.v)}
+              className={`rounded-md border-2 px-3 py-2.5 font-[var(--font-label)] text-label-md font-semibold transition-transform hover:-translate-y-0.5 ${
                 on
-                  ? "border-on-surface bg-primary text-white"
-                  : "border-on-surface/25 bg-surface text-on-surface"
+                  ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
+                  : "border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
               }`}
             >
-              {opt}
+              {opt.label}
             </button>
           );
         })}
@@ -325,7 +486,8 @@ function EligibilityInput({
       type={q.kind === "number" ? "number" : "text"}
       value={value}
       onChange={(e) => update(e.target.value)}
-      className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+      placeholder={q.kind === "number" ? "Enter a number" : "Type your answer"}
+      className="w-full rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
     />
   );
 }
@@ -355,15 +517,20 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
   return (
     <div>
       {existing ? (
-        <div className="flex items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-tertiary" />
-          <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">
-            {existing.fileName}
+        <div className="flex items-center gap-3 rounded-md border-2 border-tertiary bg-tertiary/15 px-3 py-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface">
+            <CheckCircle2 className="h-4 w-4" />
           </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+              {existing.fileName}
+            </p>
+            <p className="text-label-sm text-on-surface-variant">Uploaded · counts for every school that needs this.</p>
+          </div>
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
+            className="shrink-0 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
           >
             Replace
           </button>
@@ -373,14 +540,21 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-on-surface/30 bg-surface px-3 py-3 font-[var(--font-label)] text-label-md text-on-surface hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
+          className="group flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-on-surface/30 bg-surface px-3 py-6 text-center transition-colors hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
         >
-          {busy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Upload className="h-4 w-4" />
-          )}
-          {busy ? "Uploading…" : `Upload ${label.toLowerCase()}`}
+          <span className="grid h-11 w-11 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-transform group-hover:-translate-y-0.5">
+            {busy ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Upload className="h-5 w-5" />
+            )}
+          </span>
+          <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+            {busy ? "Uploading…" : `Upload ${label.toLowerCase()}`}
+          </span>
+          <span className="text-label-sm text-on-surface-variant">
+            PDF, DOC, or image · up to 20 MB
+          </span>
         </button>
       )}
       <input
@@ -390,7 +564,9 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
         onChange={(e) => pick(e.target.files?.[0])}
       />
       {error && (
-        <p className="mt-1 text-label-sm text-on-error-container">{error}</p>
+        <p className="mt-2 rounded-md border-2 border-error/30 bg-error/10 px-2.5 py-1.5 text-label-sm text-on-error-container">
+          {error}
+        </p>
       )}
     </div>
   );
@@ -398,19 +574,20 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
 
 function EssayStep() {
   return (
-    <div className="flex items-start gap-3 rounded-md border-2 border-on-surface/15 bg-surface-container-lowest p-3">
-      <PenLine className="h-5 w-5 shrink-0 text-primary" />
-      <div className="min-w-0 flex-1">
+    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-on-surface text-white">
+          <PenLine className="h-5 w-5" />
+        </span>
         <p className="text-body-sm text-on-surface">
-          Drafting essays lives in the Essay Assistant — grounded in your story,
-          first draft free.
+          Draft this essay in the Essay Assistant — grounded in your story, first draft free.
         </p>
       </div>
       <Link
         to="/essay"
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5"
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
       >
-        <Sparkles className="h-3.5 w-3.5" /> Draft in Essay Assistant
+        <Sparkles className="h-4 w-4" /> Open Essay Assistant
       </Link>
     </div>
   );
