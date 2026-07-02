@@ -42,8 +42,9 @@ export function AssistantSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open assistant"
-          className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-primary px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-surface px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
+          <span className="h-2 w-2 rounded-full bg-primary" />
           <MessageCircle className="h-5 w-5" />
           Ask AI
         </button>
@@ -106,7 +107,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
       className="fixed right-0 top-0 z-[80] flex h-[100dvh] w-full max-w-[380px] flex-col border-l-2 border-on-surface bg-surface qc-hard-shadow-sm"
     >
       {/* Header */}
-      <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-gradient-to-br from-primary/10 to-secondary/10 px-4 py-3">
+      <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 py-3">
         <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
           <Sparkles className="h-4 w-4" />
         </span>
@@ -232,7 +233,7 @@ function MessageRow({ message }: { message: ChatMessage }) {
       <div
         className={`max-w-[85%] rounded-lg border-2 px-3 py-2 text-body-sm ${
           isUser
-            ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
+            ? "border-on-surface bg-on-surface text-surface qc-hard-shadow-sm"
             : "border-on-surface/15 bg-surface text-on-surface"
         }`}
       >
