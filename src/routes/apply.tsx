@@ -205,3 +205,49 @@ function SavedToPick() {
     </section>
   );
 }
+
+function RunLiveDemoButton() {
+  const navigate = useNavigate();
+  const { startDemo } = useApplyActions();
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onClick = async () => {
+    if (starting) return;
+    setError(null);
+    setStarting(true);
+    try {
+      const { jobId } = await startDemo();
+      await navigate({ to: "/apply/$jobId", params: { jobId } });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't start demo");
+      setStarting(false);
+    }
+  };
+
+  return (
+    <div className="inline-flex max-w-xl flex-col items-start gap-1.5">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={starting}
+        className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+      >
+        {starting ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Play className="h-4 w-4 text-primary" />
+        )}
+        {starting ? "Starting demo…" : "Run a live demo"}
+      </button>
+      <p className="text-label-sm text-on-surface-variant">
+        Watch auto-apply fill a test form live — nothing is submitted.
+      </p>
+      {error && (
+        <p role="alert" className="text-label-sm font-semibold text-primary">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
