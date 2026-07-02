@@ -104,7 +104,11 @@ export function BatchActionBar() {
                 ? err
                 : isEmpty
                   ? "Tick one or more schools below — we'll pull every requirement in the background."
-                  : "We'll save them and start deep-researching each one live."}
+                  : researchedCount === count
+                    ? `All ${count} already researched — we'll just save them to your list.`
+                    : researchedCount > 0
+                      ? `${researchedCount} already researched · ${toResearch.length} new to research.`
+                      : "We'll save them and start deep-researching each one live."}
             </p>
           </div>
         </div>
@@ -116,9 +120,14 @@ export function BatchActionBar() {
             className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-4"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            {isEmpty ? "Nothing selected" : "Deep research now"}
+            {isEmpty
+              ? "Nothing selected"
+              : toResearch.length === 0
+                ? `Save ${count} to my list`
+                : `Deep research ${toResearch.length}`}
           </button>
         </div>
+
       </motion.div>
 
       <ResearchProgressModal
