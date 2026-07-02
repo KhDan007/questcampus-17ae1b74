@@ -150,20 +150,37 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
           if (!p) return;
           send({ t: "wheel", x: p.x, y: p.y, deltaX: e.deltaX, deltaY: e.deltaY });
         }}
+        onCompositionEnd={(e) => {
+          if (!interactive) return;
+          const text = e.data;
+          if (text) send({ t: "key", type: "char", text });
+        }}
         onKeyDown={(e) => {
           if (!interactive) return;
+          // Ignore composing keystrokes (IME): the composition handler covers them.
+          if (e.nativeEvent.isComposing || e.keyCode === 229) return;
           e.preventDefault();
+          const isPrintable =
+            e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+          if (isPrintable) {
+            // Send exactly ONE char event — never double up with keyDown text.
+            send({ t: "key", type: "char", text: e.key });
+            return;
+          }
           send({
             t: "key",
             type: "keyDown",
             key: e.key,
             code: e.code,
-            text: e.key.length === 1 ? e.key : "",
             keyCode: e.keyCode,
           });
         }}
         onKeyUp={(e) => {
           if (!interactive) return;
+          if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+          const isPrintable =
+            e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+          if (isPrintable) return; // no keyUp for printable chars (char event already delivered)
           e.preventDefault();
           send({
             t: "key",
