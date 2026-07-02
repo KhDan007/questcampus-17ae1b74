@@ -64,13 +64,15 @@ function ApplyRunPage() {
 function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const job = useApplyJob(jobId);
   const navigate = useNavigate();
-  const { cancelJob, confirm } = useApplyActions();
+  const { cancelJob, confirm, startApply } = useApplyActions();
   const [acting, setActing] = useState(false);
+  const [ticketNonce, setTicketNonce] = useState(0);
 
   // Reactive WS ticket — only fetched once wsEndpoint is published.
+  // `ticketNonce` lets us refresh after 1006/1008 close events.
   const liveTicket = useQuery(
     api.applyQueue.liveTicket,
-    job?.wsEndpoint ? { token, jobId } : "skip",
+    job?.wsEndpoint ? ({ token, jobId, _n: ticketNonce } as never) : "skip",
   ) as { wsUrl: string; ticket: string } | undefined;
 
   // Auto-scroll activity feed
