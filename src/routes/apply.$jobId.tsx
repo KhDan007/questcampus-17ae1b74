@@ -93,13 +93,24 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
     if (terminal) setLiveTicket(null);
   }, [terminal]);
 
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+    };
+  }, []);
+
   const onCanvasClose = useCallback(
     (code: number) => {
-      // 1006 = abnormal, 1008 = policy (ticket expired). Re-fetch and reconnect.
-      if (!terminal && (code === 1006 || code === 1008)) {
-        setLiveTicket(null);
-        void fetchTicket();
-      }
+      // 1006 = abnormal, 1008 = policy (ticket expired). Re-fetch with backoff.
+      if (terminal) return;
+      if (code !== 1006 && code !== 1008) return;
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+      setLiveTicket(null);
+      reconnectTimer.current = setTimeout(() => {
+        reconnectTimer.current = null;
+        if (!terminal) void fetchTicket();
+      }, 1500);
     },
     [fetchTicket, terminal],
   );

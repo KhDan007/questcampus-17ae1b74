@@ -63,10 +63,11 @@ function JobChip({ job }: { job: ApplyJob }) {
 function ResearchDockInner() {
   const { token } = useAuth();
   // Contract exposes ONLY `myActiveJob` (singular, non-terminal or null).
-  const single = useQuery(
+  const raw = useQuery(
     api.applyQueue.myActiveJob,
     token ? { token } : "skip",
-  ) as ApplyJob | null | undefined;
+  ) as (ApplyJob & { _id?: string }) | null | undefined;
+  const single = raw ? ({ ...raw, jobId: raw.jobId ?? (raw._id as string) } as ApplyJob) : raw;
 
   const list = single ? [single] : [];
   if (!token || list.length === 0) return null;

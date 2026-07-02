@@ -72,12 +72,20 @@ export type ApplyJob = {
   error?: string;
 };
 
+function normalizeJob<T extends { _id?: string; jobId?: string } | null | undefined>(
+  doc: T,
+): T extends null | undefined ? T : ApplyJob {
+  if (!doc) return doc as never;
+  return { ...doc, jobId: doc.jobId ?? (doc._id as string) } as never;
+}
+
 export function useApplyJob(jobId: string | undefined) {
   const { token } = useAuth();
-  return useQuery(
+  const raw = useQuery(
     api.applyQueue.getApplyJob,
     token && jobId ? { token, jobId } : "skip",
-  ) as ApplyJob | undefined;
+  ) as (ApplyJob & { _id?: string }) | undefined;
+  return raw ? normalizeJob(raw) : raw;
 }
 
 export function useActiveApplyJob() {
@@ -97,7 +105,10 @@ export function useActiveApplyJob() {
     client
       .query(api.applyQueue.myActiveJob, { token })
       .then((result) => {
-        if (!cancelled) setJob((result as ApplyJob | null | undefined) ?? null);
+        if (!cancelled) {
+          const raw = result as (ApplyJob & { _id?: string }) | null | undefined;
+          setJob(raw ? normalizeJob(raw) : null);
+        }
       })
       .catch((error) => {
         console.warn("Unable to load active application job", error);
