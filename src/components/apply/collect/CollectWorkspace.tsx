@@ -19,6 +19,7 @@ import { RequirementsZone } from "./RequirementsZone";
 import { EligibilityCard } from "./EligibilityCard";
 import { ReadinessRail } from "./ReadinessRail";
 import { LaunchBar } from "./LaunchBar";
+import { GuidedPrep } from "./GuidedPrep";
 
 
 export function CollectWorkspace({
