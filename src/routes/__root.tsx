@@ -149,15 +149,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
-        <ThemeProvider>
-          <I18nProvider>
-            <NavV2 />
-            <RouteTransitions>
-              <Outlet />
-            </RouteTransitions>
-            <EmailVerifyGate />
-          </I18nProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <NavV2 />
+          <RouteTransitions>
+            <Outlet />
+          </RouteTransitions>
+          <EmailVerifyGate />
+        </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
   );
