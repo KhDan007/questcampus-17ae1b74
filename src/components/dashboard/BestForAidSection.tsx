@@ -63,9 +63,9 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
   const scorePct = Math.max(0, Math.min(100, Math.round(rec.aidScore * 100)));
   const scoreTone =
     scorePct >= 75
-      ? "bg-tertiary text-on-surface"
+      ? "bg-tertiary text-on-tertiary"
       : scorePct >= 50
-        ? "bg-secondary text-on-surface"
+        ? "bg-primary text-white"
         : "bg-surface text-on-surface";
   const isLowConf = rec.confidence === "low";
   const reasons = rec.aidReasons.slice(0, 2);
