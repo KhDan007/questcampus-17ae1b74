@@ -190,6 +190,7 @@ export function useApplicationDocuments() {
 export function useApplyActions() {
   const { token } = useAuth();
   const enqueue = useMutation(api.applyQueue.enqueueApply);
+  const enqueueDemo = useMutation(api.applyQueue.enqueueDemoApply);
   const cancel = useMutation(api.applyQueue.cancelApply);
   const confirmCheckpoint = useMutation(api.applyQueue.confirmCheckpoint);
 
@@ -201,6 +202,12 @@ export function useApplyActions() {
     },
     [token, enqueue],
   );
+
+  const startDemo = useCallback(async () => {
+    if (!token) throw new Error("Sign in required");
+    const res = (await enqueueDemo({ token })) as { jobId: string; reused?: boolean };
+    return { jobId: res.jobId, reused: res.reused ?? false };
+  }, [token, enqueueDemo]);
 
   const cancelJob = useCallback(
     async (jobId: string) => {
@@ -218,7 +225,7 @@ export function useApplyActions() {
     [token, confirmCheckpoint],
   );
 
-  return { startApply, cancelJob, confirm };
+  return { startApply, startDemo, cancelJob, confirm };
 }
 
 export async function fetchLiveTicket(
