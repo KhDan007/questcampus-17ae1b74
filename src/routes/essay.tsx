@@ -1469,12 +1469,7 @@ function ResultView({
     [result.fullText, doSave],
   );
 
-  const autofillAllMocks = useCallback(() => {
-    const full = result.fullText ?? "";
-    const { text, count } = fillPlaceholdersWithMocks(full);
-    if (count === 0) return;
-    void doSave(text);
-  }, [result.fullText, doSave]);
+
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
