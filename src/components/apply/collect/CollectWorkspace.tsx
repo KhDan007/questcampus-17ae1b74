@@ -54,6 +54,19 @@ export function CollectWorkspace({
     }));
   }, [plan, targets]);
 
+  const readyTargets: BackendTarget[] = useMemo(() => {
+    return targets.filter((t) => {
+      const c = checklist?.perTarget.find(
+        (x) => x.system === t.system && x.externalId === t.externalId,
+      );
+      const e = eligibility?.perTarget.find(
+        (x) => x.system === t.system && x.externalId === t.externalId,
+      );
+      return (c?.checklist.ready ?? false) && e?.verdict !== "ineligible";
+    });
+  }, [targets, checklist, eligibility]);
+
+
   if (targetCount === 0) {
 
     return (
@@ -206,7 +219,7 @@ export function CollectWorkspace({
       </div>
 
       <div className="lg:col-span-2">
-        <LaunchBar entitlement={entitlement} percent={percent} />
+        <LaunchBar entitlement={entitlement} percent={percent} readyTargets={readyTargets} />
       </div>
     </div>
   );
