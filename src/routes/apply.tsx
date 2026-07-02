@@ -181,6 +181,7 @@ function SavedToPick() {
               name={u.name}
               city={u.city}
               country={u.country}
+              researched={researchedSet.has(`${u.source}::${u.externalId}`)}
             />
           </li>
         ))}
