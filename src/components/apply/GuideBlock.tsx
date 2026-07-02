@@ -125,12 +125,24 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
 
       {hasGuide && open && guide && (
         <div className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-3">
-          <p className="font-display text-label-md font-bold text-on-surface">
+          <p className="font-display text-label-md font-bold text-on-surface flex flex-wrap items-center gap-2">
             {guide.title}
+            {guide.timeEstimate && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-1.5 py-0.5 text-label-sm text-on-surface-variant">
+                <Clock className="h-3 w-3" />
+                {guide.timeEstimate}
+              </span>
+            )}
           </p>
           {guide.whatItIs && (
             <p className="mt-1 text-body-sm text-on-surface-variant">
               {guide.whatItIs}
+            </p>
+          )}
+          {guide.whereExactly && (
+            <p className="mt-1 text-body-sm text-on-surface-variant">
+              <span className="font-semibold text-on-surface">Where:</span>{" "}
+              {guide.whereExactly}
             </p>
           )}
           {Array.isArray(guide.howToGet) && guide.howToGet.length > 0 && (
@@ -152,6 +164,19 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
                 <li key={i}>{t}</li>
               ))}
             </ul>
+          )}
+          {Array.isArray(guide.commonMistakes) && guide.commonMistakes.length > 0 && (
+            <div className="mt-2">
+              <p className="inline-flex items-center gap-1 text-label-sm font-semibold text-on-surface">
+                <AlertTriangle className="h-3.5 w-3.5 text-error" />
+                Common mistakes
+              </p>
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-label-sm text-on-surface-variant">
+                {guide.commonMistakes.map((m, i) => (
+                  <li key={i}>{m}</li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}
