@@ -15,10 +15,10 @@ import {
   type BackendTarget,
   type IntakeTarget,
 } from "@/lib/apply/intake";
-import { RequirementsZone } from "./RequirementsZone";
 import { EligibilityCard } from "./EligibilityCard";
 import { ReadinessRail } from "./ReadinessRail";
 import { LaunchBar } from "./LaunchBar";
+import { GuidedPrep } from "./GuidedPrep";
 
 
 export function CollectWorkspace({
@@ -136,30 +136,26 @@ export function CollectWorkspace({
               />
             )}
 
-            <RequirementsZone
-              title="Shared essentials"
-              subtitle="Used across every application on your list."
-              items={plan?.shared ?? []}
-              onChange={(item, value) => {
-                if (item.conceptKey) setAnswer(item.conceptKey, value);
-              }}
+            <GuidedPrep
+              targets={targets}
+              plan={plan}
+              eligibility={eligibility}
+              onSetAnswer={setAnswer}
+              onAnswerEligibility={answerEligibility}
             />
 
-            <section className="space-y-3">
-              <div>
-                <h3 className="font-display text-headline-sm font-bold text-on-surface">
-                  University-specific
-                </h3>
-                <p className="text-body-sm text-on-surface-variant">
-                  Extra questions unique to each school. Grouped so nothing overwhelms.
-                </p>
-              </div>
-              {(plan?.specific ?? []).map((s) => {
-                const t = plan?.targets.find(
+            {(plan?.specific ?? []).some(
+              (s) =>
+                plan?.targets.find(
                   (x) => x.system === s.system && x.externalId === s.externalId,
-                );
-                const notFound = t?.found === false;
-                if (notFound) {
+                )?.found === false,
+            ) && (
+              <section className="space-y-2">
+                {(plan?.specific ?? []).map((s) => {
+                  const t = plan?.targets.find(
+                    (x) => x.system === s.system && x.externalId === s.externalId,
+                  );
+                  if (t?.found !== false) return null;
                   return (
                     <div
                       key={`${s.system}::${s.externalId}`}
@@ -172,24 +168,9 @@ export function CollectWorkspace({
                       </p>
                     </div>
                   );
-                }
-                return (
-                  <RequirementsZone
-                    key={`${s.system}::${s.externalId}`}
-                    title={s.name}
-                    items={s.items}
-                    onChange={(item, value) => {
-                      if (item.conceptKey) setAnswer(item.conceptKey, value);
-                    }}
-                  />
-                );
-              })}
-              {(plan?.specific ?? []).length === 0 && (
-                <p className="rounded-2xl border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
-                  No extra university-specific questions right now.
-                </p>
-              )}
-            </section>
+                })}
+              </section>
+            )}
 
             {(plan?.manualNotes ?? []).length > 0 && (
               <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
@@ -200,7 +181,7 @@ export function CollectWorkspace({
                   {(plan?.manualNotes ?? []).map((n, i) => (
                     <li key={i} className="text-body-sm text-on-surface-variant">
                       <span className="font-semibold capitalize text-on-surface">{n.kind}:</span>{" "}
-                      {n.targetNames.join(", ")}
+                      {(n.targetNames ?? []).join(", ")}
                     </li>
                   ))}
                 </ul>

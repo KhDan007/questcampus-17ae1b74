@@ -269,7 +269,8 @@ function DashboardPage() {
           <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Prep */}
             {isAuthenticated ? (
-              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+              <section id="dashboard-prep" className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+
                 <div className="mb-3 flex items-baseline justify-between gap-3">
                   <h2 className="font-display text-headline-sm font-bold text-on-surface">
                     Prep applications
