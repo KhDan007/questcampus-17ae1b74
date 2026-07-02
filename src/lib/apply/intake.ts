@@ -193,6 +193,18 @@ export function useAnswerEligibility(debounceMs = 400) {
   );
 }
 
+/**
+ * Read the full universal answer store. Handy for pre-hydrating fields when
+ * `intakePlan` doesn't already include a current value.
+ */
+export function useListAnswers() {
+  const { token } = useAuth();
+  const args = token ? { token } : "skip";
+  return useQuery(api.applications.listAnswers, args as never) as
+    | Record<string, string>
+    | undefined;
+}
+
 export function useTargetsFromSelection(items: SelectionItem[]) {
   return useMemo(() => selectionToTargets(items), [items]);
 }
