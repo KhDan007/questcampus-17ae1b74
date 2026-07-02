@@ -243,12 +243,42 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         />
       )}
       {job.status === "error" && (
-        <Banner
-          tone="error"
-          icon={<AlertTriangle className="h-5 w-5" />}
-          title="The agent hit a problem"
-          body={job.error ?? "Try again, or finish in the live browser above."}
-        />
+        <div className="mt-6 space-y-3">
+          <Banner
+            tone="error"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            title="The agent hit a problem"
+            body={job.error ?? "Something went wrong. Try again."}
+          />
+          <button
+            type="button"
+            disabled={retrying}
+            onClick={async () => {
+              if (!job.system || !job.externalId) return;
+              setRetrying(true);
+              try {
+                const res = await startApply({
+                  system: job.system,
+                  externalId: job.externalId,
+                  targetName: job.targetName,
+                });
+                void navigate({
+                  to: "/apply/$jobId",
+                  params: { jobId: res.jobId },
+                  replace: true,
+                });
+              } catch (e) {
+                console.warn("retry failed", e);
+              } finally {
+                setRetrying(false);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+          >
+            {retrying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Try again
+          </button>
+        </div>
       )}
       {job.status === "cancelled" && (
         <Banner
