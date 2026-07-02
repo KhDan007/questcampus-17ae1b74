@@ -326,7 +326,7 @@ function ProfilePage() {
             Coming soon to your account
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            Join the waitlist to lock in 30% off monthly access.
+            Join the waitlist to lock in {WAITLIST_BASE_DISCOUNT}% off monthly access.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <UpcomingTile
