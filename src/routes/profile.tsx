@@ -205,7 +205,7 @@ function ProfilePage() {
                 tone="primary"
               />
               <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
-              <Stat label="Waitlist discount" value="30% off" tone="accent" />
+              <Stat label="Waitlist discount" value={`${WAITLIST_BASE_DISCOUNT}% off`} tone="accent" />
             </div>
           </div>
         </motion.section>
