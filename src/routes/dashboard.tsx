@@ -265,6 +265,13 @@ function DashboardPage() {
             </SilentErrorBoundary>
           )}
 
+          {/* Best for scholarships & aid — ranked from saved schools */}
+          {isAuthenticated && (
+            <SilentErrorBoundary>
+              <BestForAidSection />
+            </SilentErrorBoundary>
+          )}
+
           {/* Two-column workspace: Prep + Search/Matches */}
           <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Prep */}
