@@ -25,7 +25,7 @@ export function NextProductiveAction() {
         title: "While we research, finish your profile",
         body: `${missingCount} field${missingCount === 1 ? "" : "s"} left. Takes about a minute and unlocks every form.`,
         cta: "Continue profile",
-        to: "/apply/prep",
+        to: "/apply",
       };
     }
     if (docsCount < 2) {
