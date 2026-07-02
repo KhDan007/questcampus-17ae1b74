@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -9,13 +10,22 @@ import {
   ScanSearch,
   Sparkles,
   CheckCircle2,
+  Upload,
+  MessageSquare,
+  ClipboardCheck,
+  Rocket,
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { useProgress, nextStep, type NextStep } from "@/lib/progress";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
+import {
+  useGuidedSteps,
+  describeGuidedStep,
+  type GuidedStep,
+} from "@/lib/apply/guidedSteps";
+import type { BackendTarget } from "@/lib/apply/intake";
 
 type StepDef = {
-  index: number;
-  total: number;
   eyebrow: string;
   title: string;
   desc: string;
@@ -23,14 +33,37 @@ type StepDef = {
   cta: string;
   Icon: ComponentType<{ className?: string }>;
   tone: "primary" | "done";
+  onClick?: () => void;
 };
 
-function defFor(step: NextStep, isAuthenticated: boolean): StepDef {
+function stepIcon(kind: GuidedStep["kind"]): ComponentType<{ className?: string }> {
+  switch (kind) {
+    case "document":
+      return Upload;
+    case "essay":
+      return PenLine;
+    case "eligibility":
+      return ClipboardCheck;
+    case "field":
+    default:
+      return MessageSquare;
+  }
+}
+
+function scrollToPrep() {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById("dashboard-prep");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  // If we're not on the dashboard already, browser will handle "/dashboard#dashboard-prep".
+}
+
+function fallbackDef(step: NextStep, isAuthenticated: boolean): StepDef {
   if (step === "refine") {
     return {
-      index: 1,
-      total: 3,
-      eyebrow: "Recommended next step · 1 of 3",
+      eyebrow: "Recommended next step",
       title: "Refine your recommendations",
       desc: "Answer a few more questions about your goals, learning style, and constraints — we'll re-rank your matches with much more precision.",
       to: isAuthenticated ? "/onboarding" : "/signin",
@@ -41,9 +74,7 @@ function defFor(step: NextStep, isAuthenticated: boolean): StepDef {
   }
   if (step === "draft") {
     return {
-      index: 2,
-      total: 3,
-      eyebrow: "Recommended next step · 2 of 3",
+      eyebrow: "Recommended next step",
       title: "Draft your personal statement",
       desc: "Use what you told us to generate a Common-App essay you can shape, edit, and own — first generation is free.",
       to: "/essay",
@@ -54,9 +85,7 @@ function defFor(step: NextStep, isAuthenticated: boolean): StepDef {
   }
   if (step === "review") {
     return {
-      index: 3,
-      total: 3,
-      eyebrow: "Recommended next step · 3 of 3",
+      eyebrow: "Recommended next step",
       title: "Review your essay with AI",
       desc: "Get line-by-line feedback, stronger hooks, and rewrites you can apply with one click.",
       to: "/essay",
@@ -66,8 +95,6 @@ function defFor(step: NextStep, isAuthenticated: boolean): StepDef {
     };
   }
   return {
-    index: 3,
-    total: 3,
     eyebrow: "You're all caught up",
     title: "All recommended steps complete",
     desc: "You've refined your matches, drafted your essay, and reviewed it. Keep iterating on any step — or explore what's coming next below.",
@@ -81,13 +108,75 @@ function defFor(step: NextStep, isAuthenticated: boolean): StepDef {
 export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) {
   const reduce = useReducedMotion();
   const progress = useProgress();
-  const step = nextStep(progress);
-  const def = defFor(step, isAuthenticated);
+
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const guided = useGuidedSteps(targets);
+
+  const hasTargets = targets.length > 0;
+  const guidedReady = !guided.loading && hasTargets && guided.total > 0;
+
+  let def: StepDef;
+  let progressCopy: string | null = null;
+
+  if (hasTargets && guided.next) {
+    // A real, unsatisfied prep step exists.
+    const s = guided.next;
+    def = {
+      eyebrow: "Recommended next step",
+      title: describeGuidedStep(s),
+      desc:
+        s.kind === "document"
+          ? "One upload — reused across every portal you apply to."
+          : s.kind === "essay"
+            ? "Draft it once in the Essay Assistant; we'll reuse it where it fits."
+            : s.kind === "eligibility"
+              ? "Quick answer to confirm you match this school's requirements."
+              : "One quick answer — saved everywhere it's asked.",
+      to: s.kind === "essay" ? "/essay" : "/dashboard",
+      cta: s.kind === "essay" ? "Draft in Essay Assistant" : "Open guided prep",
+      Icon: stepIcon(s.kind),
+      tone: "primary",
+      onClick: s.kind === "essay" ? undefined : scrollToPrep,
+    };
+    progressCopy = `${guided.doneCount} of ${guided.total} done`;
+  } else if (guidedReady && guided.total > 0) {
+    // All required prep is done — targets are ready to launch.
+    const readyName =
+      guided.steps[0]?.targetName ??
+      targets[0]?.name ??
+      "your first university";
+    def = {
+      eyebrow: "You're ready",
+      title: `Apply to ${readyName} — you're ready`,
+      desc: "Every required item is complete. Launch auto-apply from the guided prep section.",
+      to: "/dashboard",
+      cta: "Launch auto-apply",
+      Icon: Rocket,
+      tone: "done",
+      onClick: scrollToPrep,
+    };
+    progressCopy = `${guided.doneCount} of ${guided.total} done`;
+  } else {
+    // No saved universities yet (or intake still loading) → fall back to the
+    // refine/draft/review ladder.
+    def = fallbackDef(nextStep(progress), isAuthenticated);
+  }
+
   const Icon = def.Icon;
   const isDone = def.tone === "done";
-
   const search =
-    step === "refine" && !isAuthenticated ? ({ redirect: "/onboarding" } as never) : undefined;
+    !hasTargets && def.to === "/signin"
+      ? ({ redirect: "/onboarding" } as never)
+      : undefined;
 
   return (
     <motion.section
@@ -132,23 +221,83 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
               >
                 {def.desc}
               </p>
-              <ProgressDots step={step} done={isDone} />
+              {progressCopy ? (
+                <GuidedProgress
+                  done={guided.doneCount}
+                  total={guided.total}
+                  label={progressCopy}
+                  onWhite={isDone}
+                />
+              ) : (
+                <ProgressDots step={nextStep(progress)} done={isDone} />
+              )}
             </div>
           </div>
-          <Link
-            to={def.to}
-            search={search}
-            className={`group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface px-5 py-3 font-display text-label-lg font-bold qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
-              isDone ? "bg-white text-on-surface" : "bg-primary text-white"
-            }`}
-          >
-            {isDone ? <Sparkles className="h-4 w-4" /> : null}
-            {def.cta}
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          {def.onClick ? (
+            <button
+              type="button"
+              onClick={def.onClick}
+              className={`group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface px-5 py-3 font-display text-label-lg font-bold qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+                isDone ? "bg-white text-on-surface" : "bg-primary text-white"
+              }`}
+            >
+              {isDone ? <Sparkles className="h-4 w-4" /> : null}
+              {def.cta}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          ) : (
+            <Link
+              to={def.to}
+              search={search}
+              className={`group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface px-5 py-3 font-display text-label-lg font-bold qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+                isDone ? "bg-white text-on-surface" : "bg-primary text-white"
+              }`}
+            >
+              {isDone ? <Sparkles className="h-4 w-4" /> : null}
+              {def.cta}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </div>
       </div>
     </motion.section>
+  );
+}
+
+function GuidedProgress({
+  done,
+  total,
+  label,
+  onWhite,
+}: {
+  done: number;
+  total: number;
+  label: string;
+  onWhite: boolean;
+}) {
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+  return (
+    <div className="mt-3 max-w-sm">
+      <div
+        className={`h-1.5 w-full overflow-hidden rounded-full ${
+          onWhite ? "bg-white/25" : "bg-on-surface/15"
+        }`}
+      >
+        <div
+          className={`h-full transition-[width] duration-300 ${
+            onWhite ? "bg-white" : "bg-primary"
+          }`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <p
+        className={`mt-1.5 font-[var(--font-label)] text-label-sm font-semibold ${
+          onWhite ? "text-white/85" : "text-on-surface/60"
+        }`}
+      >
+        {label}
+      </p>
+    </div>
   );
 }
 
