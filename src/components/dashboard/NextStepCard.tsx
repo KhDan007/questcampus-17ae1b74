@@ -55,9 +55,7 @@ function scrollToPrep() {
   const el = document.getElementById("dashboard-prep");
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
   }
-  // If we're not on the dashboard already, browser will handle "/dashboard#dashboard-prep".
 }
 
 function fallbackDef(step: NextStep, isAuthenticated: boolean): StepDef {
