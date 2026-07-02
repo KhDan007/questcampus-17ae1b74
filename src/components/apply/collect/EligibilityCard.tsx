@@ -7,9 +7,10 @@ import type { EligibilityResult, EligQuestion } from "@/lib/apply/intake";
 type Props = {
   eligibility: EligibilityResult;
   onAnswer: (askKey: string, value: string) => void;
+  showQuestions?: boolean;
 };
 
-export function EligibilityCard({ eligibility, onAnswer }: Props) {
+export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }: Props) {
   const [open, setOpen] = useState(false);
   const [openWhy, setOpenWhy] = useState<string | null>(null);
   const [local, setLocal] = useState<Record<string, string>>({});
