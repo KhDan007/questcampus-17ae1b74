@@ -13,6 +13,7 @@ import { Route as UniversitiesRouteImport } from './routes/universities'
 import { Route as TosRouteImport } from './routes/tos'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrepRouteImport } from './routes/prep'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -44,6 +45,11 @@ const SigninRoute = SigninRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrepRoute = PrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
+  '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
+  '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/essay': typeof EssayRoute
   '/onboarding': typeof OnboardingRoute
+  '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/essay'
     | '/onboarding'
+    | '/prep'
     | '/profile'
     | '/signin'
     | '/tos'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/essay'
     | '/onboarding'
+    | '/prep'
     | '/profile'
     | '/signin'
     | '/tos'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/essay'
     | '/onboarding'
+    | '/prep'
     | '/profile'
     | '/signin'
     | '/tos'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   EssayRoute: typeof EssayRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrepRoute: typeof PrepRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
   TosRoute: typeof TosRoute
@@ -266,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prep': {
+      id: '/prep'
+      path: '/prep'
+      fullPath: '/prep'
+      preLoaderRoute: typeof PrepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -372,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   EssayRoute: EssayRoute,
   OnboardingRoute: OnboardingRoute,
+  PrepRoute: PrepRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,
   TosRoute: TosRoute,
