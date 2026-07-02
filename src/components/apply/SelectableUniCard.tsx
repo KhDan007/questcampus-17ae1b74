@@ -83,7 +83,8 @@ export function SelectableUniCard({ source, externalId, name, city, country, res
           </>
         ) : (
           <>
-            <Plus className="h-3.5 w-3.5" /> Add to batch
+            <Plus className="h-3.5 w-3.5" />
+            {researched ? "Add to batch" : "Add to batch"}
           </>
         )}
       </span>
