@@ -211,7 +211,7 @@ function DashboardPage() {
       <DashboardShell>
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+          className="relative mx-auto w-full max-w-(--container-content) px-4 pb-16 pt-20 sm:px-6 lg:px-8"
         >
           {/* Re-ranked celebration banner */}
           <AnimatePresence>
@@ -221,7 +221,7 @@ function DashboardPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary px-5 py-4 text-white qc-hard-shadow"
+                className="mb-4 flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary px-4 py-3 text-white qc-hard-shadow"
               >
                 <motion.span
                   animate={{ rotate: [0, 14, -8, 0] }}
@@ -229,220 +229,207 @@ function DashboardPage() {
                 >
                   <Sparkles className="h-5 w-5" />
                 </motion.span>
-                <p className="font-display text-label-lg font-bold">
+                <p className="font-display text-label-md font-bold">
                   Re-ranked with your new answers — here are your fresh matches.
                 </p>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Hero */}
-          <motion.section
-            initial={reduce ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-              Your dashboard
-            </p>
-            <h1 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
-              {firstName ? `Welcome back, ${firstName}.` : "Welcome to QuestCampus."}
-              <br />
-              <span className="qc-text-gradient">Let's build your shortlist.</span>
-            </h1>
-            <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
-              Your matches are saved here. Everything else is on the way — and you'll get 30% off
-              the monthly plan as a waitlist member.
-            </p>
-          </motion.section>
+          {/* Compact stat bar */}
+          <SilentErrorBoundary>
+            <StatBar
+              firstName={firstName}
+              isAuthenticated={isAuthenticated}
+              quizMatches={saved?.matches.length ?? 0}
+            />
+          </SilentErrorBoundary>
 
-          {/* Recommended next step */}
-          <NextStepCard isAuthenticated={isAuthenticated} />
+          {/* Split hero: next-step (8) + task rail (4) */}
+          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <NextStepCard isAuthenticated={isAuthenticated} />
+            </div>
+            <div className="lg:col-span-4">
+              <SilentErrorBoundary>
+                <TaskRail isAuthenticated={isAuthenticated} />
+              </SilentErrorBoundary>
+            </div>
+          </div>
 
-          {/* Resume in-progress application */}
-          {isAuthenticated && (
-            <SilentErrorBoundary>
-              <ActiveApplyResumeCard />
-            </SilentErrorBoundary>
-          )}
-
-          {/* Your picks — saved / researched universities */}
+          {/* Your picks — main picks grid */}
           {isAuthenticated && (
             <SilentErrorBoundary>
               <YourPicksSection />
             </SilentErrorBoundary>
           )}
 
-
-          {/* Matches */}
-          <section className="mt-14">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                  Your university matches
-                </h2>
-                <p className="mt-1 text-body-md text-on-surface-variant">
-                  {loading
-                    ? "Loading your matches…"
-                    : saved
-                      ? `${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
-                      : "We'll save your quiz matches here automatically."}
-                </p>
-              </div>
-              {!saved && !loading && (
-                <Link
-                  to="/"
-                  className="inline-flex shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  Take the quiz
-                </Link>
-              )}
-            </div>
-
-            {loading ? (
-              <div className="mt-6 grid gap-5 lg:grid-cols-3">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="h-64 animate-pulse rounded-lg border-2 border-on-surface/20 bg-surface/60"
-                  />
-                ))}
-                <div className="col-span-full mt-2 flex items-center justify-center gap-2 text-body-sm text-on-surface-variant">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Re-ranking from your latest answers…
+          {/* Two-column workspace: Prep + Search/Matches */}
+          <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {/* Prep */}
+            {isAuthenticated ? (
+              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+                <div className="mb-3 flex items-baseline justify-between gap-3">
+                  <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                    Prep applications
+                  </h2>
+                  <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                    Answer once, use everywhere
+                  </span>
                 </div>
-              </div>
-            ) : saved && saved.matches.length > 0 ? (
-              <motion.div
-                key={saved.at}
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: {},
-                  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-                }}
-                className="mt-6 grid gap-5 lg:grid-cols-3"
-              >
-                {saved.matches.map((m, i) => (
-                  <MatchCard
-                    key={`${saved.at}-${m.name}-${i}`}
-                    match={m}
-                    celebrate={justRefreshed}
-                  />
-                ))}
-              </motion.div>
+                <SilentErrorBoundary>
+                  <DashboardPrepSection />
+                </SilentErrorBoundary>
+              </section>
             ) : (
-              <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-                <p className="text-body-lg text-on-surface-variant">
-                  No matches yet. Take the 60-second quiz on the landing page to populate this.
+              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+                <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                  Save this workspace
+                </h2>
+                <p className="mt-1 text-body-sm text-on-surface-variant">
+                  Create a free account to save picks, essays, and answers across devices.
                 </p>
                 <Link
-                  to="/"
-                  className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  to="/signin"
+                  search={{ mode: "signup" } as never}
+                  className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
                 >
-                  Start the quiz <ArrowRight className="h-4 w-4" />
+                  Create account <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
+              </section>
             )}
-          </section>
 
-          {/* Search any university */}
-          <section className="mt-14 rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-8">
-            <SilentErrorBoundary>
-              <UniversitySearchSection
-                title="Search any university"
-                subtitle="Search 11,000+ universities and add the ones you're already considering to your shortlist."
-              />
-            </SilentErrorBoundary>
-            <div className="mt-5">
-              <Link
-                to="/universities"
-                search={{ q: "" }}
-                className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md font-semibold text-primary hover:underline"
-              >
-                Open full universities workspace
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+            {/* Right column: Essay + Search stacked */}
+            <div className="flex flex-col gap-4">
+              {isAuthenticated && (
+                <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow">
+                  <div className="flex items-start gap-3">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white">
+                      <PenLine className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                          Personal statement
+                        </h2>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+                          <Sparkles className="h-3 w-3" /> Live
+                        </span>
+                      </div>
+                      <p className="mt-1 text-body-sm text-on-surface/80">
+                        Grounded in your story. First draft free.
+                      </p>
+                    </div>
+                    <Link
+                      to="/essay"
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                    >
+                      Open <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </section>
+              )}
+
+              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+                <SilentErrorBoundary>
+                  <UniversitySearchSection
+                    title="Search 11,000+ universities"
+                    subtitle="Add any school to your shortlist."
+                  />
+                </SilentErrorBoundary>
+                <Link
+                  to="/universities"
+                  search={{ q: "" }}
+                  className="mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                >
+                  Open full workspace <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </section>
             </div>
-          </section>
+          </div>
 
-          {/* Prepare your applications — over saved unis */}
-          {isAuthenticated && (
-            <section className="mt-14">
-              <div className="mb-4">
-                <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                  Prepare your applications
-                </h2>
-                <p className="mt-1 text-body-md text-on-surface-variant">
-                  Answer once — we apply it to every saved university.
-                </p>
+          {/* Quiz matches — collapsed compact strip */}
+          {(loading || (saved && saved.matches.length > 0) || !saved) && (
+            <section className="mt-8">
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                    From your quiz
+                  </h2>
+                  <p className="text-body-sm text-on-surface-variant">
+                    {loading
+                      ? "Loading matches…"
+                      : saved
+                        ? `${saved.matches.length} AI match${saved.matches.length === 1 ? "" : "es"} · save the ones you like to your picks`
+                        : "Take the quiz to see your first matches."}
+                  </p>
+                </div>
+                {!saved && !loading && (
+                  <Link
+                    to="/"
+                    className="inline-flex shrink-0 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  >
+                    Take quiz
+                  </Link>
+                )}
               </div>
-              <SilentErrorBoundary>
-                <DashboardPrepSection />
-              </SilentErrorBoundary>
+
+              {loading ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className="h-40 animate-pulse rounded-lg border-2 border-on-surface/20 bg-surface/60"
+                    />
+                  ))}
+                </div>
+              ) : saved && saved.matches.length > 0 ? (
+                <motion.div
+                  key={saved.at}
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.06, delayChildren: 0.02 } },
+                  }}
+                  className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                  {saved.matches.slice(0, 6).map((m, i) => (
+                    <MatchCard
+                      key={`${saved.at}-${m.name}-${i}`}
+                      match={m}
+                      celebrate={justRefreshed}
+                    />
+                  ))}
+                </motion.div>
+              ) : (
+                <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+                  <p className="text-body-md text-on-surface-variant">
+                    No matches yet. Take the 60-second quiz to populate this.
+                  </p>
+                </div>
+              )}
             </section>
           )}
 
-
-
-
-          {/* Personal statement — live feature, logged-in only */}
-          {isAuthenticated && (
-            <motion.section
-              initial={reduce ? false : { opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-16"
-            >
-              <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow sm:p-8">
-                <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-4">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
-                      <PenLine className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-                        <Sparkles className="h-3 w-3" /> New · live
-                      </span>
-                      <h2 className="mt-2 font-display text-headline-lg font-bold text-on-surface">
-                        Write your Common App personal statement
-                      </h2>
-                      <p className="mt-1.5 max-w-2xl text-body-md text-on-surface/80">
-                        Grounded in what you told us — zero invented facts. First generation is
-                        free; a $15/month subscription reveals the full essay plus your full match
-                        list.
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    to="/essay"
-                    className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                  >
-                    Start writing
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </div>
-              </div>
-            </motion.section>
-          )}
-
-          {/* Coming soon tiles */}
-          <section className="mt-16">
-            <h2 className="font-display text-headline-lg font-bold text-on-surface">
-              What's next for you
-            </h2>
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              Tap any tool to join the waitlist and lock in 30% off monthly access.
-            </p>
-
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          {/* Coming soon compact */}
+          <section className="mt-10">
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                What's next
+              </h2>
+              <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                Tap to join the waitlist · 30% off monthly
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
               {COMING_SOON.map((t, i) => (
                 <ToolTile
                   key={t.key}
                   title={t.title}
                   desc={t.desc}
                   Icon={t.icon}
-                  delay={i * 0.05}
+                  delay={i * 0.04}
                   onClick={() => setModal({ title: t.title })}
                 />
               ))}
@@ -450,7 +437,7 @@ function DashboardPage() {
           </section>
 
           {!isAuthenticated && (
-            <p className="mt-10 text-center text-body-sm text-on-surface-variant">
+            <p className="mt-8 text-center text-body-sm text-on-surface-variant">
               You're browsing as a guest.{" "}
               <a href="/signin?mode=signup" className="text-primary hover:underline">
                 Create a free account
@@ -468,6 +455,7 @@ function DashboardPage() {
         body="Join the waitlist to be first in line and lock in 30% off monthly access."
         feature={modal?.title}
       />
+
     </>
   );
 }
@@ -659,65 +647,55 @@ function YourPicksSection() {
   );
 
   return (
-    <section className="mt-10">
-      <div className="mb-4 flex items-end justify-between gap-4">
+    <section className="mt-6">
+      <div className="mb-3 flex items-end justify-between gap-4">
         <div>
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-            Main picks
-          </p>
-          <h2 className="mt-1 font-display text-headline-lg font-bold text-on-surface">
-            Your picks
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            Your picks{" "}
+            <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant">
+              · {targets.length}
+            </span>
           </h2>
-          <p className="mt-1 text-body-md text-on-surface-variant">
-            {targets.length} universit{targets.length === 1 ? "y" : "ies"} you're
-            applying to — we're deep-researching each one.
+          <p className="text-body-sm text-on-surface-variant">
+            Deep-researched in the background — status updates live.
           </p>
         </div>
         <Link
           to="/apply"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
-          Add more <ArrowRight className="h-4 w-4" />
+          Add more <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {(saved ?? []).map((s) => {
           const key = `${s.source}::${s.externalId}`;
           const found = foundMap.get(key);
-          const location = [s.city, s.state, s.country].filter(Boolean).join(", ");
+          const location = [s.city, s.country].filter(Boolean).join(", ");
           return (
             <li
               key={s.id}
-              className="flex items-start gap-3 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm"
+              className="flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-3 py-2.5 qc-hard-shadow-sm"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
-                <GraduationCap className="h-5 w-5" />
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+                <GraduationCap className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                <p className="truncate font-display text-label-md font-bold text-on-surface">
                   {s.name}
                 </p>
-                {location && (
-                  <p className="truncate text-label-sm text-on-surface-variant">
-                    {location}
-                  </p>
-                )}
-                <p
-                  className={`mt-1.5 inline-flex items-center gap-1 font-[var(--font-label)] text-label-sm font-semibold ${
-                    found ? "text-tertiary" : "text-primary"
-                  }`}
-                >
+                <p className="flex items-center gap-1.5 truncate text-label-sm text-on-surface-variant">
                   {found ? (
                     <>
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Research ready
-                    </>
-                  ) : plan === undefined ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading…
+                      <CheckCircle2 className="h-3 w-3 text-tertiary" />
+                      <span className="text-tertiary">Ready</span>
+                      {location && <span className="text-on-surface/40">· {location}</span>}
                     </>
                   ) : (
                     <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Researching…
+                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      <span className="text-primary">Researching</span>
+                      {location && <span className="text-on-surface/40">· {location}</span>}
                     </>
                   )}
                 </p>
@@ -729,5 +707,216 @@ function YourPicksSection() {
     </section>
   );
 }
+
+function StatBar({
+  firstName,
+  isAuthenticated,
+  quizMatches,
+}: {
+  firstName: string | null;
+  isAuthenticated: boolean;
+  quizMatches: number;
+}) {
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const plan = useIntakePlan(targets);
+  const picks = targets.length;
+  const ready = plan?.targets?.filter((t) => t.found).length ?? 0;
+
+  return (
+    <section className="grid grid-cols-1 items-center gap-3 rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 backdrop-blur-md qc-hard-shadow sm:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+          <Sparkles className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate font-display text-headline-md font-bold text-on-surface">
+            {firstName ? `Hey ${firstName} 👋` : "Welcome to QuestCampus"}
+          </h1>
+          <p className="truncate text-body-sm text-on-surface-variant">
+            {isAuthenticated
+              ? "Your admissions command center."
+              : "Sign in to save picks and drafts across devices."}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:justify-end">
+        <StatChip label="Picks" value={picks} />
+        <span className="hidden h-8 w-px bg-on-surface/15 sm:block" />
+        <StatChip
+          label="Researched"
+          value={ready}
+          tone={ready === picks && picks > 0 ? "success" : "default"}
+        />
+        <span className="hidden h-8 w-px bg-on-surface/15 sm:block" />
+        <StatChip label="Quiz matches" value={quizMatches} />
+      </div>
+    </section>
+  );
+}
+
+function StatChip({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success";
+}) {
+  return (
+    <div className="text-center">
+      <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">
+        {label}
+      </p>
+      <p
+        className={`font-display text-headline-sm font-bold leading-none ${
+          tone === "success" ? "text-tertiary" : "text-primary"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function TaskRail({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const job = useActiveApplyJob();
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((s) => ({
+        system: s.source,
+        externalId: s.externalId,
+        name: s.name,
+      })),
+    [saved],
+  );
+  const plan = useIntakePlan(targets);
+  const researching = (plan?.targets ?? []).filter((t) => !t.found).length;
+  const ready = (plan?.targets ?? []).filter((t) => t.found).length;
+
+  const items: Array<{
+    key: string;
+    dot: "primary" | "tertiary" | "muted";
+    title: string;
+    subtitle: string;
+    to: string;
+    params?: Record<string, string>;
+  }> = [];
+
+  if (job) {
+    items.push({
+      key: "active",
+      dot: "primary",
+      title: job.targetName ?? job.externalId ?? "Resume application",
+      subtitle: job.progress?.message ?? job.status,
+      to: "/apply/$jobId",
+      params: { jobId: job.jobId },
+    });
+  }
+  if (researching > 0) {
+    items.push({
+      key: "researching",
+      dot: "primary",
+      title: `${researching} deep-research${researching === 1 ? "" : "es"} in progress`,
+      subtitle: "Requirements pulled from each portal",
+      to: "/apply",
+    });
+  }
+  if (ready > 0) {
+    items.push({
+      key: "ready",
+      dot: "tertiary",
+      title: `${ready} universit${ready === 1 ? "y" : "ies"} ready to prep`,
+      subtitle: "Answer questions, then auto-apply",
+      to: "/apply/prep",
+    });
+  }
+  if (isAuthenticated) {
+    items.push({
+      key: "essay",
+      dot: "muted",
+      title: "Personal statement",
+      subtitle: "Draft or review with AI",
+      to: "/essay",
+    });
+  }
+  if (targets.length === 0 && isAuthenticated) {
+    items.push({
+      key: "pick",
+      dot: "primary",
+      title: "Pick your first universities",
+      subtitle: "Choose from matches or search",
+      to: "/apply",
+    });
+  }
+  if (!isAuthenticated) {
+    items.push({
+      key: "signin",
+      dot: "primary",
+      title: "Save your work",
+      subtitle: "Create a free account",
+      to: "/signin",
+    });
+  }
+
+  const dotColor = (d: "primary" | "tertiary" | "muted") =>
+    d === "tertiary" ? "bg-tertiary" : d === "muted" ? "bg-on-surface/30" : "bg-primary";
+
+  return (
+    <aside className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h3 className="font-display text-headline-sm font-bold text-on-surface">Task rail</h3>
+        <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+          Live
+        </span>
+      </div>
+      {items.length === 0 ? (
+        <p className="text-body-sm text-on-surface-variant">
+          You're all caught up — enjoy the calm.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {items.map((it) => (
+            <li key={it.key}>
+              <Link
+                to={it.to as never}
+                params={it.params as never}
+                className="group flex items-center gap-3 rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest px-3 py-2.5 transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface"
+              >
+                <span
+                  className={`relative grid h-2.5 w-2.5 shrink-0 place-items-center rounded-full ${dotColor(it.dot)}`}
+                >
+                  {it.dot === "primary" && (
+                    <span
+                      className={`absolute inset-0 animate-ping rounded-full ${dotColor(it.dot)} opacity-50`}
+                    />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-md font-bold text-on-surface">
+                    {it.title}
+                  </p>
+                  <p className="truncate text-label-sm text-on-surface-variant">{it.subtitle}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </aside>
+  );
+}
+
 
 

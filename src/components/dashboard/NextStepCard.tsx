@@ -94,10 +94,10 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
       initial={reduce ? false : { opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-      className="mt-10"
+      className="h-full"
     >
       <div
-        className={`relative overflow-hidden rounded-2xl border-2 border-on-surface p-6 qc-hard-shadow sm:p-8 ${
+        className={`relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-on-surface p-6 qc-hard-shadow sm:p-7 ${
           isDone ? "bg-primary text-white" : "bg-secondary-container"
         }`}
       >
