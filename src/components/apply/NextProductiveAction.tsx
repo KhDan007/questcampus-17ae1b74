@@ -45,10 +45,9 @@ function stepIcon(kind: GuidedStep["kind"]): ComponentType<{ className?: string 
 }
 
 function scrollToPrep() {
-  if (typeof document === "undefined") return;
-  const el = document.getElementById("dashboard-prep");
-  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  // No-op placeholder retained for backwards compatibility; unused.
 }
+void scrollToPrep;
 
 export function NextProductiveAction() {
   const { saved } = useSavedUniversities();
