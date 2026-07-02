@@ -12,12 +12,14 @@ import {
   useIntakePlan,
   useSetAnswer,
   useTargetsFromSelection,
+  type BackendTarget,
   type IntakeTarget,
 } from "@/lib/apply/intake";
 import { RequirementsZone } from "./RequirementsZone";
 import { EligibilityCard } from "./EligibilityCard";
 import { ReadinessRail } from "./ReadinessRail";
 import { LaunchBar } from "./LaunchBar";
+
 
 export function CollectWorkspace({
   targets: targetsProp,
@@ -88,7 +90,7 @@ export function CollectWorkspace({
                 Answer once, apply everywhere.
               </h2>
               <p className="mt-1 text-body-md text-on-surface-variant">
-                We only ask what your {items.length} {items.length === 1 ? "university needs" : "universities need"}. Everything saves as you type.
+                We only ask what your {targetCount} {targetCount === 1 ? "university needs" : "universities need"}. Everything saves as you type.
               </p>
             </div>
             <div className="hidden text-right sm:block">
