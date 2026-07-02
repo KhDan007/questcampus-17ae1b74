@@ -673,33 +673,37 @@ function YourPicksSection() {
           const found = foundMap.get(key);
           const location = [s.city, s.country].filter(Boolean).join(", ");
           return (
-            <li
-              key={s.id}
-              className="flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-3 py-2.5 qc-hard-shadow-sm"
-            >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
-                <GraduationCap className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-label-md font-bold text-on-surface">
-                  {s.name}
-                </p>
-                <p className="flex items-center gap-1.5 truncate text-label-sm text-on-surface-variant">
-                  {found ? (
-                    <>
-                      <CheckCircle2 className="h-3 w-3 text-tertiary" />
-                      <span className="text-tertiary">Ready</span>
-                      {location && <span className="text-on-surface/40">· {location}</span>}
-                    </>
-                  ) : (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                      <span className="text-primary">Researching</span>
-                      {location && <span className="text-on-surface/40">· {location}</span>}
-                    </>
-                  )}
-                </p>
-              </div>
+            <li key={s.id}>
+              <Link
+                to="/application/$system/$externalId"
+                params={{ system: s.source, externalId: s.externalId }}
+                className="group flex w-full items-center gap-3 rounded-xl border-2 border-on-surface bg-surface-container-lowest px-3 py-2.5 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+                  <GraduationCap className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-md font-bold text-on-surface">
+                    {s.name}
+                  </p>
+                  <p className="flex items-center gap-1.5 truncate text-label-sm text-on-surface-variant">
+                    {found ? (
+                      <>
+                        <CheckCircle2 className="h-3 w-3 text-tertiary" />
+                        <span className="text-tertiary">Ready</span>
+                        {location && <span className="text-on-surface/40">· {location}</span>}
+                      </>
+                    ) : (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                        <span className="text-primary">Researching</span>
+                        {location && <span className="text-on-surface/40">· {location}</span>}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+              </Link>
             </li>
           );
         })}
