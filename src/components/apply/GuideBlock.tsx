@@ -53,6 +53,27 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
     }
   }
 
+  async function handleWriteHere() {
+    if (!guide?.writable) return;
+    if (guide.editor === "essay") {
+      navigate({ to: "/essay" });
+    } else {
+      setCreating(true);
+      try {
+        const docId = await createDocument({
+          docKind: guide.editorKind ?? "other",
+          system: explainArgs.system,
+          externalId: explainArgs.externalId,
+        });
+        navigate({ to: "/documents/$id", params: { id: docId } });
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to create draft");
+      } finally {
+        setCreating(false);
+      }
+    }
+  }
+
   const hasGuide = !!guide;
 
   return (
