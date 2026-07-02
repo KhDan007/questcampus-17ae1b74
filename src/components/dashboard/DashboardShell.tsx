@@ -46,6 +46,14 @@ type Item =
 const TOP_ITEMS: Item[] = [
   {
     kind: "link",
+    key: "autoapply",
+    label: "Applications",
+    to: "/apply",
+    icon: Send,
+    match: (p) => p.startsWith("/apply") || p.startsWith("/application"),
+  },
+  {
+    kind: "link",
     key: "universities",
     label: "Universities",
     to: "/universities",
@@ -73,14 +81,6 @@ const TOP_ITEMS: Item[] = [
     label: "Deadlines",
     icon: CalendarClock,
     feature: "Deadline tracker",
-  },
-  {
-    kind: "link",
-    key: "autoapply",
-    label: "Auto-Apply",
-    to: "/apply",
-    icon: Send,
-    match: (p) => p.startsWith("/apply"),
   },
 ];
 

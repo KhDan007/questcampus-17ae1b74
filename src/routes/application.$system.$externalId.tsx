@@ -42,15 +42,6 @@ function ApplicationDetailPage() {
   const { system, externalId } = Route.useParams();
   const { saved } = useSavedUniversities();
 
-  if (!isAuthenticated) {
-    return (
-      <Navigate
-        to="/signin"
-        search={{ redirect: `/application/${system}/${externalId}` } as never}
-      />
-    );
-  }
-
   const uni = (saved ?? []).find((s) => s.source === system && s.externalId === externalId);
   const target: BackendTarget = useMemo(
     () => ({ system, externalId, name: uni?.name ?? "This university" }),
@@ -61,6 +52,15 @@ function ApplicationDetailPage() {
   const plan = useIntakePlan(targets);
   const elig = useEligibility(targets);
   const checklist = useChecklist(targets);
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/signin"
+        search={{ redirect: `/application/${system}/${externalId}` } as never}
+      />
+    );
+  }
 
   const targetInfo = plan?.targets.find(
     (t) => t.system === system && t.externalId === externalId,
