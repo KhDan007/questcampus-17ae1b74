@@ -31,6 +31,7 @@ import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
 import { BestForAidSection } from "@/components/dashboard/BestForAidSection";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useGuidedSteps, describeGuidedStep } from "@/lib/apply/guidedSteps";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { CheckCircle2 } from "lucide-react";
 
