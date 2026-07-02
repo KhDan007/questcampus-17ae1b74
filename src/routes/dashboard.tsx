@@ -358,6 +358,22 @@ function DashboardPage() {
             </div>
           </section>
 
+          {/* Prepare your applications — over saved unis */}
+          {isAuthenticated && (
+            <section className="mt-14">
+              <div className="mb-4">
+                <h2 className="font-display text-headline-lg font-bold text-on-surface">
+                  Prepare your applications
+                </h2>
+                <p className="mt-1 text-body-md text-on-surface-variant">
+                  Answer once — we apply it to every saved university.
+                </p>
+              </div>
+              <SilentErrorBoundary>
+                <DashboardPrepSection />
+              </SilentErrorBoundary>
+
+
           {/* Personal statement — live feature, logged-in only */}
           {isAuthenticated && (
             <motion.section
