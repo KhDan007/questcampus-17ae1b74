@@ -61,7 +61,7 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
 
       {open && (
         <div className="space-y-5 border-t-2 border-on-surface/10 p-5">
-          {questions.length > 0 && (
+          {showQuestions && questions.length > 0 && (
             <div className="grid gap-3 md:grid-cols-2">
               {questions.map((q) => (
                 <EligibilityQuestionField
