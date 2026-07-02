@@ -9,7 +9,7 @@ import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 
 export function NavV2() {
   const reduce = useReducedMotion();
