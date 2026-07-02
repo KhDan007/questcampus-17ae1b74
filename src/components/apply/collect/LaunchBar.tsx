@@ -39,7 +39,7 @@ export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
 
   async function launch() {
     if (needsPayment) {
-      void navigate({ to: "/apply" });
+      void navigate({ to: "/unlock" });
       return;
     }
     if (!enabled) return;
@@ -47,20 +47,35 @@ export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
     setError(null);
     try {
       let firstJobId: string | null = null;
+      let firstReused = false;
       for (const t of readyTargets) {
         try {
-          const id = await startApply({
+          const res = await startApply({
             system: t.system,
             externalId: t.externalId,
             targetName: t.name,
           });
-          if (!firstJobId) firstJobId = id;
+          if (!firstJobId) {
+            firstJobId = res.jobId;
+            firstReused = res.reused;
+          }
         } catch (e) {
-          setError(e instanceof Error ? e.message : "One application couldn't start");
+          // Surface backend error message verbatim.
+          const msg = e instanceof Error ? e.message : "Couldn't start this application";
+          setError(msg);
+          if (/payment required/i.test(msg)) {
+            void navigate({ to: "/unlock" });
+            return;
+          }
         }
       }
-      if (firstJobId) void navigate({ to: "/apply/$jobId", params: { jobId: firstJobId } });
-      else void navigate({ to: "/apply" });
+      if (firstJobId) {
+        void navigate({
+          to: "/apply/$jobId",
+          params: { jobId: firstJobId },
+          replace: firstReused,
+        });
+      }
     } finally {
       setBusy(false);
     }
