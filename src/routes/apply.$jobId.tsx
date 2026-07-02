@@ -372,18 +372,34 @@ function CheckpointModal({
   }
 
   if (checkpoint.kind === "submit") {
-    const filled =
-      (checkpoint.payload as { filled?: Array<{ field: string; value?: string }> } | undefined)
-        ?.filled ?? [];
-    const unmatched =
-      (checkpoint.payload as { unmatched?: Array<{ field: string; reason?: string }> } | undefined)
-        ?.unmatched ?? [];
+    const payload = checkpoint.payload as
+      | {
+          filled?: Array<{ field: string; value?: string }>;
+          unmatched?: Array<{ field: string; reason?: string }>;
+          reachedReview?: boolean;
+        }
+      | undefined;
+    const filled = payload?.filled ?? [];
+    const unmatched = payload?.unmatched ?? [];
+    const reachedReview = payload?.reachedReview !== false; // default true if omitted
     return (
       <Modal title="Review and submit" icon={<Send className="h-5 w-5 text-primary" />}>
         <p className="text-body-md text-on-surface-variant">
           The form is filled. Look it over in the live browser, fix anything you want, then hit the
           portal&apos;s submit button. Tap below once it&apos;s sent.
         </p>
+
+        {!reachedReview && (
+          <div className="mt-3 rounded-md border-2 border-error/60 bg-error-container/50 p-3">
+            <p className="font-[var(--font-label)] text-label-sm font-semibold text-on-error-container">
+              Heads up: the agent couldn&apos;t reach the portal&apos;s review screen.
+            </p>
+            <p className="mt-0.5 text-body-sm text-on-error-container">
+              Navigate to the review/submit step yourself in the live browser above, then confirm below.
+            </p>
+          </div>
+        )}
+
 
         {filled.length > 0 && (
           <div className="mt-4">
