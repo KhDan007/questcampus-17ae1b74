@@ -378,7 +378,7 @@ function ProfilePage() {
         open={waitlistOpen}
         onClose={() => setWaitlistOpen(false)}
         title="Coming soon"
-        body="Join the waitlist and we'll email you the moment this is ready — 30% off monthly access locked in."
+        body={`Join the waitlist and we'll email you the moment this is ready — ${WAITLIST_BASE_DISCOUNT}% off monthly access locked in.`}
       />
     </>
   );
