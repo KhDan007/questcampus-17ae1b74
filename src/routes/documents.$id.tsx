@@ -32,9 +32,6 @@ export const Route = createFileRoute("/documents/$id")({
 function DocumentEditorPage() {
   const { id } = Route.useParams();
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated)
-    return <Navigate to="/signin" search={{ redirect: `/documents/${id}` } as never} />;
-
   const navigate = useNavigate();
   const doc = useDocument(id);
   const { save, flushNow } = useSaveDocument(600);
@@ -46,14 +43,15 @@ function DocumentEditorPage() {
   const [notes, setNotes] = useState("");
   const [genBusy, setGenBusy] = useState(false);
   const [improveBusy, setImproveBusy] = useState<ImproveGoal | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedId, setHydratedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!doc || hydrated) return;
+    if (!doc) return;
+    if (hydratedId === doc.id) return;
     setTitle(doc.title ?? "");
     setContent(doc.content ?? "");
-    setHydrated(true);
-  }, [doc, hydrated]);
+    setHydratedId(doc.id);
+  }, [doc, hydratedId]);
 
   useEffect(() => {
     return () => {
@@ -61,6 +59,9 @@ function DocumentEditorPage() {
     };
   }, [id, flushNow]);
 
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" search={{ redirect: `/documents/${id}` } as never} />;
+  }
   if (doc === undefined) {
     return (
       <DashboardShell>
