@@ -31,6 +31,15 @@ import {
   type IntakeItem,
   type EligibilityPerTarget,
 } from "@/lib/apply/intake";
+import {
+  useUniFacts,
+  useUniScholarships,
+  useResearchProgress,
+  type UniFacts,
+  type UniDeadline,
+  type Scholarship,
+  type ResearchProgress,
+} from "@/lib/apply/uniData";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
