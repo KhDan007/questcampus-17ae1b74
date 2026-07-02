@@ -2,40 +2,31 @@
 
 import { useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
-import type { IntakeRequirement } from "@/lib/apply/intake";
-import { RequirementField } from "./RequirementField";
+import type { IntakeItem } from "@/lib/apply/intake";
+import { IntakeItemField } from "./RequirementField";
 
 type Props = {
   title: string;
   subtitle?: string;
-  requirements: IntakeRequirement[];
-  onChange: (key: string, value: unknown) => void;
+  items: IntakeItem[];
+  onChange: (item: IntakeItem, value: string) => void;
   defaultOpen?: boolean;
 };
-
-function isAnswered(r: IntakeRequirement): boolean {
-  if (r.answered) return true;
-  const v = r.value;
-  if (v === undefined || v === null) return false;
-  if (typeof v === "string") return v.trim().length > 0;
-  if (Array.isArray(v)) return v.length > 0;
-  return true;
-}
 
 export function RequirementsZone({
   title,
   subtitle,
-  requirements,
+  items,
   onChange,
   defaultOpen = false,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const [showAnswered, setShowAnswered] = useState(false);
 
-  const answered = requirements.filter(isAnswered);
-  const unanswered = requirements.filter((r) => !isAnswered(r));
-  const complete = requirements.length > 0 && unanswered.length === 0;
-  const visible = showAnswered ? requirements : unanswered;
+  const answered = items.filter((i) => i.answered);
+  const unanswered = items.filter((i) => !i.answered);
+  const complete = items.length > 0 && unanswered.length === 0;
+  const visible = showAnswered ? items : unanswered;
 
   return (
     <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 qc-hard-shadow-sm">
@@ -47,9 +38,7 @@ export function RequirementsZone({
       >
         <div className="min-w-0">
           <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
-          {subtitle && (
-            <p className="mt-0.5 text-body-sm text-on-surface-variant">{subtitle}</p>
-          )}
+          {subtitle && <p className="mt-0.5 text-body-sm text-on-surface-variant">{subtitle}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {complete ? (
@@ -58,7 +47,7 @@ export function RequirementsZone({
             </span>
           ) : (
             <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              {answered.length}/{requirements.length}
+              {answered.length}/{items.length}
             </span>
           )}
           <ChevronDown
@@ -69,18 +58,26 @@ export function RequirementsZone({
 
       {open && (
         <div className="border-t-2 border-on-surface/10 p-5">
-          {requirements.length === 0 ? (
+          {items.length === 0 ? (
             <p className="text-body-sm text-on-surface-variant">Nothing to answer here.</p>
           ) : (
             <>
               {visible.length === 0 && (
                 <p className="text-body-sm text-on-surface-variant">
-                  All set. Answered items are hidden — <button className="underline underline-offset-2" type="button" onClick={() => setShowAnswered(true)}>show them</button>.
+                  All set. Answered items are hidden —{" "}
+                  <button
+                    className="underline underline-offset-2"
+                    type="button"
+                    onClick={() => setShowAnswered(true)}
+                  >
+                    show them
+                  </button>
+                  .
                 </p>
               )}
               <div className="grid gap-3 md:grid-cols-2">
-                {visible.map((r) => (
-                  <RequirementField key={r.key} req={r} onChange={(v) => onChange(r.key, v)} />
+                {visible.map((it) => (
+                  <IntakeItemField key={it.key} item={it} onChange={(v) => onChange(it, v)} />
                 ))}
               </div>
               {answered.length > 0 && unanswered.length > 0 && (
