@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Trophy,
   AlertTriangle,
+  ArrowRight,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
