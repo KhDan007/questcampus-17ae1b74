@@ -139,11 +139,10 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
             : s.kind === "eligibility"
               ? "Quick answer to confirm you match this school's requirements."
               : "One quick answer — saved everywhere it's asked.",
-      to: s.kind === "essay" ? "/essay" : "/dashboard",
+      to: s.kind === "essay" ? "/essay" : "/prep",
       cta: s.kind === "essay" ? "Draft in Essay Assistant" : "Open guided prep",
       Icon: stepIcon(s.kind),
       tone: "primary",
-      onClick: s.kind === "essay" ? undefined : scrollToPrep,
     };
     progressCopy = `${guided.doneCount} of ${guided.total} done`;
   } else if (guidedReady && guided.total > 0) {
@@ -155,12 +154,11 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
     def = {
       eyebrow: "You're ready",
       title: `Apply to ${readyName} — you're ready`,
-      desc: "Every required item is complete. Launch auto-apply from the guided prep section.",
-      to: "/dashboard",
+      desc: "Every required item is complete. Launch auto-apply from guided prep.",
+      to: "/prep",
       cta: "Launch auto-apply",
       Icon: Rocket,
       tone: "done",
-      onClick: scrollToPrep,
     };
     progressCopy = `${guided.doneCount} of ${guided.total} done`;
   } else {
