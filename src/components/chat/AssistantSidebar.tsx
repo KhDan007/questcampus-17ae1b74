@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
+import { Markdown } from "@/components/common/Markdown";
 import {
   useChatThreads,
   useThreadMessages,
