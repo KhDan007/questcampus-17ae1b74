@@ -28,9 +28,10 @@ import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
-import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+
 import { BestForAidSection } from "@/components/dashboard/BestForAidSection";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useGuidedSteps, describeGuidedStep } from "@/lib/apply/guidedSteps";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { CheckCircle2 } from "lucide-react";
 
@@ -273,24 +274,12 @@ function DashboardPage() {
             </SilentErrorBoundary>
           )}
 
-          {/* Two-column workspace: Prep + Search/Matches */}
+          {/* Compact Prep summary + Essay + Search */}
           <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {/* Prep */}
             {isAuthenticated ? (
-              <section id="dashboard-prep" className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
-
-                <div className="mb-3 flex items-baseline justify-between gap-3">
-                  <h2 className="font-display text-headline-sm font-bold text-on-surface">
-                    Prep applications
-                  </h2>
-                  <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                    Answer once, use everywhere
-                  </span>
-                </div>
-                <SilentErrorBoundary>
-                  <DashboardPrepSection />
-                </SilentErrorBoundary>
-              </section>
+              <SilentErrorBoundary>
+                <PrepSummaryCard />
+              </SilentErrorBoundary>
             ) : (
               <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
                 <h2 className="font-display text-headline-sm font-bold text-on-surface">
@@ -609,9 +598,9 @@ function ActiveApplyResumeCard() {
   );
 }
 
-function DashboardPrepSection() {
+function PrepSummaryCard() {
   const { saved } = useSavedUniversities();
-  const targets = useMemo(
+  const targets: BackendTarget[] = useMemo(
     () =>
       (saved ?? []).map((s) => ({
         system: s.source,
@@ -620,20 +609,104 @@ function DashboardPrepSection() {
       })),
     [saved],
   );
+  const guided = useGuidedSteps(targets);
 
   if (saved === undefined) {
     return (
-      <div className="h-40 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+      <div className="h-56 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
     );
   }
-  if (targets.length === 0) {
-    return (
-      <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-6 text-body-md text-on-surface-variant">
-        Save some universities first — we'll auto-research each one and surface the exact questions you need to answer.
+
+  const hasTargets = targets.length > 0;
+  const percent =
+    guided.total > 0 ? Math.round((guided.doneCount / guided.total) * 100) : 0;
+  const nextTitle = guided.next ? describeGuidedStep(guided.next) : null;
+  const isDone = hasTargets && guided.total > 0 && guided.doneCount === guided.total;
+
+  return (
+    <section
+      id="dashboard-prep"
+      className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+            Guided prep
+          </p>
+          <h2 className="mt-1 font-display text-headline-md font-bold text-on-surface">
+            Prep applications
+          </h2>
+          <p className="mt-1 text-body-sm text-on-surface-variant">
+            Answer once — reused everywhere.
+          </p>
+        </div>
+        {hasTargets && guided.total > 0 && (
+          <div className="shrink-0 text-right">
+            <p className="font-display text-headline-lg font-bold text-on-surface">
+              {percent}%
+            </p>
+            <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {guided.doneCount}/{guided.total}
+            </p>
+          </div>
+        )}
       </div>
-    );
-  }
-  return <CollectWorkspace targets={targets} />;
+
+      {hasTargets && guided.total > 0 && (
+        <div className="mt-4 h-2 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface">
+          <div
+            className="h-full bg-primary transition-[width] duration-500"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      )}
+
+      <div className="mt-4 flex-1">
+        {!hasTargets ? (
+          <p className="text-body-sm text-on-surface-variant">
+            Save some universities first — we'll surface the exact questions each one asks.
+          </p>
+        ) : guided.loading ? (
+          <p className="text-body-sm text-on-surface-variant">Loading your prep queue…</p>
+        ) : isDone ? (
+          <div className="flex items-center gap-2 rounded-lg border-2 border-on-surface/15 bg-tertiary-fixed px-3 py-2 text-on-tertiary-fixed">
+            <CheckCircle2 className="h-4 w-4" />
+            <p className="font-[var(--font-label)] text-label-md font-semibold">
+              Everything's ready — launch auto-apply.
+            </p>
+          </div>
+        ) : nextTitle ? (
+          <div className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-3">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
+              Next step
+            </p>
+            <p className="mt-1 font-display text-label-lg font-bold text-on-surface">
+              {nextTitle}
+            </p>
+          </div>
+        ) : (
+          <p className="text-body-sm text-on-surface-variant">
+            We're pulling the exact questions each university asks.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Link
+          to={hasTargets ? "/prep" : "/apply"}
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          {hasTargets ? (isDone ? "Review & launch" : "Continue prep") : "Pick universities"}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+        {hasTargets && guided.total > 0 && (
+          <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+            {guided.total - guided.doneCount} step{guided.total - guided.doneCount === 1 ? "" : "s"} left
+          </span>
+        )}
+      </div>
+    </section>
+  );
 }
 
 function YourPicksSection() {

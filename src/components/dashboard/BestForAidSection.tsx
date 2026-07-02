@@ -35,7 +35,7 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
             Ranked by affordability + need-based aid, from your saved schools.
           </p>
         </div>
-        <span className="hidden shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-tertiary px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm sm:inline-flex">
+        <span className="hidden shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-on-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-surface qc-hard-shadow-sm sm:inline-flex">
           <PiggyBank className="h-3.5 w-3.5" /> Aid-ranked
         </span>
       </header>
@@ -63,9 +63,9 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
   const scorePct = Math.max(0, Math.min(100, Math.round(rec.aidScore * 100)));
   const scoreTone =
     scorePct >= 75
-      ? "bg-tertiary text-on-surface"
+      ? "bg-tertiary text-on-tertiary"
       : scorePct >= 50
-        ? "bg-secondary text-on-surface"
+        ? "bg-primary text-white"
         : "bg-surface text-on-surface";
   const isLowConf = rec.confidence === "low";
   const reasons = rec.aidReasons.slice(0, 2);
