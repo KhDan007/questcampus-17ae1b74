@@ -133,6 +133,7 @@ export function CollectWorkspace({
               <EligibilityCard
                 eligibility={eligibility}
                 onAnswer={(askKey, value) => answerEligibility(askKey, value)}
+                showQuestions={false}
               />
             )}
 

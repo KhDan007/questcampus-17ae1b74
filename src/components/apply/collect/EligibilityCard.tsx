@@ -7,9 +7,10 @@ import type { EligibilityResult, EligQuestion } from "@/lib/apply/intake";
 type Props = {
   eligibility: EligibilityResult;
   onAnswer: (askKey: string, value: string) => void;
+  showQuestions?: boolean;
 };
 
-export function EligibilityCard({ eligibility, onAnswer }: Props) {
+export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }: Props) {
   const [open, setOpen] = useState(false);
   const [openWhy, setOpenWhy] = useState<string | null>(null);
   const [local, setLocal] = useState<Record<string, string>>({});
@@ -46,7 +47,7 @@ export function EligibilityCard({ eligibility, onAnswer }: Props) {
               A few eligibility questions
             </h3>
             <p className="mt-0.5 text-body-sm text-on-surface-variant">
-              {questions.length > 0
+              {showQuestions && questions.length > 0
                 ? `${questions.length} quick ${questions.length === 1 ? "question" : "questions"} to confirm fit.`
                 : "Confirm your fit for each university."}
               {ineligible.length > 0 && ` · ${ineligible.length} may not be a match.`}
@@ -60,7 +61,7 @@ export function EligibilityCard({ eligibility, onAnswer }: Props) {
 
       {open && (
         <div className="space-y-5 border-t-2 border-on-surface/10 p-5">
-          {questions.length > 0 && (
+          {showQuestions && questions.length > 0 && (
             <div className="grid gap-3 md:grid-cols-2">
               {questions.map((q) => (
                 <EligibilityQuestionField

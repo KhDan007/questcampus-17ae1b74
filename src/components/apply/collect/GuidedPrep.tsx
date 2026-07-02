@@ -99,6 +99,7 @@ export function GuidedPrep({
         <AllRequirements plan={plan} onChange={onSetAnswer} />
       ) : step ? (
         <StepCard
+          key={step.id}
           step={step}
           onAnswerEligibility={onAnswerEligibility}
           onSetAnswer={onSetAnswer}
