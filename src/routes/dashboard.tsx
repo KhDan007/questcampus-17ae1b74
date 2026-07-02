@@ -30,6 +30,7 @@ import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { CheckCircle2 } from "lucide-react";
 
 
@@ -87,12 +88,6 @@ const COMING_SOON = [
     title: "Deadline tracker",
     desc: "Every requirement, fee, and deadline auto-synced to your calendar.",
     icon: CalendarClock,
-  },
-  {
-    key: "autoapply",
-    title: "Auto-Apply",
-    desc: "One profile, every common application — pre-filled and submitted.",
-    icon: Send,
   },
   {
     key: "scholarships",
@@ -425,7 +420,7 @@ function DashboardPage() {
                 What's next
               </h2>
               <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                Tap to join the waitlist · 30% off monthly
+                Tap to join the waitlist · {WAITLIST_BASE_DISCOUNT}% off monthly
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -458,7 +453,7 @@ function DashboardPage() {
         open={!!modal}
         onClose={() => setModal(null)}
         title={modal ? `${modal.title} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off monthly access."
+        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
         feature={modal?.title}
       />
 
@@ -848,7 +843,7 @@ function TaskRail({ isAuthenticated }: { isAuthenticated: boolean }) {
       dot: "tertiary",
       title: `${ready} universit${ready === 1 ? "y" : "ies"} ready to prep`,
       subtitle: "Answer questions, then auto-apply",
-      to: "/apply/prep",
+      to: "/apply",
     });
   }
   if (isAuthenticated) {

@@ -19,7 +19,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
-import { fillPlaceholdersWithMocks, hasPlaceholders } from "@/lib/essays/mockStories";
+
 
 // -----------------------------------------------------------------------------
 // Types
@@ -726,26 +726,6 @@ function ResultCard({
         </p>
         {paid && !locked && (
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-            {hasPlaceholders(workingText) && (
-              <button
-                type="button"
-                onClick={() => {
-                  const { text, count } = fillPlaceholdersWithMocks(workingText);
-                  if (count === 0) return;
-                  setUndoStack((s) => [
-                    ...s,
-                    { text: workingText, label: `Autofill ${count} placeholder${count === 1 ? "" : "s"}` },
-                  ]);
-                  setWorkingText(text);
-                  setMissMsg(`Filled ${count} placeholder${count === 1 ? "" : "s"} with mock stories — edit any to make it yours.`);
-                  window.setTimeout(() => setMissMsg(null), 4000);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                title="Replace every [ADD: …] placeholder with a plausible mock sentence"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Autofill mock stories
-              </button>
-            )}
             <button
               type="button"
               onClick={applyAll}

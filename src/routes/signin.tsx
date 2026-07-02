@@ -8,6 +8,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
@@ -164,7 +165,7 @@ function SignInPage() {
                 Bookmark schools, track deadlines, and never re-do your answers.
               </Perk>
               <Perk icon={<ShieldCheck className="h-4 w-4" />} title="Waitlist pricing">
-                30% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
+                {WAITLIST_BASE_DISCOUNT}% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
               </Perk>
             </ul>
           </motion.aside>

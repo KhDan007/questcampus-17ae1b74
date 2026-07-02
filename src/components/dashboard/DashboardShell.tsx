@@ -25,6 +25,7 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 type Item =
   | {
@@ -305,7 +306,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         open={!!waitlist}
         onClose={() => setWaitlist(null)}
         title={waitlist ? `${waitlist} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off monthly access."
+        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
         feature={waitlist ?? undefined}
       />
 
