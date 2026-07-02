@@ -186,9 +186,9 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
           <div className="flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface">
             <Sparkles className="h-3.5 w-3.5" /> AI helper
           </div>
-          <p className="mt-1 whitespace-pre-wrap text-body-sm text-on-surface">
-            {answer}
-          </p>
+          <div className="mt-1">
+            <Markdown>{answer}</Markdown>
+          </div>
         </div>
       )}
 
