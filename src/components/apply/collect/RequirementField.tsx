@@ -1,124 +1,174 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
-import type { IntakeRequirement } from "@/lib/apply/intake";
+import { useEffect, useRef, useState } from "react";
+import { Check, Upload, FileText, Loader2 } from "lucide-react";
+import type { IntakeItem } from "@/lib/apply/intake";
+import { useApplicationDocuments, type DocType } from "@/lib/applyQueue/client";
 
 type Props = {
-  req: IntakeRequirement;
-  onChange: (value: unknown) => void;
-  compact?: boolean;
+  item: IntakeItem;
+  /** Called for field/essay only (kind !== document/video). Value is always a string. */
+  onChange: (value: string) => void;
 };
 
-function isAnswered(v: unknown): boolean {
-  if (v === undefined || v === null) return false;
-  if (typeof v === "string") return v.trim().length > 0;
-  if (Array.isArray(v)) return v.length > 0;
-  return true;
+function wordCount(s: string) {
+  return s.trim() ? s.trim().split(/\s+/).length : 0;
 }
 
-export function RequirementField({ req, onChange, compact }: Props) {
-  const [value, setValue] = useState<unknown>(req.value ?? (req.type === "multiselect" ? [] : ""));
+export function IntakeItemField({ item, onChange }: Props) {
+  const [value, setValue] = useState<string>(item.value ?? "");
 
   useEffect(() => {
-    setValue(req.value ?? (req.type === "multiselect" ? [] : ""));
+    setValue(item.value ?? "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [req.key]);
+  }, [item.conceptKey, item.key]);
 
-  function update(v: unknown) {
+  function update(v: string) {
     setValue(v);
     onChange(v);
   }
 
-  const answered = isAnswered(value);
-  const label = req.label ?? req.question ?? req.key;
-  const options = (req.options ?? []).map((o) =>
-    typeof o === "string" ? { value: o, label: o } : { value: o.value, label: o.label ?? o.value },
-  );
+  const answered = item.answered || (value?.trim().length ?? 0) > 0;
+  const askedBy =
+    item.targetNames.length === 0
+      ? null
+      : item.targetNames.length <= 2
+        ? `Asked by ${item.targetNames.join(", ")}`
+        : `Asked by ${item.targetNames.slice(0, 1).join(", ")} +${item.targetNames.length - 1}`;
 
   return (
-    <div
-      className={`rounded-xl border-2 border-on-surface/15 bg-surface p-4 transition-colors ${answered ? "border-on-surface/25" : ""}`}
-    >
+    <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
       <div className="flex items-start justify-between gap-3">
-        <label className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
-          {label}
-          {req.required && <span className="ml-1 text-primary">*</span>}
-        </label>
+        <div className="min-w-0">
+          <label className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+            {item.label}
+            {item.required && <span className="ml-1 text-primary">*</span>}
+          </label>
+          {askedBy && (
+            <p className="mt-0.5 text-label-sm text-on-surface-variant">{askedBy}</p>
+          )}
+        </div>
         {answered && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-tertiary/20 px-2 py-0.5 text-label-sm text-on-surface">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-tertiary/25 px-2 py-0.5 text-label-sm text-on-surface">
             <Check className="h-3 w-3" /> Saved
           </span>
         )}
       </div>
-      {req.help && !compact && (
-        <p className="mt-1 text-body-sm text-on-surface-variant">{req.help}</p>
+
+      {item.kind === "document" || item.kind === "video" ? (
+        <DocumentUploadSlot item={item} />
+      ) : item.kind === "essay" ? (
+        <EssayInput item={item} value={value} onChange={update} />
+      ) : item.type === "select" ? (
+        <select
+          value={value}
+          onChange={(e) => update(e.target.value)}
+          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+        >
+          <option value="">Select…</option>
+          {(item.enumOptions ?? []).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+      ) : item.type === "textarea" ? (
+        <textarea
+          value={value}
+          onChange={(e) => update(e.target.value)}
+          rows={3}
+          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+        />
+      ) : (
+        <input
+          type={item.type === "date" ? "date" : item.type === "number" ? "number" : item.type === "email" ? "email" : item.type === "tel" ? "tel" : "text"}
+          value={value}
+          onChange={(e) => update(e.target.value)}
+          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+        />
       )}
-      <div className="mt-3">
-        {req.type === "textarea" ? (
-          <textarea
-            value={String(value ?? "")}
-            onChange={(e) => update(e.target.value)}
-            rows={3}
-            className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
-          />
-        ) : req.type === "select" ? (
-          <select
-            value={String(value ?? "")}
-            onChange={(e) => update(e.target.value)}
-            className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+    </div>
+  );
+}
+
+function EssayInput({ item, value, onChange }: { item: IntakeItem; value: string; onChange: (v: string) => void }) {
+  const wc = wordCount(value);
+  const over = item.wordLimit ? wc > item.wordLimit : false;
+  return (
+    <>
+      {item.prompt && (
+        <p className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-3 py-2 text-body-sm text-on-surface-variant">
+          {item.prompt}
+        </p>
+      )}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={6}
+        className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+      />
+      {item.wordLimit && (
+        <p className={`mt-1 text-label-sm ${over ? "text-on-error-container" : "text-on-surface-variant"}`}>
+          {wc} / {item.wordLimit} words
+        </p>
+      )}
+    </>
+  );
+}
+
+function DocumentUploadSlot({ item }: { item: IntakeItem }) {
+  const { docs, upload } = useApplicationDocuments();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const docType = (item.docType ?? "other") as DocType;
+  const existing = (docs ?? []).find((d) => d.docType === docType);
+
+  async function onPick(file: File | null | undefined) {
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await upload(file, docType);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-3">
+      {existing ? (
+        <div className="flex items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
+          <FileText className="h-4 w-4 text-on-surface" />
+          <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">{existing.fileName}</span>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
           >
-            <option value="">Select…</option>
-            {options.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        ) : req.type === "multiselect" ? (
-          <div className="flex flex-wrap gap-2">
-            {options.map((o) => {
-              const arr = Array.isArray(value) ? (value as string[]) : [];
-              const on = arr.includes(o.value);
-              return (
-                <button
-                  type="button"
-                  key={o.value}
-                  onClick={() =>
-                    update(on ? arr.filter((v) => v !== o.value) : [...arr, o.value])
-                  }
-                  className={`rounded-full border-2 px-3 py-1 text-label-sm ${on ? "border-on-surface bg-primary text-white" : "border-on-surface/25 bg-surface text-on-surface"}`}
-                >
-                  {o.label}
-                </button>
-              );
-            })}
-          </div>
-        ) : req.type === "boolean" ? (
-          <div className="flex gap-2">
-            {["yes", "no"].map((opt) => {
-              const on = String(value) === opt;
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update(opt)}
-                  className={`rounded-md border-2 px-3 py-1.5 text-label-sm capitalize ${on ? "border-on-surface bg-primary text-white" : "border-on-surface/25 bg-surface text-on-surface"}`}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <input
-            type={req.type === "date" ? "date" : req.type === "number" ? "number" : "text"}
-            value={String(value ?? "")}
-            onChange={(e) => update(e.target.value)}
-            className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
-          />
-        )}
-      </div>
+            Replace
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+          className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-on-surface/30 bg-surface px-3 py-3 font-[var(--font-label)] text-label-md text-on-surface hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {busy ? "Uploading…" : `Upload ${item.label.toLowerCase()}`}
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => onPick(e.target.files?.[0])}
+      />
+      {error && <p className="mt-1 text-label-sm text-on-error-container">{error}</p>}
     </div>
   );
 }

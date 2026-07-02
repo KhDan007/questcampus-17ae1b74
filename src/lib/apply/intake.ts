@@ -6,53 +6,87 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { SelectionItem } from "@/lib/applyQueue/selection";
 
-/**
- * Convert local selection items into the target shape the backend expects.
- * Backend targets are `{ source, externalId }` pairs.
- */
-export function selectionToTargets(items: SelectionItem[]) {
-  return items.map((i) => ({ source: i.source, externalId: i.externalId }));
+/** Backend target shape uses `system` (SelectionItem.source → system). */
+export type BackendTarget = { system: string; externalId: string; name?: string };
+
+export function selectionToTargets(items: SelectionItem[]): BackendTarget[] {
+  return items.map((i) => ({ system: i.source, externalId: i.externalId, name: i.name }));
 }
 
-export type IntakeRequirement = {
+export type IntakeItemKind = "field" | "essay" | "document" | "video";
+
+export type IntakeItem = {
   key: string;
-  label?: string;
-  question?: string;
-  help?: string;
-  type?: "text" | "textarea" | "select" | "multiselect" | "date" | "number" | "boolean" | "file" | string;
-  options?: Array<{ value: string; label?: string } | string>;
-  required?: boolean;
-  value?: unknown;
-  answered?: boolean;
-  group?: string;
+  kind: IntakeItemKind;
+  conceptKey?: string;
+  docType?: string;
+  label: string;
+  type: string; // text|email|date|number|tel|select|textarea
+  enumOptions?: string[];
+  prompt?: string;
+  wordLimit?: number;
+  required: boolean;
+  targetCount: number;
+  targetNames: string[];
+  answered: boolean;
+  value?: string;
 };
 
 export type IntakeTarget = {
-  source: string;
+  system: string;
   externalId: string;
-  name?: string;
-  found?: boolean;
+  name: string;
+  found: boolean;
 };
 
 export type IntakePlan = {
-  shared?: IntakeRequirement[];
-  specific?: Array<{
-    target: IntakeTarget;
-    requirements?: IntakeRequirement[];
-  }>;
-  targets?: IntakeTarget[];
+  targets: IntakeTarget[];
+  shared: IntakeItem[];
+  specific: { system: string; externalId: string; name: string; items: IntakeItem[] }[];
+  manualNotes: { kind: "fee" | "recommender"; targetNames: string[] }[];
+  summary: { totalAskable: number; answered: number; remaining: number };
 };
 
-export type EligibilityEntry = {
-  target: IntakeTarget;
-  ready?: boolean;
-  blockers?: Array<{ key?: string; message: string; severity?: "hard" | "soft" }>;
-  questions?: IntakeRequirement[];
+export type EligQuestion = {
+  askKey: string;
+  label: string;
+  kind: "select" | "number" | "text" | "boolean";
+  options?: string[];
+};
+
+export type EligibilityBlocker = {
+  criterion: string;
+  label: string;
+  askKey: string;
+  evidence?: string;
+  evidenceUrl?: string;
+};
+
+export type EligibilityPerTarget = {
+  system: string;
+  externalId: string;
+  name: string;
+  verdict: "eligible" | "ineligible" | "unknown";
+  blockers: EligibilityBlocker[];
+  warnings: EligibilityBlocker[];
+  unknowns: EligibilityBlocker[];
+  questions: EligQuestion[];
 };
 
 export type EligibilityResult = {
-  entries?: EligibilityEntry[];
+  overall: "eligible" | "ineligible" | "unknown";
+  questions: EligQuestion[];
+  perTarget: EligibilityPerTarget[];
+};
+
+export type ChecklistResult = {
   overallReady?: boolean;
+  perTarget: {
+    system: string;
+    externalId: string;
+    found: boolean;
+    checklist: { ready: boolean; [k: string]: unknown };
+  }[];
 };
 
 export type AutoApplyEntitlement = {
@@ -63,27 +97,29 @@ export type AutoApplyEntitlement = {
   applyCount?: number;
 };
 
-export function useIntakePlan(targets: Array<{ source: string; externalId: string }>) {
+export function useIntakePlan(targets: BackendTarget[]) {
   const { token } = useAuth();
   const args = token && targets.length > 0 ? { token, targets } : "skip";
   return useQuery(api.applications.intakePlan, args as never) as IntakePlan | undefined;
 }
 
-export function useEligibility(targets: Array<{ source: string; externalId: string }>) {
+export function useEligibility(targets: BackendTarget[]) {
   const { token } = useAuth();
   const args = token && targets.length > 0 ? { token, targets } : "skip";
-  return useQuery(api.applications.eligibilityForTargets, args as never) as EligibilityResult | undefined;
-}
-
-export function useChecklist(targets: Array<{ source: string; externalId: string }>) {
-  const { token } = useAuth();
-  const args = token && targets.length > 0 ? { token, targets } : "skip";
-  return useQuery(api.applications.checklistForTargets, args as never) as
-    | { entries?: Array<{ target: IntakeTarget; ready?: boolean; missing?: string[] }> }
+  return useQuery(api.applications.eligibilityForTargets, args as never) as
+    | EligibilityResult
     | undefined;
 }
 
-export function useAutoApplyEntitlement(targets: Array<{ source: string; externalId: string }>) {
+export function useChecklist(targets: BackendTarget[]) {
+  const { token } = useAuth();
+  const args = token && targets.length > 0 ? { token, targets } : "skip";
+  return useQuery(api.applications.checklistForTargets, args as never) as
+    | ChecklistResult
+    | undefined;
+}
+
+export function useAutoApplyEntitlement(targets: BackendTarget[]) {
   const { token } = useAuth();
   const args = token && targets.length > 0 ? { token, targets } : "skip";
   return useQuery(api.applications.autoApplyEntitlement, args as never) as
@@ -91,12 +127,15 @@ export function useAutoApplyEntitlement(targets: Array<{ source: string; externa
     | undefined;
 }
 
-/** Debounced setAnswer with per-key coalescing. */
+/**
+ * Debounced setAnswer. Universal answer store — one value per conceptKey,
+ * shared across all universities. Empty string clears.
+ */
 export function useSetAnswer(debounceMs = 400) {
   const { token } = useAuth();
   const mutate = useMutation(api.applications.setAnswer);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const pending = useRef<Record<string, unknown>>({});
+  const pending = useRef<Record<string, string>>({});
 
   useEffect(() => {
     return () => {
@@ -105,57 +144,53 @@ export function useSetAnswer(debounceMs = 400) {
   }, []);
 
   return useCallback(
-    (args: {
-      key: string;
-      value: unknown;
-      target?: { source: string; externalId: string } | null;
-      scope?: "shared" | "specific";
-    }) => {
-      if (!token) return;
-      const scopeKey = args.target ? `${args.target.source}::${args.target.externalId}::${args.key}` : `shared::${args.key}`;
-      pending.current[scopeKey] = args.value;
-      if (timers.current[scopeKey]) clearTimeout(timers.current[scopeKey]);
-      timers.current[scopeKey] = setTimeout(() => {
-        const value = pending.current[scopeKey];
-        delete pending.current[scopeKey];
-        delete timers.current[scopeKey];
-        mutate({
-          token,
-          key: args.key,
-          value,
-          target: args.target ?? undefined,
-          scope: args.scope,
-        } as never).catch((e) => console.warn("setAnswer failed", e));
+    (conceptKey: string, value: string) => {
+      if (!token || !conceptKey) return;
+      pending.current[conceptKey] = value;
+      if (timers.current[conceptKey]) clearTimeout(timers.current[conceptKey]);
+      timers.current[conceptKey] = setTimeout(() => {
+        const v = pending.current[conceptKey];
+        delete pending.current[conceptKey];
+        delete timers.current[conceptKey];
+        mutate({ token, conceptKey, value: v } as never).catch((e) =>
+          console.warn("setAnswer failed", e),
+        );
       }, debounceMs);
     },
     [token, mutate, debounceMs],
   );
 }
 
-export function useAnswerEligibility() {
+/**
+ * Batched eligibility answers. Backend takes the WHOLE record every time —
+ * we merge locally and debounce.
+ */
+export function useAnswerEligibility(debounceMs = 400) {
   const { token } = useAuth();
   const mutate = useMutation(api.applications.answerEligibility);
-  return useCallback(
-    (args: { target: { source: string; externalId: string }; key: string; value: unknown }) => {
-      if (!token) return Promise.resolve();
-      return mutate({ token, ...args } as never).catch((e) => {
-        console.warn("answerEligibility failed", e);
-      });
-    },
-    [token, mutate],
-  );
-}
+  const buffer = useRef<Record<string, string>>({});
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-/** Utility: total answered / total required across a plan for progress UI. */
-export function summarizePlan(plan: IntakePlan | undefined) {
-  if (!plan) return { total: 0, answered: 0, percent: 0 };
-  const all: IntakeRequirement[] = [];
-  (plan.shared ?? []).forEach((r) => all.push(r));
-  (plan.specific ?? []).forEach((s) => (s.requirements ?? []).forEach((r) => all.push(r)));
-  const total = all.length;
-  const answered = all.filter((r) => r.answered || (r.value !== undefined && r.value !== null && r.value !== "")).length;
-  const percent = total === 0 ? 0 : Math.round((answered / total) * 100);
-  return { total, answered, percent };
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
+
+  return useCallback(
+    (askKey: string, value: string) => {
+      if (!token || !askKey) return;
+      buffer.current[askKey] = value;
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => {
+        const answers = { ...buffer.current };
+        mutate({ token, answers } as never).catch((e) =>
+          console.warn("answerEligibility failed", e),
+        );
+      }, debounceMs);
+    },
+    [token, mutate, debounceMs],
+  );
 }
 
 export function useTargetsFromSelection(items: SelectionItem[]) {

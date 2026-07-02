@@ -7,11 +7,11 @@ import { useApplySelection } from "@/lib/applyQueue/selection";
 import {
   useAnswerEligibility,
   useAutoApplyEntitlement,
+  useChecklist,
   useEligibility,
   useIntakePlan,
   useSetAnswer,
   useTargetsFromSelection,
-  summarizePlan,
   type IntakeTarget,
 } from "@/lib/apply/intake";
 import { RequirementsZone } from "./RequirementsZone";
@@ -26,15 +26,19 @@ export function CollectWorkspace() {
 
   const plan = useIntakePlan(targets);
   const eligibility = useEligibility(targets);
+  const checklist = useChecklist(targets);
   const entitlement = useAutoApplyEntitlement(targets);
   const setAnswer = useSetAnswer();
   const answerEligibility = useAnswerEligibility();
 
-  const summary = useMemo(() => summarizePlan(plan), [plan]);
+  const summary = plan?.summary;
+  const percent = summary && summary.totalAskable > 0
+    ? Math.round((summary.answered / summary.totalAskable) * 100)
+    : 0;
 
   const planTargets: IntakeTarget[] = useMemo(() => {
     if (plan?.targets && plan.targets.length > 0) return plan.targets;
-    return items.map((i) => ({ source: i.source, externalId: i.externalId, name: i.name, found: true }));
+    return items.map((i) => ({ system: i.source, externalId: i.externalId, name: i.name, found: true }));
   }, [plan, items]);
 
   if (items.length === 0) {
@@ -76,16 +80,16 @@ export function CollectWorkspace() {
               </p>
             </div>
             <div className="hidden text-right sm:block">
-              <p className="font-display text-display-sm font-bold text-on-surface">{summary.percent}%</p>
+              <p className="font-display text-display-sm font-bold text-on-surface">{percent}%</p>
               <p className="text-label-sm text-on-surface-variant">
-                {summary.answered} / {summary.total} answered
+                {summary?.answered ?? 0} / {summary?.totalAskable ?? 0} answered
               </p>
             </div>
           </div>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
             <div
               className="h-full bg-primary transition-[width] duration-300"
-              style={{ width: `${summary.percent}%` }}
+              style={{ width: `${percent}%` }}
             />
           </div>
         </header>
@@ -98,18 +102,20 @@ export function CollectWorkspace() {
           </div>
         ) : (
           <>
-            <EligibilityCard
-              entries={eligibility?.entries ?? []}
-              onAnswer={(target, key, value) => {
-                void answerEligibility({ target, key, value });
-              }}
-            />
+            {eligibility && (
+              <EligibilityCard
+                eligibility={eligibility}
+                onAnswer={(askKey, value) => answerEligibility(askKey, value)}
+              />
+            )}
 
             <RequirementsZone
               title="Shared essentials"
               subtitle="Used across every application on your list."
-              requirements={plan?.shared ?? []}
-              onChange={(key, value) => setAnswer({ key, value, scope: "shared" })}
+              items={plan?.shared ?? []}
+              onChange={(item, value) => {
+                if (item.conceptKey) setAnswer(item.conceptKey, value);
+              }}
             />
 
             <section className="space-y-3">
@@ -122,18 +128,19 @@ export function CollectWorkspace() {
                 </p>
               </div>
               {(plan?.specific ?? []).map((s) => {
-                const notFound = s.target.found === false;
+                const t = plan?.targets.find(
+                  (x) => x.system === s.system && x.externalId === s.externalId,
+                );
+                const notFound = t?.found === false;
                 if (notFound) {
                   return (
                     <div
-                      key={`${s.target.source}::${s.target.externalId}`}
+                      key={`${s.system}::${s.externalId}`}
                       className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-on-surface/20 bg-surface/80 p-4"
                     >
                       <Loader2 className="h-4 w-4 animate-spin text-on-surface-variant" />
                       <p className="text-body-sm text-on-surface-variant">
-                        <span className="font-semibold text-on-surface">
-                          {s.target.name ?? s.target.externalId}:
-                        </span>{" "}
+                        <span className="font-semibold text-on-surface">{s.name}:</span>{" "}
                         researching requirements… we'll add its questions when ready.
                       </p>
                     </div>
@@ -141,17 +148,12 @@ export function CollectWorkspace() {
                 }
                 return (
                   <RequirementsZone
-                    key={`${s.target.source}::${s.target.externalId}`}
-                    title={s.target.name ?? s.target.externalId}
-                    requirements={s.requirements ?? []}
-                    onChange={(key, value) =>
-                      setAnswer({
-                        key,
-                        value,
-                        target: { source: s.target.source, externalId: s.target.externalId },
-                        scope: "specific",
-                      })
-                    }
+                    key={`${s.system}::${s.externalId}`}
+                    title={s.name}
+                    items={s.items}
+                    onChange={(item, value) => {
+                      if (item.conceptKey) setAnswer(item.conceptKey, value);
+                    }}
                   />
                 );
               })}
@@ -161,16 +163,36 @@ export function CollectWorkspace() {
                 </p>
               )}
             </section>
+
+            {(plan?.manualNotes ?? []).length > 0 && (
+              <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+                <h3 className="font-display text-headline-sm font-bold text-on-surface">
+                  Handle manually
+                </h3>
+                <ul className="mt-2 space-y-1.5">
+                  {(plan?.manualNotes ?? []).map((n, i) => (
+                    <li key={i} className="text-body-sm text-on-surface-variant">
+                      <span className="font-semibold capitalize text-on-surface">{n.kind}:</span>{" "}
+                      {n.targetNames.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </>
         )}
       </div>
 
       <div className="space-y-4">
-        <ReadinessRail targets={planTargets} eligibility={eligibility?.entries} />
+        <ReadinessRail
+          targets={planTargets}
+          eligibility={eligibility?.perTarget}
+          checklist={checklist}
+        />
       </div>
 
       <div className="lg:col-span-2">
-        <LaunchBar entitlement={entitlement} percent={summary.percent} />
+        <LaunchBar entitlement={entitlement} percent={percent} />
       </div>
     </div>
   );
