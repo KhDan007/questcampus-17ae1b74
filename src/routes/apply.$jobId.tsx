@@ -384,6 +384,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
             }
           }}
           busy={acting}
+          isDemo={isDemo}
         />
       )}
     </>
