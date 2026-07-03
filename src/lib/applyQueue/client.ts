@@ -203,9 +203,12 @@ export function useApplyActions() {
     [token, enqueue],
   );
 
-  const startDemo = useCallback(async () => {
+  const startDemo = useCallback(async (fresh?: boolean) => {
     if (!token) throw new Error("Sign in required");
-    const res = (await enqueueDemo({ token })) as { jobId: string; reused?: boolean };
+    const res = (await enqueueDemo({ token, ...(fresh ? { fresh: true } : {}) })) as {
+      jobId: string;
+      reused?: boolean;
+    };
     return { jobId: res.jobId, reused: res.reused ?? false };
   }, [token, enqueueDemo]);
 
