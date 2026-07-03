@@ -2,7 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+
 
 /*
  * Design system definition.
@@ -97,40 +97,6 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
-}
 
 @layer base {
   * {
@@ -146,72 +112,149 @@
 
 /* ============================================================
    QuestCampus design tokens — Illuminated Path (Electric Coral)
+   Light default + Midnight Coral dark. Tokens are defined as CSS
+   variables on :root / .dark so the .dark class can override them,
+   then mapped into Tailwind utilities via @theme inline.
    Fonts loaded via Google Fonts <link> in __root.tsx.
    ============================================================ */
 @theme {
   --font-display: "Epilogue", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
   --font-label: "Geist", ui-sans-serif, system-ui, sans-serif;
+}
 
-  --color-surface: #fdf9f5;
-  --color-surface-dim: #ddd9d6;
-  --color-surface-bright: #fdf9f5;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f7f3ef;
-  --color-surface-container: #f1ede9;
-  --color-surface-container-high: #ebe7e4;
-  --color-surface-container-highest: #e5e2de;
-  --color-surface-variant: #e5e2de;
-  --color-surface-tint: #b3272c;
+@theme inline {
+  --color-surface: var(--qc-surface);
+  --color-surface-dim: var(--qc-surface-dim);
+  --color-surface-bright: var(--qc-surface-bright);
+  --color-surface-container-lowest: var(--qc-surface-container-lowest);
+  --color-surface-container-low: var(--qc-surface-container-low);
+  --color-surface-container: var(--qc-surface-container);
+  --color-surface-container-high: var(--qc-surface-container-high);
+  --color-surface-container-highest: var(--qc-surface-container-highest);
+  --color-surface-variant: var(--qc-surface-variant);
+  --color-surface-tint: var(--qc-surface-tint);
 
-  --color-on-surface: #1c1c19;
-  --color-on-surface-variant: #5a413f;
-  --color-background: #fdf9f5;
-  --color-on-background: #1c1c19;
+  --color-on-surface: var(--qc-on-surface);
+  --color-on-surface-variant: var(--qc-on-surface-variant);
+  --color-background: var(--qc-background);
+  --color-on-background: var(--qc-on-background);
 
-  --color-inverse-surface: #31302e;
-  --color-inverse-on-surface: #f4f0ec;
-  --color-inverse-primary: #ffb3ae;
+  --color-inverse-surface: var(--qc-inverse-surface);
+  --color-inverse-on-surface: var(--qc-inverse-on-surface);
+  --color-inverse-primary: var(--qc-inverse-primary);
 
-  --color-outline: #8d706e;
-  --color-outline-variant: #e2bebc;
+  --color-outline: var(--qc-outline);
+  --color-outline-variant: var(--qc-outline-variant);
 
-  --color-primary: #b3272c;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #ff5f5d;
-  --color-on-primary-container: #64000b;
+  --color-primary: var(--qc-primary);
+  --color-on-primary: var(--qc-on-primary);
+  --color-primary-container: var(--qc-primary-container);
+  --color-on-primary-container: var(--qc-on-primary-container);
 
-  --color-secondary: #7c5800;
-  --color-on-secondary: #ffffff;
-  --color-secondary-container: #feb700;
-  --color-on-secondary-container: #6b4b00;
+  --color-secondary: var(--qc-secondary);
+  --color-on-secondary: var(--qc-on-secondary);
+  --color-secondary-container: var(--qc-secondary-container);
+  --color-on-secondary-container: var(--qc-on-secondary-container);
 
-  --color-tertiary: #3b6934;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #71a267;
-  --color-on-tertiary-container: #073707;
+  --color-tertiary: var(--qc-tertiary);
+  --color-on-tertiary: var(--qc-on-tertiary);
+  --color-tertiary-container: var(--qc-tertiary-container);
+  --color-on-tertiary-container: var(--qc-on-tertiary-container);
 
-  --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-error: var(--qc-error);
+  --color-on-error: var(--qc-on-error);
+  --color-error-container: var(--qc-error-container);
+  --color-on-error-container: var(--qc-on-error-container);
 
-  --color-primary-fixed: #ffdad7;
-  --color-primary-fixed-dim: #ffb3ae;
-  --color-on-primary-fixed: #410005;
-  --color-on-primary-fixed-variant: #910818;
-  --color-secondary-fixed: #ffdea8;
-  --color-secondary-fixed-dim: #ffba20;
-  --color-on-secondary-fixed: #271900;
-  --color-on-secondary-fixed-variant: #5e4200;
-  --color-tertiary-fixed: #bcf0ae;
-  --color-tertiary-fixed-dim: #a1d494;
-  --color-on-tertiary-fixed: #002201;
-  --color-on-tertiary-fixed-variant: #23501e;
+  --color-primary-fixed: var(--qc-primary-fixed);
+  --color-primary-fixed-dim: var(--qc-primary-fixed-dim);
+  --color-on-primary-fixed: var(--qc-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--qc-on-primary-fixed-variant);
+  --color-secondary-fixed: var(--qc-secondary-fixed);
+  --color-secondary-fixed-dim: var(--qc-secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--qc-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--qc-on-secondary-fixed-variant);
+  --color-tertiary-fixed: var(--qc-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--qc-tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--qc-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--qc-on-tertiary-fixed-variant);
 
-  --color-bucket-safety: #3b6934;
-  --color-bucket-target: #2e4a7a;
-  --color-bucket-reach: #5e2150;
+  --color-bucket-safety: var(--qc-bucket-safety);
+  --color-bucket-target: var(--qc-bucket-target);
+  --color-bucket-reach: var(--qc-bucket-reach);
+}
+
+:root {
+  /* Light — Illuminated Path (default) */
+  --qc-surface: #fdf9f5;
+  --qc-surface-dim: #ddd9d6;
+  --qc-surface-bright: #fdf9f5;
+  --qc-surface-container-lowest: #ffffff;
+  --qc-surface-container-low: #f7f3ef;
+  --qc-surface-container: #f1ede9;
+  --qc-surface-container-high: #ebe7e4;
+  --qc-surface-container-highest: #e5e2de;
+  --qc-surface-variant: #e5e2de;
+  --qc-surface-tint: #b3272c;
+
+  --qc-on-surface: #1c1c19;
+  --qc-on-surface-variant: #5a413f;
+  --qc-background: #fdf9f5;
+  --qc-on-background: #1c1c19;
+
+  --qc-inverse-surface: #31302e;
+  --qc-inverse-on-surface: #f4f0ec;
+  --qc-inverse-primary: #ffb3ae;
+
+  --qc-outline: #8d706e;
+  --qc-outline-variant: #e2bebc;
+
+  --qc-primary: #b3272c;
+  --qc-on-primary: #ffffff;
+  --qc-primary-container: #ff5f5d;
+  --qc-on-primary-container: #64000b;
+
+  --qc-secondary: #7c5800;
+  --qc-on-secondary: #ffffff;
+  --qc-secondary-container: #feb700;
+  --qc-on-secondary-container: #6b4b00;
+
+  --qc-tertiary: #3b6934;
+  --qc-on-tertiary: #ffffff;
+  --qc-tertiary-container: #71a267;
+  --qc-on-tertiary-container: #073707;
+
+  --qc-error: #ba1a1a;
+  --qc-on-error: #ffffff;
+  --qc-error-container: #ffdad6;
+  --qc-on-error-container: #93000a;
+
+  --qc-primary-fixed: #ffdad7;
+  --qc-primary-fixed-dim: #ffb3ae;
+  --qc-on-primary-fixed: #410005;
+  --qc-on-primary-fixed-variant: #910818;
+  --qc-secondary-fixed: #ffdea8;
+  --qc-secondary-fixed-dim: #ffba20;
+  --qc-on-secondary-fixed: #271900;
+  --qc-on-secondary-fixed-variant: #5e4200;
+  --qc-tertiary-fixed: #bcf0ae;
+  --qc-tertiary-fixed-dim: #a1d494;
+  --qc-on-tertiary-fixed: #002201;
+  --qc-on-tertiary-fixed-variant: #23501e;
+
+  --qc-bucket-safety: #3b6934;
+  --qc-bucket-target: #2e4a7a;
+  --qc-bucket-reach: #5e2150;
+
+  --qc-grain-color: 28, 28, 25;
+  --qc-shadow-color: 28, 28, 25;
+  --qc-shadow-strength: 1;
+}
+
+
+@theme {
+
 
   --radius-sm: 0.25rem;
   --radius-DEFAULT: 0.5rem;
@@ -234,6 +277,11 @@
   --text-display-lg-mobile--letter-spacing: -0.02em;
   --text-display-lg-mobile--font-weight: 700;
 
+  --text-display-md: 2.25rem;
+  --text-display-md--line-height: 2.75rem;
+  --text-display-md--letter-spacing: -0.02em;
+  --text-display-md--font-weight: 700;
+
   --text-headline-lg: 2rem;
   --text-headline-lg--line-height: 2.5rem;
   --text-headline-lg--font-weight: 700;
@@ -251,6 +299,14 @@
 
   --text-body-md: 1rem;
   --text-body-md--line-height: 1.5rem;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.375rem;
+
+  --text-label-lg: 1rem;
+  --text-label-lg--line-height: 1.5rem;
+  --text-label-lg--letter-spacing: 0.01em;
+  --text-label-lg--font-weight: 600;
 
   --text-label-md: 0.875rem;
   --text-label-md--line-height: 1.25rem;
@@ -348,9 +404,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
 .animate-shimmer { background-size: 200% 200%; animation: shimmer 4s ease-in-out infinite; }
 
 .qc-grain {
-  background-image: radial-gradient(rgba(28,28,25,0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(var(--qc-grain-color), 0.07) 1px, transparent 1px);
   background-size: 3px 3px;
 }
+
 
 .qc-hard-shadow { box-shadow: 4px 4px 0 0 var(--color-on-surface); }
 .qc-hard-shadow-primary { box-shadow: 5px 5px 0 0 var(--color-primary); }

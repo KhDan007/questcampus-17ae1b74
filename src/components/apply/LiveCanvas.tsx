@@ -8,6 +8,10 @@ type Props = {
   ticket: string | undefined;
   /** When false, input events are not forwarded. */
   interactive?: boolean;
+  /** When true, force-close the socket (e.g. terminal job status). */
+  disconnect?: boolean;
+  /** Called with the CloseEvent code so parent can re-fetch ticket on 1006/1008. */
+  onClose?: (code: number) => void;
 };
 
 const SRC_W = 1280;
@@ -17,7 +21,13 @@ const SRC_H = 800;
  * Renders the worker browser screencast and forwards mouse / wheel / keyboard
  * events back over the WebSocket. Coordinates are scaled to the 1280×800 source.
  */
-export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
+export function LiveCanvas({
+  wsEndpoint,
+  ticket,
+  interactive = true,
+  disconnect = false,
+  onClose,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<"idle" | "connecting" | "open" | "closed" | "error">(
@@ -27,7 +37,7 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
 
   // Connect WS
   useEffect(() => {
-    if (!wsEndpoint || !ticket) return;
+    if (!wsEndpoint || !ticket || disconnect) return;
     setStatus("connecting");
     setHasFrame(false);
 
@@ -43,7 +53,10 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
 
     ws.onopen = () => setStatus("open");
     ws.onerror = () => setStatus("error");
-    ws.onclose = () => setStatus("closed");
+    ws.onclose = (ev) => {
+      setStatus("closed");
+      onClose?.(ev.code);
+    };
 
     ws.onmessage = (e) => {
       let msg: { t?: string; data?: string } | null = null;
@@ -73,7 +86,19 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
       }
       wsRef.current = null;
     };
-  }, [wsEndpoint, ticket]);
+  }, [wsEndpoint, ticket, disconnect, onClose]);
+
+  // Prevent page scroll when the user scrolls over the canvas.
+  // React's onWheel is passive; attach a non-passive listener manually.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !interactive) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+    };
+    canvas.addEventListener("wheel", handler, { passive: false });
+    return () => canvas.removeEventListener("wheel", handler);
+  }, [interactive]);
 
   // Scale page-coords -> source canvas coords (1280×800)
   function toSource(ev: { clientX: number; clientY: number }): { x: number; y: number } | null {
@@ -150,20 +175,37 @@ export function LiveCanvas({ wsEndpoint, ticket, interactive = true }: Props) {
           if (!p) return;
           send({ t: "wheel", x: p.x, y: p.y, deltaX: e.deltaX, deltaY: e.deltaY });
         }}
+        onCompositionEnd={(e) => {
+          if (!interactive) return;
+          const text = e.data;
+          if (text) send({ t: "key", type: "char", text });
+        }}
         onKeyDown={(e) => {
           if (!interactive) return;
+          // Ignore composing keystrokes (IME): the composition handler covers them.
+          if (e.nativeEvent.isComposing || e.keyCode === 229) return;
           e.preventDefault();
+          const isPrintable =
+            e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+          if (isPrintable) {
+            // Send exactly ONE char event — never double up with keyDown text.
+            send({ t: "key", type: "char", text: e.key });
+            return;
+          }
           send({
             t: "key",
             type: "keyDown",
             key: e.key,
             code: e.code,
-            text: e.key.length === 1 ? e.key : "",
             keyCode: e.keyCode,
           });
         }}
         onKeyUp={(e) => {
           if (!interactive) return;
+          if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+          const isPrintable =
+            e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+          if (isPrintable) return; // no keyUp for printable chars (char event already delivered)
           e.preventDefault();
           send({
             t: "key",

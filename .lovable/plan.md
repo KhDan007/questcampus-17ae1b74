@@ -1,83 +1,56 @@
-# Apply Flow Redesign
+# Diagnosis — dashboard white-screens after filling application info
 
-The current Apply experience hides the primary CTA inside a small icon button on saved-uni cards, has no multi-select, no guided onboarding for the user's own data, and dumps the user on a waiting screen while deep research runs. We'll rebuild it as a four-stage flow with the same backend.
+No code changes. Findings below map to your numbered questions.
 
-## The four stages
+## 1. Where the mutation fires
 
-```text
-1. Pick      →  2. Prep         →  3. Research          →  4. Apply
-   Multi-      Guided profile +    Background w/        Live browser
-   select      doc onboarding      productive work         + submit
+The only place the user can fill "application info" that reaches the dashboard is `DashboardPrepSection` → `CollectWorkspace` (`src/routes/dashboard.tsx:281–283` → `src/components/apply/collect/CollectWorkspace.tsx`).
+
+- `RequirementField` (`RequirementsZone.tsx:80`) → `onChange` → `CollectWorkspace.tsx:144, 182` → `setAnswer(conceptKey, value)` from `useSetAnswer` (`src/lib/apply/intake.ts:130–158`), debounced 400 ms → `api.applications.setAnswer` (`intake.ts:150`). Writes to `applicationAnswers`.
+- `EligibilityCard` (`EligibilityCard.tsx:29`) → `onChange` → `CollectWorkspace.tsx:135` → `answerEligibility(askKey, value)` from `useAnswerEligibility` (`intake.ts:164–190`), debounced 400 ms → `api.applications.answerEligibility` (`intake.ts:170`). Buffer never cleared (`intake.ts:181`) — sends the *accumulated* answers object every subsequent call. Rewrites the onboarding profile → `profileHash` moves.
+
+## 2. Reactive dashboard queries that depend on those writes
+
+All args are `{ token, targets }` where each `target = { system, externalId, name }` (only 3 fields; no extras leak — verified at `dashboard.tsx:605–613, 632–640, 726–734, 799–807` and `intake.ts:9–11` `selectionToTargets`). So hypothesis 3(a) — strict arg validator throw — is **not** the cause.
+
+Subscribed on the dashboard (all inside `SilentErrorBoundary`, so a throw here disappears the *section* silently and looks like "the dashboard broke"):
+
+| Component | Query | Depends on |
+| --- | --- | --- |
+| `StatBar` (`dashboard.tsx:735`) | `api.applications.intakePlan` | answers |
+| `YourPicksSection` (`dashboard.tsx:641`) | `api.applications.intakePlan` | answers |
+| `TaskRail` (`dashboard.tsx:808`) | `api.applications.intakePlan` | answers |
+| `DashboardPrepSection` → `CollectWorkspace` (`CollectWorkspace.tsx:35–38`) | `intakePlan`, `eligibilityForTargets`, `checklistForTargets`, `autoApplyEntitlement` | answers + onboarding profile |
+| `NextProductiveAction` (unused on dashboard now, but wired via `useApplicationDocuments`) | `api.applicationDocuments.list` | not affected |
+
+Not reactive: `useActiveApplyJob` (one-shot `client.query` in `useEffect`, `applyQueue/client.ts:96–121`) and the recommendations action (`dashboard.tsx:144, 160`) — a `useAction` in a `useEffect` gated on `[sessionId, isAuthenticated, token, ...]`, not on profileHash. So hypothesis (4) — the dashboard reactively consuming a nulled `recommendations` cache — is **not** the cause. Recommendations only refetch on `?refresh=1` or first mount.
+
+## 3. What actually throws — most-likely root cause
+
+**`src/components/apply/collect/CollectWorkspace.tsx:57–67` — the `readyTargets` `useMemo`, specifically line 65:**
+
+```ts
+return (c?.checklist.ready ?? false) && e?.verdict !== "ineligible";
 ```
 
-The user moves linearly but can re-enter any stage from a left-rail stepper at the top of `/apply`.
+`c` is a `checklist.perTarget[i]` entry. The `ChecklistResult` type in `intake.ts:98–107` declares `checklist: { ready: boolean; [k]: unknown }`, but backend `checklistForTargets` returns per-target entries for **still-researching** targets where `found: false` and `checklist` is `undefined` (there is no requirements set to evaluate yet). Before the first `setAnswer` / `answerEligibility` fires, `checklist` is `undefined` (still loading) → `c` is `undefined` via optional chaining → the expression short-circuits to `false` → no throw.
 
-## 1. Pick — intuitive Apply confirmation + multi-select
+The moment `setAnswer` (or `answerEligibility`) resolves, Convex reactively re-runs `checklistForTargets`. Now it returns a populated `perTarget` array that *includes* the `found:false` entries with a missing/undefined `checklist`. `c` becomes truthy, `c?.checklist` becomes `undefined`, and `.ready` throws:
 
-- On the saved-uni grid (`/apply` and `MyUniversitiesSection`), every card becomes a **selectable tile** with a visible checkbox in the top-right corner and a giant primary "Start application" pill across the bottom of each card. No more 12px "Apply" icon buttons.
-- A persistent **bottom action bar** appears the moment ≥1 card is checked: "Apply to N universities" + secondary "Deep-research only". This is the multi-select confirm step.
-- On `/universities` matches view: every match card gets the same checkbox + "Add to apply queue" action so the user can build the batch from anywhere.
-- Hitting "Apply to N" goes to stage 2 with the selected IDs in route search params.
-
-## 2. Prep — guided one-question-at-a-time onboarding
-
-A new route `/apply/prep` shows a single-column wizard, one prompt per screen, with progress dots at top:
-
-```text
-Your name → Date of birth → Citizenship → High school → GPA →
-Test scores → Activities → Documents (transcript, PS, recs, passport, resume) →
-Review & confirm
+```
+TypeError: Cannot read properties of undefined (reading 'ready')
 ```
 
-Each step:
-- One big question in display type, a clear input, "Continue" pill, "Back" link.
-- Inline helper text ("This is what universities ask for. You can edit later.").
-- Document steps wrap `DocumentManager` rows one at a time with skip option.
-- Skipped or missing fields surface a small "3 fields still needed" chip on every later screen.
-- The whole wizard auto-saves to the existing applicant-profile mutation after each step (no "save" button).
+Thrown during the `useMemo` computation → propagates through render → caught by the `<SilentErrorBoundary>` around `DashboardPrepSection` (`dashboard.tsx:281–283`). The whole Prep column collapses to `null`, which — because the user was typing in it — looks like "the dashboard broke / white-screened / crashed".
 
-The same backend doc + profile mutations are reused; only the UI is new.
+The identical pattern in `ReadinessRail.tsx:47–52` (`c?.checklist.ready`, `c?.found`) shares the same failure mode inside the same subtree, guaranteeing a throw somewhere in that render pass even if the memo is skipped.
 
-## 3. Research — kick off + redirect to productive work
+## 4. Recommendations cache / profileHash
 
-When the user finishes prep (or clicks "Deep-research only" from stage 1):
-- We enqueue an apply job **per selected uni** and immediately navigate to `/apply` hub showing a **Research dock** at the top: small live progress chips for each uni driven by `api.ingest.deepResearch.deepResearchProgress({ system, externalId })`.
-- The hero of `/apply` switches to a **"While we research, do this"** card with 2–3 suggested productive actions ranked by progress signals: finish profile gaps, upload missing doc, draft personal statement (link to `/essay`), refine recommendations. Each is a single primary CTA, not a list.
-- Status states render per spec: `researching_deep` → compact progress with stage/message, `ready` → green check + "Open application", `paywalled` → amber chip with copy, `error` → muted chip "Couldn't finish — public requirements still available". Never block the page.
+Not consumed reactively on the dashboard. `answerEligibility` does change `profileHash` server-side, but the dashboard's `recs` are pulled once via an action into local `saved` state (`dashboard.tsx:139, 158–191`). It won't null out mid-session.
 
-## 4. Apply — already exists, only entry-point changes
+## Single most-likely root cause
 
-When a uni flips to `ready`, the progress chip's CTA routes into the existing `/apply/$jobId` live-browser flow. No changes there.
+`src/components/apply/collect/CollectWorkspace.tsx:65` — `(c?.checklist.ready ?? false)` throws `TypeError: Cannot read properties of undefined (reading 'ready')` on the reactive `checklistForTargets` re-run that follows `setAnswer`/`answerEligibility`, because the backend returns `perTarget` entries with `checklist` undefined for still-researching targets. Same-shape hazard at `ReadinessRail.tsx:47` and `:52`. The `SilentErrorBoundary` around `DashboardPrepSection` swallows it and empties the section, which is what the user perceives as the dashboard breaking.
 
-## Files
-
-New:
-- `src/routes/apply.prep.tsx` — guided wizard route
-- `src/components/apply/PrepWizard.tsx` — step engine + one-question-per-screen UI
-- `src/components/apply/ApplyStepper.tsx` — Pick/Prep/Research/Apply rail used on apply screens
-- `src/components/apply/SelectableUniCard.tsx` — checkbox + big CTA card used in saved + matches views
-- `src/components/apply/BatchActionBar.tsx` — sticky bottom bar shown when selection > 0
-- `src/components/apply/ResearchDock.tsx` — live progress chips for in-flight jobs
-- `src/components/apply/NextProductiveAction.tsx` — single-CTA "while we research" card
-- `src/lib/applyQueue/selection.ts` — small zustand-free hook (`useApplySelection`) for the cross-page selection set, persisted in `sessionStorage`
-- `src/lib/applyQueue/deepResearch.ts` — `useDeepResearchProgress({ system, externalId })` wrapping the Convex query
-
-Modified:
-- `src/routes/apply.tsx` — new layout: stepper, Research dock, NextProductiveAction, then docs, then `SelectableUniCard` grid + `BatchActionBar`
-- `src/routes/universities.tsx` — wrap each result/match card with selectable wrapper; show `BatchActionBar`
-- `src/components/profile/MyUniversitiesSection.tsx` — use `SelectableUniCard`
-- `src/components/apply/ApplyButton.tsx` — keep for single-uni quick-apply, restyle to match new visual weight (full-width primary inside card)
-- `src/components/apply/DocumentManager.tsx` — expose a "compact step" variant the wizard reuses
-
-Backend: zero changes. Reuses `enqueueApply`, `liveTicket`, `deepResearchProgress`, existing doc + profile mutations.
-
-## Design register
-
-Product UI (per Impeccable product register). Carry over the project's existing tokens (`bg-surface`, `border-on-surface`, `qc-hard-shadow`, primary/tertiary). Motion is restrained: one-question wizard slides horizontally with `motion` x-transition + opacity, progress chips animate the percent bar only. Reduced-motion fallback: crossfade.
-
-## Out of scope this pass
-
-- Backend changes
-- Per-uni custom essays (different feature)
-- Reordering the application queue (can add later if asked)
-- Visual redesign of the existing `/apply/$jobId` live-browser page
+Fix (for the next build turn, not now): treat `c?.checklist?.ready` (extra `?.`) at both call sites, and mirror the guard in `ReadinessRail` line 47 (`c?.checklist?.ready`, `c?.found ?? false`).

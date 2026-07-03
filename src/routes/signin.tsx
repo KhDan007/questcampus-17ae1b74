@@ -8,6 +8,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
@@ -58,7 +59,7 @@ function SignInPage() {
     if (doc?.completed) {
       navigate({ to: "/dashboard", replace: true });
     } else {
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/onboarding", replace: true });
     }
   }
 
@@ -164,7 +165,7 @@ function SignInPage() {
                 Bookmark schools, track deadlines, and never re-do your answers.
               </Perk>
               <Perk icon={<ShieldCheck className="h-4 w-4" />} title="Waitlist pricing">
-                30% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
+                {WAITLIST_BASE_DISCOUNT}% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
               </Perk>
             </ul>
           </motion.aside>
@@ -266,7 +267,7 @@ function SignInPage() {
               <button
                 type="submit"
                 disabled={submitting || googleLoading}
-                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary shadow-[0_8px_24px_-6px_rgba(79,70,229,0.45)] transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

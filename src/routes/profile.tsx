@@ -22,6 +22,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Your profile — QuestCampus" }] }),
@@ -149,7 +150,7 @@ function ProfilePage() {
               <div
                 className="animate-aurora-1 absolute -left-20 -top-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
                 style={{
-                  background: "radial-gradient(circle, rgba(79,70,229,0.28), transparent 65%)",
+                  background: "radial-gradient(circle, rgba(179,39,44,0.28), transparent 65%)",
                 }}
               />
               <div
@@ -181,7 +182,7 @@ function ProfilePage() {
                 )}
                 <p className="mt-3 max-w-2xl text-body-md text-on-surface-variant">
                   Everything you've matched and built lives here. We'll keep adding tools as they
-                  ship — waitlist members get 30% off monthly access.
+                  ship — waitlist members get {WAITLIST_BASE_DISCOUNT}% off monthly access.
                 </p>
               </div>
 
@@ -204,7 +205,7 @@ function ProfilePage() {
                 tone="primary"
               />
               <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
-              <Stat label="Waitlist discount" value="30% off" tone="accent" />
+              <Stat label="Waitlist discount" value={`${WAITLIST_BASE_DISCOUNT}% off`} tone="accent" />
             </div>
           </div>
         </motion.section>
@@ -325,7 +326,7 @@ function ProfilePage() {
             Coming soon to your account
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            Join the waitlist to lock in 30% off monthly access.
+            Join the waitlist to lock in {WAITLIST_BASE_DISCOUNT}% off monthly access.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <UpcomingTile
@@ -377,7 +378,7 @@ function ProfilePage() {
         open={waitlistOpen}
         onClose={() => setWaitlistOpen(false)}
         title="Coming soon"
-        body="Join the waitlist and we'll email you the moment this is ready — 30% off monthly access locked in."
+        body={`Join the waitlist and we'll email you the moment this is ready — ${WAITLIST_BASE_DISCOUNT}% off monthly access locked in.`}
       />
     </>
   );

@@ -14,6 +14,8 @@ import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
+import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
+
 
 import appCss from "../styles.css?url";
 import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
@@ -125,6 +127,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: "try{document.documentElement.classList.remove('dark')}catch(e){}" }} />
       </head>
       <body>
         <a href="#main-content" className="skip-link">
@@ -153,6 +156,8 @@ function RootComponent() {
             <Outlet />
           </RouteTransitions>
           <EmailVerifyGate />
+          <AssistantSidebar />
+
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>

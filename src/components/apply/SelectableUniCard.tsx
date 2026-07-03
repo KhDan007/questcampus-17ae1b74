@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, GraduationCap, MapPin, Plus, X } from "lucide-react";
+import { Check, GraduationCap, MapPin, Plus, Sparkles, X } from "lucide-react";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 
 type Props = {
@@ -9,10 +9,11 @@ type Props = {
   name: string;
   city?: string;
   country?: string;
+  researched?: boolean;
   onApplyNow?: () => void;
 };
 
-export function SelectableUniCard({ source, externalId, name, city, country, onApplyNow }: Props) {
+export function SelectableUniCard({ source, externalId, name, city, country, researched, onApplyNow }: Props) {
   const { isSelected, toggle, remove } = useApplySelection();
   const selected = isSelected(source, externalId);
   const location = [city, country].filter(Boolean).join(", ");
@@ -63,6 +64,12 @@ export function SelectableUniCard({ source, externalId, name, city, country, onA
         </span>
       </span>
 
+      {researched && (
+        <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-md border-2 border-tertiary bg-tertiary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
+          <Sparkles className="h-3 w-3" /> Already researched
+        </span>
+      )}
+
       <span
         className={`mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 px-3 py-2 font-[var(--font-label)] text-label-md font-bold transition-colors ${
           selected
@@ -76,7 +83,8 @@ export function SelectableUniCard({ source, externalId, name, city, country, onA
           </>
         ) : (
           <>
-            <Plus className="h-3.5 w-3.5" /> Add to batch
+            <Plus className="h-3.5 w-3.5" />
+            {researched ? "Add to batch" : "Add to batch"}
           </>
         )}
       </span>

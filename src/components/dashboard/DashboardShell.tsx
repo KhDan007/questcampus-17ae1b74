@@ -10,6 +10,7 @@ import {
   PenLine,
   Activity,
   CalendarClock,
+  ClipboardList,
   Send,
   Settings as SettingsIcon,
   Sparkles,
@@ -25,6 +26,7 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
 type Item =
   | {
@@ -44,6 +46,22 @@ type Item =
     };
 
 const TOP_ITEMS: Item[] = [
+  {
+    kind: "link",
+    key: "autoapply",
+    label: "Applications",
+    to: "/apply",
+    icon: Send,
+    match: (p) => p.startsWith("/apply") || p.startsWith("/application"),
+  },
+  {
+    kind: "link",
+    key: "commonapp",
+    label: "Common App",
+    to: "/common-app",
+    icon: ClipboardList,
+    match: (p) => p.startsWith("/common-app"),
+  },
   {
     kind: "link",
     key: "universities",
@@ -73,14 +91,6 @@ const TOP_ITEMS: Item[] = [
     label: "Deadlines",
     icon: CalendarClock,
     feature: "Deadline tracker",
-  },
-  {
-    kind: "link",
-    key: "autoapply",
-    label: "Auto-Apply",
-    to: "/apply",
-    icon: Send,
-    match: (p) => p.startsWith("/apply"),
   },
 ];
 
@@ -232,7 +242,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           )}
         </aside>
 
-        <div className="w-full min-w-0">{children}</div>
+        <div className="w-full min-w-0 lg:-ml-5">{children}</div>
       </div>
 
       {/* Mobile open button (FAB) */}
@@ -305,7 +315,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         open={!!waitlist}
         onClose={() => setWaitlist(null)}
         title={waitlist ? `${waitlist} — coming soon` : "Coming soon"}
-        body="Join the waitlist to be first in line and lock in 30% off monthly access."
+        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
         feature={waitlist ?? undefined}
       />
 

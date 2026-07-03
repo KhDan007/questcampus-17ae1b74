@@ -62,18 +62,14 @@ function JobChip({ job }: { job: ApplyJob }) {
 
 function ResearchDockInner() {
   const { token } = useAuth();
-  const jobs = useQuery(
-    api.applyQueue.myActiveJobs,
-    token ? { token } : "skip",
-  ) as ApplyJob[] | undefined;
-
-  // Fallback to single-active if the bulk query isn't there
-  const single = useQuery(
+  // Contract exposes ONLY `myActiveJob` (singular, non-terminal or null).
+  const raw = useQuery(
     api.applyQueue.myActiveJob,
-    token && !jobs ? { token } : "skip",
-  ) as ApplyJob | null | undefined;
+    token ? { token } : "skip",
+  ) as (ApplyJob & { _id?: string }) | null | undefined;
+  const single = raw ? ({ ...raw, jobId: raw.jobId ?? (raw._id as string) } as ApplyJob) : raw;
 
-  const list = jobs ?? (single ? [single] : []);
+  const list = single ? [single] : [];
   if (!token || list.length === 0) return null;
 
   return (

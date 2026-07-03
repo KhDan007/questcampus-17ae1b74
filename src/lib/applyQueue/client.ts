@@ -20,7 +20,11 @@ export type ApplicationDocument = {
   mime?: string;
   size?: number;
   uploadedAt?: number;
+  hasFile?: boolean;
 };
+
+/** Backend upload cap. Files above this are rejected before requesting a ticket. */
+export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 export type ApplyJobStatus =
   | "queued"
@@ -48,8 +52,8 @@ export type ApplyJobCheckpoint =
 
 export type ApplyJobActivity = {
   ts: number;
-  level?: "info" | "warn" | "error";
-  message: string;
+  text: string;
+  type: "status" | "fill" | "unmatched" | "review" | string;
 };
 
 export type ApplyJob = {
@@ -68,12 +72,20 @@ export type ApplyJob = {
   error?: string;
 };
 
+function normalizeJob<T extends { _id?: string; jobId?: string } | null | undefined>(
+  doc: T,
+): T extends null | undefined ? T : ApplyJob {
+  if (!doc) return doc as never;
+  return { ...doc, jobId: doc.jobId ?? (doc._id as string) } as never;
+}
+
 export function useApplyJob(jobId: string | undefined) {
   const { token } = useAuth();
-  return useQuery(
+  const raw = useQuery(
     api.applyQueue.getApplyJob,
     token && jobId ? { token, jobId } : "skip",
-  ) as ApplyJob | undefined;
+  ) as (ApplyJob & { _id?: string }) | undefined;
+  return raw ? normalizeJob(raw) : raw;
 }
 
 export function useActiveApplyJob() {
@@ -93,7 +105,10 @@ export function useActiveApplyJob() {
     client
       .query(api.applyQueue.myActiveJob, { token })
       .then((result) => {
-        if (!cancelled) setJob((result as ApplyJob | null | undefined) ?? null);
+        if (!cancelled) {
+          const raw = result as (ApplyJob & { _id?: string }) | null | undefined;
+          setJob(raw ? normalizeJob(raw) : null);
+        }
       })
       .catch((error) => {
         console.warn("Unable to load active application job", error);
@@ -117,11 +132,14 @@ export function useApplicationDocuments() {
   const requestTicket = useMutation(api.applicationDocuments.requestUploadTicket);
   const recordDoc = useMutation(api.applicationDocuments.record);
   const removeDoc = useMutation(api.applicationDocuments.remove);
-  const downloadUrlMut = useMutation(api.applicationDocuments.downloadUrl);
+  const convex = useConvex();
 
   const upload = useCallback(
     async (file: File, docType: DocType) => {
       if (!token) throw new Error("Sign in required");
+      if (file.size > MAX_UPLOAD_BYTES) {
+        throw new Error("File is too large. Max size is 25 MB.");
+      }
       const { uploadUrl, oracleKey, ticket } = (await requestTicket({
         token,
         docType,
@@ -156,12 +174,14 @@ export function useApplicationDocuments() {
   const getDownloadUrl = useCallback(
     async (id: string): Promise<string | null> => {
       if (!token) return null;
-      const res = (await downloadUrlMut({ token, id })) as { url?: string } | string | null;
-      if (!res) return null;
-      if (typeof res === "string") return res;
-      return res.url ?? null;
+      // downloadUrl is a QUERY that returns a bare URL string or null.
+      const res = (await convex.query(api.applicationDocuments.downloadUrl, {
+        token,
+        id,
+      })) as string | null;
+      return res ?? null;
     },
-    [token, downloadUrlMut],
+    [token, convex],
   );
 
   return { docs, upload, remove, getDownloadUrl };
@@ -170,17 +190,27 @@ export function useApplicationDocuments() {
 export function useApplyActions() {
   const { token } = useAuth();
   const enqueue = useMutation(api.applyQueue.enqueueApply);
+  const enqueueDemo = useMutation(api.applyQueue.enqueueDemoApply);
   const cancel = useMutation(api.applyQueue.cancelApply);
   const confirmCheckpoint = useMutation(api.applyQueue.confirmCheckpoint);
 
   const startApply = useCallback(
     async (args: { system: string; externalId: string; targetName?: string }) => {
       if (!token) throw new Error("Sign in required");
-      const res = (await enqueue({ token, ...args })) as { jobId: string };
-      return res.jobId;
+      const res = (await enqueue({ token, ...args })) as { jobId: string; reused?: boolean };
+      return { jobId: res.jobId, reused: res.reused ?? false };
     },
     [token, enqueue],
   );
+
+  const startDemo = useCallback(async (fresh?: boolean) => {
+    if (!token) throw new Error("Sign in required");
+    const res = (await enqueueDemo({ token, ...(fresh ? { fresh: true } : {}) })) as {
+      jobId: string;
+      reused?: boolean;
+    };
+    return { jobId: res.jobId, reused: res.reused ?? false };
+  }, [token, enqueueDemo]);
 
   const cancelJob = useCallback(
     async (jobId: string) => {
@@ -198,7 +228,7 @@ export function useApplyActions() {
     [token, confirmCheckpoint],
   );
 
-  return { startApply, cancelJob, confirm };
+  return { startApply, startDemo, cancelJob, confirm };
 }
 
 export async function fetchLiveTicket(

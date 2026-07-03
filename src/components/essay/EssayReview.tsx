@@ -19,7 +19,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
-import { fillPlaceholdersWithMocks, hasPlaceholders } from "@/lib/essays/mockStories";
+
 
 // -----------------------------------------------------------------------------
 // Types
@@ -39,6 +39,7 @@ type Dimension = {
   label: string;
   score: number;
   rationale: string;
+  quote?: string;
 };
 
 type Comment = {
@@ -49,8 +50,12 @@ type Comment = {
 
 type Rewrite = { before: string; after: string; why: string };
 
+type Band = "needs_work" | "competitive" | "strong" | "exceptional";
+
 type ReviewFree = {
   overall: number;
+  band?: Band;
+  bandLabel?: string;
   verdict: string;
   dimensions: Dimension[];
   topTip: string;
@@ -90,33 +95,68 @@ type Mode = "paste" | "upload" | "pick";
 // Helpers
 // -----------------------------------------------------------------------------
 
-function tierColor(overall: number): { ring: string; text: string; chip: string; label: string } {
+function tierColor(
+  overall: number,
+  band?: Band,
+  bandLabel?: string,
+): { ring: string; text: string; chip: string; label: string } {
+  // Prefer the backend band when present (deterministic + calibrated).
+  if (band) {
+    if (band === "exceptional")
+      return {
+        ring: "#b45309",
+        text: "text-amber-800",
+        chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+        label: bandLabel ?? "Exceptional",
+      };
+    if (band === "strong")
+      return {
+        ring: "#0d9488",
+        text: "text-teal-700",
+        chip: "border-2 border-on-surface bg-primary text-white",
+        label: bandLabel ?? "Strong",
+      };
+    if (band === "competitive")
+      return {
+        ring: "#0369a1",
+        text: "text-sky-800",
+        chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+        label: bandLabel ?? "Competitive",
+      };
+    return {
+      ring: "#6b7280",
+      text: "text-on-surface",
+      chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+      label: bandLabel ?? "Needs work",
+    };
+  }
+  // Fallback thresholds — rebased for the stricter, calibrated scale.
   if (overall >= 85)
     return {
-      ring: "#0d9488",
-      text: "text-teal-700",
-      chip: "bg-teal-100 text-teal-800",
-      label: "Outstanding",
+      ring: "#b45309",
+      text: "text-amber-800",
+      chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+      label: "Exceptional",
     };
   if (overall >= 70)
     return {
-      ring: "#16a34a",
-      text: "text-green-700",
-      chip: "bg-green-100 text-green-800",
+      ring: "#0d9488",
+      text: "text-teal-700",
+      chip: "border-2 border-on-surface bg-primary text-white",
       label: "Strong",
     };
-  if (overall >= 50)
+  if (overall >= 55)
     return {
-      ring: "#d97706",
-      text: "text-amber-700",
-      chip: "bg-amber-100 text-amber-900",
-      label: "Promising — work to do",
+      ring: "#0369a1",
+      text: "text-sky-800",
+      chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+      label: "Competitive",
     };
   return {
-    ring: "#dc2626",
-    text: "text-red-700",
-    chip: "bg-red-100 text-red-800",
-    label: "Needs another pass",
+    ring: "#6b7280",
+    text: "text-on-surface",
+    chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+    label: "Needs work",
   };
 }
 
@@ -583,7 +623,7 @@ function ResultCard({
 }) {
   const reduce = useReducedMotion();
   const { free, paid, locked, sourceLabel, wordCount } = result;
-  const tier = tierColor(free.overall);
+  const tier = tierColor(free.overall, free.band, free.bandLabel);
 
   // Working text — what's actually shown / edited. Diverges from originalBody
   // when the user applies rewrites.
@@ -714,11 +754,19 @@ function ResultCard({
             <h2 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
               {sourceLabel}
             </h2>
-            <span
-              className={`mt-1 inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}
-            >
-              {tier.label}
-            </span>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="font-display text-headline-sm font-bold text-on-surface">
+                {free.overall} / 100
+              </span>
+              <span
+                className={`inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-bold ${tier.chip}`}
+              >
+                {tier.label}
+              </span>
+            </div>
+            <p className="mt-1 max-w-sm text-label-sm text-on-surface-variant">
+              Scored by two independent graders, averaged — calibrated against real admitted essays.
+            </p>
           </div>
         </div>
         <p className="font-display text-headline-sm text-on-surface text-balance sm:border-l-2 sm:border-on-surface/10 sm:pl-5">
@@ -726,26 +774,6 @@ function ResultCard({
         </p>
         {paid && !locked && (
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-            {hasPlaceholders(workingText) && (
-              <button
-                type="button"
-                onClick={() => {
-                  const { text, count } = fillPlaceholdersWithMocks(workingText);
-                  if (count === 0) return;
-                  setUndoStack((s) => [
-                    ...s,
-                    { text: workingText, label: `Autofill ${count} placeholder${count === 1 ? "" : "s"}` },
-                  ]);
-                  setWorkingText(text);
-                  setMissMsg(`Filled ${count} placeholder${count === 1 ? "" : "s"} with mock stories — edit any to make it yours.`);
-                  window.setTimeout(() => setMissMsg(null), 4000);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                title="Replace every [ADD: …] placeholder with a plausible mock sentence"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Autofill mock stories
-              </button>
-            )}
             <button
               type="button"
               onClick={applyAll}
@@ -1110,6 +1138,11 @@ function Workspace({
                     </p>
                     <Dots score={d.score} />
                   </div>
+                  {d.quote && (
+                    <p className="mt-1 border-l-2 border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
+                      &ldquo;…{d.quote}…&rdquo;
+                    </p>
+                  )}
                   <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
                 </div>
               ))}
@@ -1271,6 +1304,11 @@ function LockedTeaser({
               <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
               <Dots score={d.score} />
             </div>
+            {d.quote && (
+              <p className="mt-1 border-l-2 border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
+                &ldquo;…{d.quote}…&rdquo;
+              </p>
+            )}
             <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
           </motion.li>
         ))}

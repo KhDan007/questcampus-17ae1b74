@@ -1,19 +1,34 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CheckSquare, Search, Send, Square } from "lucide-react";
+import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckSquare,
+  ClipboardList,
+  Loader2,
+  Play,
+  Search,
+  Send,
+  Square,
+} from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
 import { ApplyStepper } from "@/components/apply/ApplyStepper";
 import { ResearchDock } from "@/components/apply/ResearchDock";
+import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
+import { useApplyActions } from "@/lib/applyQueue/client";
+import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useCommonAppProfile } from "@/lib/apply/commonAppProfile";
+import { useMemo, useState } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
-export const Route = createFileRoute("/apply")({
+export const Route = createFileRoute("/apply/")({
   head: () => ({
     meta: [
       { title: "Auto-Apply — QuestCampus" },
@@ -62,12 +77,22 @@ function ApplyHubPage() {
             Select one or many. Prep your details once. We deep-research each portal, fill it in a
             live browser, and hand you the wheel before submit.
           </p>
+          <div className="mt-6">
+            <RunLiveDemoCard />
+          </div>
         </header>
 
         <div className="mt-8 space-y-8">
           <SilentErrorBoundary>
+            <CommonAppProfileCard />
+          </SilentErrorBoundary>
+
+          <ResumeBanner />
+
+          <SilentErrorBoundary>
             <ResearchDock />
           </SilentErrorBoundary>
+
 
           <SilentErrorBoundary>
             <NextProductiveAction />
@@ -97,6 +122,18 @@ function ApplyHubPage() {
 function SavedToPick() {
   const { saved } = useSavedUniversities();
   const { count, items, toggle, clear } = useApplySelection();
+  const planTargets: BackendTarget[] = useMemo(
+    () => (saved ?? []).map((u) => ({ system: u.source, externalId: u.externalId, name: u.name })),
+    [saved],
+  );
+  const plan = useIntakePlan(planTargets);
+  const researchedSet = useMemo(() => {
+    const s = new Set<string>();
+    (plan?.targets ?? []).forEach((t) => {
+      if (t.found) s.add(`${t.system}::${t.externalId}`);
+    });
+    return s;
+  }, [plan]);
 
   if (!saved || saved.length === 0) {
     return (
@@ -167,10 +204,122 @@ function SavedToPick() {
               name={u.name}
               city={u.city}
               country={u.country}
+              researched={researchedSet.has(`${u.source}::${u.externalId}`)}
             />
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+function RunLiveDemoCard() {
+  const navigate = useNavigate();
+  const { startDemo } = useApplyActions();
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onClick = async () => {
+    if (starting) return;
+    setError(null);
+    setStarting(true);
+    try {
+      const { jobId } = await startDemo(true);
+      await navigate({ to: "/apply/$jobId", params: { jobId } });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't start demo");
+      setStarting(false);
+    }
+  };
+
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+      <div className="flex flex-wrap items-center gap-4 sm:flex-nowrap">
+        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+          <Play className="h-5 w-5 text-primary" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            See it in action — live demo
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            Watch auto-apply open a real browser and fill a test form in ~60 seconds. Nothing is submitted.
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <button
+            type="button"
+            onClick={onClick}
+            disabled={starting}
+            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+          >
+            {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            {starting ? "Starting demo…" : "Run live demo"}
+          </button>
+          {error && (
+            <p role="alert" className="text-label-sm font-semibold text-primary">
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CommonAppProfileCard() {
+  const profile = useCommonAppProfile();
+  if (profile === undefined || profile === null) return null;
+  const c = profile.completeness;
+  const percent = Math.max(0, Math.min(100, Math.round(c?.percent ?? 0)));
+  const complete = c?.complete ?? false;
+  return (
+    <section
+      className={
+        "rounded-2xl border-2 p-5 sm:p-6 " +
+        (complete
+          ? "border-on-surface/20 bg-surface qc-hard-shadow-sm"
+          : "border-on-surface bg-primary-fixed qc-hard-shadow")
+      }
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
+            <ClipboardList className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              Universal profile
+            </p>
+            <h3 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
+              Common App Profile — {percent}% complete
+            </h3>
+            <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
+              {complete
+                ? "You're set. We'll auto-fill every Common App school."
+                : "Fill this once and every Common App application gets pre-filled for you."}
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/common-app"
+          className={
+            "inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none " +
+            (complete
+              ? "bg-surface text-on-surface"
+              : "bg-primary text-white")
+          }
+        >
+          {complete ? "Review profile" : "Complete your profile"}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+        <div
+          className={"h-full transition-[width] duration-300 " + (complete ? "bg-tertiary" : "bg-primary")}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
     </section>
   );
 }
