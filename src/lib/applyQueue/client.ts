@@ -52,8 +52,8 @@ export type ApplyJobCheckpoint =
 
 export type ApplyJobActivity = {
   ts: number;
-  level?: "info" | "warn" | "error";
-  message: string;
+  text: string;
+  type: "status" | "fill" | "unmatched" | "review" | string;
 };
 
 export type ApplyJob = {

@@ -297,17 +297,17 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                 <li
                   key={`${a.ts}-${i}`}
                   className={`flex items-start gap-2 rounded-md px-2 py-1.5 ${
-                    a.level === "error"
-                      ? "bg-error-container/40 text-on-error-container"
-                      : a.level === "warn"
-                        ? "bg-tertiary-container/40 text-on-surface"
+                    a.type === "unmatched"
+                      ? "bg-tertiary-container/40 text-on-surface"
+                      : a.type === "review"
+                        ? "font-medium text-on-surface"
                         : "text-on-surface"
                   }`}
                 >
                   <span className="mt-0.5 text-label-sm tabular-nums text-on-surface-variant">
                     {new Date(a.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
-                  <span className="min-w-0 flex-1 break-words">{a.message}</span>
+                  <span className="min-w-0 flex-1 break-words">{a.text}</span>
                 </li>
               ))
             )}
