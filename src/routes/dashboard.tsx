@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import {
   Sparkles,
   Award,
@@ -13,6 +13,11 @@ import {
   TrendingUp,
   Lock,
   Loader2,
+  Bookmark,
+  FileText,
+  MapPin,
+  Layers,
+  Search,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -25,7 +30,8 @@ import { UniversitySearchSection } from "@/components/universities/UniversitySea
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { markProgress } from "@/lib/progress";
-import { useActiveApplyJob } from "@/lib/applyQueue/client";
+import { useActiveApplyJob, type ApplyJob, type ApplyJobStatus } from "@/lib/applyQueue/client";
+import { useSavedUniversities, type SavedUniversity } from "@/lib/universities/savedClient";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Your dashboard — QuestCampus" }] }),
@@ -50,11 +56,31 @@ type SavedMatch = {
 };
 type SavedPayload = { matches: SavedMatch[]; at: number };
 
+type PastEssay = {
+  essayId: string;
+  targetName?: string;
+  wordCount: number;
+  preview: string;
+  createdAt: number;
+};
+
 function normalizeUrl(u?: string): string | null {
   if (!u) return null;
   const trimmed = u.trim();
   if (!trimmed) return null;
   return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+}
+
+function timeAgo(ts: number): string {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}d ago`;
+  return `${Math.floor(d / 30)}mo ago`;
 }
 
 const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof Award }> = {
@@ -73,6 +99,18 @@ const BUCKET_STYLES: Record<Bucket, { border: string; chip: string; icon: typeof
     chip: "bg-[#f0c7e6] text-[#3a0e2e]",
     icon: Award,
   },
+};
+
+// Friendly, human-facing labels for the live application state.
+const APPLY_STATUS: Record<ApplyJobStatus, { label: string; live: boolean }> = {
+  queued: { label: "Queued", live: true },
+  claimed: { label: "Starting", live: true },
+  awaiting_login: { label: "Needs login", live: true },
+  filling: { label: "Filling in", live: true },
+  awaiting_submit: { label: "Ready to submit", live: true },
+  done: { label: "Submitted", live: false },
+  cancelled: { label: "Cancelled", live: false },
+  error: { label: "Needs attention", live: true },
 };
 
 const COMING_SOON = [
@@ -142,6 +180,13 @@ function DashboardPage() {
 
   const recommend = useAction(api.rag.recommend.recommend);
 
+  // Live data sources for the command center.
+  const activeJob = useActiveApplyJob();
+  const { saved: shortlist } = useSavedUniversities();
+  const pastEssays = useQuery(api.essays.listEssays, token ? { token } : "skip") as
+    | PastEssay[]
+    | undefined;
+
   useEffect(() => {
     setSessionId(getSessionId());
     setSaved(loadSaved());
@@ -200,13 +245,17 @@ function DashboardPage() {
 
   const loading = isAuthenticated && serverStatus === "loading" && !saved;
 
+  const matchCount = saved?.matches.length ?? 0;
+  const shortlistCount = shortlist?.length ?? 0;
+  const essayCount = pastEssays?.length ?? 0;
+
   return (
     <>
       <LivingBackground />
       <DashboardShell>
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12"
         >
           {/* Re-ranked celebration banner */}
           <AnimatePresence>
@@ -231,112 +280,125 @@ function DashboardPage() {
             )}
           </AnimatePresence>
 
-          {/* Hero */}
-          <motion.section
-            initial={reduce ? false : { opacity: 0, y: 16 }}
+          {/* Command-center header */}
+          <motion.header
+            initial={reduce ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-              Your dashboard
+              Command center
             </p>
-            <h1 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
+            <h1 className="mt-2 text-display-lg-mobile text-on-surface text-balance">
               {firstName ? `Welcome back, ${firstName}.` : "Welcome to QuestCampus."}
-              <br />
-              <span className="qc-text-gradient">Let's build your shortlist.</span>
             </h1>
-            <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
-              Your matches are saved here. Everything else is on the way — and you'll get 30% off
-              the monthly plan as a waitlist member.
+            <p className="mt-3 max-w-2xl text-body-lg text-on-surface-variant">
+              Your shortlist, essays, and next move — all in one place.
             </p>
-          </motion.section>
+          </motion.header>
 
-          {/* Recommended next step */}
-          <NextStepCard isAuthenticated={isAuthenticated} />
+          {/* Signature: the KPI instrument cluster */}
+          <StatCluster
+            reduce={!!reduce}
+            shortlist={shortlistCount}
+            matches={matchCount}
+            essays={essayCount}
+            job={isAuthenticated ? activeJob : null}
+          />
 
-          {/* Resume in-progress application */}
-          {isAuthenticated && (
-            <SilentErrorBoundary>
-              <ActiveApplyResumeCard />
-            </SilentErrorBoundary>
-          )}
-
-
-
-
-          {/* Matches */}
-          <section className="mt-14">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                  Your university matches
-                </h2>
-                <p className="mt-1 text-body-md text-on-surface-variant">
-                  {loading
-                    ? "Loading your matches…"
-                    : saved
-                      ? `${saved.matches.length} match${saved.matches.length === 1 ? "" : "es"}`
-                      : "We'll save your quiz matches here automatically."}
-                </p>
-              </div>
-              {!saved && !loading && (
-                <Link
-                  to="/"
-                  className="hidden shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
-                >
-                  Take the quiz
-                </Link>
-              )}
-            </div>
-
-            {loading ? (
-              <div className="mt-6 grid gap-5 lg:grid-cols-3">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="h-64 animate-pulse rounded-lg border-2 border-on-surface/20 bg-surface/60"
-                  />
-                ))}
-                <div className="col-span-full mt-2 flex items-center justify-center gap-2 text-body-sm text-on-surface-variant">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Re-ranking from your latest answers…
-                </div>
-              </div>
-            ) : saved && saved.matches.length > 0 ? (
-              <motion.div
-                key={saved.at}
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: {},
-                  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-                }}
-                className="mt-6 grid gap-5 lg:grid-cols-3"
-              >
-                {saved.matches.map((m, i) => (
-                  <MatchCard
-                    key={`${saved.at}-${m.name}-${i}`}
-                    match={m}
-                    celebrate={justRefreshed}
-                  />
-                ))}
-              </motion.div>
+          {/* Focus row — what to do right now */}
+          <div className="mt-8">
+            {isAuthenticated && activeJob ? (
+              <SilentErrorBoundary>
+                <ApplyFocusCard job={activeJob} reduce={!!reduce} />
+              </SilentErrorBoundary>
             ) : (
-              <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-                <p className="text-body-lg text-on-surface-variant">
-                  No matches yet. Take the 60-second quiz on the landing page to populate this.
-                </p>
-                <Link
-                  to="/"
-                  className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  Start the quiz <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+              <NextStepCard isAuthenticated={isAuthenticated} />
             )}
-          </section>
+          </div>
+
+          {/* Working area: matches (main) + rail */}
+          <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+            {/* Matches */}
+            <section>
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-headline-lg font-bold text-on-surface">
+                    Your matches
+                  </h2>
+                  <p className="mt-1 text-body-md text-on-surface-variant">
+                    {loading
+                      ? "Loading your matches…"
+                      : saved
+                        ? `${matchCount} best-fit ${matchCount === 1 ? "school" : "schools"} from your answers`
+                        : "We'll save your quiz matches here automatically."}
+                  </p>
+                </div>
+                {!saved && !loading && (
+                  <Link
+                    to="/"
+                    className="hidden shrink-0 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
+                  >
+                    Take the quiz
+                  </Link>
+                )}
+              </div>
+
+              {loading ? (
+                <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="h-56 animate-pulse rounded-lg border-2 border-on-surface/20 bg-surface/60"
+                    />
+                  ))}
+                  <div className="col-span-full mt-2 flex items-center justify-center gap-2 text-body-sm text-on-surface-variant">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Re-ranking from your latest answers…
+                  </div>
+                </div>
+              ) : saved && saved.matches.length > 0 ? (
+                <motion.div
+                  key={saved.at}
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } },
+                  }}
+                  className="mt-6 grid gap-5 sm:grid-cols-2"
+                >
+                  {saved.matches.map((m, i) => (
+                    <MatchCard
+                      key={`${saved.at}-${m.name}-${i}`}
+                      match={m}
+                      celebrate={justRefreshed}
+                    />
+                  ))}
+                </motion.div>
+              ) : (
+                <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
+                  <p className="text-body-lg text-on-surface-variant">
+                    No matches yet. Take the 60-second quiz to fill your shortlist.
+                  </p>
+                  <Link
+                    to="/"
+                    className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  >
+                    Start the quiz <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+            </section>
+
+            {/* Rail */}
+            <aside className="flex flex-col gap-6">
+              <SavedSchoolsPanel list={shortlist} isAuthenticated={isAuthenticated} />
+              <EssaysPanel essays={pastEssays} isAuthenticated={isAuthenticated} />
+            </aside>
+          </div>
 
           {/* Search any university */}
-          <section className="mt-14 rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-8">
+          <section className="mt-12 rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-8">
             <SilentErrorBoundary>
               <UniversitySearchSection
                 title="Search any university"
@@ -355,57 +417,17 @@ function DashboardPage() {
             </div>
           </section>
 
-          {/* Personal statement — live feature, logged-in only */}
-          {isAuthenticated && (
-            <motion.section
-              initial={reduce ? false : { opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-16"
-            >
-              <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow sm:p-8">
-                <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-4">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
-                      <PenLine className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-                        <Sparkles className="h-3 w-3" /> New · live
-                      </span>
-                      <h2 className="mt-2 font-display text-headline-lg font-bold text-on-surface">
-                        Write your Common App personal statement
-                      </h2>
-                      <p className="mt-1.5 max-w-2xl text-body-md text-on-surface/80">
-                        Grounded in what you told us — zero invented facts. First generation is
-                        free; a $15/month subscription reveals the full essay plus your full match
-                        list.
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    to="/essay"
-                    className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                  >
-                    Start writing
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </div>
-              </div>
-            </motion.section>
-          )}
-
-          {/* Coming soon tiles */}
-          <section className="mt-16">
-            <h2 className="font-display text-headline-lg font-bold text-on-surface">
-              What's next for you
-            </h2>
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              Tap any tool to join the waitlist and lock in 30% off monthly access.
-            </p>
-
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          {/* Coming soon — subdued strip */}
+          <section className="mt-12">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-display text-headline-md font-bold text-on-surface">
+                What's next for you
+              </h2>
+              <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                Join the waitlist · 30% off monthly
+              </span>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-3">
               {COMING_SOON.map((t, i) => (
                 <ToolTile
                   key={t.key}
@@ -439,6 +461,324 @@ function DashboardPage() {
         feature={modal?.title}
       />
     </>
+  );
+}
+
+/* ── Signature: KPI instrument cluster ──────────────────────────────
+   A single hard-shadowed panel split into hairline-divided stat tiles.
+   The application tile carries a live coral pulse while a job is running. */
+function StatCluster({
+  reduce,
+  shortlist,
+  matches,
+  essays,
+  job,
+}: {
+  reduce: boolean;
+  shortlist: number;
+  matches: number;
+  essays: number;
+  job: ApplyJob | null | undefined;
+}) {
+  const applyState = job ? APPLY_STATUS[job.status] : null;
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
+      className="mt-8 overflow-hidden rounded-2xl border-2 border-on-surface qc-hard-shadow"
+    >
+      <div className="grid grid-cols-2 gap-[2px] bg-on-surface/15 sm:grid-cols-4">
+        <StatTile
+          Icon={Bookmark}
+          to="/universities"
+          value={shortlist}
+          label="Saved schools"
+          hint={shortlist === 0 ? "Add your first" : "In your shortlist"}
+        />
+        <StatTile
+          Icon={Layers}
+          value={matches}
+          label="AI matches"
+          hint={matches === 0 ? "Take the quiz" : "Best-fit for you"}
+        />
+        <StatTile
+          Icon={PenLine}
+          to="/essay"
+          value={essays}
+          label="Essays"
+          hint={essays === 0 ? "Draft one free" : "Drafted"}
+        />
+        <ApplyTile state={applyState} />
+      </div>
+    </motion.div>
+  );
+}
+
+function StatTile({
+  Icon,
+  value,
+  label,
+  hint,
+  to,
+}: {
+  Icon: typeof Award;
+  value: number;
+  label: string;
+  hint: string;
+  to?: "/universities" | "/essay";
+}) {
+  const inner = (
+    <>
+      <div className="flex items-center gap-2 text-on-surface-variant">
+        <Icon className="h-4 w-4" />
+        <span className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.08em]">
+          {label}
+        </span>
+      </div>
+      <p className="mt-3 font-display text-[2rem] font-bold leading-none text-on-surface">{value}</p>
+      <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">{hint}</p>
+    </>
+  );
+  const cls =
+    "group flex flex-col bg-surface-container-lowest p-5 transition-colors hover:bg-surface-container-low";
+  return to ? (
+    <Link to={to} search={to === "/universities" ? ({ q: "" } as never) : undefined} className={cls}>
+      {inner}
+    </Link>
+  ) : (
+    <div className={cls}>{inner}</div>
+  );
+}
+
+function ApplyTile({ state }: { state: { label: string; live: boolean } | null }) {
+  return (
+    <Link
+      to="/apply"
+      className="group relative flex flex-col bg-surface-container-lowest p-5 transition-colors hover:bg-surface-container-low"
+    >
+      {state?.live && <span className="absolute inset-x-0 top-0 h-1 bg-primary" />}
+      <div className="flex items-center gap-2 text-on-surface-variant">
+        <Send className="h-4 w-4" />
+        <span className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.08em]">
+          Application
+        </span>
+      </div>
+      <p className="mt-3 flex items-center gap-2 font-display text-headline-sm font-bold leading-none text-on-surface">
+        {state ? state.label : "Not started"}
+        {state?.live && (
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/70" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
+          </span>
+        )}
+      </p>
+      <p className="mt-1.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        {state ? "Tap to resume" : "Prepare a target"}
+      </p>
+    </Link>
+  );
+}
+
+/* ── Focus card: an application currently in progress ─────────────── */
+function ApplyFocusCard({ job, reduce }: { job: ApplyJob; reduce: boolean }) {
+  const state = APPLY_STATUS[job.status];
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+    >
+      <Link
+        to="/apply/$jobId"
+        params={{ jobId: job.jobId }}
+        className="group relative flex flex-col gap-5 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary p-6 text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:flex-row sm:items-center sm:justify-between sm:p-8"
+      >
+        <div className="flex items-start gap-4">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-white/70 bg-white/15">
+            <Send className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="inline-flex items-center gap-2 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.16em] text-white/85">
+              Application in progress
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+              </span>
+            </p>
+            <h2 className="mt-1.5 font-display text-headline-md font-bold text-white">
+              {job.targetName ?? job.externalId ?? "Your application"}
+            </h2>
+            <p className="mt-1 text-body-md text-white/85">
+              {job.progress?.message ?? `${state.label} — pick up where you left off.`}
+            </p>
+          </div>
+        </div>
+        <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-white bg-white px-5 py-3 font-display text-label-lg font-bold text-primary">
+          Resume
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </Link>
+    </motion.div>
+  );
+}
+
+/* ── Rail: saved shortlist (real, from userUniversities) ──────────── */
+function SavedSchoolsPanel({
+  list,
+  isAuthenticated,
+}: {
+  list: SavedUniversity[] | undefined;
+  isAuthenticated: boolean;
+}) {
+  const preview = (list ?? []).slice(0, 4);
+  const remaining = Math.max(0, (list?.length ?? 0) - preview.length);
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+          <Bookmark className="h-4 w-4 text-primary" /> Saved schools
+        </h3>
+        {(list?.length ?? 0) > 0 && (
+          <Link
+            to="/universities"
+            search={{ q: "" }}
+            className="font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+          >
+            Manage
+          </Link>
+        )}
+      </div>
+
+      {!isAuthenticated ? (
+        <p className="mt-4 text-body-md text-on-surface-variant">
+          <Link to="/signin" className="text-primary underline">
+            Sign in
+          </Link>{" "}
+          to build a shortlist you keep across devices.
+        </p>
+      ) : list === undefined ? (
+        <div className="mt-4 flex items-center gap-2 text-body-md text-on-surface-variant">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : preview.length === 0 ? (
+        <div className="mt-4">
+          <p className="text-body-md text-on-surface-variant">
+            Nothing saved yet. Add schools from your matches or search.
+          </p>
+          <Link
+            to="/universities"
+            search={{ q: "" }}
+            className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            <Search className="h-3.5 w-3.5" /> Find schools
+          </Link>
+        </div>
+      ) : (
+        <ul className="mt-4 flex flex-col gap-2.5">
+          {preview.map((u) => {
+            const location = [u.city, u.state, u.country].filter(Boolean).join(", ");
+            return (
+              <li
+                key={u.id}
+                className="flex min-w-0 items-center gap-3 rounded-xl border-2 border-on-surface/12 bg-surface-container-lowest p-3"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
+                  <GraduationCap className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                    {u.name}
+                  </p>
+                  {location && (
+                    <p className="mt-0.5 flex min-w-0 items-center gap-1 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{location}</span>
+                    </p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+          {remaining > 0 && (
+            <Link
+              to="/universities"
+              search={{ q: "" }}
+              className="inline-flex items-center gap-1.5 pt-1 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+            >
+              + {remaining} more <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/* ── Rail: recent essays (real, from api.essays.listEssays) ───────── */
+function EssaysPanel({
+  essays,
+  isAuthenticated,
+}: {
+  essays: PastEssay[] | undefined;
+  isAuthenticated: boolean;
+}) {
+  const preview = (essays ?? []).slice(0, 3);
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+          <FileText className="h-4 w-4 text-primary" /> Essays
+        </h3>
+        {preview.length > 0 && (
+          <Link
+            to="/essay"
+            className="font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+          >
+            Open
+          </Link>
+        )}
+      </div>
+
+      {!isAuthenticated || preview.length === 0 ? (
+        <div className="mt-4">
+          <p className="text-body-md text-on-surface-variant">
+            Turn your story into a Common App personal statement — grounded in your answers, zero
+            invented facts. First draft is free.
+          </p>
+          <Link
+            to="/essay"
+            className="group mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            <PenLine className="h-3.5 w-3.5" /> Start writing
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+      ) : (
+        <ul className="mt-4 flex flex-col gap-2.5">
+          {preview.map((e) => (
+            <Link
+              key={e.essayId}
+              to="/essay"
+              className="group flex flex-col gap-1 rounded-xl border-2 border-on-surface/12 bg-surface-container-lowest p-3 transition-colors hover:border-on-surface/30"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="truncate font-display text-label-lg font-bold text-on-surface">
+                  {e.targetName ?? "Personal statement"}
+                </p>
+                <span className="shrink-0 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                  {e.wordCount}w
+                </span>
+              </div>
+              <p className="line-clamp-2 text-body-sm text-on-surface/70">{e.preview}</p>
+              <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                {timeAgo(e.createdAt)}
+              </span>
+            </Link>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -509,14 +849,12 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
 function ToolTile({
   title,
   desc,
-  price,
   Icon,
   onClick,
   delay = 0,
 }: {
   title: string;
   desc: string;
-  price?: string;
   Icon: typeof Award;
   onClick: () => void;
   delay?: number;
@@ -529,54 +867,20 @@ function ToolTile({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay }}
       whileHover={{ y: -3, transition: { type: "spring", stiffness: 280, damping: 22 } }}
-      className="group relative flex w-full items-start gap-4 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-5 text-left backdrop-blur-md qc-hard-shadow transition-all hover:shadow-[6px_6px_0_0_var(--color-primary)]"
+      className="group relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border-2 border-on-surface/70 bg-surface/70 p-4 text-left backdrop-blur-md transition-all hover:border-on-surface hover:qc-hard-shadow-sm"
     >
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-container text-on-primary-container">
-        <Icon className="h-5 w-5" />
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-container text-on-primary-container">
+        <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
-          <span className="inline-flex items-center gap-1 rounded-full bg-on-surface text-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold">
-            <Lock className="h-3 w-3" /> Coming soon
+          <h3 className="font-display text-label-lg font-bold text-on-surface">{title}</h3>
+          <span className="inline-flex items-center gap-1 rounded-full bg-on-surface/8 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface-variant">
+            <Lock className="h-3 w-3" /> Soon
           </span>
         </div>
-        <p className="mt-1.5 text-body-md text-on-surface-variant">{desc}</p>
-        {price && (
-          <p className="mt-2 font-[var(--font-label)] text-label-sm font-semibold text-primary">
-            {price}
-          </p>
-        )}
+        <p className="mt-1 text-body-sm text-on-surface-variant">{desc}</p>
       </div>
-      <ArrowRight className="h-5 w-5 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
     </motion.button>
-  );
-}
-
-function ActiveApplyResumeCard() {
-  const job = useActiveApplyJob();
-  if (!job) return null;
-  return (
-    <Link
-      to="/apply/$jobId"
-      params={{ jobId: job.jobId }}
-      className="mt-6 flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-4 backdrop-blur-md qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5"
-    >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white">
-        <Send className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-primary">
-          Application in progress
-        </p>
-        <p className="truncate font-display text-headline-sm font-bold text-on-surface">
-          {job.targetName ?? job.externalId ?? "Resume application"}
-        </p>
-        <p className="truncate text-label-sm text-on-surface-variant">
-          {job.progress?.message ?? job.status}
-        </p>
-      </div>
-      <ArrowRight className="h-5 w-5 shrink-0 text-on-surface/60" />
-    </Link>
   );
 }
