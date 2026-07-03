@@ -75,7 +75,7 @@ export function NavV2() {
             : "bg-transparent"
         }`}
       >
-        <nav className="flex h-16 w-full items-center justify-between">
+        <nav className="flex h-16 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <button
               type="button"
