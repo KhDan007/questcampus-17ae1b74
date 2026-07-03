@@ -689,6 +689,8 @@ function EssayPage() {
                     error={genError}
                     token={token}
                     sessionId={sessionId}
+                    supplementPrompt={search.prompt}
+                    supplementWordLimit={search.wordLimit}
                   />
                 </StepWrap>
               )}
