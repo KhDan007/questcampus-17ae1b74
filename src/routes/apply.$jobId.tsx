@@ -46,6 +46,14 @@ function didReachReview(checkpoint?: ApplyJobCheckpoint | null): boolean {
   return payload?.reachedReview !== false;
 }
 
+function activityText(text: string, awaitingPortalAction: boolean): string {
+  if (!awaitingPortalAction) return text;
+  if (/\b(submitted|submission|all done|done)\b/i.test(text)) {
+    return "Waiting for you to log in or reach the portal review step.";
+  }
+  return text;
+}
+
 function stageGuidance(
   status: string,
   isDemo: boolean,
@@ -348,7 +356,9 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                   <span className="mt-0.5 text-label-sm tabular-nums text-on-surface-variant">
                     {new Date(a.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
-                  <span className="min-w-0 flex-1 break-words">{a.text}</span>
+                  <span className="min-w-0 flex-1 break-words">
+                    {activityText(a.text, submitNeedsPortalAction)}
+                  </span>
                 </li>
               ))
             )}
