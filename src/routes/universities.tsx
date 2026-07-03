@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useAction, useQuery } from "convex/react";
@@ -312,10 +313,11 @@ function UniversitiesPage() {
   return (
     <>
       <LivingBackground />
-      <main
-        id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
-      >
+      <DashboardShell>
+        <main
+          id="main-content"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+        >
         <button
           type="button"
           onClick={() => {
@@ -550,6 +552,7 @@ function UniversitiesPage() {
           )}
         </AnimatePresence>
       </main>
+      </DashboardShell>
     </>
   );
 }
