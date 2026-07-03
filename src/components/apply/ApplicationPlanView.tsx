@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2, CheckCircle2, Circle, ChevronDown, ChevronRight, CalendarClock } from "lucide-react";
+import { Loader2, CheckCircle2, Circle, ChevronDown, ChevronRight, CalendarClock, BookOpen } from "lucide-react";
 import {
   useApplicationPlan,
   useSetPlanDeadline,
@@ -11,7 +11,7 @@ import {
   type PlanTask,
   type EssayForTarget,
 } from "@/lib/apply/plan";
-import { useCreateDocument } from "@/lib/documents";
+import { TaskGuideDialog } from "@/components/apply/TaskGuideDialog";
 
 function fmtDate(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, {
@@ -205,9 +205,8 @@ function TaskRow({
   onToggle: () => Promise<void> | void;
 }) {
   const navigate = useNavigate();
-  const createDoc = useCreateDocument();
-  const [busy, setBusy] = useState(false);
   const [draftsOpen, setDraftsOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const overdue = task.dueMs < Date.now() && !task.done;
   const isEssay = task.kind === "essay";
@@ -225,31 +224,6 @@ function TaskRow({
     });
   }
 
-  async function handleNonEssayCta() {
-    if (busy) return;
-    if (task.editor === "document") {
-      setBusy(true);
-      try {
-        const id = await createDoc({
-          docKind: task.editorKind ?? "other",
-          system,
-          externalId,
-        });
-        void navigate({ to: "/documents/$id", params: { id } });
-      } catch {
-        setBusy(false);
-      }
-      return;
-    }
-    if (task.upload) {
-      void navigate({ to: "/apply" });
-      return;
-    }
-    if (task.kind === "profile") {
-      void navigate({ to: "/apply" });
-    }
-  }
-
   const nonEssayLabel =
     task.editor === "document"
       ? "Write"
@@ -257,7 +231,7 @@ function TaskRow({
       ? "Upload"
       : task.kind === "profile"
       ? "Complete"
-      : null;
+      : "Open guide";
 
   return (
     <li className="flex items-start gap-3 py-3">
@@ -339,6 +313,15 @@ function TaskRow({
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
+            onClick={() => setGuideOpen(true)}
+            aria-label="Open step-by-step guide"
+            className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/30 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface hover:border-on-surface"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            Guide
+          </button>
+          <button
+            type="button"
             onClick={writeEssay}
             className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
@@ -362,18 +345,24 @@ function TaskRow({
           )}
         </div>
       ) : (
-        nonEssayLabel && (
-          <button
-            type="button"
-            onClick={() => void handleNonEssayCta()}
-            disabled={busy}
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-            {nonEssayLabel}
-          </button>
-        )
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          {nonEssayLabel}
+        </button>
       )}
+
+      <TaskGuideDialog
+        open={guideOpen}
+        onOpenChange={setGuideOpen}
+        task={task}
+        system={system}
+        externalId={externalId}
+        onDone={onToggle}
+      />
     </li>
   );
 }
