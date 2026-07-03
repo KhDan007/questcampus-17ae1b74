@@ -266,3 +266,60 @@ function RunLiveDemoCard() {
     </section>
   );
 }
+
+function CommonAppProfileCard() {
+  const profile = useCommonAppProfile();
+  if (profile === undefined || profile === null) return null;
+  const c = profile.completeness;
+  const percent = Math.max(0, Math.min(100, Math.round(c?.percent ?? 0)));
+  const complete = c?.complete ?? false;
+  return (
+    <section
+      className={
+        "rounded-2xl border-2 p-5 sm:p-6 " +
+        (complete
+          ? "border-on-surface/20 bg-surface qc-hard-shadow-sm"
+          : "border-on-surface bg-primary-fixed qc-hard-shadow")
+      }
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
+            <ClipboardList className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              Universal profile
+            </p>
+            <h3 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
+              Common App Profile — {percent}% complete
+            </h3>
+            <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
+              {complete
+                ? "You're set. We'll auto-fill every Common App school."
+                : "Fill this once and every Common App application gets pre-filled for you."}
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/common-app"
+          className={
+            "inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none " +
+            (complete
+              ? "bg-surface text-on-surface"
+              : "bg-primary text-white")
+          }
+        >
+          {complete ? "Review profile" : "Complete your profile"}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+        <div
+          className={"h-full transition-[width] duration-300 " + (complete ? "bg-tertiary" : "bg-primary")}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </section>
+  );
+}
