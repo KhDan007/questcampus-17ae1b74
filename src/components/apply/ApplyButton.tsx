@@ -49,7 +49,7 @@ export function ApplyButton({
           setError(null);
           setBusy(true);
           try {
-            const jobId = await startApply({
+            const { jobId } = await startApply({
               system: system ?? source,
               externalId,
               targetName,
