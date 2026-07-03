@@ -10,11 +10,13 @@ import {
   LogIn,
   Send,
   ListChecks,
+  Hourglass,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LiveCanvas } from "@/components/apply/LiveCanvas";
+import { RunStepper } from "@/components/apply/RunStepper";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useApplyActions, useApplyJob, type ApplyJobCheckpoint } from "@/lib/applyQueue/client";
 
