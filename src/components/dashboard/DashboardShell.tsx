@@ -56,6 +56,14 @@ const TOP_ITEMS: Item[] = [
   },
   {
     kind: "link",
+    key: "commonapp",
+    label: "Common App",
+    to: "/common-app",
+    icon: ClipboardList,
+    match: (p) => p.startsWith("/common-app"),
+  },
+  {
+    kind: "link",
     key: "universities",
     label: "Universities",
     to: "/universities",
