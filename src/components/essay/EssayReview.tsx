@@ -1304,6 +1304,11 @@ function LockedTeaser({
               <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
               <Dots score={d.score} />
             </div>
+            {d.quote && (
+              <p className="mt-1 border-l-2 border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
+                &ldquo;…{d.quote}…&rdquo;
+              </p>
+            )}
             <p className="mt-1 text-body-sm text-on-surface-variant">{d.rationale}</p>
           </motion.li>
         ))}
