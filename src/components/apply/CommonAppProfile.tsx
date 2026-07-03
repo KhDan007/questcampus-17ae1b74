@@ -240,18 +240,23 @@ function ScalarField({
   value: string;
   onChange: (v: string) => void;
 }) {
-  // Uncontrolled + `key` on the value from the store so reactive refreshes
-  // don't fight the user's typing.
+  // Controlled input; sync from the store only while unfocused so reactive
+  // refreshes (e.g. Prefill) never fight the user's active typing.
   const [local, setLocal] = useState(value);
+  const [focused, setFocused] = useState(false);
   useEffect(() => {
-    setLocal(value);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field.conceptKey]);
+    if (!focused) setLocal(value);
+  }, [value, focused]);
 
   const update = (v: string) => {
     setLocal(v);
     onChange(v);
   };
+  const focusHandlers = {
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  };
+
 
   const isFullWidth = field.type === "longtext" || field.type === "essay";
   const wrapperClass = isFullWidth ? "sm:col-span-2" : "";
