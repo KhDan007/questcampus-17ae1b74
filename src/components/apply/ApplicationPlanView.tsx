@@ -149,6 +149,11 @@ export function ApplicationPlanView({
                   task={t}
                   system={system}
                   externalId={externalId}
+                  matchingEssays={
+                    t.kind === "essay"
+                      ? essaysByConcept.get(t.conceptKey ?? null) ?? []
+                      : []
+                  }
                   onToggle={() =>
                     setTaskDone({
                       system,
