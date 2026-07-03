@@ -754,11 +754,19 @@ function ResultCard({
             <h2 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
               {sourceLabel}
             </h2>
-            <span
-              className={`mt-1 inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${tier.chip}`}
-            >
-              {tier.label}
-            </span>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="font-display text-headline-sm font-bold text-on-surface">
+                {free.overall} / 100
+              </span>
+              <span
+                className={`inline-block rounded-full px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-bold ${tier.chip}`}
+              >
+                {tier.label}
+              </span>
+            </div>
+            <p className="mt-1 max-w-sm text-label-sm text-on-surface-variant">
+              Scored by two independent graders, averaged — calibrated against real admitted essays.
+            </p>
           </div>
         </div>
         <p className="font-display text-headline-sm text-on-surface text-balance sm:border-l-2 sm:border-on-surface/10 sm:pl-5">
