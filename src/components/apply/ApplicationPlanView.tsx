@@ -205,7 +205,6 @@ function TaskRow({
   onToggle: () => Promise<void> | void;
 }) {
   const navigate = useNavigate();
-  const [busy, setBusy] = useState(false);
   const [draftsOpen, setDraftsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
 
