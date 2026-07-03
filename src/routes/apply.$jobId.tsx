@@ -460,19 +460,25 @@ function CheckpointModal({
   checkpoint,
   onConfirm,
   busy,
+  isDemo,
 }: {
   checkpoint: ApplyJobCheckpoint;
   onConfirm: (kind: string, value?: unknown) => Promise<void>;
   busy: boolean;
+  isDemo: boolean;
 }) {
   if (!checkpoint) return null;
 
   if (checkpoint.kind === "login") {
     return (
-      <Modal title="Log in to the portal" icon={<LogIn className="h-5 w-5 text-primary" />}>
+      <Modal
+        title={isDemo ? "Demo — no login needed" : "Log in to the portal"}
+        icon={<LogIn className="h-5 w-5 text-primary" />}
+      >
         <p className="text-body-md text-on-surface-variant">
-          Sign in using the live browser above. Use your real credentials — we never see them. Once
-          you&apos;re past the login screen, hit Continue and the agent takes over.
+          {isDemo
+            ? "This is a live demo on a test form, so there's nothing to log into. Click Continue to watch auto-apply fill it in."
+            : "Sign in using the live browser above. Use your real credentials — we never see them. Once you're past the login screen, hit Continue and the agent takes over."}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -482,7 +488,7 @@ function CheckpointModal({
             className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-            I&apos;m logged in
+            {isDemo ? "Continue" : "I'm logged in"}
           </button>
         </div>
       </Modal>
@@ -503,8 +509,9 @@ function CheckpointModal({
     return (
       <Modal title="Review and submit" icon={<Send className="h-5 w-5 text-primary" />}>
         <p className="text-body-md text-on-surface-variant">
-          The form is filled. Look it over in the live browser, fix anything you want, then hit the
-          portal&apos;s submit button. Tap below once it&apos;s sent.
+          {isDemo
+            ? "This is a demo — clicking below just completes the run; nothing is sent anywhere."
+            : "The form is filled. Look it over in the live browser, fix anything you want, then hit the portal's submit button. Tap below once it's sent."}
         </p>
 
         {!reachedReview && (
@@ -517,7 +524,6 @@ function CheckpointModal({
             </p>
           </div>
         )}
-
 
         {filled.length > 0 && (
           <div className="mt-4">
