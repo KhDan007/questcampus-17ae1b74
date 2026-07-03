@@ -551,7 +551,7 @@ function EssayPage() {
       setGenStatus("error");
       setGenError("generation_failed");
     }
-  }, [sessionId, token, generate, answers, target, clearDraft]);
+  }, [sessionId, token, generate, answers, target, clearDraft, search.system, search.externalId, search.conceptKey, search.prompt, search.wordLimit]);
 
   const canSubmitQuestions = useMemo(() => {
     // Only the anchor story is required; everything else is optional.
