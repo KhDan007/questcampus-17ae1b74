@@ -10,6 +10,7 @@ import {
   PenLine,
   Activity,
   CalendarClock,
+  ClipboardList,
   Send,
   Settings as SettingsIcon,
   Sparkles,
@@ -52,6 +53,14 @@ const TOP_ITEMS: Item[] = [
     to: "/apply",
     icon: Send,
     match: (p) => p.startsWith("/apply") || p.startsWith("/application"),
+  },
+  {
+    kind: "link",
+    key: "commonapp",
+    label: "Common App",
+    to: "/common-app",
+    icon: ClipboardList,
+    match: (p) => p.startsWith("/common-app"),
   },
   {
     kind: "link",
