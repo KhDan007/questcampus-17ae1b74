@@ -309,19 +309,19 @@ function ScalarField({
 
       {field.type === "longtext" ? (
         <textarea
-          key={field.conceptKey}
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           rows={4}
           className={inputClass}
+          {...focusHandlers}
           {...maxAttr}
         />
       ) : field.type === "enum" ? (
         <select
-          key={field.conceptKey}
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           className={inputClass}
+          {...focusHandlers}
         >
           <option value="">Select…</option>
           {(field.options ?? []).map((o) => (
@@ -332,7 +332,6 @@ function ScalarField({
         </select>
       ) : (
         <input
-          key={field.conceptKey}
           type={
             field.type === "date"
               ? "date"
@@ -344,12 +343,14 @@ function ScalarField({
                     ? "number"
                     : "text"
           }
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           className={inputClass}
+          {...focusHandlers}
           {...maxAttr}
         />
       )}
+
 
       <div className="flex items-center justify-between gap-3">
         {field.help ? (
