@@ -350,6 +350,41 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   );
 }
 
+function QueuedWaitingCard({ createdAt }: { createdAt?: number }) {
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const start = createdAt ?? now;
+  const elapsedSec = Math.max(0, Math.floor((now - start) / 1000));
+  const mm = String(Math.floor(elapsedSec / 60)).padStart(2, "0");
+  const ss = String(elapsedSec % 60).padStart(2, "0");
+
+  return (
+    <div className="relative flex aspect-[16/10] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow">
+      <div
+        aria-hidden
+        className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_20%,rgba(0,0,0,0.04)_50%,transparent_80%)]"
+      />
+      <div className="relative flex flex-col items-center gap-2 text-center">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+          <Hourglass className="h-5 w-5 animate-pulse text-primary" />
+        </span>
+        <p className="font-display text-headline-sm font-bold text-on-surface">
+          Waiting for a worker to pick this up…
+        </p>
+        <p className="font-[var(--font-label)] text-label-md tabular-nums text-on-surface-variant">
+          Elapsed {mm}:{ss}
+        </p>
+        <p className="max-w-md text-body-sm text-on-surface-variant">
+          Your test form will open here and fill itself — nothing is submitted.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function Banner({
   tone,
   icon,
