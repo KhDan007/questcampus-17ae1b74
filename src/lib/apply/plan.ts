@@ -5,6 +5,33 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 
+export type EssayForTarget = {
+  essayId: string;
+  conceptKey: string | null;
+  promptText: string | null;
+  wordLimit: number | null;
+  targetName: string | null;
+  wordCount: number;
+  preview: string;
+  createdAt: number;
+  editedAt: number | null;
+};
+
+export function useEssaysForTarget(
+  system: string | undefined,
+  externalId: string | undefined,
+): EssayForTarget[] | undefined {
+  const { token } = useAuth();
+  const args =
+    token && system && externalId
+      ? ({ token, system, externalId } as never)
+      : ("skip" as const);
+  return useQuery(api.essays.essaysForTarget, args) as
+    | EssayForTarget[]
+    | undefined;
+}
+
+
 export type PlanTaskKind =
   | "profile"
   | "essay"

@@ -35,8 +35,39 @@ import { PRICE_MVP } from "@/lib/config";
 import type { RecCard } from "@/components/profile/UniversityCard";
 import { markProgress } from "@/lib/progress";
 
+export type EssaySearch = {
+  system?: string;
+  externalId?: string;
+  conceptKey?: string;
+  prompt?: string;
+  wordLimit?: number;
+  essayId?: string;
+  mode?: string;
+};
+
 export const Route = createFileRoute("/essay")({
   head: () => ({ meta: [{ title: "Personal statement — QuestCampus" }] }),
+  validateSearch: (search: Record<string, unknown>): EssaySearch => {
+    const s = search ?? {};
+    const str = (v: unknown) => (typeof v === "string" ? v : undefined);
+    const num = (v: unknown) => {
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+      if (typeof v === "string" && v.trim() !== "") {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : undefined;
+      }
+      return undefined;
+    };
+    return {
+      system: str(s.system),
+      externalId: str(s.externalId),
+      conceptKey: str(s.conceptKey),
+      prompt: str(s.prompt),
+      wordLimit: num(s.wordLimit),
+      essayId: str(s.essayId),
+      mode: str(s.mode),
+    };
+  },
   component: EssayPage,
 });
 
