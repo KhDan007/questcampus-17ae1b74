@@ -115,9 +115,9 @@ const DocumentsIdRoute = DocumentsIdRouteImport.update({
   getParentRoute: () => DocumentsRoute,
 } as any)
 const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
-  id: '/$jobId',
-  path: '/$jobId',
-  getParentRoute: () => ApplyRoute,
+  id: '/apply/$jobId',
+  path: '/apply/$jobId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApplicationSystemExternalIdRoute =
   ApplicationSystemExternalIdRouteImport.update({
@@ -268,6 +268,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   TosRoute: typeof TosRoute
   UniversitiesRoute: typeof UniversitiesRoute
+  ApplyJobIdRoute: typeof ApplyJobIdRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
@@ -399,10 +400,10 @@ declare module '@tanstack/react-router' {
     }
     '/apply/$jobId': {
       id: '/apply/$jobId'
-      path: '/$jobId'
+      path: '/apply/$jobId'
       fullPath: '/apply/$jobId'
       preLoaderRoute: typeof ApplyJobIdRouteImport
-      parentRoute: typeof ApplyRoute
+      parentRoute: typeof rootRouteImport
     }
     '/application/$system/$externalId': {
       id: '/application/$system/$externalId'
@@ -438,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   TosRoute: TosRoute,
   UniversitiesRoute: UniversitiesRoute,
+  ApplyJobIdRoute: ApplyJobIdRoute,
   OauthCallbackRoute: OauthCallbackRoute,
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,
@@ -448,13 +450,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
