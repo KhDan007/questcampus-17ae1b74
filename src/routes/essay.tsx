@@ -1113,6 +1113,8 @@ function QuestionsForm({
   error,
   token,
   sessionId,
+  supplementPrompt,
+  supplementWordLimit,
 }: {
   answers: AnswerMap;
   setAnswers: (next: AnswerMap | ((prev: AnswerMap) => AnswerMap)) => void;
@@ -1123,6 +1125,8 @@ function QuestionsForm({
   error: EssayError["error"] | null;
   token: string | undefined;
   sessionId: string | null;
+  supplementPrompt?: string;
+  supplementWordLimit?: number;
 }) {
   const setField = (key: string, patch: Partial<AnswerVal>) =>
     setAnswers((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
@@ -1130,6 +1134,22 @@ function QuestionsForm({
 
   return (
     <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+      {supplementPrompt && (
+        <div className="mb-6 rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm">
+          <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-primary">
+            Prompt
+          </p>
+          <p className="mt-1 font-display text-label-lg text-on-surface text-balance">
+            {supplementPrompt}
+          </p>
+          {supplementWordLimit ? (
+            <p className="mt-2 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {supplementWordLimit}-word limit
+            </p>
+          ) : null}
+        </div>
+      )}
+
       <h2 className="font-display text-headline-md font-bold text-on-surface">
         Tell us your story
       </h2>
