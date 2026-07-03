@@ -179,6 +179,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   }
 
   // `terminal` is already computed above from the RunBody hook block.
+  const isDemo = job.targetName === "Demo test run";
 
   return (
     <>
