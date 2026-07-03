@@ -7,7 +7,9 @@ import {
   useApplicationPlan,
   useSetPlanDeadline,
   useSetTaskDone,
+  useEssaysForTarget,
   type PlanTask,
+  type EssayForTarget,
 } from "@/lib/apply/plan";
 import { useCreateDocument } from "@/lib/documents";
 
