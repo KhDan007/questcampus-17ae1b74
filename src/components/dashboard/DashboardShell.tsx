@@ -233,7 +233,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           )}
         </aside>
 
-        <div className="w-full min-w-0">{children}</div>
+        <div className="w-full min-w-0 lg:-ml-5">{children}</div>
       </div>
 
       {/* Mobile open button (FAB) */}
