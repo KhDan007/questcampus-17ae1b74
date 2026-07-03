@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   Loader2,
   XCircle,
+  X,
   CheckCircle2,
   AlertTriangle,
   LogIn,
@@ -39,7 +40,25 @@ const STATUS_LABEL: Record<string, string> = {
   error: "Something went wrong",
 };
 
-function stageGuidance(status: string, isDemo: boolean): string {
+function didReachReview(checkpoint?: ApplyJobCheckpoint | null): boolean {
+  if (checkpoint?.kind !== "submit") return true;
+  const payload = checkpoint.payload as { reachedReview?: boolean } | undefined;
+  return payload?.reachedReview !== false;
+}
+
+function activityText(text: string, awaitingPortalAction: boolean): string {
+  if (!awaitingPortalAction) return text;
+  if (/\b(submitted|submission|all done|done)\b/i.test(text)) {
+    return "Waiting for you to log in or reach the portal review step.";
+  }
+  return text;
+}
+
+function stageGuidance(
+  status: string,
+  isDemo: boolean,
+  checkpoint?: ApplyJobCheckpoint | null,
+): string {
   switch (status) {
     case "queued":
       return "Waiting for a worker to pick this up. Nothing for you to do yet.";
@@ -48,13 +67,16 @@ function stageGuidance(status: string, isDemo: boolean): string {
     case "awaiting_login":
       return isDemo
         ? "This is a demo — there's no login. Click Continue below to watch it fill."
-        : 'Log in to the portal in the live browser on the left, then click "I\'m logged in".';
+        : 'Create an account in this university portal, or log in if you already have one, in the live browser. Once you are past the portal login screen, click "I\'m in".';
     case "filling":
       return (
         "We're filling the form in the live browser — just watch. You don't need to do anything; you'll review everything before ANY submit." +
         (isDemo ? " (Demo — nothing is ever submitted.)" : "")
       );
     case "awaiting_submit":
+      if (!didReachReview(checkpoint)) {
+        return "The portal still needs your action. Use the live browser to create an account or log in, then continue through the university portal until you reach its review/submit step.";
+      }
       return isDemo
         ? 'The form is filled. Look it over in the live browser, then click "I\'ve submitted" — this is a demo, so nothing is actually sent.'
         : 'The form is filled. Review it in the live browser, submit it in the portal, then click "I\'ve submitted".';
@@ -103,9 +125,13 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const [liveTicket, setLiveTicket] = useState<{ wsUrl: string; ticket: string } | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [demoCompleted, setDemoCompleted] = useState(false);
+  const [dismissedCheckpointKey, setDismissedCheckpointKey] = useState<string | null>(null);
+  const hasUnresolvedCheckpoint = !!job?.checkpoint && !demoCompleted;
   const terminal =
     demoCompleted ||
-    (!!job && (job.status === "done" || job.status === "cancelled" || job.status === "error"));
+    (!!job &&
+      !hasUnresolvedCheckpoint &&
+      (job.status === "done" || job.status === "cancelled" || job.status === "error"));
 
   const fetchTicket = useCallback(async () => {
     if (!job?.wsEndpoint || terminal) return;
@@ -183,6 +209,18 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
 
   // `terminal` is already computed above from the RunBody hook block.
   const isDemo = job.targetName === "Demo test run";
+  const visibleStatus =
+    job.checkpoint?.kind === "login"
+      ? "awaiting_login"
+      : job.checkpoint?.kind === "submit" && job.status === "done"
+        ? "awaiting_submit"
+        : job.status;
+  const checkpointKey = job.checkpoint ? `${jobId}:${job.checkpoint.kind}` : null;
+  const checkpointDismissed = !!checkpointKey && dismissedCheckpointKey === checkpointKey;
+  const submitNeedsPortalAction = job.checkpoint?.kind === "submit" && !didReachReview(job.checkpoint);
+  const statusLabel = submitNeedsPortalAction
+    ? "Waiting for portal login/review"
+    : STATUS_LABEL[visibleStatus] ?? visibleStatus;
 
   return (
     <>
@@ -200,7 +238,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
             )}
           </h1>
           <p className="mt-1 text-body-md text-on-surface-variant">
-            {STATUS_LABEL[job.status] ?? job.status}
+            {statusLabel}
             {job.progress?.message ? ` · ${job.progress.message}` : ""}
           </p>
         </div>
@@ -227,16 +265,24 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
 
       {/* Phased stepper */}
       <div className="mt-5">
-        <RunStepper status={job.status} />
+        <RunStepper status={visibleStatus} />
       </div>
 
       {/* Stage guidance */}
       <div className="mt-4 rounded-xl border-2 border-on-surface/20 bg-surface p-3 qc-hard-shadow-sm">
         <p className="flex items-start gap-2 text-body-sm text-on-surface">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-          <span>{stageGuidance(job.status, isDemo)}</span>
+          <span>{stageGuidance(visibleStatus, isDemo, job.checkpoint)}</span>
         </p>
       </div>
+
+      {job.checkpoint && !demoCompleted && checkpointDismissed && (
+        <CheckpointNudge
+          checkpoint={job.checkpoint}
+          onOpen={() => setDismissedCheckpointKey(null)}
+          needsPortalAction={submitNeedsPortalAction}
+        />
+      )}
 
       {/* Slim percent bar (only when there's real progress) */}
       {percent > 0 && (
@@ -310,7 +356,9 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                   <span className="mt-0.5 text-label-sm tabular-nums text-on-surface-variant">
                     {new Date(a.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
-                  <span className="min-w-0 flex-1 break-words">{a.text}</span>
+                  <span className="min-w-0 flex-1 break-words">
+                    {activityText(a.text, submitNeedsPortalAction)}
+                  </span>
                 </li>
               ))
             )}
@@ -319,7 +367,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       </div>
 
       {/* Terminal banners */}
-      {(job.status === "done" || demoCompleted) && (
+      {((job.status === "done" && !job.checkpoint) || demoCompleted) && (
         <Banner
           tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
@@ -379,30 +427,63 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       )}
 
       {/* Checkpoint modals */}
-      {job.checkpoint && !demoCompleted && (
+      {job.checkpoint && !demoCompleted && !checkpointDismissed && (
         <CheckpointModal
           checkpoint={job.checkpoint}
           onConfirm={async (kind, value) => {
             setActing(true);
             try {
-              await confirm(jobId, kind, value).catch((e) => {
-                console.warn("confirm failed", e);
-              });
+              await confirm(jobId, kind, value);
               // Demo has no real backend worker to advance the job past
               // the submit checkpoint — mark it complete locally so the
               // modal closes and the success banner appears.
               if (isDemo && kind === "submitted") {
                 setDemoCompleted(true);
+              } else if (checkpointKey) {
+                setDismissedCheckpointKey(checkpointKey);
               }
+            } catch (e) {
+              console.warn("confirm failed", e);
             } finally {
               setActing(false);
             }
+          }}
+          onClose={() => {
+            if (checkpointKey) setDismissedCheckpointKey(checkpointKey);
           }}
           busy={acting}
           isDemo={isDemo}
         />
       )}
     </>
+  );
+}
+
+function CheckpointNudge({
+  checkpoint,
+  onOpen,
+  needsPortalAction,
+}: {
+  checkpoint: ApplyJobCheckpoint;
+  onOpen: () => void;
+  needsPortalAction: boolean;
+}) {
+  const isLogin = checkpoint.kind === "login";
+  return (
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-on-surface bg-surface p-3 qc-hard-shadow-sm">
+      <p className="min-w-0 flex-1 text-body-sm text-on-surface">
+        {isLogin || needsPortalAction
+          ? "Use the live browser to create an account for this university portal, or log in if you already have one."
+          : "Review the filled portal page in the live browser before confirming anything was submitted."}
+      </p>
+      <button
+        type="button"
+        onClick={onOpen}
+        className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+      >
+        <Info className="h-4 w-4" /> Instructions
+      </button>
+    </div>
   );
 }
 
@@ -474,11 +555,13 @@ function Banner({
 function CheckpointModal({
   checkpoint,
   onConfirm,
+  onClose,
   busy,
   isDemo,
 }: {
   checkpoint: ApplyJobCheckpoint;
   onConfirm: (kind: string, value?: unknown) => Promise<void>;
+  onClose: () => void;
   busy: boolean;
   isDemo: boolean;
 }) {
@@ -487,13 +570,14 @@ function CheckpointModal({
   if (checkpoint.kind === "login") {
     return (
       <Modal
-        title={isDemo ? "Demo — no login needed" : "Log in to the portal"}
+        title={isDemo ? "Demo — no login needed" : "Create an account or log in"}
         icon={<LogIn className="h-5 w-5 text-primary" />}
+        onClose={onClose}
       >
         <p className="text-body-md text-on-surface-variant">
           {isDemo
             ? "This is a live demo on a test form, so there's nothing to log into. Click Continue to watch auto-apply fill it in."
-            : "Sign in using the live browser above. Use your real credentials — we never see them. Once you're past the login screen, hit Continue and the agent takes over."}
+            : "Use the university portal in the live browser. If you do not already have an account for this university, choose Sign up or Create account there. If you do, log in there. QuestCampus never sees your password. Once the portal is past login, click below."}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -503,7 +587,7 @@ function CheckpointModal({
             className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-            {isDemo ? "Continue" : "I'm logged in"}
+            {isDemo ? "Continue" : "I'm in"}
           </button>
         </div>
       </Modal>
@@ -522,9 +606,15 @@ function CheckpointModal({
     const unmatched = payload?.unmatched ?? [];
     const reachedReview = payload?.reachedReview !== false; // default true if omitted
     return (
-      <Modal title="Review and submit" icon={<Send className="h-5 w-5 text-primary" />}>
+      <Modal
+        title={reachedReview ? "Review and submit" : "Continue in the portal"}
+        icon={reachedReview ? <Send className="h-5 w-5 text-primary" /> : <LogIn className="h-5 w-5 text-primary" />}
+        onClose={onClose}
+      >
         <p className="text-body-md text-on-surface-variant">
-          {isDemo
+          {!reachedReview
+            ? "The agent has not reached the portal review screen. Use the live browser to create an account or log in for this university, then continue through the portal steps yourself."
+            : isDemo
             ? "This is a demo — clicking below just completes the run; nothing is sent anywhere."
             : "The form is filled. Look it over in the live browser, fix anything you want, then hit the portal's submit button. Tap below once it's sent."}
         </p>
@@ -535,7 +625,7 @@ function CheckpointModal({
               Heads up: the agent couldn&apos;t reach the portal&apos;s review screen.
             </p>
             <p className="mt-0.5 text-body-sm text-on-error-container">
-              Navigate to the review/submit step yourself in the live browser above, then confirm below.
+              Create an account or log in in the live browser above, then navigate to the portal&apos;s review/submit step before confirming anything was submitted.
             </p>
           </div>
         )}
@@ -573,15 +663,25 @@ function CheckpointModal({
         )}
 
         <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onConfirm("submitted")}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-            I&apos;ve submitted
-          </button>
+          {!reachedReview ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <LogIn className="h-4 w-4" /> Use live browser
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onConfirm("submitted")}
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              I&apos;ve submitted
+            </button>
+          )}
         </div>
       </Modal>
     );
@@ -593,10 +693,12 @@ function CheckpointModal({
 function Modal({
   title,
   icon,
+  onClose,
   children,
 }: {
   title: string;
   icon?: React.ReactNode;
+  onClose: () => void;
   children: React.ReactNode;
 }) {
   return (
@@ -606,9 +708,19 @@ function Modal({
       aria-modal="true"
     >
       <div className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-start gap-2">
           {icon}
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
+          <h3 className="min-w-0 flex-1 font-display text-headline-sm font-bold text-on-surface">
+            {title}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close instructions"
+            className="-mr-1 -mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
         <div className="mt-3">{children}</div>
       </div>
