@@ -290,6 +290,7 @@ function EssayPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
   const token = auth.getSession()?.token;
+  const search = Route.useSearch();
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
