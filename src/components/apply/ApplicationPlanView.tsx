@@ -205,9 +205,9 @@ function TaskRow({
   onToggle: () => Promise<void> | void;
 }) {
   const navigate = useNavigate();
-  const createDoc = useCreateDocument();
   const [busy, setBusy] = useState(false);
   const [draftsOpen, setDraftsOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const overdue = task.dueMs < Date.now() && !task.done;
   const isEssay = task.kind === "essay";
@@ -225,31 +225,6 @@ function TaskRow({
     });
   }
 
-  async function handleNonEssayCta() {
-    if (busy) return;
-    if (task.editor === "document") {
-      setBusy(true);
-      try {
-        const id = await createDoc({
-          docKind: task.editorKind ?? "other",
-          system,
-          externalId,
-        });
-        void navigate({ to: "/documents/$id", params: { id } });
-      } catch {
-        setBusy(false);
-      }
-      return;
-    }
-    if (task.upload) {
-      void navigate({ to: "/apply" });
-      return;
-    }
-    if (task.kind === "profile") {
-      void navigate({ to: "/apply" });
-    }
-  }
-
   const nonEssayLabel =
     task.editor === "document"
       ? "Write"
@@ -257,7 +232,7 @@ function TaskRow({
       ? "Upload"
       : task.kind === "profile"
       ? "Complete"
-      : null;
+      : "Open guide";
 
   return (
     <li className="flex items-start gap-3 py-3">
