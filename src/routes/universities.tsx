@@ -552,6 +552,7 @@ function UniversitiesPage() {
           )}
         </AnimatePresence>
       </main>
+      </DashboardShell>
     </>
   );
 }
