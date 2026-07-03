@@ -122,10 +122,10 @@ export const Route = createFileRoute("/application/$system/$externalId")({
 });
 
 function ApplicationDetailPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isHydrated } = useAuth();
   const { system, externalId } = Route.useParams();
 
-  if (!isAuthenticated) {
+  if (isHydrated && !isAuthenticated) {
     return (
       <Navigate
         to="/signin"
@@ -140,7 +140,13 @@ function ApplicationDetailPage() {
     <DashboardShell>
       <LivingBackground />
       <SilentErrorBoundary fallback={<ApplicationFallback target={fallbackTarget} />}>
-        <ApplicationDetailContent system={system} externalId={externalId} />
+        {isHydrated ? (
+          <ApplicationDetailContent system={system} externalId={externalId} />
+        ) : (
+          <main className="relative mx-auto flex w-full max-w-(--container-content) items-center justify-center px-5 pt-24 sm:px-8 lg:px-12">
+            <Loader2 className="h-6 w-6 animate-spin text-on-surface-variant" />
+          </main>
+        )}
       </SilentErrorBoundary>
     </DashboardShell>
   );
