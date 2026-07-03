@@ -148,6 +148,8 @@ export function CommonAppProfile() {
         </div>
       </section>
 
+      <CommonAppLoginCard />
+
       {/* Sections */}
       {schema.map((section) => (
         <SectionCard
