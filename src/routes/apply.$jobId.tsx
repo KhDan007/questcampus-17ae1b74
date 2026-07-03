@@ -39,6 +39,36 @@ const STATUS_LABEL: Record<string, string> = {
   error: "Something went wrong",
 };
 
+function stageGuidance(status: string, isDemo: boolean): string {
+  switch (status) {
+    case "queued":
+      return "Waiting for a worker to pick this up. Nothing for you to do yet.";
+    case "claimed":
+      return "Opening a live browser…";
+    case "awaiting_login":
+      return isDemo
+        ? "This is a demo — there's no login. Click Continue below to watch it fill."
+        : 'Log in to the portal in the live browser on the left, then click "I\'m logged in".';
+    case "filling":
+      return (
+        "We're filling the form in the live browser — just watch. You don't need to do anything; you'll review everything before ANY submit." +
+        (isDemo ? " (Demo — nothing is ever submitted.)" : "")
+      );
+    case "awaiting_submit":
+      return isDemo
+        ? 'The form is filled. Look it over in the live browser, then click "I\'ve submitted" — this is a demo, so nothing is actually sent.'
+        : 'The form is filled. Review it in the live browser, submit it in the portal, then click "I\'ve submitted".';
+    case "done":
+      return "All done.";
+    case "error":
+      return 'Something went wrong. Use "Try again" below.';
+    case "cancelled":
+      return "This run was stopped.";
+    default:
+      return "";
+  }
+}
+
 function ApplyRunPage() {
   const { jobId } = Route.useParams();
   const { isAuthenticated, token } = useAuth();
