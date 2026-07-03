@@ -7,7 +7,6 @@ import {
   Award,
   GraduationCap,
   ArrowRight,
-  PenLine,
   CalendarClock,
   Send,
   TrendingUp,
@@ -244,12 +243,12 @@ function DashboardPage() {
           </SilentErrorBoundary>
 
           {/* Resume any live application first */}
-          <div className="mt-4">
+          <div className="mt-6">
             <ResumeBanner />
           </div>
 
           {/* Split hero: next-step (8) + task rail (4) */}
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
             <div className="lg:col-span-8">
               <NextStepCard isAuthenticated={isAuthenticated} />
             </div>
@@ -274,14 +273,14 @@ function DashboardPage() {
             </SilentErrorBoundary>
           )}
 
-          {/* Compact Prep summary + Essay + Search */}
-          <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {/* Secondary utility row: prep progress + search (quiet tier) */}
+          <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
             {isAuthenticated ? (
               <SilentErrorBoundary>
                 <PrepSummaryCard />
               </SilentErrorBoundary>
             ) : (
-              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
+              <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md">
                 <h2 className="font-display text-headline-sm font-bold text-on-surface">
                   Save this workspace
                 </h2>
@@ -298,58 +297,27 @@ function DashboardPage() {
               </section>
             )}
 
-            {/* Right column: Essay + Search stacked */}
-            <div className="flex flex-col gap-4">
-              {isAuthenticated && (
-                <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow">
-                  <div className="flex items-start gap-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white">
-                      <PenLine className="h-4 w-4" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="font-display text-headline-sm font-bold text-on-surface">
-                          Personal statement
-                        </h2>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-secondary-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-                          <Sparkles className="h-3 w-3" /> Live
-                        </span>
-                      </div>
-                      <p className="mt-1 text-body-sm text-on-surface/80">
-                        Grounded in your story. First draft free.
-                      </p>
-                    </div>
-                    <Link
-                      to="/essay"
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                    >
-                      Open <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </section>
-              )}
-
-              <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow">
-                <SilentErrorBoundary>
-                  <UniversitySearchSection
-                    title="Search 11,000+ universities"
-                    subtitle="Add any school to your shortlist."
-                  />
-                </SilentErrorBoundary>
-                <Link
-                  to="/universities"
-                  search={{ q: "" }}
-                  className="mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
-                >
-                  Open full workspace <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </section>
-            </div>
+            {/* Search — quiet utility (essay lives in the task rail + sidebar) */}
+            <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md">
+              <SilentErrorBoundary>
+                <UniversitySearchSection
+                  title="Search 11,000+ universities"
+                  subtitle="Add any school to your shortlist."
+                />
+              </SilentErrorBoundary>
+              <Link
+                to="/universities"
+                search={{ q: "" }}
+                className="mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+              >
+                Open full workspace <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </section>
           </div>
 
           {/* Quiz matches — collapsed compact strip */}
           {(loading || (saved && saved.matches.length > 0) || !saved) && (
-            <section className="mt-8">
+            <section className="mt-10">
               <div className="mb-3 flex items-end justify-between gap-3">
                 <div>
                   <h2 className="font-display text-headline-sm font-bold text-on-surface">
@@ -546,19 +514,19 @@ function ToolTile({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay }}
       whileHover={{ y: -3, transition: { type: "spring", stiffness: 280, damping: 22 } }}
-      className="group relative flex w-full items-start gap-4 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-5 text-left backdrop-blur-md qc-hard-shadow transition-all hover:shadow-[6px_6px_0_0_var(--color-primary)]"
+      className="group relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border border-on-surface/15 bg-surface/60 p-4 text-left backdrop-blur-md transition-all hover:border-on-surface hover:qc-hard-shadow-sm"
     >
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-container text-on-primary-container">
-        <Icon className="h-5 w-5" />
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-container text-on-primary-container">
+        <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
-          <span className="inline-flex items-center gap-1 rounded-full bg-on-surface text-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold">
-            <Lock className="h-3 w-3" /> Coming soon
+          <h3 className="font-display text-label-lg font-bold text-on-surface">{title}</h3>
+          <span className="inline-flex items-center gap-1 rounded-full bg-on-surface/8 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-surface-variant">
+            <Lock className="h-3 w-3" /> Soon
           </span>
         </div>
-        <p className="mt-1.5 text-body-md text-on-surface-variant">{desc}</p>
+        <p className="mt-1 text-body-sm text-on-surface-variant">{desc}</p>
         {price && (
           <p className="mt-2 font-[var(--font-label)] text-label-sm font-semibold text-primary">
             {price}
@@ -626,7 +594,7 @@ function PrepSummaryCard() {
   return (
     <section
       id="dashboard-prep"
-      className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow"
+      className="flex h-full flex-col rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
