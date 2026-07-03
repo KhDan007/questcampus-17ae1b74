@@ -227,6 +227,14 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         <RunStepper status={job.status} />
       </div>
 
+      {/* Stage guidance */}
+      <div className="mt-4 rounded-xl border-2 border-on-surface/20 bg-surface p-3 qc-hard-shadow-sm">
+        <p className="flex items-start gap-2 text-body-sm text-on-surface">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <span>{stageGuidance(job.status, isDemo)}</span>
+        </p>
+      </div>
+
       {/* Slim percent bar (only when there's real progress) */}
       {percent > 0 && (
         <>
