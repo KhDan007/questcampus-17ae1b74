@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2, CheckCircle2, Circle, ChevronDown, ChevronRight, CalendarClock } from "lucide-react";
+import { Loader2, CheckCircle2, Circle, ChevronDown, ChevronRight, CalendarClock, BookOpen } from "lucide-react";
 import {
   useApplicationPlan,
   useSetPlanDeadline,
@@ -11,7 +11,7 @@ import {
   type PlanTask,
   type EssayForTarget,
 } from "@/lib/apply/plan";
-import { useCreateDocument } from "@/lib/documents";
+import { TaskGuideDialog } from "@/components/apply/TaskGuideDialog";
 
 function fmtDate(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, {
