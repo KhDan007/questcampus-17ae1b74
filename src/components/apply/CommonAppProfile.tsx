@@ -11,6 +11,8 @@ import {
   Trash2,
   PenLine,
   ArrowLeft,
+  Lock,
+  KeyRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
