@@ -801,6 +801,8 @@ function RequirementsList({
   externalId: string;
   guideRows: GuideRow[] | undefined;
 }) {
+  const setAnswer = useSetAnswer();
+  const [editing, setEditing] = useState<IntakeItem | null>(null);
   return (
     <SectionCard
       id={id}
@@ -861,12 +863,13 @@ function RequirementsList({
                       <p className="mt-0.5 text-body-sm text-on-surface-variant">{it.prompt}</p>
                     )}
                   </div>
-                  <Link
-                    to="/dashboard"
-                    className="shrink-0 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setEditing(it)}
+                    className="shrink-0 rounded-md border-2 border-on-surface/30 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
                   >
                     {it.answered ? "Edit" : "Fill in"}
-                  </Link>
+                  </button>
                 </div>
                 <div className="pl-9">
                   <GuideBlock
@@ -888,6 +891,16 @@ function RequirementsList({
           })}
         </ul>
       )}
+      <RequirementEditorDialog
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        item={editing}
+        system={system}
+        externalId={externalId}
+        onSave={(value) => {
+          if (editing?.conceptKey) setAnswer(editing.conceptKey, value);
+        }}
+      />
     </SectionCard>
   );
 }
