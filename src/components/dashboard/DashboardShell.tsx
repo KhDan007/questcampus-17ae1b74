@@ -10,6 +10,7 @@ import {
   PenLine,
   Activity,
   CalendarClock,
+  ClipboardList,
   Send,
   Settings as SettingsIcon,
   Sparkles,
