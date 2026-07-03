@@ -39,6 +39,7 @@ type Dimension = {
   label: string;
   score: number;
   rationale: string;
+  quote?: string;
 };
 
 type Comment = {
@@ -49,8 +50,12 @@ type Comment = {
 
 type Rewrite = { before: string; after: string; why: string };
 
+type Band = "needs_work" | "competitive" | "strong" | "exceptional";
+
 type ReviewFree = {
   overall: number;
+  band?: Band;
+  bandLabel?: string;
   verdict: string;
   dimensions: Dimension[];
   topTip: string;
