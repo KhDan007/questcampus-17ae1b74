@@ -48,6 +48,18 @@ export function ApplicationPlanView({
   const plan = useApplicationPlan(system, externalId);
   const setDeadline = useSetPlanDeadline();
   const setTaskDone = useSetTaskDone();
+  const essays = useEssaysForTarget(system, externalId);
+
+  const essaysByConcept = useMemo(() => {
+    const map = new Map<string | null, EssayForTarget[]>();
+    (essays ?? []).forEach((e) => {
+      const key = e.conceptKey ?? null;
+      const arr = map.get(key) ?? [];
+      arr.push(e);
+      map.set(key, arr);
+    });
+    return map;
+  }, [essays]);
 
   if (plan === undefined) {
     return (
