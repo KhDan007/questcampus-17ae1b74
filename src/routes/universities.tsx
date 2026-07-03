@@ -313,10 +313,11 @@ function UniversitiesPage() {
   return (
     <>
       <LivingBackground />
-      <main
-        id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
-      >
+      <DashboardShell>
+        <main
+          id="main-content"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+        >
         <button
           type="button"
           onClick={() => {
