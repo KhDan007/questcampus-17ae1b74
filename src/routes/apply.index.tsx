@@ -26,7 +26,7 @@ import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
 import { useMemo, useState } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
-export const Route = createFileRoute("/apply")({
+export const Route = createFileRoute("/apply/")({
   head: () => ({
     meta: [
       { title: "Auto-Apply — QuestCampus" },
