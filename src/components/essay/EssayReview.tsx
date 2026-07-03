@@ -623,7 +623,7 @@ function ResultCard({
 }) {
   const reduce = useReducedMotion();
   const { free, paid, locked, sourceLabel, wordCount } = result;
-  const tier = tierColor(free.overall);
+  const tier = tierColor(free.overall, free.band, free.bandLabel);
 
   // Working text — what's actually shown / edited. Diverges from originalBody
   // when the user applies rewrites.
