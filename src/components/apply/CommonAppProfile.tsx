@@ -24,6 +24,13 @@ import {
   type RepeatGroup,
 } from "@/lib/apply/commonAppProfile";
 import { useSetAnswer } from "@/lib/apply/intake";
+import {
+  useCommonAppCredentials,
+  useSetCommonAppCredentials,
+  useRemoveCommonAppCredentials,
+} from "@/lib/apply/commonAppCredentials";
+
+
 
 export function CommonAppProfile() {
   const schema = useCommonAppSchema();
