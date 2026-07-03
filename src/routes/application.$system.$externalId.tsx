@@ -27,6 +27,7 @@ import {
   useIntakePlan,
   useEligibility,
   useChecklist,
+  useSetAnswer,
   type BackendTarget,
   type IntakeItem,
   type EligibilityPerTarget,
@@ -45,6 +46,7 @@ import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
 import type { GuideRow } from "@/lib/apply/guidance";
 import { ApplicationPlanView } from "@/components/apply/ApplicationPlanView";
+import { RequirementEditorDialog } from "@/components/apply/RequirementEditorDialog";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -122,10 +124,10 @@ export const Route = createFileRoute("/application/$system/$externalId")({
 });
 
 function ApplicationDetailPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isHydrated } = useAuth();
   const { system, externalId } = Route.useParams();
 
-  if (!isAuthenticated) {
+  if (isHydrated && !isAuthenticated) {
     return (
       <Navigate
         to="/signin"
@@ -140,7 +142,13 @@ function ApplicationDetailPage() {
     <DashboardShell>
       <LivingBackground />
       <SilentErrorBoundary fallback={<ApplicationFallback target={fallbackTarget} />}>
-        <ApplicationDetailContent system={system} externalId={externalId} />
+        {isHydrated ? (
+          <ApplicationDetailContent system={system} externalId={externalId} />
+        ) : (
+          <main className="relative mx-auto flex w-full max-w-(--container-content) items-center justify-center px-5 pt-24 sm:px-8 lg:px-12">
+            <Loader2 className="h-6 w-6 animate-spin text-on-surface-variant" />
+          </main>
+        )}
       </SilentErrorBoundary>
     </DashboardShell>
   );
@@ -793,6 +801,8 @@ function RequirementsList({
   externalId: string;
   guideRows: GuideRow[] | undefined;
 }) {
+  const setAnswer = useSetAnswer();
+  const [editing, setEditing] = useState<IntakeItem | null>(null);
   return (
     <SectionCard
       id={id}
@@ -853,12 +863,13 @@ function RequirementsList({
                       <p className="mt-0.5 text-body-sm text-on-surface-variant">{it.prompt}</p>
                     )}
                   </div>
-                  <Link
-                    to="/dashboard"
-                    className="shrink-0 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setEditing(it)}
+                    className="shrink-0 rounded-md border-2 border-on-surface/30 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
                   >
                     {it.answered ? "Edit" : "Fill in"}
-                  </Link>
+                  </button>
                 </div>
                 <div className="pl-9">
                   <GuideBlock
@@ -880,6 +891,16 @@ function RequirementsList({
           })}
         </ul>
       )}
+      <RequirementEditorDialog
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        item={editing}
+        system={system}
+        externalId={externalId}
+        onSave={(value) => {
+          if (editing?.conceptKey) setAnswer(editing.conceptKey, value);
+        }}
+      />
     </SectionCard>
   );
 }

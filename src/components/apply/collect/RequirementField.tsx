@@ -117,7 +117,7 @@ function EssayInput({ item, value, onChange }: { item: IntakeItem; value: string
 }
 
 function DocumentUploadSlot({ item }: { item: IntakeItem }) {
-  const { docs, upload } = useApplicationDocuments();
+  const { docs, upload, getDownloadUrl, remove } = useApplicationDocuments();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -137,18 +137,58 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
     }
   }
 
+  async function viewFile() {
+    if (!existing) return;
+    setError(null);
+    try {
+      const url = await getDownloadUrl(existing.id);
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        setError("File is no longer available.");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't open file");
+    }
+  }
+
+  async function removeFile() {
+    if (!existing) return;
+    if (!confirm(`Remove ${existing.fileName}?`)) return;
+    setError(null);
+    try {
+      await remove(existing.id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Remove failed");
+    }
+  }
+
   return (
     <div className="mt-3">
       {existing ? (
-        <div className="flex items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface" />
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">{existing.fileName}</span>
+          <button
+            type="button"
+            onClick={viewFile}
+            className="text-label-sm font-semibold text-primary underline underline-offset-2 hover:opacity-80"
+          >
+            View
+          </button>
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
           >
             Replace
+          </button>
+          <button
+            type="button"
+            onClick={removeFile}
+            className="text-label-sm text-on-error-container underline underline-offset-2 hover:opacity-80"
+          >
+            Remove
           </button>
         </div>
       ) : (

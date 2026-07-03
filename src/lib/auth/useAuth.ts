@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   subscribeAuth,
   getAuthSnapshot,
@@ -31,12 +31,20 @@ export function useAuth(): {
   isAuthenticated: boolean;
   isAdmin: boolean;
   hasPaidAccess: boolean;
+  isHydrated: boolean;
 } {
   const session = useSyncExternalStore(
     subscribeAuth,
     getAuthSnapshot,
     getAuthServerSnapshot,
   );
+  // Track client-side hydration so route guards don't redirect to /signin
+  // during the first render pass (when the server snapshot is null even
+  // for signed-in users whose token lives in localStorage).
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
   const user = session?.user ?? null;
   return {
     session,
@@ -45,5 +53,6 @@ export function useAuth(): {
     isAuthenticated: !!session,
     isAdmin: isAdminUser(user),
     hasPaidAccess: hasPaidAccess(user),
+    isHydrated,
   };
 }
