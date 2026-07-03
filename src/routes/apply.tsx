@@ -217,7 +217,7 @@ function RunLiveDemoCard() {
     setError(null);
     setStarting(true);
     try {
-      const { jobId } = await startDemo();
+      const { jobId } = await startDemo(true);
       await navigate({ to: "/apply/$jobId", params: { jobId } });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't start demo");
