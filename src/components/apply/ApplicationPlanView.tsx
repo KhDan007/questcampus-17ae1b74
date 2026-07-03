@@ -195,25 +195,38 @@ function TaskRow({
   task,
   system,
   externalId,
+  matchingEssays,
   onToggle,
 }: {
   task: PlanTask;
   system: string;
   externalId: string;
+  matchingEssays: EssayForTarget[];
   onToggle: () => Promise<void> | void;
 }) {
   const navigate = useNavigate();
   const createDoc = useCreateDocument();
   const [busy, setBusy] = useState(false);
+  const [draftsOpen, setDraftsOpen] = useState(false);
 
   const overdue = task.dueMs < Date.now() && !task.done;
+  const isEssay = task.kind === "essay";
 
-  async function handleCta() {
+  function writeEssay() {
+    void navigate({
+      to: "/essay",
+      search: {
+        system,
+        externalId,
+        ...(task.conceptKey ? { conceptKey: task.conceptKey } : {}),
+        ...(task.detail ? { prompt: task.detail } : {}),
+        ...(task.wordLimit ? { wordLimit: task.wordLimit } : {}),
+      },
+    });
+  }
+
+  async function handleNonEssayCta() {
     if (busy) return;
-    if (task.editor === "essay") {
-      void navigate({ to: "/essay" });
-      return;
-    }
     if (task.editor === "document") {
       setBusy(true);
       try {
@@ -237,8 +250,8 @@ function TaskRow({
     }
   }
 
-  const ctaLabel =
-    task.editor === "essay" || task.editor === "document"
+  const nonEssayLabel =
+    task.editor === "document"
       ? "Write"
       : task.upload
       ? "Upload"
@@ -295,18 +308,71 @@ function TaskRow({
         {task.detail && (
           <p className="mt-1 text-body-sm text-on-surface-variant">{task.detail}</p>
         )}
+        {isEssay && draftsOpen && matchingEssays.length > 0 && (
+          <ul className="mt-2 divide-y divide-on-surface/10 rounded-md border-2 border-on-surface/20 bg-surface">
+            {matchingEssays.map((d) => (
+              <li key={d.essayId}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftsOpen(false);
+                    void navigate({ to: "/essay", search: { essayId: d.essayId } });
+                  }}
+                  className="block w-full px-3 py-2 text-left hover:bg-surface-container-lowest"
+                >
+                  <p className="text-body-sm text-on-surface">
+                    {d.preview.length > 80
+                      ? d.preview.slice(0, 80) + "…"
+                      : d.preview || "(empty draft)"}
+                  </p>
+                  <p className="text-label-sm text-on-surface-variant">
+                    {d.wordCount} words · {fmtDate(d.editedAt ?? d.createdAt)}
+                  </p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {ctaLabel && (
-        <button
-          type="button"
-          onClick={() => void handleCta()}
-          disabled={busy}
-          className="shrink-0 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-          {ctaLabel}
-        </button>
+      {isEssay ? (
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={writeEssay}
+            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            Write
+          </button>
+          {matchingEssays.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setDraftsOpen((v) => !v)}
+              aria-expanded={draftsOpen}
+              className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface hover:border-on-surface"
+            >
+              Use a draft ({matchingEssays.length})
+              <ChevronDown
+                className={
+                  "h-3.5 w-3.5 transition-transform " +
+                  (draftsOpen ? "rotate-180" : "")
+                }
+              />
+            </button>
+          )}
+        </div>
+      ) : (
+        nonEssayLabel && (
+          <button
+            type="button"
+            onClick={() => void handleNonEssayCta()}
+            disabled={busy}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+            {nonEssayLabel}
+          </button>
+        )
       )}
     </li>
   );
