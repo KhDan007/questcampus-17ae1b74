@@ -19,9 +19,9 @@ import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlankRouteImport } from './routes/blank'
-import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnlockIndexRouteImport } from './routes/unlock.index'
+import { Route as ApplyIndexRouteImport } from './routes/apply.index'
 import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
@@ -79,11 +79,6 @@ const BlankRoute = BlankRouteImport.update({
   path: '/blank',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApplyRoute = ApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -92,6 +87,11 @@ const IndexRoute = IndexRouteImport.update({
 const UnlockIndexRoute = UnlockIndexRouteImport.update({
   id: '/unlock/',
   path: '/unlock/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyIndexRoute = ApplyIndexRouteImport.update({
+  id: '/apply/',
+  path: '/apply/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UnlockSuccessRoute = UnlockSuccessRouteImport.update({
@@ -115,9 +115,9 @@ const DocumentsIdRoute = DocumentsIdRouteImport.update({
   getParentRoute: () => DocumentsRoute,
 } as any)
 const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
-  id: '/$jobId',
-  path: '/$jobId',
-  getParentRoute: () => ApplyRoute,
+  id: '/apply/$jobId',
+  path: '/apply/$jobId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApplicationSystemExternalIdRoute =
   ApplicationSystemExternalIdRouteImport.update({
@@ -128,7 +128,6 @@ const ApplicationSystemExternalIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRouteWithChildren
@@ -144,12 +143,12 @@ export interface FileRoutesByFullPath {
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
+  '/apply/': typeof ApplyIndexRoute
   '/unlock/': typeof UnlockIndexRoute
   '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRouteWithChildren
@@ -165,13 +164,13 @@ export interface FileRoutesByTo {
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
+  '/apply': typeof ApplyIndexRoute
   '/unlock': typeof UnlockIndexRoute
   '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/apply': typeof ApplyRouteWithChildren
   '/blank': typeof BlankRoute
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRouteWithChildren
@@ -187,6 +186,7 @@ export interface FileRoutesById {
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
   '/unlock/success': typeof UnlockSuccessRoute
+  '/apply/': typeof ApplyIndexRoute
   '/unlock/': typeof UnlockIndexRoute
   '/application/$system/$externalId': typeof ApplicationSystemExternalIdRoute
 }
@@ -194,7 +194,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/apply'
     | '/blank'
     | '/dashboard'
     | '/documents'
@@ -210,12 +209,12 @@ export interface FileRouteTypes {
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
+    | '/apply/'
     | '/unlock/'
     | '/application/$system/$externalId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/apply'
     | '/blank'
     | '/dashboard'
     | '/documents'
@@ -231,12 +230,12 @@ export interface FileRouteTypes {
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
+    | '/apply'
     | '/unlock'
     | '/application/$system/$externalId'
   id:
     | '__root__'
     | '/'
-    | '/apply'
     | '/blank'
     | '/dashboard'
     | '/documents'
@@ -252,13 +251,13 @@ export interface FileRouteTypes {
     | '/oauth/callback'
     | '/unlock/cancel'
     | '/unlock/success'
+    | '/apply/'
     | '/unlock/'
     | '/application/$system/$externalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApplyRoute: typeof ApplyRouteWithChildren
   BlankRoute: typeof BlankRoute
   DashboardRoute: typeof DashboardRoute
   DocumentsRoute: typeof DocumentsRouteWithChildren
@@ -269,9 +268,11 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   TosRoute: typeof TosRoute
   UniversitiesRoute: typeof UniversitiesRoute
+  ApplyJobIdRoute: typeof ApplyJobIdRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
+  ApplyIndexRoute: typeof ApplyIndexRoute
   UnlockIndexRoute: typeof UnlockIndexRoute
   ApplicationSystemExternalIdRoute: typeof ApplicationSystemExternalIdRoute
 }
@@ -348,13 +349,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlankRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apply': {
-      id: '/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof ApplyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -367,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/unlock'
       fullPath: '/unlock/'
       preLoaderRoute: typeof UnlockIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply/': {
+      id: '/apply/'
+      path: '/apply'
+      fullPath: '/apply/'
+      preLoaderRoute: typeof ApplyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/unlock/success': {
@@ -399,10 +400,10 @@ declare module '@tanstack/react-router' {
     }
     '/apply/$jobId': {
       id: '/apply/$jobId'
-      path: '/$jobId'
+      path: '/apply/$jobId'
       fullPath: '/apply/$jobId'
       preLoaderRoute: typeof ApplyJobIdRouteImport
-      parentRoute: typeof ApplyRoute
+      parentRoute: typeof rootRouteImport
     }
     '/application/$system/$externalId': {
       id: '/application/$system/$externalId'
@@ -413,16 +414,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface ApplyRouteChildren {
-  ApplyJobIdRoute: typeof ApplyJobIdRoute
-}
-
-const ApplyRouteChildren: ApplyRouteChildren = {
-  ApplyJobIdRoute: ApplyJobIdRoute,
-}
-
-const ApplyRouteWithChildren = ApplyRoute._addFileChildren(ApplyRouteChildren)
 
 interface DocumentsRouteChildren {
   DocumentsIdRoute: typeof DocumentsIdRoute
@@ -438,7 +429,6 @@ const DocumentsRouteWithChildren = DocumentsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApplyRoute: ApplyRouteWithChildren,
   BlankRoute: BlankRoute,
   DashboardRoute: DashboardRoute,
   DocumentsRoute: DocumentsRouteWithChildren,
@@ -449,9 +439,11 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   TosRoute: TosRoute,
   UniversitiesRoute: UniversitiesRoute,
+  ApplyJobIdRoute: ApplyJobIdRoute,
   OauthCallbackRoute: OauthCallbackRoute,
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,
+  ApplyIndexRoute: ApplyIndexRoute,
   UnlockIndexRoute: UnlockIndexRoute,
   ApplicationSystemExternalIdRoute: ApplicationSystemExternalIdRoute,
 }
