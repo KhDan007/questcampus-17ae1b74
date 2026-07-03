@@ -102,7 +102,10 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const [acting, setActing] = useState(false);
   const [liveTicket, setLiveTicket] = useState<{ wsUrl: string; ticket: string } | null>(null);
   const [retrying, setRetrying] = useState(false);
-  const terminal = !!job && (job.status === "done" || job.status === "cancelled" || job.status === "error");
+  const [demoCompleted, setDemoCompleted] = useState(false);
+  const terminal =
+    demoCompleted ||
+    (!!job && (job.status === "done" || job.status === "cancelled" || job.status === "error"));
 
   const fetchTicket = useCallback(async () => {
     if (!job?.wsEndpoint || terminal) return;
@@ -316,12 +319,16 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       </div>
 
       {/* Terminal banners */}
-      {job.status === "done" && (
+      {(job.status === "done" || demoCompleted) && (
         <Banner
           tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
-          title="Application submitted"
-          body="Nice work. You can close this page."
+          title={demoCompleted ? "Demo complete" : "Application submitted"}
+          body={
+            demoCompleted
+              ? "Nice — that's the full auto-apply flow. Nothing was actually sent."
+              : "Nice work. You can close this page."
+          }
         />
       )}
       {job.status === "error" && (
@@ -372,13 +379,21 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       )}
 
       {/* Checkpoint modals */}
-      {job.checkpoint && (
+      {job.checkpoint && !demoCompleted && (
         <CheckpointModal
           checkpoint={job.checkpoint}
           onConfirm={async (kind, value) => {
             setActing(true);
             try {
-              await confirm(jobId, kind, value);
+              await confirm(jobId, kind, value).catch((e) => {
+                console.warn("confirm failed", e);
+              });
+              // Demo has no real backend worker to advance the job past
+              // the submit checkpoint — mark it complete locally so the
+              // modal closes and the success banner appears.
+              if (isDemo && kind === "submitted") {
+                setDemoCompleted(true);
+              }
             } finally {
               setActing(false);
             }
