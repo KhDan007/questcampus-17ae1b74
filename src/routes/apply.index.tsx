@@ -83,11 +83,16 @@ function ApplyHubPage() {
         </header>
 
         <div className="mt-8 space-y-8">
+          <SilentErrorBoundary>
+            <CommonAppProfileCard />
+          </SilentErrorBoundary>
+
           <ResumeBanner />
 
           <SilentErrorBoundary>
             <ResearchDock />
           </SilentErrorBoundary>
+
 
           <SilentErrorBoundary>
             <NextProductiveAction />
