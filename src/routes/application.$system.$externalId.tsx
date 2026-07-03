@@ -46,6 +46,7 @@ import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
 import type { GuideRow } from "@/lib/apply/guidance";
 import { ApplicationPlanView } from "@/components/apply/ApplicationPlanView";
+import { RequirementEditorDialog } from "@/components/apply/RequirementEditorDialog";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
