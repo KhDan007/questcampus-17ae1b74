@@ -319,12 +319,16 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       </div>
 
       {/* Terminal banners */}
-      {job.status === "done" && (
+      {(job.status === "done" || demoCompleted) && (
         <Banner
           tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
-          title="Application submitted"
-          body="Nice work. You can close this page."
+          title={demoCompleted ? "Demo complete" : "Application submitted"}
+          body={
+            demoCompleted
+              ? "Nice — that's the full auto-apply flow. Nothing was actually sent."
+              : "Nice work. You can close this page."
+          }
         />
       )}
       {job.status === "error" && (
