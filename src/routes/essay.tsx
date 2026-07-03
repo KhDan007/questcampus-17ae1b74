@@ -391,6 +391,46 @@ function EssayPage() {
     }
   }, [draftQ]);
 
+  // ---- Deep-link seeding from search params (essayId | target | prompt).
+  // Applied once, AFTER draft hydration completes.
+  const deepLinkAppliedRef = useRef(false);
+  useEffect(() => {
+    if (deepLinkAppliedRef.current) return;
+    if (!hydratedRef.current) return;
+    if (search.essayId) {
+      deepLinkAppliedRef.current = true;
+      // Seed a stub; the essayDoc query keyed on result.essayId will resolve
+      // the real content (fullText if paid, preview otherwise).
+      setResult({
+        essayId: search.essayId,
+        format: "common_app",
+        targetName: undefined,
+        preview: "",
+        wordCount: 0,
+        placeholders: [],
+        locked: true,
+        fullText: undefined,
+      });
+      setStep("result");
+      return;
+    }
+    if (search.system && search.externalId) {
+      deepLinkAppliedRef.current = true;
+      // Try to enrich the display name from the loaded matches list.
+      const match =
+        matches?.find((m) => (m as { externalId?: string }).externalId === search.externalId) ??
+        null;
+      const name =
+        (match as { name?: string } | null)?.name ??
+        target?.name ??
+        search.externalId;
+      setTarget({ externalId: search.externalId, name });
+      // If user hasn't started answering, jump them to the questions step.
+      setStep((prev) => (prev === "target" ? "questions" : prev));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftQ, search.essayId, search.system, search.externalId, matches]);
+
   const saveDraft = useMutation(api.essays.saveDraft);
   const clearDraft = useMutation(api.essays.clearDraft);
 
