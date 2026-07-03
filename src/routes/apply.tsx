@@ -75,8 +75,8 @@ function ApplyHubPage() {
             Select one or many. Prep your details once. We deep-research each portal, fill it in a
             live browser, and hand you the wheel before submit.
           </p>
-          <div className="mt-5">
-            <RunLiveDemoButton />
+          <div className="mt-6">
+            <RunLiveDemoCard />
           </div>
         </header>
 
@@ -206,7 +206,7 @@ function SavedToPick() {
   );
 }
 
-function RunLiveDemoButton() {
+function RunLiveDemoCard() {
   const navigate = useNavigate();
   const { startDemo } = useApplyActions();
   const [starting, setStarting] = useState(false);
@@ -226,28 +226,36 @@ function RunLiveDemoButton() {
   };
 
   return (
-    <div className="inline-flex max-w-xl flex-col items-start gap-1.5">
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={starting}
-        className="group inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-      >
-        {starting ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Play className="h-4 w-4 text-primary" />
-        )}
-        {starting ? "Starting demo…" : "Run a live demo"}
-      </button>
-      <p className="text-label-sm text-on-surface-variant">
-        Watch auto-apply fill a test form live — nothing is submitted.
-      </p>
-      {error && (
-        <p role="alert" className="text-label-sm font-semibold text-primary">
-          {error}
-        </p>
-      )}
-    </div>
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+      <div className="flex flex-wrap items-center gap-4 sm:flex-nowrap">
+        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+          <Play className="h-5 w-5 text-primary" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-headline-md font-bold text-on-surface">
+            See it in action — live demo
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            Watch auto-apply open a real browser and fill a test form in ~60 seconds. Nothing is submitted.
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <button
+            type="button"
+            onClick={onClick}
+            disabled={starting}
+            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+          >
+            {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            {starting ? "Starting demo…" : "Run live demo"}
+          </button>
+          {error && (
+            <p role="alert" className="text-label-sm font-semibold text-primary">
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

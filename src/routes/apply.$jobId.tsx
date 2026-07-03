@@ -10,11 +10,13 @@ import {
   LogIn,
   Send,
   ListChecks,
+  Hourglass,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LiveCanvas } from "@/components/apply/LiveCanvas";
+import { RunStepper } from "@/components/apply/RunStepper";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useApplyActions, useApplyJob, type ApplyJobCheckpoint } from "@/lib/applyQueue/client";
 
@@ -154,8 +156,13 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
             Live application
           </p>
-          <h1 className="mt-2 font-display text-display-md text-on-surface">
-            {job.targetName ?? job.externalId ?? "Application"}
+          <h1 className="mt-2 flex flex-wrap items-center gap-2 font-display text-display-md text-on-surface">
+            <span>{job.targetName ?? job.externalId ?? "Application"}</span>
+            {job.targetName === "Demo test run" && (
+              <span className="rounded-md border-2 border-on-surface bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-on-surface">
+                Demo — nothing is submitted
+              </span>
+            )}
           </h1>
           <p className="mt-1 text-body-md text-on-surface-variant">
             {STATUS_LABEL[job.status] ?? job.status}
@@ -183,37 +190,61 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         )}
       </header>
 
-      {/* Progress bar */}
-      <div className="mt-4 h-2 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface-container-lowest">
-        <div
-          className="h-full bg-primary transition-all duration-500"
-          style={{ width: `${percent}%` }}
-        />
+      {/* Phased stepper */}
+      <div className="mt-5">
+        <RunStepper status={job.status} />
       </div>
-      <p className="mt-1 text-label-sm text-on-surface-variant">
-        {job.progress?.stage ?? "Working"} · {percent}%
-      </p>
+
+      {/* Slim percent bar (only when there's real progress) */}
+      {percent > 0 && (
+        <>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface-container-lowest">
+            <div
+              className="h-full bg-primary transition-all duration-500"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          <p className="mt-1 text-label-sm text-on-surface-variant">
+            {job.progress?.stage ?? "Working"} · {percent}%
+          </p>
+        </>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Live canvas */}
+        {/* Live canvas / waiting state */}
         <div className="min-w-0">
-          <LiveCanvas
-            wsEndpoint={job.wsEndpoint}
-            ticket={liveTicket?.ticket}
-            interactive={!terminal}
-            disconnect={terminal}
-            onClose={onCanvasClose}
-          />
-          <p className="mt-2 text-label-sm text-on-surface-variant">
-            This is the agent&apos;s real browser. Click and type here to log in, solve captchas,
-            or take over at any time.
-          </p>
+          {job.wsEndpoint ? (
+            <>
+              <LiveCanvas
+                wsEndpoint={job.wsEndpoint}
+                ticket={liveTicket?.ticket}
+                interactive={!terminal}
+                disconnect={terminal}
+                onClose={onCanvasClose}
+              />
+              <p className="mt-2 text-label-sm text-on-surface-variant">
+                This is the agent&apos;s real browser. Click and type here to log in, solve captchas,
+                or take over at any time.
+              </p>
+            </>
+          ) : (
+            <QueuedWaitingCard createdAt={job.createdAt} />
+          )}
         </div>
 
         {/* Activity feed */}
         <aside className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 backdrop-blur-md qc-hard-shadow-sm">
           <h2 className="flex items-center gap-1.5 font-display text-headline-sm font-bold text-on-surface">
             <ListChecks className="h-4 w-4 text-primary" /> Activity
+            {!terminal && (
+              <span className="ml-1 inline-flex items-center gap-1 text-label-sm font-normal text-on-surface-variant">
+                <span className="relative inline-flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
+                live
+              </span>
+            )}
           </h2>
           <ol
             ref={feedRef}
@@ -316,6 +347,41 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         />
       )}
     </>
+  );
+}
+
+function QueuedWaitingCard({ createdAt }: { createdAt?: number }) {
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const start = createdAt ?? now;
+  const elapsedSec = Math.max(0, Math.floor((now - start) / 1000));
+  const mm = String(Math.floor(elapsedSec / 60)).padStart(2, "0");
+  const ss = String(elapsedSec % 60).padStart(2, "0");
+
+  return (
+    <div className="relative flex aspect-[16/10] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow">
+      <div
+        aria-hidden
+        className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_20%,rgba(0,0,0,0.04)_50%,transparent_80%)]"
+      />
+      <div className="relative flex flex-col items-center gap-2 text-center">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+          <Hourglass className="h-5 w-5 animate-pulse text-primary" />
+        </span>
+        <p className="font-display text-headline-sm font-bold text-on-surface">
+          Waiting for a worker to pick this up…
+        </p>
+        <p className="font-[var(--font-label)] text-label-md tabular-nums text-on-surface-variant">
+          Elapsed {mm}:{ss}
+        </p>
+        <p className="max-w-md text-body-sm text-on-surface-variant">
+          Your test form will open here and fill itself — nothing is submitted.
+        </p>
+      </div>
+    </div>
   );
 }
 
