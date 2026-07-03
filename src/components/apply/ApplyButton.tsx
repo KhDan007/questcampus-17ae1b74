@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Send, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useApplyActions } from "@/lib/applyQueue/client";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useCommonAppProfile } from "@/lib/apply/commonAppProfile";
 
 type Props = {
   source: string;
@@ -24,9 +26,11 @@ export function ApplyButton({
   className,
   size = "sm",
 }: Props) {
+  // All hooks unconditionally at the top — Rules of Hooks.
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { startApply } = useApplyActions();
+  const profile = useCommonAppProfile();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +48,13 @@ export function ApplyButton({
             const redirect =
               typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
             void navigate({ to: "/signin", search: { redirect } as never });
+            return;
+          }
+          // Gate on Common App profile completeness — the backend also
+          // blocks, but this guides the user before we hit that error.
+          if (profile && !profile.completeness.complete) {
+            toast.error("Complete your Common App profile first");
+            void navigate({ to: "/common-app" });
             return;
           }
           setError(null);
@@ -78,3 +89,4 @@ export function ApplyButton({
     </>
   );
 }
+

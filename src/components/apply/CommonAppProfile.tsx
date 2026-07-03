@@ -11,6 +11,8 @@ import {
   Trash2,
   PenLine,
   ArrowLeft,
+  Lock,
+  KeyRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -22,6 +24,13 @@ import {
   type RepeatGroup,
 } from "@/lib/apply/commonAppProfile";
 import { useSetAnswer } from "@/lib/apply/intake";
+import {
+  useCommonAppCredentials,
+  useSetCommonAppCredentials,
+  useRemoveCommonAppCredentials,
+} from "@/lib/apply/commonAppCredentials";
+
+
 
 export function CommonAppProfile() {
   const schema = useCommonAppSchema();
@@ -148,6 +157,8 @@ export function CommonAppProfile() {
         </div>
       </section>
 
+      <CommonAppLoginCard />
+
       {/* Sections */}
       {schema.map((section) => (
         <SectionCard
@@ -240,18 +251,23 @@ function ScalarField({
   value: string;
   onChange: (v: string) => void;
 }) {
-  // Uncontrolled + `key` on the value from the store so reactive refreshes
-  // don't fight the user's typing.
+  // Controlled input; sync from the store only while unfocused so reactive
+  // refreshes (e.g. Prefill) never fight the user's active typing.
   const [local, setLocal] = useState(value);
+  const [focused, setFocused] = useState(false);
   useEffect(() => {
-    setLocal(value);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field.conceptKey]);
+    if (!focused) setLocal(value);
+  }, [value, focused]);
 
   const update = (v: string) => {
     setLocal(v);
     onChange(v);
   };
+  const focusHandlers = {
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  };
+
 
   const isFullWidth = field.type === "longtext" || field.type === "essay";
   const wrapperClass = isFullWidth ? "sm:col-span-2" : "";
@@ -304,19 +320,19 @@ function ScalarField({
 
       {field.type === "longtext" ? (
         <textarea
-          key={field.conceptKey}
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           rows={4}
           className={inputClass}
+          {...focusHandlers}
           {...maxAttr}
         />
       ) : field.type === "enum" ? (
         <select
-          key={field.conceptKey}
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           className={inputClass}
+          {...focusHandlers}
         >
           <option value="">Select…</option>
           {(field.options ?? []).map((o) => (
@@ -327,7 +343,6 @@ function ScalarField({
         </select>
       ) : (
         <input
-          key={field.conceptKey}
           type={
             field.type === "date"
               ? "date"
@@ -339,12 +354,14 @@ function ScalarField({
                     ? "number"
                     : "text"
           }
-          defaultValue={value}
+          value={local}
           onChange={(e) => update(e.target.value)}
           className={inputClass}
+          {...focusHandlers}
           {...maxAttr}
         />
       )}
+
 
       <div className="flex items-center justify-between gap-3">
         {field.help ? (
@@ -456,5 +473,140 @@ function RepeatGroupEditor({
         </button>
       )}
     </div>
+  );
+}
+
+function CommonAppLoginCard() {
+  const creds = useCommonAppCredentials();
+  const saveCreds = useSetCommonAppCredentials();
+  const removeCreds = useRemoveCommonAppCredentials();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+
+  const has = creds?.hasCredentials ?? false;
+
+  async function onSave() {
+    if (saving) return;
+    if (!email.trim() || !password) {
+      toast.error("Email and password are required.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveCreds(email.trim(), password);
+      setEmail("");
+      setPassword("");
+      toast.success("Saved — we'll sign you in automatically.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save login");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function onRemove() {
+    if (removing) return;
+    if (!confirm("Remove your saved Common App login?")) return;
+    setRemoving(true);
+    try {
+      await removeCreds();
+      toast.success("Login removed.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't remove login");
+    } finally {
+      setRemoving(false);
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-on-surface/20 bg-surface-container-lowest text-on-surface">
+          <KeyRound className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-headline-sm font-bold text-on-surface">
+            Common App login
+          </h2>
+          <p className="mt-1 text-body-sm text-on-surface-variant">
+            We use this to sign into your Common App account during auto-apply.
+          </p>
+
+          {creds === undefined ? (
+            <div className="mt-4 flex items-center gap-2 text-body-sm text-on-surface-variant">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading…
+            </div>
+          ) : has ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-tertiary" />
+                <p className="min-w-0 truncate text-body-sm text-on-surface">
+                  Saved for{" "}
+                  <span className="font-semibold">
+                    {creds.loginEmail ?? "your Common App account"}
+                  </span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onRemove}
+                disabled={removing}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {removing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+                  Common App email
+                </label>
+                <input
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={saving}
+                  className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none disabled:opacity-60"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={saving}
+                  className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none disabled:opacity-60"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={onSave}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Save login
+              </button>
+            </div>
+          )}
+
+          <p className="mt-3 inline-flex items-center gap-1.5 text-label-sm text-on-surface-variant">
+            <Lock className="h-3 w-3" />
+            Stored encrypted; used only to sign you into Common App during auto-apply. We never
+            show it back to you.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
