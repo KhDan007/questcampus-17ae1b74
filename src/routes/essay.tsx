@@ -290,6 +290,7 @@ function EssayPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
   const token = auth.getSession()?.token;
+  const search = Route.useSearch();
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -390,6 +391,46 @@ function EssayPage() {
     }
   }, [draftQ]);
 
+  // ---- Deep-link seeding from search params (essayId | target | prompt).
+  // Applied once, AFTER draft hydration completes.
+  const deepLinkAppliedRef = useRef(false);
+  useEffect(() => {
+    if (deepLinkAppliedRef.current) return;
+    if (!hydratedRef.current) return;
+    if (search.essayId) {
+      deepLinkAppliedRef.current = true;
+      // Seed a stub; the essayDoc query keyed on result.essayId will resolve
+      // the real content (fullText if paid, preview otherwise).
+      setResult({
+        essayId: search.essayId,
+        format: "common_app",
+        targetName: undefined,
+        preview: "",
+        wordCount: 0,
+        placeholders: [],
+        locked: true,
+        fullText: undefined,
+      });
+      setStep("result");
+      return;
+    }
+    if (search.system && search.externalId) {
+      deepLinkAppliedRef.current = true;
+      // Try to enrich the display name from the loaded matches list.
+      const match =
+        matches?.find((m) => (m as { externalId?: string }).externalId === search.externalId) ??
+        null;
+      const name =
+        (match as { name?: string } | null)?.name ??
+        target?.name ??
+        search.externalId;
+      setTarget({ externalId: search.externalId, name });
+      // If user hasn't started answering, jump them to the questions step.
+      setStep((prev) => (prev === "target" ? "questions" : prev));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftQ, search.essayId, search.system, search.externalId, matches]);
+
   const saveDraft = useMutation(api.essays.saveDraft);
   const clearDraft = useMutation(api.essays.clearDraft);
 
@@ -461,13 +502,26 @@ function EssayPage() {
     setGenStatus("loading");
     setGenError(null);
     try {
+      // Prefer deep-linked target (search.system/externalId) over the picker.
+      const useSearchTarget = !!(search.system && search.externalId);
+      const argTargetSource = useSearchTarget
+        ? search.system
+        : target?.externalId
+          ? "scorecard"
+          : undefined;
+      const argTargetExternalId = useSearchTarget
+        ? search.externalId
+        : target?.externalId;
       const res = (await generate({
         sessionId,
         token,
         essayAnswers: buildPayload(answers),
         questionLabels: buildLabels(answers),
-        targetSource: target?.externalId ? "scorecard" : undefined,
-        targetExternalId: target?.externalId,
+        targetSource: argTargetSource,
+        targetExternalId: argTargetExternalId,
+        ...(search.conceptKey ? { conceptKey: search.conceptKey } : {}),
+        ...(search.prompt ? { prompt: search.prompt } : {}),
+        ...(search.wordLimit ? { wordLimit: search.wordLimit } : {}),
         lang: "en",
       })) as EssayResult | EssayError;
       if ("error" in res) {
@@ -497,7 +551,7 @@ function EssayPage() {
       setGenStatus("error");
       setGenError("generation_failed");
     }
-  }, [sessionId, token, generate, answers, target, clearDraft]);
+  }, [sessionId, token, generate, answers, target, clearDraft, search.system, search.externalId, search.conceptKey, search.prompt, search.wordLimit]);
 
   const canSubmitQuestions = useMemo(() => {
     // Only the anchor story is required; everything else is optional.
@@ -635,6 +689,8 @@ function EssayPage() {
                     error={genError}
                     token={token}
                     sessionId={sessionId}
+                    supplementPrompt={search.prompt}
+                    supplementWordLimit={search.wordLimit}
                   />
                 </StepWrap>
               )}
@@ -1057,6 +1113,8 @@ function QuestionsForm({
   error,
   token,
   sessionId,
+  supplementPrompt,
+  supplementWordLimit,
 }: {
   answers: AnswerMap;
   setAnswers: (next: AnswerMap | ((prev: AnswerMap) => AnswerMap)) => void;
@@ -1067,6 +1125,8 @@ function QuestionsForm({
   error: EssayError["error"] | null;
   token: string | undefined;
   sessionId: string | null;
+  supplementPrompt?: string;
+  supplementWordLimit?: number;
 }) {
   const setField = (key: string, patch: Partial<AnswerVal>) =>
     setAnswers((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
@@ -1074,6 +1134,22 @@ function QuestionsForm({
 
   return (
     <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+      {supplementPrompt && (
+        <div className="mb-6 rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm">
+          <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-primary">
+            Prompt
+          </p>
+          <p className="mt-1 font-display text-label-lg text-on-surface text-balance">
+            {supplementPrompt}
+          </p>
+          {supplementWordLimit ? (
+            <p className="mt-2 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+              {supplementWordLimit}-word limit
+            </p>
+          ) : null}
+        </div>
+      )}
+
       <h2 className="font-display text-headline-md font-bold text-on-surface">
         Tell us your story
       </h2>
