@@ -88,6 +88,18 @@ export function LiveCanvas({
     };
   }, [wsEndpoint, ticket, disconnect, onClose]);
 
+  // Prevent page scroll when the user scrolls over the canvas.
+  // React's onWheel is passive; attach a non-passive listener manually.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !interactive) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+    };
+    canvas.addEventListener("wheel", handler, { passive: false });
+    return () => canvas.removeEventListener("wheel", handler);
+  }, [interactive]);
+
   // Scale page-coords -> source canvas coords (1280×800)
   function toSource(ev: { clientX: number; clientY: number }): { x: number; y: number } | null {
     const canvas = canvasRef.current;
