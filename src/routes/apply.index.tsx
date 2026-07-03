@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckSquare,
+  ClipboardList,
   Loader2,
   Play,
   Search,
@@ -23,6 +24,7 @@ import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 import { useApplyActions } from "@/lib/applyQueue/client";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useCommonAppProfile } from "@/lib/apply/commonAppProfile";
 import { useMemo, useState } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
