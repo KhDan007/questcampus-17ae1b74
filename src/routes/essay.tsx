@@ -502,13 +502,26 @@ function EssayPage() {
     setGenStatus("loading");
     setGenError(null);
     try {
+      // Prefer deep-linked target (search.system/externalId) over the picker.
+      const useSearchTarget = !!(search.system && search.externalId);
+      const argTargetSource = useSearchTarget
+        ? search.system
+        : target?.externalId
+          ? "scorecard"
+          : undefined;
+      const argTargetExternalId = useSearchTarget
+        ? search.externalId
+        : target?.externalId;
       const res = (await generate({
         sessionId,
         token,
         essayAnswers: buildPayload(answers),
         questionLabels: buildLabels(answers),
-        targetSource: target?.externalId ? "scorecard" : undefined,
-        targetExternalId: target?.externalId,
+        targetSource: argTargetSource,
+        targetExternalId: argTargetExternalId,
+        ...(search.conceptKey ? { conceptKey: search.conceptKey } : {}),
+        ...(search.prompt ? { prompt: search.prompt } : {}),
+        ...(search.wordLimit ? { wordLimit: search.wordLimit } : {}),
         lang: "en",
       })) as EssayResult | EssayError;
       if ("error" in res) {
