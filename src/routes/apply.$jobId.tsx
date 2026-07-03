@@ -102,7 +102,10 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   const [acting, setActing] = useState(false);
   const [liveTicket, setLiveTicket] = useState<{ wsUrl: string; ticket: string } | null>(null);
   const [retrying, setRetrying] = useState(false);
-  const terminal = !!job && (job.status === "done" || job.status === "cancelled" || job.status === "error");
+  const [demoCompleted, setDemoCompleted] = useState(false);
+  const terminal =
+    demoCompleted ||
+    (!!job && (job.status === "done" || job.status === "cancelled" || job.status === "error"));
 
   const fetchTicket = useCallback(async () => {
     if (!job?.wsEndpoint || terminal) return;
