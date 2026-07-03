@@ -95,33 +95,68 @@ type Mode = "paste" | "upload" | "pick";
 // Helpers
 // -----------------------------------------------------------------------------
 
-function tierColor(overall: number): { ring: string; text: string; chip: string; label: string } {
+function tierColor(
+  overall: number,
+  band?: Band,
+  bandLabel?: string,
+): { ring: string; text: string; chip: string; label: string } {
+  // Prefer the backend band when present (deterministic + calibrated).
+  if (band) {
+    if (band === "exceptional")
+      return {
+        ring: "#b45309",
+        text: "text-amber-800",
+        chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+        label: bandLabel ?? "Exceptional",
+      };
+    if (band === "strong")
+      return {
+        ring: "#0d9488",
+        text: "text-teal-700",
+        chip: "border-2 border-on-surface bg-primary text-white",
+        label: bandLabel ?? "Strong",
+      };
+    if (band === "competitive")
+      return {
+        ring: "#0369a1",
+        text: "text-sky-800",
+        chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+        label: bandLabel ?? "Competitive",
+      };
+    return {
+      ring: "#6b7280",
+      text: "text-on-surface",
+      chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+      label: bandLabel ?? "Needs work",
+    };
+  }
+  // Fallback thresholds — rebased for the stricter, calibrated scale.
   if (overall >= 85)
     return {
-      ring: "#0d9488",
-      text: "text-teal-700",
-      chip: "bg-teal-100 text-teal-800",
-      label: "Outstanding",
+      ring: "#b45309",
+      text: "text-amber-800",
+      chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+      label: "Exceptional",
     };
   if (overall >= 70)
     return {
-      ring: "#16a34a",
-      text: "text-green-700",
-      chip: "bg-green-100 text-green-800",
+      ring: "#0d9488",
+      text: "text-teal-700",
+      chip: "border-2 border-on-surface bg-primary text-white",
       label: "Strong",
     };
-  if (overall >= 50)
+  if (overall >= 55)
     return {
-      ring: "#d97706",
-      text: "text-amber-700",
-      chip: "bg-amber-100 text-amber-900",
-      label: "Promising — work to do",
+      ring: "#0369a1",
+      text: "text-sky-800",
+      chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+      label: "Competitive",
     };
   return {
-    ring: "#dc2626",
-    text: "text-red-700",
-    chip: "bg-red-100 text-red-800",
-    label: "Needs another pass",
+    ring: "#6b7280",
+    text: "text-on-surface",
+    chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+    label: "Needs work",
   };
 }
 
