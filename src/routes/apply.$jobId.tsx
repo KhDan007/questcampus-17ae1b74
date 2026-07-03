@@ -379,13 +379,21 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       )}
 
       {/* Checkpoint modals */}
-      {job.checkpoint && (
+      {job.checkpoint && !demoCompleted && (
         <CheckpointModal
           checkpoint={job.checkpoint}
           onConfirm={async (kind, value) => {
             setActing(true);
             try {
-              await confirm(jobId, kind, value);
+              await confirm(jobId, kind, value).catch((e) => {
+                console.warn("confirm failed", e);
+              });
+              // Demo has no real backend worker to advance the job past
+              // the submit checkpoint — mark it complete locally so the
+              // modal closes and the success banner appears.
+              if (isDemo && kind === "submitted") {
+                setDemoCompleted(true);
+              }
             } finally {
               setActing(false);
             }
