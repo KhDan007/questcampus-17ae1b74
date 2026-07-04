@@ -32,7 +32,7 @@ import {
 
 
 
-export function CommonAppProfile() {
+export function CommonAppProfile({ focusSection }: { focusSection?: string } = {}) {
   const schema = useCommonAppSchema();
   const profile = useCommonAppProfile();
   const setAnswer = useSetAnswer();
@@ -159,8 +159,21 @@ export function CommonAppProfile() {
 
       <CommonAppLoginCard />
 
+      {focusSection && schema.some((s) => s.key === focusSection) && (
+        <Link
+          to="/common-app"
+          search={{} as never}
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+        >
+          Show all sections
+        </Link>
+      )}
+
       {/* Sections */}
-      {schema.map((section) => (
+      {(focusSection
+        ? schema.filter((s) => s.key === focusSection)
+        : schema
+      ).map((section) => (
         <SectionCard
           key={section.key}
           section={section}

@@ -19,6 +19,7 @@ import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
+import { CommonAppScheduleCard } from "@/components/apply/CommonAppScheduleCard";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
@@ -85,6 +86,10 @@ function ApplyHubPage() {
         <div className="mt-8 space-y-8">
           <SilentErrorBoundary>
             <CommonAppProfileCard />
+          </SilentErrorBoundary>
+
+          <SilentErrorBoundary>
+            <CommonAppScheduleCard />
           </SilentErrorBoundary>
 
           <ResumeBanner />

@@ -84,3 +84,30 @@ export function usePrefillFromOnboarding() {
     return res ?? { filled: 0 };
   }, [token, mutate]);
 }
+
+export type ScheduleSection = {
+  sectionKey: string;
+  title: string;
+  unansweredRequired: number;
+  unansweredTotal: number;
+  dueMs: number;
+};
+
+export type IntakeSchedule = {
+  soonestDeadlineMs: number;
+  sections: ScheduleSection[];
+};
+
+/**
+ * Sectioned intake schedule (hardest-first, soonest-due).
+ * `nowMs` is passed in so the query result stays deterministic/cacheable.
+ * Returns null when signed out, undefined while loading.
+ */
+export function useIntakeSchedule(nowMs: number): IntakeSchedule | null | undefined {
+  const { token } = useAuth();
+  const args = token ? { token, nowMs } : "skip";
+  return useQuery(api.applicationPlan.intakeSchedule, args as never) as
+    | IntakeSchedule
+    | null
+    | undefined;
+}
