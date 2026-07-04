@@ -32,7 +32,7 @@ import {
 
 
 
-export function CommonAppProfile() {
+export function CommonAppProfile({ focusSection }: { focusSection?: string } = {}) {
   const schema = useCommonAppSchema();
   const profile = useCommonAppProfile();
   const setAnswer = useSetAnswer();
