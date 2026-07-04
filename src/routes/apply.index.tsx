@@ -88,6 +88,10 @@ function ApplyHubPage() {
             <CommonAppProfileCard />
           </SilentErrorBoundary>
 
+          <SilentErrorBoundary>
+            <CommonAppScheduleCard />
+          </SilentErrorBoundary>
+
           <ResumeBanner />
 
           <SilentErrorBoundary>
