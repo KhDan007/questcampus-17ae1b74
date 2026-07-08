@@ -1,13 +1,13 @@
 "use client";
 
-import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
+import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 
 export function FooterV2() {
   return (
     <footer className="relative border-t-2 border-on-surface/10 bg-surface px-5 py-12 sm:px-8">
       <div className="mx-auto flex max-w-(--container-content) flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div className="flex items-center">
-          <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-auto object-contain" />
+          <QuestCampusLogo className="h-8" />
         </div>
 
         <nav className="flex flex-wrap items-center gap-x-7 gap-y-3 font-[var(--font-label)] text-label-md text-on-surface-variant">

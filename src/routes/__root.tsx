@@ -19,7 +19,6 @@ import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
 
 
 import appCss from "../styles.css?url";
-import faviconAsset from "@/assets/questcampus-icon.png.asset.json";
 import ogImageAsset from "@/assets/questcampus-og.jpg.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -107,8 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: faviconAsset.url },
-      { rel: "apple-touch-icon", href: faviconAsset.url },
+      { rel: "icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", href: "/favicon.ico" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

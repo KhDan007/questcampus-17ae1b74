@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Menu, X, GraduationCap, PenLine, Settings as SettingsIcon, Home, Sparkles, FileText } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
+import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -88,7 +88,7 @@ export function NavV2() {
             </button>
 
             <a href="/" className="group flex items-center">
-              <img src={logoAsset.url} alt="QuestCampus" className="h-8 w-auto object-contain" />
+              <QuestCampusLogo className="h-8" />
             </a>
           </div>
 
@@ -152,7 +152,7 @@ export function NavV2() {
               >
                 <div className="mb-4 flex items-center justify-between">
                   <Link to="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
-                    <img src={logoAsset.url} alt="QuestCampus" className="h-7 w-auto object-contain" />
+                    <QuestCampusLogo className="h-7" />
                   </Link>
                   <button
                     type="button"
@@ -166,6 +166,9 @@ export function NavV2() {
 
                 <nav className="flex flex-col gap-1">
                   <MobileLink to="/" icon={Home} label="Home" active={isLanding} onClick={() => setMobileOpen(false)} />
+                  {isAuthenticated && (
+                    <MobileLink to="/agent" icon={Sparkles} label="Agent" active={pathname.startsWith("/agent")} onClick={() => setMobileOpen(false)} />
+                  )}
                   <MobileLink to="/universities" icon={GraduationCap} label="Universities" active={pathname.startsWith("/universities")} onClick={() => setMobileOpen(false)} />
                   <MobileLink to="/essay" icon={PenLine} label="Essays" active={pathname.startsWith("/essay")} onClick={() => setMobileOpen(false)} />
                   {isAuthenticated && (

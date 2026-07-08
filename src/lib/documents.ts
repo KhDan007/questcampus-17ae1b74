@@ -147,8 +147,9 @@ export function useSaveDocument(debounceMs = 600) {
   const pending = useRef<Record<string, { content: string; title?: string }>>({});
 
   useEffect(() => {
+    const activeTimers = timers.current;
     return () => {
-      Object.values(timers.current).forEach((t) => clearTimeout(t));
+      Object.values(activeTimers).forEach((t) => clearTimeout(t));
     };
   }, []);
 

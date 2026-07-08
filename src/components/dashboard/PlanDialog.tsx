@@ -30,7 +30,9 @@ async function cancelSubscription(
     let body: { error?: string } = {};
     try {
       body = await res.json();
-    } catch {}
+    } catch {
+      // A non-JSON error body falls back to the status message below.
+    }
     return { ok: false, message: body.error ?? `Cancel failed (${res.status})` };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Network error" };

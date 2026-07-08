@@ -253,7 +253,9 @@ function OnboardingPage() {
       // Clear stale localStorage matches so dashboard shows the new ones.
       try {
         window.localStorage.removeItem("qc.landing.matches");
-      } catch {}
+      } catch {
+        // Stale local matches are harmless if storage is unavailable.
+      }
       navigate({ to: "/dashboard", search: { refresh: 1 } as never });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Try again.");

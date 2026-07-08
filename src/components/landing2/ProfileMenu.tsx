@@ -46,7 +46,6 @@ export function ProfileMenu() {
         className="group relative grid h-10 w-10 place-items-center overflow-hidden rounded-full border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
       >
         {user?.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
         ) : isAuthenticated ? (
           <span className="font-[var(--font-label)] text-label-sm font-semibold">

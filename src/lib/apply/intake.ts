@@ -138,8 +138,9 @@ export function useSetAnswer(debounceMs = 400) {
   const pending = useRef<Record<string, string>>({});
 
   useEffect(() => {
+    const activeTimers = timers.current;
     return () => {
-      Object.values(timers.current).forEach((t) => clearTimeout(t));
+      Object.values(activeTimers).forEach((t) => clearTimeout(t));
     };
   }, []);
 

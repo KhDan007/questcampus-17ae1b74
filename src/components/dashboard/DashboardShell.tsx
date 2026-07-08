@@ -48,6 +48,14 @@ type Item =
 const TOP_ITEMS: Item[] = [
   {
     kind: "link",
+    key: "agent",
+    label: "Agent",
+    to: "/agent",
+    icon: Sparkles,
+    match: (p) => p.startsWith("/agent"),
+  },
+  {
+    kind: "link",
     key: "autoapply",
     label: "Applications",
     to: "/apply",
@@ -120,7 +128,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       const w = Number(localStorage.getItem(LS_WIDTH));
       if (w && w >= MIN_W && w <= MAX_W) setWidth(w);
       setCollapsed(localStorage.getItem(LS_COLLAPSED) === "1");
-    } catch {}
+    } catch {
+      // localStorage can be unavailable in private browsing.
+    }
   }, []);
 
   // Persist
@@ -128,13 +138,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (!mounted) return;
     try {
       localStorage.setItem(LS_WIDTH, String(width));
-    } catch {}
+    } catch {
+      // Persisting sidebar width is non-critical.
+    }
   }, [width, mounted]);
   useEffect(() => {
     if (!mounted) return;
     try {
       localStorage.setItem(LS_COLLAPSED, collapsed ? "1" : "0");
-    } catch {}
+    } catch {
+      // Persisting sidebar state is non-critical.
+    }
   }, [collapsed, mounted]);
 
   // Close mobile drawer on route change
@@ -207,7 +221,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="relative flex min-h-screen w-full items-start">
+      <div className="relative flex min-h-screen w-full max-w-full items-start overflow-x-hidden">
         {/* Desktop sidebar */}
         <aside
           aria-label="Primary"
@@ -249,7 +263,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        aria-label="Open menu"
+        aria-label="Open workspace menu"
+        title="Open workspace menu"
         className="fixed bottom-5 left-5 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none lg:hidden"
       >
         <PanelLeft className="h-5 w-5" />
@@ -260,10 +275,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         createPortal(
           <AnimatePresence>
             {mobileOpen && (
-              <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true">
+              <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true" aria-label="Workspace menu">
                 <motion.button
                   type="button"
-                  aria-label="Close menu"
+                  aria-label="Close workspace menu"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -272,18 +287,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   onClick={() => setMobileOpen(false)}
                 />
                 <motion.aside
-                  initial={{ x: -24, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -24, opacity: 0 }}
+                  initial={{ x: -24 }}
+                  animate={{ x: 0 }}
+                  exit={{ x: -24 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute inset-y-0 left-0 flex w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface shadow-2xl"
+                  className="absolute inset-y-0 left-0 flex w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface shadow-2xl will-change-transform"
                 >
                   <div className="flex items-center justify-between border-b-2 border-on-surface/10 px-4 py-3">
                     <p className="font-display text-label-lg font-bold text-on-surface">Menu</p>
                     <button
                       type="button"
                       onClick={() => setMobileOpen(false)}
-                      aria-label="Close menu"
+                      aria-label="Close workspace menu"
                       className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none"
                     >
                       <X className="h-4 w-4" />

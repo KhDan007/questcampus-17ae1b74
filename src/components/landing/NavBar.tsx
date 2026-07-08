@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { CTAButton } from "./CTAButton";
 import { ONBOARDING_PATH, SIGNIN_PATH } from "@/lib/routes";
-import logoAsset from "@/assets/questcampus-logo-full.png.asset.json";
+import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth, type AuthUser } from "@/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -50,11 +50,7 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
           href="/"
           className="flex items-center gap-2 font-display text-xl font-bold text-primary tracking-tight"
         >
-          <img
-            src={logoAsset.url}
-            alt="QuestCampus"
-            className="h-8 w-auto object-contain"
-          />
+          <QuestCampusLogo className="h-8" />
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3">

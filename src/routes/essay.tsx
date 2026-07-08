@@ -941,7 +941,7 @@ function Stepper({ step }: { step: "target" | "questions" | "result" }) {
   );
 }
 
-function StepWrap({ children, key: _k }: { children: React.ReactNode; key?: string }) {
+function StepWrap({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}

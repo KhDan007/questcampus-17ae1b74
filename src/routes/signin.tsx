@@ -25,6 +25,21 @@ export const Route = createFileRoute("/signin")({
 
 type Mode = "signin" | "signup";
 
+function safeRedirectFromSearch(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("redirect");
+  if (!raw) return null;
+  try {
+    const url = new URL(raw, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    const path = `${url.pathname}${url.search}${url.hash}`;
+    if (!path.startsWith("/") || path.startsWith("//") || path.startsWith("/signin")) return null;
+    return path;
+  } catch {
+    return null;
+  }
+}
+
 function SignInPage() {
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -39,7 +54,7 @@ function SignInPage() {
   const linkOnLogin = useMutation(api.onboarding.linkOnLogin);
   const linkDraftOnLogin = useMutation(api.essays.linkDraftOnLogin);
 
-  async function afterLogin(token: string) {
+  async function afterLogin(token: string, requestedRedirect = safeRedirectFromSearch()) {
     let doc: { completed?: boolean; currentStep?: number } | null = null;
     const sessionId = getSessionId();
     try {
@@ -56,6 +71,10 @@ function SignInPage() {
       window.localStorage.removeItem("qc_profile");
       window.localStorage.removeItem("qc_resume_step");
     }
+    if (requestedRedirect && typeof window !== "undefined") {
+      window.location.replace(requestedRedirect);
+      return;
+    }
     if (doc?.completed) {
       navigate({ to: "/dashboard", replace: true });
     } else {
@@ -65,6 +84,7 @@ function SignInPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const requestedRedirect = safeRedirectFromSearch();
     if (params.get("mode") === "signup") setMode("signup");
     const code = params.get("code");
     const state = params.get("state");
@@ -79,7 +99,7 @@ function SignInPage() {
       window.history.replaceState({}, "", "/signin");
       auth
         .exchangeGoogleCode(code, state)
-        .then((session) => afterLogin(session.token))
+        .then((session) => afterLogin(session.token, requestedRedirect))
         .catch((e: Error) => {
           setError(e.message);
           setGoogleLoading(false);
@@ -124,7 +144,11 @@ function SignInPage() {
     setError(null);
     setGoogleLoading(true);
     try {
-      const { authorizationUrl } = await auth.startGoogle(`${window.location.origin}/signin`);
+      const requestedRedirect = safeRedirectFromSearch();
+      const returnPath = requestedRedirect
+        ? `/signin?redirect=${encodeURIComponent(requestedRedirect)}`
+        : "/signin";
+      const { authorizationUrl } = await auth.startGoogle(`${window.location.origin}${returnPath}`);
       window.location.href = authorizationUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : t("signin.err.google"));

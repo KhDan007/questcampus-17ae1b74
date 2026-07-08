@@ -26,9 +26,9 @@ import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
 const SUGGESTIONS = [
-  "What do I still need to do?",
-  "How do I get my transcript?",
-  "Which of my saved schools is cheapest?",
+  "What is my safest next action?",
+  "Find scholarship-friendly schools for my profile",
+  "What can the extension safely do now?",
 ];
 
 export function AssistantSidebar() {
@@ -114,7 +114,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-display text-label-md font-bold text-on-surface">Assistant</p>
-          <p className="text-label-sm text-on-surface-variant">Grounded in your app data</p>
+          <p className="text-label-sm text-on-surface-variant">Grounded in your app data - actions confirm first</p>
         </div>
         <button
           type="button"
@@ -139,7 +139,9 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         ref={scrollRef}
         className="flex-1 space-y-3 overflow-y-auto bg-surface-container-lowest px-3 py-4"
       >
-        {showEmpty ? (
+        {sending && showEmpty ? (
+          <PendingFirstReply />
+        ) : showEmpty ? (
           <EmptyState onPick={submit} disabled={disabled} />
         ) : messages === undefined ? (
           <div className="flex items-center justify-center py-8 text-on-surface-variant">
@@ -169,7 +171,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
               }
             }}
             rows={2}
-            placeholder="Ask anything about your applications…"
+            placeholder="Ask anything about your applications..."
             className="min-h-[44px] flex-1 resize-none rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-2 text-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
           />
           <button
@@ -185,7 +187,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <p className="mt-1 text-label-sm text-on-surface-variant">
-          Enter to send · Shift+Enter for newline
+          Enter to send - Shift+Enter for newline
         </p>
       </form>
     </aside>
@@ -203,13 +205,14 @@ function EmptyState({
     <div className="mt-4 space-y-3">
       <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
         <p className="font-display text-label-md font-bold text-on-surface">
-          Hi — how can I help?
+          Hi - how can I help?
         </p>
         <p className="mt-1 text-body-sm text-on-surface-variant">
-          I can answer questions about your saved schools, requirements, and next steps — and take
+          I can answer questions about your saved schools, requirements, and next steps - and take
           actions for you when you confirm.
         </p>
       </div>
+      <SafetyStrip />
       <div className="space-y-2">
         {SUGGESTIONS.map((s) => (
           <button
@@ -222,6 +225,45 @@ function EmptyState({
             {s}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function SafetyStrip() {
+  const rails = [
+    "No hidden prompts or tokens",
+    "Official-source checks for money and URLs",
+    "No auto-submit without confirmation",
+  ];
+  return (
+    <div className="rounded-xl border-2 border-on-surface/15 bg-secondary-container/45 p-3">
+      <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-on-surface/70">
+        Guardrails active
+      </p>
+      <ul className="mt-2 space-y-1">
+        {rails.map((rail) => (
+          <li key={rail} className="flex items-start gap-2 text-label-sm text-on-surface/80">
+            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <span>{rail}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PendingFirstReply() {
+  return (
+    <div className="mt-4 rounded-xl border-2 border-on-surface/15 bg-surface p-4">
+      <div className="flex items-start gap-3">
+        <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-primary" />
+        <div>
+          <p className="font-display text-label-md font-bold text-on-surface">Checking live context</p>
+          <p className="mt-1 text-body-sm text-on-surface-variant">
+            Reading your application state and safety rails before replying.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -250,6 +292,9 @@ function MessageRow({ message }: { message: ChatMessage }) {
         )}
         {!isUser && message.actions && message.actions.length > 0 && (
           <div className="mt-2 space-y-1.5">
+            <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.1em] text-on-surface/60">
+              Proposed action - review before confirming
+            </p>
             {message.actions.map((a) => (
               <ActionCard key={a.id} messageId={message._id} action={a} />
             ))}
@@ -285,7 +330,7 @@ function ActionCard({
         }`}
       >
         {action.status === "done" && <Check className="h-3 w-3" />}
-        {action.label} · {action.status}
+        {action.label} - {action.status}
       </div>
     );
   }
@@ -305,7 +350,7 @@ function ActionCard({
     try {
       await execute(action, { setAnswer, answerEligibility, startApply, navigate });
       await setStatus(messageId, action.id, "done");
-      toast.success("Done ✓");
+      toast.success("Done");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Action failed";
       setErr(msg);

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { UNI_LOGOS } from "@/assets/unis";
 
 const ROW_A = ["Harvard", "Stanford", "MIT", "Oxford", "Cambridge", "Yale"];
-const ROW_B = ["Princeton", "UC Berkeley", "NYU", "Columbia", "Imperial", "ETH Zürich"];
+const ROW_B = ["Princeton", "UC Berkeley", "NYU", "Columbia", "Imperial", "ETH Zurich"];
 const ROW_C = ["McGill", "Edinburgh", "Trinity", "NUS", "Tokyo", "Sciences Po"];
 
 const HUES: Record<string, string> = {
@@ -20,7 +20,7 @@ const HUES: Record<string, string> = {
   NYU: "#57068c",
   Columbia: "#9bcbeb",
   Imperial: "#003e74",
-  "ETH Zürich": "#1f407a",
+  "ETH Zurich": "#1f407a",
   McGill: "#ed1b2f",
   Edinburgh: "#041e42",
   Trinity: "#0c2340",

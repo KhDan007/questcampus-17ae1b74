@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-08T00:00:00.000Z",
+  "title": "Design System: QuestCampus",
+  "extensions": {
+    "colorMeta": {
+      "coral-primary": {
+        "role": "primary",
+        "displayName": "Operator Coral",
+        "canonical": "#b3272c",
+        "tonalRamp": [
+          "oklch(20% 0.08 25)",
+          "oklch(32% 0.14 25)",
+          "oklch(44% 0.18 25)",
+          "oklch(54% 0.2 25)",
+          "oklch(64% 0.18 25)",
+          "oklch(74% 0.14 25)",
+          "oklch(84% 0.09 25)",
+          "oklch(94% 0.04 25)"
+        ]
+      },
+      "amber-secondary": {
+        "role": "secondary",
+        "displayName": "Scholarship Amber",
+        "canonical": "#feb700",
+        "tonalRamp": [
+          "oklch(22% 0.06 85)",
+          "oklch(34% 0.1 85)",
+          "oklch(48% 0.14 85)",
+          "oklch(62% 0.16 85)",
+          "oklch(74% 0.15 85)",
+          "oklch(84% 0.12 85)",
+          "oklch(91% 0.08 85)",
+          "oklch(96% 0.04 85)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Application Ink",
+        "canonical": "#1c1c19",
+        "tonalRamp": [
+          "#1c1c19",
+          "#31302e",
+          "#5a413f",
+          "#8d706e",
+          "#e2bebc",
+          "#e5e2de",
+          "#f1ede9",
+          "#fdf9f5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Epilogue Display",
+        "purpose": "Confident route and module headings."
+      },
+      "body": {
+        "displayName": "Be Vietnam Pro Body",
+        "purpose": "Readable guidance, evidence, and application copy."
+      },
+      "label": {
+        "displayName": "Geist Label",
+        "purpose": "Dense navigation, metadata, buttons, and status labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hard-shadow",
+        "value": "4px 4px 0 0 var(--color-on-surface)",
+        "purpose": "Tactile primary cards and controls."
+      },
+      {
+        "name": "hard-shadow-sm",
+        "value": "2px 2px 0 0 var(--color-on-surface)",
+        "purpose": "Compact buttons and navigation."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150-250ms ease-out",
+        "purpose": "Fast product state changes."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action button for cockpit and application workflows.",
+      "html": "<button class=\"ds-btn-primary\">Start roadmap</button>",
+      "css": ".ds-btn-primary{background:#b3272c;color:#fff;border:2px solid #1c1c19;border-radius:8px;padding:10px 16px;font:700 14px/1.25 Geist,system-ui,sans-serif;box-shadow:2px 2px 0 0 #1c1c19;transition:transform .18s ease-out,box-shadow .18s ease-out}.ds-btn-primary:hover{transform:translate(1px,1px);box-shadow:none}.ds-btn-primary:focus-visible{outline:2px solid #b3272c;outline-offset:2px}"
+    },
+    {
+      "name": "Tactile Card",
+      "kind": "card",
+      "refersTo": "card-tactile",
+      "description": "Operational module card for readiness, roadmap, and target rows.",
+      "html": "<article class=\"ds-card\"><p class=\"ds-card-label\">Ready package</p><h3>University target</h3><p>All required fields, essays, and documents are complete.</p></article>",
+      "css": ".ds-card{background:#fdf9f5;color:#1c1c19;border:2px solid #1c1c19;border-radius:8px;padding:20px;box-shadow:4px 4px 0 0 #1c1c19;font-family:'Be Vietnam Pro',system-ui,sans-serif}.ds-card h3{margin:6px 0 4px;font:700 20px/1.25 Epilogue,system-ui,sans-serif}.ds-card p{margin:0;color:#5a413f}.ds-card-label{font:700 12px/1 Geist,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#b3272c!important}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "Semantic status chip for readiness, scholarship, and extension sync.",
+      "html": "<span class=\"ds-chip\">Ready for extension</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#bcf0ae;color:#073707;padding:5px 10px;font:700 12px/1 Geist,system-ui,sans-serif;border:1px solid rgba(28,28,25,.18)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Application Control Room",
+    "overview": "QuestCampus is a product workspace first: focused, tactile, evidence-rich, and serious about application state.",
+    "keyCharacteristics": [
+      "Tactile controls with firm borders and hard shadows.",
+      "Warm surface system with high-contrast dark ink.",
+      "Dense but readable application cockpit layouts."
+    ],
+    "rules": [
+      {
+        "name": "Evidence Before Accent",
+        "body": "A colored chip or highlight must correspond to real status, recommendation evidence, scholarship priority, or action urgency.",
+        "section": "colors"
+      },
+      {
+        "name": "No Generic Chat Wall",
+        "body": "Agent output must be structured into headings, status, evidence, and next actions.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do show readiness, evidence, scholarship priority, and extension sync as first class product states.",
+      "Do keep CTAs specific."
+    ],
+    "donts": [
+      "Don't bury the autonomous agent inside a generic chatbot surface.",
+      "Don't imply an application is submitted before human review/submission."
+    ]
+  }
+}
