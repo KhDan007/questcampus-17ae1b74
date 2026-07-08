@@ -20,9 +20,10 @@ import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
 
 import appCss from "../styles.css?url";
 import ogImageAsset from "@/assets/questcampus-og.jpg.asset.json";
+import { assetUrl } from "@/lib/assets";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-const OG_IMAGE_URL = `https://questcampus.space${ogImageAsset.url}`;
+const OG_IMAGE_URL = assetUrl(ogImageAsset);
 
 function NotFoundComponent() {
   return (
