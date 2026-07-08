@@ -381,18 +381,27 @@ function ShowcaseTile({
         <img
           src={logo}
           alt={name}
-          className="absolute inset-0 h-full w-full object-contain p-3"
-          loading="lazy"
+          className="absolute inset-0 h-full w-full object-contain"
+          style={{ padding: size < 110 ? 4 : 8 }}
+          loading="eager"
+          decoding="async"
         />
       ) : (
-        <div className="absolute inset-0 opacity-25 mix-blend-soft-light">
-          <svg viewBox="0 0 100 100" className="h-full w-full">
-            <path
-              d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
-              fill="white"
-            />
-          </svg>
-        </div>
+        <>
+          <div className="absolute inset-0 opacity-25 mix-blend-soft-light">
+            <svg viewBox="0 0 100 100" className="h-full w-full">
+              <path
+                d="M50 12 L60 30 L82 32 L66 48 L72 70 L50 60 L28 70 L34 48 L18 32 L40 30 Z"
+                fill="white"
+              />
+            </svg>
+          </div>
+          <div className="absolute inset-x-1.5 bottom-1.5 sm:inset-x-2 sm:bottom-2">
+            <div className="rounded-md bg-black/55 px-1.5 py-0.5 sm:px-2 sm:py-1 text-center font-[var(--font-label)] text-[9px] sm:text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm truncate">
+              {name}
+            </div>
+          </div>
+        </>
       )}
       {/* Specular sheen that brightens with proximity */}
       <motion.div
@@ -406,11 +415,7 @@ function ShowcaseTile({
           ),
         }}
       />
-      <div className="absolute inset-x-1.5 bottom-1.5 sm:inset-x-2 sm:bottom-2">
-        <div className="rounded-md bg-black/55 px-1.5 py-0.5 sm:px-2 sm:py-1 text-center font-[var(--font-label)] text-[9px] sm:text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm truncate">
-          {name}
-        </div>
-      </div>
+
     </motion.div>
   );
 }
