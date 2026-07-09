@@ -74,7 +74,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "pricing.paid.f3": "Filters by country, scholarship type, deadline",
     "pricing.paid.f4": "Direct application links",
     "pricing.paid.f5": "Priority support",
-    "pricing.paid.cta": "Get full access →",
+    "pricing.paid.cta": "Start free trial →",
     "pricing.waitlist.text":
       "Joining the waitlist? Get {discount}% off at launch — plus an extra {refDiscount}% off per friend you refer. Founding Member badge included.",
     "pricing.waitlist.link": "Join the waitlist →",
