@@ -164,23 +164,16 @@ function RootShell({ children }: { children: ReactNode }) {
  * navigations. Respects prefers-reduced-motion (opacity instead of width anim).
  */
 function RouteProgressBar() {
-  const reduce = useReducedMotion();
   const isNavigating = useRouterState({ select: (s) => s.status === "pending" });
 
-  if (reduce) {
-    return (
-      <div
-        aria-hidden
-        className="fixed inset-x-0 top-0 z-[100] h-0.5 bg-primary transition-opacity duration-150"
-        style={{ opacity: isNavigating ? 1 : 0 }}
-      />
-    );
-  }
-
+  // Single markup path (no useReducedMotion JS branch) so SSR and first client
+  // render are identical — the branch read matchMedia on the client only and
+  // caused a hydration mismatch. Reduced-motion users get opacity-only via the
+  // Tailwind motion-reduce variant; width still snaps but never animates.
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-0.5">
       <div
-        className="h-full bg-primary transition-[width,opacity] ease-out"
+        className="h-full bg-primary ease-out motion-safe:transition-[width,opacity] motion-reduce:transition-opacity"
         style={{
           width: isNavigating ? "90%" : "100%",
           opacity: isNavigating ? 1 : 0,
