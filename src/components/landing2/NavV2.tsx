@@ -155,7 +155,7 @@ export function NavV2() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={reduce ? undefined : { x: -24, opacity: 0 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute inset-y-0 left-0 flex w-[84vw] max-w-[320px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface p-4 shadow-2xl"
+                className="absolute left-0 top-0 flex h-dvh w-[84vw] max-w-[320px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl"
               >
                 <div className="mb-4 flex items-center justify-between">
                   <Link to="/" className="flex items-center" onClick={() => setMobileOpen(false)}>

@@ -292,7 +292,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   animate={{ x: 0 }}
                   exit={{ x: -24 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute inset-y-0 left-0 flex w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface shadow-2xl will-change-transform"
+                  className="absolute left-0 top-0 flex h-dvh w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl will-change-transform"
                 >
                   <div className="flex items-center justify-between border-b-2 border-on-surface/10 px-4 py-3">
                     <p className="font-display text-label-lg font-bold text-on-surface">Menu</p>
