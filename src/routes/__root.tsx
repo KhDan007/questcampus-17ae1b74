@@ -16,6 +16,20 @@ import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
+import { useAuth } from "@/lib/auth/useAuth";
+
+// Core workspace routes to warm up after first paint for signed-in users, so
+// sidebar navigation is instant even without a hover to trigger intent preload.
+const WARMUP_ROUTES = [
+  "/dashboard",
+  "/universities",
+  "/plan",
+  "/apply",
+  "/essay",
+  "/common-app",
+  "/agent",
+  "/documents",
+] as const;
 
 
 import appCss from "../styles.css?url";
@@ -134,6 +148,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
+        <RouteProgressBar />
         {children}
         <Scripts />
       </body>
@@ -141,12 +156,78 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Instant, subtle navigation feedback: a 2px brand-primary bar fixed to the top
+ * of the viewport. Driven by the router's overall status ("pending" during a
+ * navigation while the destination chunk/loader resolves, "idle" otherwise).
+ * The router's defaultPendingMs/MinMs keep the transition from flashing on fast
+ * navigations. Respects prefers-reduced-motion (opacity instead of width anim).
+ */
+function RouteProgressBar() {
+  const reduce = useReducedMotion();
+  const isNavigating = useRouterState({ select: (s) => s.status === "pending" });
+
+  if (reduce) {
+    return (
+      <div
+        aria-hidden
+        className="fixed inset-x-0 top-0 z-[100] h-0.5 bg-primary transition-opacity duration-150"
+        style={{ opacity: isNavigating ? 1 : 0 }}
+      />
+    );
+  }
+
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-0.5">
+      <div
+        className="h-full bg-primary transition-[width,opacity] ease-out"
+        style={{
+          width: isNavigating ? "90%" : "100%",
+          opacity: isNavigating ? 1 : 0,
+          transitionDuration: isNavigating ? "800ms" : "250ms",
+        }}
+      />
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const { isAuthenticated, isHydrated } = useAuth();
 
+  // Idle warm-up: once a signed-in user's first paint is done, preload the core
+  // workspace route chunks during idle time so sidebar navigation is already
+  // warm even without a hover. SSR-guarded and fires once per session.
   useEffect(() => {
-    // Referral capture removed.
-  }, []);
+    if (typeof window === "undefined") return;
+    if (!isHydrated || !isAuthenticated) return;
+
+    let done = false;
+    const warm = () => {
+      if (done) return;
+      done = true;
+      for (const to of WARMUP_ROUTES) {
+        // Fire-and-forget; failures (e.g. a route mid-refactor) are non-fatal.
+        void router.preloadRoute({ to }).catch(() => {});
+      }
+    };
+
+    const ric = (window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    }).requestIdleCallback;
+    if (typeof ric === "function") {
+      const id = ric(warm, { timeout: 3000 });
+      return () => {
+        const cic = (window as unknown as {
+          cancelIdleCallback?: (id: number) => void;
+        }).cancelIdleCallback;
+        cic?.(id);
+      };
+    }
+    const t = window.setTimeout(warm, 1500);
+    return () => window.clearTimeout(t);
+  }, [router, isAuthenticated, isHydrated]);
 
   return (
     <QueryClientProvider client={queryClient}>
