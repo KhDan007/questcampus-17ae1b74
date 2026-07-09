@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
+import { useApplyActions } from "@/lib/applyQueue/client";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -235,8 +236,16 @@ function OnboardingPage() {
 
   const complete = useMutation(api.onboarding.complete);
   const recommend = useAction(api.rag.recommend.recommend);
+  const { startDemo } = useApplyActions();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // When arriving via a "run the demo" CTA (?next=demo), we bounce the user
+  // straight into the live demo after they finish, instead of the dashboard.
+  const wantsDemo = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("next") === "demo";
+  }, []);
 
   async function onSubmit() {
     setSubmitting(true);
@@ -256,6 +265,16 @@ function OnboardingPage() {
       } catch {
         // Stale local matches are harmless if storage is unavailable.
       }
+      // Return-to-demo: now that we have their real answers, run the demo.
+      if (wantsDemo) {
+        try {
+          const { jobId } = await startDemo(true);
+          navigate({ to: "/apply/$jobId", params: { jobId } });
+          return;
+        } catch {
+          // If the demo can't start, fall through to the dashboard gracefully.
+        }
+      }
       navigate({ to: "/dashboard", search: { refresh: 1 } as never });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
@@ -265,7 +284,12 @@ function OnboardingPage() {
 
   // ── Render guards ──
   if (hydrated && !isAuthenticated) {
-    return <Navigate to="/signin" search={{ redirect: "/onboarding" } as never} />;
+    // Preserve ?next=demo (and any other query) through the sign-in round-trip.
+    const redirect =
+      typeof window !== "undefined" && window.location.search
+        ? `/onboarding${window.location.search}`
+        : "/onboarding";
+    return <Navigate to="/signin" search={{ redirect } as never} />;
   }
 
   const canSubmit =
