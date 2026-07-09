@@ -179,10 +179,15 @@ function UnlockPage() {
                     </Link>
                   </>
                 ) : (
-                  <UnlockButton
-                    token={token}
-                    className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-                  />
+                  <>
+                    <UnlockButton
+                      token={token}
+                      className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                    />
+                    <p className="text-center font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                      Card required today, first charge on day 3.
+                    </p>
+                  </>
                 )}
               </div>
 
