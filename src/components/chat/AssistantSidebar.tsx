@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
 import {
   MessageCircle,
@@ -38,22 +39,32 @@ export function AssistantSidebar() {
   return (
     <>
       <Toaster position="bottom-left" richColors />
-      {!open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open assistant"
-          className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-surface px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-        >
-          <span className="h-2 w-2 rounded-full bg-primary" />
-          <MessageCircle className="h-5 w-5" />
-          Ask AI
-        </button>
-      )}
-      {open && <SidebarPanel onClose={() => setOpen(false)} />}
+      <AnimatePresence initial={false}>
+        {!open && (
+          <motion.button
+            key="fab"
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Open assistant"
+            initial={{ opacity: 0, scale: 0.9, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 8 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-surface px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          >
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            <MessageCircle className="h-5 w-5" />
+            Ask AI
+          </motion.button>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {open && <SidebarPanel key="panel" onClose={() => setOpen(false)} />}
+      </AnimatePresence>
     </>
   );
 }
+
 
 function SidebarPanel({ onClose }: { onClose: () => void }) {
   const threads = useChatThreads();
