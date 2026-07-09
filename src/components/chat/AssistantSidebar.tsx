@@ -12,7 +12,10 @@ import {
   Sparkles,
   Check,
   Loader2,
+  History,
+  ArrowLeft,
 } from "lucide-react";
+
 import { useAuth } from "@/lib/auth/useAuth";
 import { Markdown } from "@/components/common/Markdown";
 import {
