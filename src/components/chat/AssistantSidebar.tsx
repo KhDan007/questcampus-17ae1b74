@@ -113,7 +113,15 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   function newChat() {
     setForceNew(true);
     setSelectedId(undefined);
+    setHistoryOpen(false);
   }
+
+  function pickThread(id: string) {
+    setSelectedId(id);
+    setForceNew(false);
+    setHistoryOpen(false);
+  }
+
 
   const showEmpty = !activeThreadId || messages?.length === 0;
 
