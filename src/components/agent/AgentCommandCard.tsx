@@ -48,12 +48,15 @@ export function AgentCommandCard({
   return (
     <section
       className={[
-        "rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow-sm",
+        // @container so the row layout keys off the CARD's width, not the
+        // viewport — this card renders in narrow grid columns where a
+        // viewport sm: breakpoint row-ified it and crushed the text.
+        "@container rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow-sm",
         compact ? "p-4" : "p-5 sm:p-6",
         className,
       ].filter(Boolean).join(" ")}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 @xl:flex-row @xl:items-center @xl:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container text-primary">
             {running || busy ? (
@@ -87,7 +90,7 @@ export function AgentCommandCard({
             )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+        <div className="flex shrink-0 flex-wrap gap-2 @xl:justify-end">
           <button
             type="button"
             onClick={() => void start()}
