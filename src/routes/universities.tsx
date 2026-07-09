@@ -383,20 +383,8 @@ function UniversitiesPage() {
           <RefineRecommendationsCard isAuthenticated={isAuthenticated} />
         )}
 
-        {isAuthenticated && (
-          <div className="mt-6">
-            <SilentErrorBoundary>
-              <AgentCommandCard
-                compact
-                title="Agent sees matches and saved schools"
-                body="Run a roadmap after saving targets to connect recommendations, readiness, aid routes, and application status."
-              />
-            </SilentErrorBoundary>
-          </div>
-        )}
-
         {/* Search box */}
-        <section className="mt-8 rounded-2xl border-2 border-on-surface bg-surface/85 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
+        <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:p-5">
           <label className="block">
             <span className="font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
               Search universities
@@ -407,14 +395,15 @@ function UniversitiesPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="e.g. Stanford, ETH, Sciences Po…"
-                className="h-12 w-full bg-transparent text-body-lg text-on-surface placeholder:text-on-surface/40 focus:outline-none"
+                className="h-11 w-full bg-transparent text-body-lg text-on-surface placeholder:text-on-surface/40 focus:outline-none"
               />
             </div>
           </label>
 
         </section>
 
-        <div className="mt-10">
+        <div className="mt-6">
+
           {/* Main column */}
           <div className="min-w-0">
             {/* Search results */}
