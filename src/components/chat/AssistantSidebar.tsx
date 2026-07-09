@@ -147,12 +147,29 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         </div>
         <button
           type="button"
+          onClick={() => setHistoryOpen((v) => !v)}
+          aria-pressed={historyOpen}
+          className={`inline-flex items-center gap-1 rounded-md border-2 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold hover:border-on-surface ${
+            historyOpen
+              ? "border-on-surface bg-secondary-container text-on-surface"
+              : "border-on-surface/25 bg-surface text-on-surface"
+          }`}
+          title="Previous chats"
+        >
+          <History className="h-3.5 w-3.5" /> History
+          {threads && threads.length > 0 && (
+            <span className="opacity-60">({threads.length})</span>
+          )}
+        </button>
+        <button
+          type="button"
           onClick={newChat}
           className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
           title="Start a new chat"
         >
           <Plus className="h-3.5 w-3.5" /> New
         </button>
+
         <button
           type="button"
           onClick={onClose}
