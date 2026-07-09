@@ -206,7 +206,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
           Enter to send - Shift+Enter for newline
         </p>
       </form>
-    </aside>
+    </motion.aside>
   );
 }
 
