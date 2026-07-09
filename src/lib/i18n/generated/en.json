@@ -373,7 +373,7 @@
   "unlock.signinLink": "Sign in or sign up",
   "unlock.signinPrompt": "Sign in",
   "unlock.signinSuffix": "to unlock.",
-  "unlock.subtitle": "${price}/month subscription. Billed monthly. Cancel anytime. Every match sorted into safety, target, and reach.",
+  "unlock.subtitle": "Start free — card required, not charged for 3 days. Then ${price}/month, cancel anytime before it renews.",
   "unlock.title": "Unlock your full match list",
   "unlockOk.go": "Go to my matches →",
   "unlockOk.loading": "Loading your full safety, target & reach list…",
