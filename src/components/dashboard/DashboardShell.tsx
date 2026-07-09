@@ -277,23 +277,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <AnimatePresence>
             {mobileOpen && (
               <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true" aria-label="Workspace menu">
-                <motion.button
+                {/* Plain elements, no JS-driven entry animation: framer's rAF
+                    animation can freeze at its initial frame on throttled
+                    mobile browsers, leaving the drawer shifted or invisible. */}
+                <button
                   type="button"
                   aria-label="Close workspace menu"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.16 }}
                   className="absolute inset-0 h-full w-full bg-black/50"
                   onClick={() => setMobileOpen(false)}
                 />
-                <motion.aside
-                  initial={{ x: -24 }}
-                  animate={{ x: 0 }}
-                  exit={{ x: -24 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute left-0 top-0 flex h-dvh w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl will-change-transform"
-                >
+                <aside className="absolute left-0 top-0 flex h-dvh w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl">
                   <div className="flex items-center justify-between border-b-2 border-on-surface/10 px-4 py-3">
                     <p className="font-display text-label-lg font-bold text-on-surface">Menu</p>
                     <button
@@ -320,7 +313,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                     }}
                     hideCollapseToggle
                   />
-                </motion.aside>
+                </aside>
               </div>
             )}
           </AnimatePresence>,

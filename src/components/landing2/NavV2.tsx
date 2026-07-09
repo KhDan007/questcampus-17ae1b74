@@ -82,18 +82,6 @@ export function NavV2() {
       >
         <nav className="flex h-16 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            {showMobileMenu && (
-              <button
-                type="button"
-                onClick={() => setMobileOpen((open) => !open)}
-                aria-label={mobileOpen ? "Close menu" : "Open menu"}
-                aria-expanded={mobileOpen}
-                className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none md:hidden"
-              >
-                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            )}
-
             <a href="/" className="group flex items-center">
               <QuestCampusLogo className="h-8" />
             </a>
@@ -136,27 +124,33 @@ export function NavV2() {
         </nav>
       </motion.header>
 
+      {/* Mobile open button (FAB) — same treatment as the workspace drawer's. */}
+      {showMobileMenu && (
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          title="Open menu"
+          className="fixed bottom-5 left-5 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      )}
+
       {mounted && createPortal(
         <AnimatePresence>
           {mobileOpen && showMobileMenu && (
             <div className="fixed inset-0 z-[9999] md:hidden" role="dialog" aria-modal="true">
-              <motion.button
+              {/* Plain elements, no JS-driven entry animation: framer's rAF
+                  animation can freeze at its initial frame on throttled
+                  mobile browsers, leaving the drawer shifted or invisible. */}
+              <button
                 type="button"
                 aria-label="Close menu"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.16 }}
                 className="absolute inset-0 h-full w-full bg-black/50"
                 onClick={() => setMobileOpen(false)}
               />
-              <motion.aside
-                initial={reduce ? false : { x: -24, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={reduce ? undefined : { x: -24, opacity: 0 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute left-0 top-0 flex h-dvh w-[84vw] max-w-[320px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl"
-              >
+              <aside className="absolute left-0 top-0 flex h-dvh w-[84vw] max-w-[320px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
                 <div className="mb-4 flex items-center justify-between">
                   <Link to="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
                     <QuestCampusLogo className="h-7" />
@@ -218,7 +212,7 @@ export function NavV2() {
                     </Link>
                   )}
                 </div>
-              </motion.aside>
+              </aside>
             </div>
           )}
         </AnimatePresence>,
