@@ -583,18 +583,10 @@ function OnboardingPage() {
               label="Specific subjects you enjoy"
               hint="Free text — comma-separated. E.g. Physics, Economics, Studio Art."
             >
-              <input
-                type="text"
-                value={(answers.subjects?.selected ?? []).join(", ")}
-                onChange={(e) => {
-                  const list = e.target.value
-                    .split(",")
-                    .map((s) => s.trim())
-                    .filter(Boolean);
-                  setAnswers((a) => ({ ...a, subjects: { selected: list } }));
-                }}
+              <CsvField
+                selected={answers.subjects?.selected ?? []}
+                onChange={(list) => setAnswers((a) => ({ ...a, subjects: { selected: list } }))}
                 placeholder="Physics, Economics, Studio Art"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
               />
             </Field>
           </Section>
@@ -937,6 +929,47 @@ function Field({
       )}
       <div className="mt-2.5">{children}</div>
     </div>
+  );
+}
+
+// Free-text comma-separated input. The displayed value is the RAW text the user
+// types — parsing to the array happens in the background. A previous version
+// bound the input directly to `list.join(", ")`, so every keystroke was
+// split/trim/filtered and the value snapped back, making spaces and commas
+// impossible to type. Reseeds from `selected` only while unfocused (e.g. async
+// answer load), so it never clobbers active typing.
+function CsvField({
+  selected,
+  onChange,
+  placeholder,
+}: {
+  selected: string[];
+  onChange: (list: string[]) => void;
+  placeholder?: string;
+}) {
+  const [raw, setRaw] = useState(() => selected.join(", "));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => {
+    if (!focused) setRaw(selected.join(", "));
+  }, [selected, focused]);
+  return (
+    <input
+      type="text"
+      value={raw}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onChange={(e) => {
+        setRaw(e.target.value);
+        onChange(
+          e.target.value
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        );
+      }}
+      placeholder={placeholder}
+      className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+    />
   );
 }
 
