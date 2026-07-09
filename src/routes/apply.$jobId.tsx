@@ -19,6 +19,9 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LiveCanvas } from "@/components/apply/LiveCanvas";
 import { RunStepper } from "@/components/apply/RunStepper";
+import { PortalChapterRail } from "@/components/apply/demo/PortalChapterRail";
+import { DemoTicker } from "@/components/apply/demo/DemoTicker";
+import { DemoSummaryCard } from "@/components/apply/demo/DemoSummaryCard";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useApplyActions, useApplyJob, type ApplyJobCheckpoint } from "@/lib/applyQueue/client";
 
@@ -225,7 +228,9 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   }
 
   // `terminal` is already computed above from the RunBody hook block.
-  const isDemo = job.targetName === "Demo test run";
+  // Multi-portal cinematic demo: keyed off the new contract (system/demo object).
+  const isMultiPortalDemo = job.system === "demo" || !!job.demo;
+  const isDemo = job.targetName === "Demo test run" || isMultiPortalDemo;
   const visibleStatus =
     job.checkpoint?.kind === "login"
       ? "awaiting_login"
@@ -319,6 +324,11 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         {/* Live canvas / waiting state */}
         <div className="min-w-0">
+          {/* Demo: portal chapter rail above the stage */}
+          {isMultiPortalDemo && job.demo?.portals?.length ? (
+            <PortalChapterRail portals={job.demo.portals} />
+          ) : null}
+
           {job.wsEndpoint ? (
             <>
               <LiveCanvas
@@ -328,10 +338,19 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                 disconnect={terminal}
                 onClose={onCanvasClose}
               />
-              <p className="mt-2 text-label-sm text-on-surface-variant">
-                This is the agent&apos;s real browser. Click and type here to log in, solve captchas,
-                or take over at any time.
-              </p>
+              {isMultiPortalDemo ? (
+                <>
+                  <DemoTicker field={job.demo?.currentField} />
+                  <p className="mt-2 text-label-sm text-on-surface-variant">
+                    Watch your saved answers fill across each portal. Nothing is ever submitted.
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 text-label-sm text-on-surface-variant">
+                  This is the agent&apos;s real browser. Click and type here to log in, solve
+                  captchas, or take over at any time.
+                </p>
+              )}
             </>
           ) : (
             <QueuedWaitingCard createdAt={job.createdAt} />
@@ -384,17 +403,21 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       </div>
 
       {/* Terminal banners */}
-      {((job.status === "done" && !job.checkpoint) || demoCompleted) && (
-        <Banner
-          tone="success"
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          title={demoCompleted ? "Demo complete" : "Application submitted"}
-          body={
-            demoCompleted
-              ? "Nice — that's the full auto-apply flow. Nothing was actually sent."
-              : "Nice work. You can close this page."
-          }
-        />
+      {isMultiPortalDemo && job.demo && terminal ? (
+        <DemoSummaryCard demo={job.demo} />
+      ) : (
+        ((job.status === "done" && !job.checkpoint) || demoCompleted) && (
+          <Banner
+            tone="success"
+            icon={<CheckCircle2 className="h-5 w-5" />}
+            title={demoCompleted ? "Demo complete" : "Application submitted"}
+            body={
+              demoCompleted
+                ? "Nice — that's the full auto-apply flow. Nothing was actually sent."
+                : "Nice work. You can close this page."
+            }
+          />
+        )
       )}
       {job.status === "error" && (
         <div className="mt-6 space-y-3">

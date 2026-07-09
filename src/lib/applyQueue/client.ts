@@ -56,6 +56,29 @@ export type ApplyJobActivity = {
   type: "status" | "fill" | "unmatched" | "review" | string;
 };
 
+/** Source of a filled value in a demo run. */
+export type DemoFieldSource = "yours" | "example";
+
+/** Per-portal live progress for the cinematic multi-portal demo run. */
+export type DemoPortalProgress = {
+  key: string;
+  name: string;
+  state: "pending" | "filling" | "done";
+  filled: number;
+  total: number;
+};
+
+/**
+ * Live progress object for demo jobs, patched by the worker as it fills each
+ * portal (see the demo design contract). Present only on `system === "demo"`
+ * jobs; the frontend renders the chapter rail + ticker + summary from it.
+ */
+export type ApplyJobDemo = {
+  portals: DemoPortalProgress[];
+  currentField?: { label: string; source: DemoFieldSource };
+  totals?: { portals: number; fields: number; yours: number; examples: number };
+};
+
 export type ApplyJob = {
   _id: string;
   jobId: string;
@@ -70,6 +93,8 @@ export type ApplyJob = {
   createdAt?: number;
   updatedAt?: number;
   error?: string;
+  /** Multi-portal demo progress (present only when `system === "demo"`). */
+  demo?: ApplyJobDemo | null;
 };
 
 export type StartApplyResult = { jobId: string; reused?: boolean };
