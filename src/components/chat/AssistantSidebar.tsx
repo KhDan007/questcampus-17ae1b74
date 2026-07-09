@@ -113,11 +113,16 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   const showEmpty = !activeThreadId || messages?.length === 0;
 
   return (
-    <aside
+    <motion.aside
       role="complementary"
       aria-label="AI assistant"
-      className="fixed right-0 top-0 z-[80] flex h-[100dvh] w-full max-w-[380px] flex-col border-l-2 border-on-surface bg-surface qc-hard-shadow-sm"
+      initial={{ x: "100%", opacity: 0.6 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "100%", opacity: 0.6 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed right-0 top-16 z-[80] flex h-[calc(100dvh-4rem)] w-full max-w-[380px] flex-col border-l-2 border-on-surface bg-surface qc-hard-shadow-sm"
     >
+
       {/* Header */}
       <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 py-3">
         <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
