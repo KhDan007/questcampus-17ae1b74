@@ -11,8 +11,12 @@ import {
   UserCircle2,
   Compass,
   Bookmark,
+  Gift,
+  Copy,
+  Check,
 } from "lucide-react";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
+import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
@@ -23,6 +27,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
+import { shareLinkFor } from "@/lib/referral/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Your profile — QuestCampus" }] }),
@@ -63,6 +68,8 @@ function ProfilePage() {
   useEffect(() => {
     setSessionId(getSessionId());
   }, []);
+
+  const referrals = useQuery(api.referrals.summary, token ? { token } : "skip");
 
   const recommend = useAction(api.rag.recommend.recommend);
   const loadRecs = useCallback(async () => {
@@ -168,7 +175,7 @@ function ProfilePage() {
                 </span>
               </div>
 
-              <div className="min-w-0 flex-1">
+              <div className="w-full min-w-0 flex-1">
                 <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
                   Your profile
                 </p>
@@ -176,8 +183,9 @@ function ProfilePage() {
                   {firstName ? `${firstName}'s QuestCampus` : "Welcome to QuestCampus"}
                 </h1>
                 {user?.email && (
-                  <p className="mt-1.5 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                    <Mail className="h-3.5 w-3.5" /> {user.email}
+                  <p className="mt-1.5 flex min-w-0 items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant">
+                    <Mail className="h-3.5 w-3.5 shrink-0" />
+                    <span className="min-w-0 truncate">{user.email}</span>
                   </p>
                 )}
                 <p className="mt-3 max-w-2xl text-body-md text-on-surface-variant">
@@ -205,10 +213,26 @@ function ProfilePage() {
                 tone="primary"
               />
               <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
-              <Stat label="Waitlist discount" value={`${WAITLIST_BASE_DISCOUNT}% off`} tone="accent" />
+              <Stat
+                label="Your discount"
+                value={
+                  token
+                    ? referrals
+                      ? `${referrals.discountPercent}% off`
+                      : "…"
+                    : `${WAITLIST_BASE_DISCOUNT}% off`
+                }
+                tone="accent"
+              />
             </div>
           </div>
         </motion.section>
+
+        {token && referrals && referrals.referralCode && (
+          <SilentErrorBoundary>
+            <ReferralCard referrals={referrals} />
+          </SilentErrorBoundary>
+        )}
 
         {/* Quick actions */}
         <section className="mt-12 grid gap-5 lg:grid-cols-2">
@@ -381,6 +405,82 @@ function ProfilePage() {
         body={`Join the waitlist and we'll email you the moment this is ready — ${WAITLIST_BASE_DISCOUNT}% off monthly access locked in.`}
       />
     </>
+  );
+}
+
+type ReferralSummary = {
+  referralCode: string | null;
+  referredBy: boolean;
+  counts: { total: number; qualified: number; pending: number };
+  discountPercent: number;
+  perReferralPercent: number;
+  maxPercent: number;
+};
+
+function ReferralCard({ referrals }: { referrals: ReferralSummary }) {
+  const [copied, setCopied] = useState(false);
+  const link = shareLinkFor(referrals.referralCode);
+  const pct = Math.min(referrals.discountPercent, referrals.maxPercent);
+  const { qualified, pending } = referrals.counts;
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      toast.success("Referral link copied.");
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast.error("Couldn't copy — select and copy the link manually.");
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+            <Gift className="h-4 w-4 text-primary" /> Invite friends
+          </h2>
+          <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
+            They get {referrals.perReferralPercent}% off when they join with your link. You get
+            +{referrals.perReferralPercent}% off for every friend who finishes onboarding, up to{" "}
+            {referrals.maxPercent}%.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full border border-on-surface/25 bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+          {pct}% / {referrals.maxPercent}%
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border-2 border-on-surface/20 bg-surface-container-lowest px-3 py-2">
+          <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface" title={link}>
+            {link}
+          </span>
+          <span className="shrink-0 rounded-full bg-on-surface/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
+            {referrals.referralCode}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={copyLink}
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? "Copied" : "Copy link"}
+        </button>
+      </div>
+
+      {(qualified > 0 || pending > 0) && (
+        <p className="mt-3 text-label-sm text-on-surface-variant">
+          {qualified > 0 &&
+            `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
+          {qualified > 0 && pending > 0 && " "}
+          {pending > 0 &&
+            `${pending} more signed up, waiting on onboarding to qualify.`}
+        </p>
+      )}
+    </section>
   );
 }
 

@@ -172,6 +172,7 @@ function SavedToPick() {
         </p>
         <Link
           to="/universities"
+          search={{ q: "" }}
           className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
           <Search className="h-4 w-4" /> Find universities <ArrowRight className="h-4 w-4" />

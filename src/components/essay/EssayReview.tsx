@@ -744,7 +744,7 @@ function ResultCard({
       className="rounded-2xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow backdrop-blur-md sm:p-6"
     >
       {/* Compact hero: score + verdict + top tip, all in one row on desktop */}
-      <div className="grid items-center gap-5 sm:grid-cols-[auto_1fr_auto]">
+      <div className="grid grid-cols-1 items-center gap-5 sm:grid-cols-[auto_1fr_auto]">
         <div className="flex items-center gap-4">
           <ScoreRing value={free.overall} color={tier.ring} reduce={!!reduce} compact />
           <div>
@@ -951,7 +951,7 @@ function Workspace({
   ];
 
   return (
-    <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+    <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       {/* Essay column — sticky on desktop so the user never scrolls away from text */}
       <div className="lg:sticky lg:top-24 lg:self-start">
         <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/95 p-5">
@@ -1290,7 +1290,7 @@ function LockedTeaser({
   reduce: boolean;
 }) {
   return (
-    <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]">
+    <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
       <ul className="grid gap-2">
         {dimensions.map((d, i) => (
           <motion.li

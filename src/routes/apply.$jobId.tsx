@@ -316,7 +316,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         </>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         {/* Live canvas / waiting state */}
         <div className="min-w-0">
           {job.wsEndpoint ? (

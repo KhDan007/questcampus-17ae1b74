@@ -605,9 +605,9 @@ function EssayPage() {
               Write your <span className="text-primary">Common App essay</span>
             </h1>
             <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
-              Grounded in what you actually told us — never invented. The opening is free. Unlock
-              the full essay with the ${PRICE_MVP}/month subscription (also unlocks all your
-              university matches).
+              {isPaid
+                ? "Grounded in what you actually told us — never invented."
+                : `Grounded in what you actually told us — never invented. The opening is free. Unlock the full essay with the $${PRICE_MVP}/month subscription (also unlocks all your university matches).`}
             </p>
           </motion.div>
 
@@ -1579,7 +1579,7 @@ function ResultView({
 
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
       <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

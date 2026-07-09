@@ -111,7 +111,7 @@ function UnlockPage() {
             initial={reduce ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-            className="mt-12 grid gap-6 md:grid-cols-[1.15fr_1fr]"
+            className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr]"
           >
             {/* Left: Price + CTA (cursor-tilt) */}
             <TiltCard className="group relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9">

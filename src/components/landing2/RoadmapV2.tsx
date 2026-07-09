@@ -124,7 +124,7 @@ export function RoadmapV2() {
             />
           </div>
 
-          <div className="relative grid gap-6 p-6 sm:gap-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="relative grid grid-cols-1 gap-6 p-6 sm:gap-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-12 w-12 items-center justify-center rounded-md bg-secondary-container text-on-secondary-container">

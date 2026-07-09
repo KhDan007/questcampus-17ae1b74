@@ -163,7 +163,7 @@ function SignInPage() {
         id="main-content"
         className="relative mx-auto flex min-h-screen w-full max-w-(--container-content) items-center justify-center px-5 pb-16 pt-28 sm:px-8 lg:px-12"
       >
-        <div className="grid w-full gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+        <div className="grid w-full grid-cols-1 gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           {/* Brand / pitch column */}
           <motion.aside
             initial={{ opacity: 0, y: 16 }}

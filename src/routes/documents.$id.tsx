@@ -173,7 +173,7 @@ function DocumentEditorPage() {
           <ArrowLeft className="h-4 w-4" /> All documents
         </button>
 
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           {/* LEFT — writing */}
           <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
             <input

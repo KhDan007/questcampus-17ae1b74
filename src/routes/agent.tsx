@@ -223,7 +223,7 @@ function AgentCockpit() {
         </div>
       </header>
 
-      <section className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-4">
           <NextActionPanel
             actions={nextActions}
@@ -288,7 +288,7 @@ function AgentLoading() {
           ))}
         </div>
       </section>
-      <section className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-4">
           {[0, 1, 2].map((item) => (
             <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-5">
@@ -476,7 +476,7 @@ function TargetReadinessPanel({
           const key = targetKey(target);
           const submission = submissions.find((item) => item.targetId === key);
           return (
-            <article key={key} className="grid gap-3 py-4 lg:grid-cols-[minmax(0,1fr)_170px]">
+            <article key={key} className="grid grid-cols-1 gap-3 py-4 lg:grid-cols-[minmax(0,1fr)_170px]">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <ReadinessBadge ready={!!target.ready} blocking={target.blocking ?? 0} />
@@ -547,9 +547,9 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
         title="Unsaved recommendations"
         body="Agent can suggest universities beyond your saved list using matching, RAG, and aid signals."
       />
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         {targets.map((target) => (
-          <article key={targetKey(target)} className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-4">
+          <article key={targetKey(target)} className="min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="truncate font-display text-headline-sm font-bold text-on-surface">
@@ -592,6 +592,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
       </div>
       <Link
         to="/universities"
+        search={{ q: "" }}
         className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
       >
         Open search <ArrowRight className="h-4 w-4" />

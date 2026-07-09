@@ -55,7 +55,7 @@ export function WaitlistV2() {
             />
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
             <div>
               <h2 className="text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
                 Be first when the full admissions workspace opens.

@@ -164,6 +164,7 @@ function EmptyState({ hasSaved }: { hasSaved: boolean }) {
         </div>
         <Link
           to="/universities"
+          search={{ q: "" }}
           className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
           Find universities <ArrowRight className="h-4 w-4" />

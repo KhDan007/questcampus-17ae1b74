@@ -11,6 +11,7 @@ import {
   Trash2,
   PenLine,
   ArrowLeft,
+  ArrowRight,
   Lock,
   KeyRound,
 } from "lucide-react";
@@ -170,19 +171,85 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
       )}
 
       {/* Sections */}
-      {(focusSection
-        ? schema.filter((s) => s.key === focusSection)
-        : schema
-      ).map((section) => (
-        <SectionCard
-          key={section.key}
-          section={section}
-          status={sectionStatusByKey.get(section.key)}
-          answers={answers}
-          setAnswer={setAnswer}
-        />
-      ))}
+      {focusSection ? (
+        schema
+          .filter((s) => s.key === focusSection)
+          .map((section) => (
+            <SectionCard
+              key={section.key}
+              section={section}
+              status={sectionStatusByKey.get(section.key)}
+              answers={answers}
+              setAnswer={setAnswer}
+            />
+          ))
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {schema.map((section) => (
+            <SectionSummaryRow
+              key={section.key}
+              section={section}
+              status={sectionStatusByKey.get(section.key)}
+            />
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+function SectionSummaryRow({
+  section,
+  status,
+}: {
+  section: ProfileSection;
+  status?: { complete: boolean; requiredDone: number; requiredTotal: number };
+}) {
+  const done = status?.complete ?? false;
+  const fieldCount = section.group
+    ? `Up to ${section.group.max} ${section.group.itemLabel.toLowerCase()}${section.group.max === 1 ? "" : "s"}`
+    : `${section.fields?.length ?? 0} field${section.fields?.length === 1 ? "" : "s"}`;
+
+  return (
+    <Link
+      to="/common-app"
+      search={{ section: section.key } as never}
+      className="group flex items-start justify-between gap-3 rounded-2xl border-2 border-on-surface bg-surface p-4 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:p-5"
+    >
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          {done ? (
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-tertiary" />
+          ) : (
+            <Circle className="h-4 w-4 shrink-0 text-on-surface-variant" />
+          )}
+          <h2 className="truncate font-display text-headline-sm font-bold text-on-surface">
+            {section.title}
+          </h2>
+        </div>
+        {section.description && (
+          <p className="mt-1 line-clamp-2 text-body-sm text-on-surface-variant">
+            {section.description}
+          </p>
+        )}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {status && (
+            <span
+              className={
+                "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 font-[var(--font-label)] text-label-sm " +
+                (done
+                  ? "border-tertiary/50 bg-tertiary/10 text-on-surface"
+                  : "border-on-surface/25 bg-surface text-on-surface-variant")
+              }
+            >
+              {status.requiredDone}/{status.requiredTotal} required
+            </span>
+          )}
+          <span className="text-label-sm text-on-surface-variant">{fieldCount}</span>
+        </div>
+      </div>
+      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5" />
+    </Link>
   );
 }
 
@@ -574,7 +641,7 @@ function CommonAppLoginCard() {
               </button>
             </div>
           ) : (
-            <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
               <div className="flex flex-col gap-1.5">
                 <label className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
                   Common App email
