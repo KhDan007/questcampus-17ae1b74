@@ -25,7 +25,9 @@ import {
   useSetActionStatus,
   type ChatAction,
   type ChatMessage,
+  type ChatThread,
 } from "@/lib/chat";
+
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
