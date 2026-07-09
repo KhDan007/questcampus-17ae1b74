@@ -250,7 +250,83 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+function HistoryPanel({
+  threads,
+  activeId,
+  onPick,
+  onNew,
+  onBack,
+}: {
+  threads: ChatThread[] | undefined;
+  activeId?: string;
+  onPick: (id: string) => void;
+  onNew: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={onNew}
+          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <Plus className="h-3.5 w-3.5" /> New chat
+        </button>
+      </div>
+      {threads === undefined ? (
+        <div className="flex items-center justify-center py-6 text-on-surface-variant">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      ) : threads.length === 0 ? (
+        <p className="rounded-md border-2 border-dashed border-on-surface/20 bg-surface p-4 text-center text-body-sm text-on-surface-variant">
+          No previous chats yet.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {threads.map((t) => {
+            const isActive = t._id === activeId;
+            return (
+              <li key={t._id}>
+                <button
+                  type="button"
+                  onClick={() => onPick(t._id)}
+                  className={`w-full rounded-md border-2 px-3 py-2 text-left transition-colors ${
+                    isActive
+                      ? "border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
+                      : "border-on-surface/15 bg-surface text-on-surface hover:border-on-surface"
+                  }`}
+                >
+                  <p className="truncate font-[var(--font-label)] text-label-md font-semibold">
+                    {t.title?.trim() || "Untitled chat"}
+                  </p>
+                  <p className="mt-0.5 text-label-sm text-on-surface-variant">
+                    {new Date(t.updatedAt).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function EmptyState({
+
   onPick,
   disabled,
 }: {
