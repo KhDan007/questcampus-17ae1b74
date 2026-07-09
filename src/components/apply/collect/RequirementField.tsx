@@ -123,6 +123,10 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const docType = (item.docType ?? "other") as DocType;
   const existing = (docs ?? []).find((d) => d.docType === docType);
+  // A row can exist without bytes (an upload that didn't finish). `hasFile`
+  // false ⇒ show a re-upload warning, not the green "saved" state. `undefined`
+  // (older cached payloads) is treated as fine, exactly as before.
+  const missingBytes = existing?.hasFile === false;
 
   async function onPick(file: File | null | undefined) {
     if (!file) return;
@@ -165,7 +169,31 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
 
   return (
     <div className="mt-3">
-      {existing ? (
+      {existing && missingBytes ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-on-surface/25 bg-secondary-container/20 px-3 py-2">
+          <FileText className="h-4 w-4 text-on-surface-variant" />
+          <div className="min-w-0 flex-1">
+            <p className="text-body-sm font-semibold text-on-surface">Needs re-upload</p>
+            <p className="text-label-sm text-on-surface-variant">
+              The file didn&rsquo;t finish uploading — add it again.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
+          >
+            Replace
+          </button>
+          <button
+            type="button"
+            onClick={removeFile}
+            className="text-label-sm text-on-error-container underline underline-offset-2 hover:opacity-80"
+          >
+            Remove
+          </button>
+        </div>
+      ) : existing ? (
         <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface" />
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">{existing.fileName}</span>

@@ -58,6 +58,9 @@ export function DocumentManager() {
         {DOC_TYPES.map((t) => {
           const list = byType.get(t.value) ?? [];
           const isBusy = busy === t.value;
+          // Only a row that actually carries bytes counts as "saved" — a
+          // byte-less row (upload that didn't finish) must not earn the tick.
+          const hasSavedFile = list.some((d) => d.hasFile !== false);
           return (
             <li
               key={t.value}
@@ -68,7 +71,7 @@ export function DocumentManager() {
                   <p className="font-display text-label-lg font-bold text-on-surface">{t.label}</p>
                   <p className="text-label-sm text-on-surface-variant">{t.hint}</p>
                 </div>
-                {list.length > 0 && (
+                {hasSavedFile && (
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-tertiary" aria-hidden />
                 )}
               </div>

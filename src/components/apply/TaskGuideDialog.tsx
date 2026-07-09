@@ -332,6 +332,9 @@ function UploadInline({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const existing = (docs ?? []).find((d) => d.docType === docType);
+  // A row can exist without bytes (upload that didn't finish). `hasFile` false ⇒
+  // warn + prompt re-upload; `undefined` (older payloads) behaves as before.
+  const missingBytes = existing?.hasFile === false;
 
   async function onPick(file: File | null | undefined) {
     if (!file) return;
@@ -349,7 +352,24 @@ function UploadInline({
 
   return (
     <div>
-      {existing ? (
+      {existing && missingBytes ? (
+        <div className="flex items-center gap-2 rounded-md border-2 border-on-surface/25 bg-secondary-container/20 px-3 py-2">
+          <FileText className="h-4 w-4 text-on-surface-variant" />
+          <div className="min-w-0 flex-1">
+            <p className="text-body-sm font-semibold text-on-surface">Needs re-upload</p>
+            <p className="text-label-sm text-on-surface-variant">
+              The file didn&rsquo;t finish uploading — add it again.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
+          >
+            Replace
+          </button>
+        </div>
+      ) : existing ? (
         <div className="flex items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface" />
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">
