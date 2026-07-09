@@ -84,7 +84,7 @@ function UnlockPage() {
             className="text-center"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" />${PRICE_MVP}/month subscription
+              <Sparkles className="h-3.5 w-3.5" />3-day free trial
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
