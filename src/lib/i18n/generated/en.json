@@ -358,7 +358,7 @@
   "unlock.already": "✅ You already have full access.",
   "unlock.alreadyHave": "You already have full access — refreshing…",
   "unlock.back": "Back to universities",
-  "unlock.button": "Unlock full list - ${price}/month",
+  "unlock.button": "Start free 3-day trial",
   "unlock.discount": "{pct}% off applied - pay {discounted}/month instead of ${price}/month",
   "unlock.genericError": "Something went wrong. Try again.",
   "unlock.needAccount": "Need an account?",
