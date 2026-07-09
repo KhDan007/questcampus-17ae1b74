@@ -29,7 +29,7 @@ import { RefineRecommendationsCard } from "@/components/universities/RefineRecom
 import { useProgress } from "@/lib/progress";
 import { ApplyButton } from "@/components/apply/ApplyButton";
 import { LiveResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
-import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
+
 
 export const Route = createFileRoute("/universities")({
   head: () => ({
