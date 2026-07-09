@@ -158,7 +158,8 @@ function UnlockPage() {
               )}
 
               <p className="mt-4 text-body-md text-on-surface-variant">
-                $15/month for matches, essays, and premium tools. Worth months of research,
+                Free for 3 days, then $15/month for matches, essays, and premium tools. Cancel
+                anytime before the trial ends — no charge. Worth months of research,
                 second-guessing, and college-counsellor calls.
               </p>
 
