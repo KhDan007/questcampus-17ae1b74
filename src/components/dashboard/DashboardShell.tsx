@@ -373,7 +373,7 @@ function SidebarBody({
             onClick={onToggleCollapsed}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={`${collapsed ? "Expand" : "Collapse"} sidebar (⌘B)`}
-            className="grid h-8 w-8 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface/70 transition-colors hover:border-on-surface hover:text-on-surface"
+            className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface/70 transition-colors hover:border-on-surface hover:text-on-surface"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -390,12 +390,17 @@ function SidebarBody({
                 key={it.key}
                 to={it.to}
                 title={collapsed ? it.label : undefined}
-                className={`group flex items-center gap-3 rounded-lg font-[var(--font-label)] text-label-md font-semibold transition-all ${
-                  collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
+                aria-label={collapsed ? it.label : undefined}
+                className={`group flex items-center gap-3 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                  collapsed
+                    ? "mx-auto h-10 w-10 justify-center rounded-xl"
+                    : "rounded-lg px-3 py-2.5"
                 } ${
                   active
                     ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-                    : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
+                    : collapsed
+                      ? "border-2 border-on-surface/15 text-on-surface/75 hover:border-on-surface/40 hover:bg-on-surface/5 hover:text-on-surface"
+                      : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -409,8 +414,11 @@ function SidebarBody({
               type="button"
               onClick={() => onWaitlist(it.feature)}
               title={collapsed ? it.label : undefined}
-              className={`group flex items-center gap-3 rounded-lg border-2 border-transparent text-left font-[var(--font-label)] text-label-md font-semibold text-on-surface/55 transition-all hover:bg-on-surface/5 hover:text-on-surface ${
-                collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
+              aria-label={collapsed ? it.label : undefined}
+              className={`group flex items-center gap-3 border-2 text-left font-[var(--font-label)] text-label-md font-semibold text-on-surface/55 transition-all hover:bg-on-surface/5 hover:text-on-surface ${
+                collapsed
+                  ? "mx-auto h-10 w-10 justify-center rounded-xl border-on-surface/15 hover:border-on-surface/40"
+                  : "rounded-lg border-transparent px-3 py-2.5"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" />
