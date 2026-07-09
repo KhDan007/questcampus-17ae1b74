@@ -418,6 +418,11 @@ function MessageRow({ message }: { message: ChatMessage }) {
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
         ) : (
           <div className="break-words">
+            {message.steps?.length ? (
+              <p className="mb-1 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                {message.steps.join(" · ")}
+              </p>
+            ) : null}
             <Markdown>{message.content}</Markdown>
             {message.streaming && (
               <span className="ml-0.5 inline-block h-3 w-[2px] animate-pulse bg-current align-middle" />

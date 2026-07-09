@@ -18,6 +18,7 @@ export type ChatMessage = {
   content: string;
   streaming?: boolean;
   actions?: ChatAction[];
+  steps?: string[];
   createdAt: number;
 };
 
