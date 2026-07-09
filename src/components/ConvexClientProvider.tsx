@@ -2,15 +2,18 @@
 
 import { ReactNode, useMemo } from "react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { resolveConvexClientUrl } from "@/lib/backend";
 
 // Single Convex client for the app. Scoped to the onboarding route group so the
 // marketing landing page stays fully static (no client runtime shipped there).
 // VITE_CONVEX_URL is provisioned by `npx convex dev` (see README/setup).
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
   const client = useMemo(() => {
-    const url = import.meta.env.VITE_CONVEX_URL;
-    if (!url) return null;
-    return new ConvexReactClient(url);
+    try {
+      return new ConvexReactClient(resolveConvexClientUrl());
+    } catch {
+      return null;
+    }
   }, []);
 
   if (!client) {

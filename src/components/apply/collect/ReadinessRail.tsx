@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Check, Loader2, CircleDashed, AlertTriangle, Send } from "lucide-react";
-import { useApplyActions, useActiveApplyJob } from "@/lib/applyQueue/client";
+import { applyJobIdFromStartResult, useApplyActions, useActiveApplyJob } from "@/lib/applyQueue/client";
 import type { IntakeTarget, EligibilityPerTarget, ChecklistResult } from "@/lib/apply/intake";
 
 type Props = {
@@ -22,11 +22,12 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
     const key = `${t.system}::${t.externalId}`;
     setBusyKey(key);
     try {
-      const id = await startApply({
+      const res = await startApply({
         system: t.system,
         externalId: t.externalId,
         targetName: t.name,
       });
+      const id = applyJobIdFromStartResult(res);
       void navigate({ to: "/apply/$jobId", params: { jobId: id } });
     } catch {
       setBusyKey(null);

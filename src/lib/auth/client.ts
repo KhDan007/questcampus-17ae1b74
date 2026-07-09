@@ -4,6 +4,8 @@
 
 // Referral system removed.
 
+import { resolveConvexSiteUrl } from "@/lib/backend";
+
 const TOKEN_KEY = "qc.auth.token";
 const USER_KEY = "qc.auth.user";
 
@@ -29,13 +31,7 @@ export function requestEmailVerification(): void {
 }
 
 function base(): string {
-  const explicit = import.meta.env.VITE_CONVEX_SITE_URL;
-  const base = import.meta.env.VITE_CONVEX_URL;
-  const url =
-    explicit ??
-    base?.replace(".convex.cloud", ".convex.site").replace("convex.", "api.");
-  if (!url) throw new Error("VITE_CONVEX_URL is not set");
-  return url.replace(/\/$/, "");
+  return resolveConvexSiteUrl();
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {

@@ -191,6 +191,25 @@ function startedRunId(result: unknown): string | null {
   return typeof runId === "string" ? runId : null;
 }
 
+export function agentRunIdFromState({
+  activeRunId,
+  roadmap,
+  events,
+}: {
+  activeRunId: string | null;
+  roadmap?: Pick<PortfolioRoadmap, "agentRunId"> | null;
+  events?: Pick<AgentEvent, "runId" | "createdAt">[];
+}): string | null {
+  if (activeRunId) return activeRunId;
+
+  const eventRun = [...(events ?? [])]
+    .filter((event): event is { runId: string; createdAt?: number } => typeof event.runId === "string")
+    .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))[0]?.runId;
+  if (eventRun) return eventRun;
+
+  return typeof roadmap?.agentRunId === "string" ? roadmap.agentRunId : null;
+}
+
 export function targetKey(target: Pick<PortfolioTarget, "system" | "externalId" | "targetId">): string {
   if (target.targetId) return target.targetId;
   return `${target.system ?? "unknown"}:${target.externalId ?? "unknown"}`;
@@ -213,9 +232,13 @@ export function usePortfolioAgent() {
     api.portfolioAgent.listAgentEvents,
     token ? { token, limit: 80 } : "skip",
   ) as AgentEvent[] | undefined;
+  const latestRunId = useMemo(
+    () => agentRunIdFromState({ activeRunId, roadmap, events }),
+    [activeRunId, roadmap, events],
+  );
   const run = useQuery(
     api.portfolioAgent.getAgentRun,
-    token && activeRunId ? { token, runId: activeRunId } : "skip",
+    token && latestRunId ? { token, runId: latestRunId } : "skip",
   ) as AgentRun | null | undefined;
   const submissions = useQuery(
     api.applications.listApplicationSubmissions,
@@ -229,6 +252,7 @@ export function usePortfolioAgent() {
     if (!token) throw new Error("Sign in required.");
     setStartError(null);
     try {
+      await refreshMutation({ token } as never);
       const result = await startMutation({ token } as never);
       const runId = startedRunId(result);
       if (runId) setActiveRunId(runId);
@@ -238,18 +262,12 @@ export function usePortfolioAgent() {
       setStartError(message);
       throw error;
     }
-  }, [startMutation, token]);
+  }, [refreshMutation, startMutation, token]);
 
   const refreshBrain = useCallback(async () => {
     if (!token) throw new Error("Sign in required.");
     await refreshMutation({ token } as never);
   }, [refreshMutation, token]);
-
-  const latestRunId = useMemo(() => {
-    if (activeRunId) return activeRunId;
-    const fromRoadmap = roadmap?.agentRunId;
-    return typeof fromRoadmap === "string" ? fromRoadmap : null;
-  }, [activeRunId, roadmap?.agentRunId]);
 
   return {
     token,

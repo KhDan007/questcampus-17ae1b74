@@ -1,14 +1,9 @@
 import { auth } from "@/lib/auth/client";
+import { resolveConvexSiteUrl } from "@/lib/backend";
 import { getSessionId } from "@/lib/onboarding/session";
 
 function base(): string {
-  const explicit = import.meta.env.VITE_CONVEX_SITE_URL;
-  const base = import.meta.env.VITE_CONVEX_URL;
-  const url =
-    explicit ??
-    base?.replace(".convex.cloud", ".convex.site").replace("convex.", "api.");
-  if (!url) throw new Error("VITE_CONVEX_URL is not set");
-  return url.replace(/\/$/, "");
+  return resolveConvexSiteUrl();
 }
 
 export type JoinWaitlistResult =

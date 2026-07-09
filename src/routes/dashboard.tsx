@@ -24,6 +24,7 @@ import { UniversitySearchSection } from "@/components/universities/UniversitySea
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { NextStepCard } from "@/components/dashboard/NextStepCard";
 import { ResumeBanner } from "@/components/apply/ResumeBanner";
+import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -132,7 +133,8 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
 
 function DashboardPage() {
   const reduce = useReducedMotion();
-  const { user, isAuthenticated, token } = useAuth();
+  const { user, isAuthenticated, token, isHydrated } = useAuth();
+  const authed = isHydrated && isAuthenticated;
   const { refresh } = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -152,7 +154,7 @@ function DashboardPage() {
   // For signed-in users, always pull server-side matches; force when ?refresh=1.
   useEffect(() => {
     if (!sessionId) return;
-    if (!isAuthenticated) return;
+    if (!authed) return;
     let cancelled = false;
     setServerStatus("loading");
     const force = refresh === 1;
@@ -193,14 +195,15 @@ function DashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, isAuthenticated, token, recommend, refresh, navigate]);
+  }, [sessionId, authed, token, recommend, refresh, navigate]);
 
   const firstName = useMemo(() => {
+    if (!authed) return null;
     const n = user?.name?.trim();
     return n ? n.split(/\s+/)[0] : null;
-  }, [user]);
+  }, [authed, user]);
 
-  const loading = isAuthenticated && serverStatus === "loading" && !saved;
+  const loading = authed && serverStatus === "loading" && !saved;
 
   return (
     <>
@@ -235,11 +238,11 @@ function DashboardPage() {
 
           {/* Compact stat bar */}
           <SilentErrorBoundary>
-            <StatBar
-              firstName={firstName}
-              isAuthenticated={isAuthenticated}
-              quizMatches={saved?.matches.length ?? 0}
-            />
+              <StatBar
+                firstName={firstName}
+              isAuthenticated={authed}
+                quizMatches={saved?.matches.length ?? 0}
+              />
           </SilentErrorBoundary>
 
           {/* Resume any live application first */}
@@ -247,27 +250,38 @@ function DashboardPage() {
             <ResumeBanner />
           </div>
 
+          {authed && (
+            <div className="mt-6">
+              <SilentErrorBoundary>
+                <AgentCommandCard
+                  title="Let the deep agent plan the next move"
+                  body="One roadmap uses your profile, saved schools, requirements, documents, scholarship signals, extension state, and applied tracker."
+                />
+              </SilentErrorBoundary>
+            </div>
+          )}
+
           {/* Split hero: next-step (8) + task rail (4) */}
           <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
             <div className="lg:col-span-8">
-              <NextStepCard isAuthenticated={isAuthenticated} />
+              <NextStepCard isAuthenticated={authed} />
             </div>
             <div className="lg:col-span-4">
               <SilentErrorBoundary>
-                <TaskRail isAuthenticated={isAuthenticated} />
+                <TaskRail isAuthenticated={authed} />
               </SilentErrorBoundary>
             </div>
           </div>
 
           {/* Your picks — main picks grid */}
-          {isAuthenticated && (
+          {authed && (
             <SilentErrorBoundary>
               <YourPicksSection />
             </SilentErrorBoundary>
           )}
 
           {/* Best for scholarships & aid — ranked from saved schools */}
-          {isAuthenticated && (
+          {authed && (
             <SilentErrorBoundary>
               <BestForAidSection />
             </SilentErrorBoundary>
@@ -275,7 +289,7 @@ function DashboardPage() {
 
           {/* Secondary utility row: prep progress + search (quiet tier) */}
           <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {isAuthenticated ? (
+            {authed ? (
               <SilentErrorBoundary>
                 <PrepSummaryCard />
               </SilentErrorBoundary>
@@ -403,7 +417,7 @@ function DashboardPage() {
             </div>
           </section>
 
-          {!isAuthenticated && (
+          {!authed && (
             <p className="mt-8 text-center text-body-sm text-on-surface-variant">
               You're browsing as a guest.{" "}
               <a href="/signin?mode=signup" className="text-primary hover:underline">

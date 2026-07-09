@@ -41,12 +41,14 @@ import {
   type Scholarship,
   type ResearchProgress,
 } from "@/lib/apply/uniData";
-import { useApplyActions } from "@/lib/applyQueue/client";
+import { applyJobIdFromStartResult, useApplyActions } from "@/lib/applyQueue/client";
 import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
 import type { GuideRow } from "@/lib/apply/guidance";
 import { ApplicationPlanView } from "@/components/apply/ApplicationPlanView";
 import { RequirementEditorDialog } from "@/components/apply/RequirementEditorDialog";
+import { ResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
+import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -232,7 +234,8 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <ResearchStatusBadge research={research} compact />
               <StatusPill found={found} ready={ready} />
               <SilentErrorBoundary>
                 <ApplyCTA target={target} ready={ready} />
@@ -334,6 +337,12 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
 
             {/* Right rail */}
             <aside className="space-y-5">
+              <ResearchStatusBadge research={research} />
+              <AgentCommandCard
+                compact
+                title="Add this target to deep roadmap"
+                body="Agent roadmap uses this school with your profile, missing items, scholarships, extension readiness, and application tracker."
+              />
               <ReadinessCard ready={ready} found={found} checklistPer={checklistPer} />
               <QuickLinks uni={uni} />
             </aside>
@@ -421,11 +430,12 @@ function ApplyCTA({ target, ready }: { target: BackendTarget; ready: boolean }) 
     if (busy) return;
     setBusy(true);
     try {
-      const id = await startApply({
+      const res = await startApply({
         system: target.system,
         externalId: target.externalId,
         targetName: target.name,
       });
+      const id = applyJobIdFromStartResult(res);
       void navigate({ to: "/apply/$jobId", params: { jobId: id } });
     } catch {
       setBusy(false);
@@ -906,26 +916,7 @@ function RequirementsList({
 }
 
 function ResearchProgressBlock({ research }: { research?: ResearchProgress | null }) {
-  const p = research?.progress ?? null;
-  const percent =
-    p?.percent != null ? Math.max(0, Math.min(100, Math.round(p.percent))) : null;
-  const message = p?.message ?? "Researching — this list will populate live.";
-  return (
-    <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4">
-      <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span>{message}</span>
-      </div>
-      {percent != null && (
-        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
-          <div
-            className="h-full bg-primary transition-[width] duration-300"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      )}
-    </div>
-  );
+  return <ResearchStatusBadge research={research} />;
 }
 
 function ScholarshipsCard({ scholarships }: { scholarships: Scholarship[] | undefined }) {

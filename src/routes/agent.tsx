@@ -23,7 +23,8 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
-import { useChecklist, type BackendTarget, type ChecklistResult } from "@/lib/apply/intake";
+import { useChecklist } from "@/lib/apply/intake";
+import { buildAgentCockpitModel, savedUniversitiesToBackendTargets } from "@/lib/agent/cockpitModel";
 import {
   targetKey,
   usePortfolioAgent,
@@ -83,44 +84,39 @@ function AgentCockpit() {
   const [busy, setBusy] = useState<"start" | "refresh" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const savedTargets: BackendTarget[] = useMemo(
-    () =>
-      (saved ?? []).map((target) => ({
-        system: target.source,
-        externalId: target.externalId,
-        name: target.name,
-      })),
-    [saved],
-  );
+  const savedTargets = useMemo(() => savedUniversitiesToBackendTargets(saved), [saved]);
   const checklist = useChecklist(savedTargets);
 
-  const targetPlans = useMemo(
-    () => buildTargetPlans(roadmap?.savedTargetPlans, latestBrain?.readinessSummary, savedTargets, checklist),
-    [roadmap?.savedTargetPlans, latestBrain?.readinessSummary, savedTargets, checklist],
-  );
-  const recommendations = useMemo(
-    () => dedupeTargets(roadmap?.recommendedTargets, latestBrain?.candidateTargets).slice(0, 8),
-    [roadmap?.recommendedTargets, latestBrain?.candidateTargets],
-  );
-  const scholarshipPrograms = useMemo(
+  const model = useMemo(
     () =>
-      ((roadmap?.scholarshipPlan?.programs?.length
-        ? roadmap.scholarshipPlan.programs
-        : latestBrain?.scholarshipCandidates) ?? []).slice(0, 8),
-    [latestBrain?.scholarshipCandidates, roadmap?.scholarshipPlan?.programs],
+      buildAgentCockpitModel({
+        savedTargets,
+        latestBrain,
+        roadmap,
+        events,
+        submissions,
+        checklist,
+      }),
+    [savedTargets, latestBrain, roadmap, events, submissions, checklist],
   );
-  const nextActions = roadmap?.nextActions ?? [];
-  const tips = roadmap?.tips ?? [];
-  const evidence = roadmap?.evidence ?? latestBrain?.evidenceIndex ?? [];
-  const readyCount = targetPlans.filter((target) => target.ready).length;
-  const blockedCount = targetPlans.filter((target) => !target.ready).length;
-  const extensionEvents = (events ?? []).filter((event) => event.source === "extension");
-  const latestExtensionEvent = extensionEvents[0];
-  const appliedCount = (submissions ?? []).filter((item) =>
-    ["submitted", "confirmed_applied"].includes(item.status ?? ""),
-  ).length;
+  const {
+    targetPlans,
+    recommendations,
+    scholarshipPrograms,
+    nextActions,
+    tips,
+    evidence,
+    readyCount,
+    blockedCount,
+    extensionEvents,
+    latestExtensionEvent,
+    appliedCount,
+    roadmapReady,
+  } = model;
+  const runInFlight = run?.status === "queued" || run?.status === "running";
 
   async function onStart() {
+    if (runInFlight) return;
     setBusy("start");
     setActionError(null);
     try {
@@ -181,18 +177,37 @@ function AgentCockpit() {
             <button
               type="button"
               onClick={() => void onStart()}
-              disabled={busy !== null}
+              disabled={busy !== null || runInFlight}
               className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
             >
-              {busy === "start" ? (
+              {busy === "start" || runInFlight ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Play className="h-4 w-4" />
               )}
-              Run deep roadmap
+              {busy === "start"
+                ? "Preparing brain"
+                : runInFlight
+                  ? "Agent running"
+                  : "Run deep roadmap"}
             </button>
           </div>
         </div>
+
+        {run && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border-2 border-on-surface/15 bg-surface px-4 py-3">
+            <span className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-primary">
+              {runInFlight ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+              Agent run
+            </span>
+            <span className="font-display text-label-lg font-bold text-on-surface">
+              {humanize(run.status ?? "pending")}
+            </span>
+            <span className="text-label-sm text-on-surface-variant">
+              {run.progress?.message ?? (run.finishedAt ? `Finished ${formatTime(run.finishedAt)}` : "Waiting for worker events")}
+            </span>
+          </div>
+        )}
 
         {(startError || actionError) && (
           <div className="mt-4 rounded-lg border-2 border-error bg-error-container/60 px-4 py-3 text-body-sm text-on-error-container">
@@ -213,7 +228,7 @@ function AgentCockpit() {
           <NextActionPanel
             actions={nextActions}
             run={run}
-            roadmapReady={!!roadmap || recommendations.length > 0 || evidence.length > 0}
+            roadmapReady={roadmapReady}
             roadmapSummary={roadmap?.summary}
           />
           <TargetReadinessPanel targets={targetPlans} submissions={submissions ?? []} />
@@ -372,7 +387,7 @@ function NextActionPanel({
   const terminalStatuses = ["succeeded", "completed", "failed", "cancelled"];
   const hasRoadmapOutput = !!roadmapReady || !!roadmapSummary || actions.length > 0;
   const running =
-    run && !hasRoadmapOutput && !terminalStatuses.includes(run.status ?? "");
+    run && !terminalStatuses.includes(run.status ?? "");
   const fallbackTitle = hasRoadmapOutput
     ? "Roadmap generated. Review the highest-signal actions below."
     : "Run the deep roadmap to generate your next action.";
@@ -1071,48 +1086,6 @@ function routeForAction(action?: RoadmapAction): { to: string; params?: Record<s
   if (action.kind === "document") return { to: "/documents", label: "Open documents" };
   if (action.kind === "extension") return { to: "/apply", label: "Open applications" };
   return { to: "/prep", label: "Do next" };
-}
-
-function buildTargetPlans(
-  roadmapTargets: PortfolioTarget[] | undefined,
-  brainTargets: PortfolioTarget[] | undefined,
-  savedTargets: BackendTarget[],
-  checklist: ChecklistResult | undefined,
-) {
-  if (roadmapTargets?.length) return roadmapTargets;
-  if (brainTargets?.length) return brainTargets;
-  return savedTargets.map((target) => {
-    const row = checklist?.perTarget.find(
-      (item) => item.system === target.system && item.externalId === target.externalId,
-    );
-    const checklistValue = row?.checklist as
-      | { ready?: boolean; requiredTotal?: number; requiredSatisfied?: number; blocking?: number }
-      | null
-      | undefined;
-    return {
-      ...target,
-      targetId: `${target.system}:${target.externalId}`,
-      ready: !!checklistValue?.ready,
-      requiredTotal: checklistValue?.requiredTotal ?? 0,
-      requiredSatisfied: checklistValue?.requiredSatisfied ?? 0,
-      blocking: checklistValue?.blocking ?? 0,
-      coverage: row?.found === false ? "needs_research" : "known",
-    };
-  });
-}
-
-function dedupeTargets(...groups: Array<PortfolioTarget[] | undefined>) {
-  const seen = new Set<string>();
-  const out: PortfolioTarget[] = [];
-  for (const group of groups) {
-    for (const target of group ?? []) {
-      const key = targetKey(target);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(target);
-    }
-  }
-  return out;
 }
 
 function humanize(value: string) {
