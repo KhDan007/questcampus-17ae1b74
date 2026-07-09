@@ -223,8 +223,8 @@ function AgentCockpit() {
         </div>
       </header>
 
-      <section className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="space-y-4">
+      <section className="mt-6 grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-4">
           <NextActionPanel
             actions={nextActions}
             run={run}
@@ -235,7 +235,7 @@ function AgentCockpit() {
           <RecommendationPanel targets={recommendations} />
           <ScholarshipPanel priority={roadmap?.scholarshipPlan?.priority} programs={scholarshipPrograms} />
         </div>
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4 xl:sticky xl:top-24">
           <ExtensionSyncPanel latestEvent={latestExtensionEvent} eventCount={extensionEvents.length} />
           <DecisionTracePanel
             latestBrain={latestBrain}
@@ -249,7 +249,7 @@ function AgentCockpit() {
             evidenceCount={evidence.length}
           />
           <GuardrailsPanel />
-          <TipsPanel tips={tips} evidence={evidence} />
+          <TipsPanel tips={tips} evidence={evidence} targets={targetPlans} />
           <EventLog events={events ?? []} />
           <AppliedTracker submissions={submissions ?? []} />
         </aside>
@@ -862,26 +862,78 @@ function GuardrailsPanel() {
   );
 }
 
-function TipsPanel({ tips, evidence }: { tips: RoadmapTip[]; evidence: EvidenceEntry[] }) {
+/** Boilerplate that repeats verbatim across every blocker tip; hoisted to one caption. */
+const BLOCKER_CAPTION =
+  "Finish the blocking requirements before the browser extension — the package gate rejects incomplete applications.";
+
+function TipsPanel({
+  tips,
+  evidence,
+  targets,
+}: {
+  tips: RoadmapTip[];
+  evidence: EvidenceEntry[];
+  targets: PortfolioTarget[];
+}) {
+  const shown = tips.slice(0, 4);
+  const targetById = useMemo(() => {
+    const map = new Map<string, PortfolioTarget>();
+    for (const t of targets) map.set(targetKey(t), t);
+    return map;
+  }, [targets]);
+
+  // A tip is a "blocker tip" when it resolves to a saved target that is not ready.
+  const resolve = (tip: RoadmapTip) => (tip.targetId ? targetById.get(tip.targetId) : undefined);
+  const hasBlockerTip = shown.some((tip) => {
+    const t = resolve(tip);
+    return t && !t.ready && (t.blocking ?? 0) > 0;
+  });
+
   return (
     <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-5">
       <PanelHeader icon={FileText} title="Grounded tips" body="No generic advice passes the backend validator." />
-      {tips.length ? (
+      {hasBlockerTip && (
+        <p className="mt-3 rounded-lg border border-on-surface/15 bg-surface-container px-3 py-2 text-label-sm text-on-surface-variant">
+          {BLOCKER_CAPTION}
+        </p>
+      )}
+      {shown.length ? (
         <div className="mt-4 space-y-3">
-          {tips.slice(0, 4).map((tip) => (
-            <article key={tip.id ?? tip.title} className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3">
-              <div className="flex items-start gap-2">
-                <PriorityDot priority={tip.priority} />
-                <div>
-                  <h3 className="font-[var(--font-label)] text-label-md font-bold text-on-surface">
-                    {tip.title}
-                  </h3>
-                  <p className="mt-1 text-body-sm text-on-surface-variant">{tip.body}</p>
-                  <EvidenceLine ids={tip.evidenceIds ?? []} evidence={evidence} />
+          {shown.map((tip) => {
+            const target = resolve(tip);
+            const isBlocker = !!target && !target.ready && (target.blocking ?? 0) > 0;
+            if (isBlocker && target) {
+              return (
+                <BlockerTipCard
+                  key={tip.id ?? tip.title ?? target.externalId}
+                  tip={tip}
+                  target={target}
+                  evidence={evidence}
+                />
+              );
+            }
+            return (
+              <article
+                key={tip.id ?? tip.title}
+                className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3"
+              >
+                <div className="flex items-start gap-2">
+                  <PriorityDot priority={tip.priority} />
+                  <div className="min-w-0">
+                    <h3 className="font-[var(--font-label)] text-label-md font-bold text-on-surface">
+                      {tip.title}
+                    </h3>
+                    {tip.body && (
+                      <p className="mt-1 break-words [overflow-wrap:anywhere] text-body-sm text-on-surface-variant">
+                        {tip.body}
+                      </p>
+                    )}
+                    <SourceChips ids={tip.evidenceIds ?? []} evidence={evidence} />
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       ) : (
         <p className="mt-4 text-body-sm text-on-surface-variant">
@@ -889,6 +941,61 @@ function TipsPanel({ tips, evidence }: { tips: RoadmapTip[]; evidence: EvidenceE
         </p>
       )}
     </section>
+  );
+}
+
+/**
+ * Scannable blocker tip: leads with the specific signal (school — % done, N
+ * blockers) as a bold line + thin meter, source chips, and one short action.
+ * The shared "why" lives once in the panel caption, not repeated here.
+ */
+function BlockerTipCard({
+  tip,
+  target,
+  evidence,
+}: {
+  tip: RoadmapTip;
+  target: PortfolioTarget;
+  evidence: EvidenceEntry[];
+}) {
+  const total = target.requiredTotal ?? 0;
+  const done = target.requiredSatisfied ?? 0;
+  const blocking = target.blocking ?? 0;
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+  const name = target.name ?? target.externalId ?? "University target";
+  const action =
+    target.nextActions?.[0]?.label ??
+    (total > 0 ? `Complete ${total - done} required item${total - done === 1 ? "" : "s"}.` : "Complete required items.");
+
+  return (
+    <article className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3">
+      <div className="flex items-start gap-2">
+        <PriorityDot priority={tip.priority} />
+        <div className="min-w-0 flex-1">
+          <h3 className="min-w-0 truncate font-[var(--font-label)] text-label-md font-bold text-on-surface">
+            {name}
+          </h3>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
+              {percent}% done · {done}/{total} required
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed">
+              <AlertTriangle className="h-3 w-3" /> {blocking} blocker{blocking === 1 ? "" : "s"}
+            </span>
+          </div>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+            <div
+              className="h-full bg-primary transition-[width] duration-500"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          <p className="mt-2 break-words [overflow-wrap:anywhere] text-body-sm text-on-surface-variant">
+            {action}
+          </p>
+          <SourceChips ids={tip.evidenceIds ?? []} evidence={evidence} />
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -1051,18 +1158,73 @@ function PriorityDot({ priority }: { priority?: string }) {
   return <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${cls}`} />;
 }
 
-function EvidenceLine({ ids, evidence }: { ids: string[]; evidence: EvidenceEntry[] }) {
+/** Parse a URL down to a bare hostname (no "www."), for compact source chips. */
+function hostnameOf(url: string): string | null {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return host || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Renders evidence as compact "Source" chips. Chips that resolve to a URL become
+ * hostname-only external links (full URL in href + title); non-URL evidence shows
+ * as a short quiet label. Never renders a raw long URL inline. Shows up to 3, then
+ * a "+N more" chip.
+ */
+function SourceChips({ ids, evidence }: { ids: string[]; evidence: EvidenceEntry[] }) {
   if (!ids.length) return null;
-  const labels = ids
-    .map((id) => evidence.find((entry) => entry.id === id))
-    .filter(Boolean)
-    .slice(0, 3)
-    .map((entry) => entry?.name || entry?.basis || entry?.kind || entry?.id)
+  const entries = ids
+    .map((id) => evidence.find((entry) => entry.id === id) ?? ({ id } as EvidenceEntry))
     .filter(Boolean);
+  if (!entries.length) return null;
+
+  const chips = entries.slice(0, 3);
+  const extra = entries.length - chips.length;
+
   return (
-    <p className="mt-2 font-[var(--font-label)] text-label-sm text-on-surface/60">
-      Evidence: {labels.length ? labels.join("; ") : ids.slice(0, 3).join("; ")}
-    </p>
+    <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5">
+      <span className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface/50">
+        Source
+      </span>
+      {chips.map((entry, index) => {
+        const url = entry.sourceUrl || entry.evidenceUrl;
+        const host = url ? hostnameOf(url) : null;
+        const label = host || entry.name || entry.basis || entry.kind || entry.id || "source";
+        const key = entry.id ?? `${label}-${index}`;
+        if (url && host) {
+          return (
+            <a
+              key={key}
+              href={url}
+              title={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-on-surface/20 bg-surface px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+            >
+              <span className="truncate">{host}</span>
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+          );
+        }
+        return (
+          <span
+            key={key}
+            title={label}
+            className="inline-flex max-w-full truncate rounded-full border border-on-surface/15 bg-surface-container px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant"
+          >
+            {label}
+          </span>
+        );
+      })}
+      {extra > 0 && (
+        <span className="inline-flex rounded-full border border-on-surface/15 bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
+          +{extra} more
+        </span>
+      )}
+    </div>
   );
 }
 
