@@ -29,7 +29,7 @@ import {
 } from "@/lib/chat";
 
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
-import { useApplyActions } from "@/lib/applyQueue/client";
+import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
 
 const SUGGESTIONS = [
   "What is my safest next action?",
@@ -449,7 +449,7 @@ function ActionCard({
   const setStatus = useSetActionStatus();
   const setAnswer = useSetAnswer();
   const answerEligibility = useAnswerEligibility();
-  const { startApply } = useApplyActions();
+  const autoApplyGate = useAutoApplyGate();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -482,11 +482,12 @@ function ActionCard({
     setBusy(true);
     setErr(null);
     try {
-      await execute(action, { setAnswer, answerEligibility, startApply, navigate });
+      const result = await execute(action, { setAnswer, answerEligibility, autoApplyGate, navigate });
       await setStatus(messageId, action.id, "done");
-      toast.success("Done");
+      if (result !== "handled") toast.success("Done");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Action failed";
+      const raw = e instanceof Error ? e.message : "Action failed";
+      const msg = friendlyActionError(raw);
       setErr(msg);
       toast.error(msg);
     } finally {
@@ -530,11 +531,13 @@ function ActionCard({
 type Executors = {
   setAnswer: ReturnType<typeof useSetAnswer>;
   answerEligibility: ReturnType<typeof useAnswerEligibility>;
-  startApply: ReturnType<typeof useApplyActions>["startApply"];
+  autoApplyGate: ReturnType<typeof useAutoApplyGate>;
   navigate: ReturnType<typeof useNavigate>;
 };
 
-async function execute(action: ChatAction, ex: Executors) {
+/** Return "handled" when the branch already gave the user specific feedback
+ * (a toast, a targeted redirect) so confirmAction skips its generic "Done". */
+async function execute(action: ChatAction, ex: Executors): Promise<"handled" | void> {
   const args = (action.args ?? {}) as Record<string, unknown>;
   const str = (k: string) => (typeof args[k] === "string" ? (args[k] as string) : undefined);
   switch (action.tool) {
@@ -556,8 +559,28 @@ async function execute(action: ChatAction, ex: Executors) {
       const system = str("system");
       const externalId = str("externalId");
       if (!system || !externalId) throw new Error("Missing system/externalId");
-      const res = await ex.startApply({ system, externalId, targetName: str("targetName") });
-      await ex.navigate({ to: "/apply/$jobId", params: { jobId: res.jobId } });
+      // Auto-apply fills happen in the user's own browser via the extension —
+      // there's nothing to enqueue server-side. Route to whatever's next.
+      switch (ex.autoApplyGate.evaluate()) {
+        case "signin_required": {
+          const redirect =
+            typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+          await ex.navigate({ to: "/signin", search: { redirect } as never });
+          return "handled";
+        }
+        case "extension_required":
+          toast.message("You'll need the QuestCampus extension for this — it fills the form from your own browser.");
+          await ex.navigate({ to: "/extension", search: { system, externalId } as never });
+          return "handled";
+        case "profile_incomplete":
+          toast.message("Almost there — finish your Common App profile and the extension can fill from it.");
+          await ex.navigate({ to: "/common-app" });
+          return "handled";
+        case "ready":
+          await ex.navigate({ to: "/application/$system/$externalId", params: { system, externalId } });
+          toast.success("Open the extension's side panel here to start filling.");
+          return "handled";
+      }
       return;
     }
     case "upload_document": {
@@ -573,6 +596,25 @@ async function execute(action: ChatAction, ex: Executors) {
     default:
       throw new Error(`Unknown action: ${action.tool}`);
   }
+}
+
+/** Never surface a raw backend error to the user — translate what we
+ * recognize, and fall back to a calm, generic nudge for everything else. */
+function friendlyActionError(raw: string): string {
+  const msg = raw.toLowerCase();
+  if (msg.includes("common app profile")) {
+    return "Finish your Common App profile first — a few required answers are still missing.";
+  }
+  if (msg.includes("not ready") || msg.includes("not_ready") || msg.includes("requirement")) {
+    return "This one isn't ready yet — some requirements still need your input.";
+  }
+  if (msg.includes("paid") || msg.includes("payment") || msg.includes("entitle")) {
+    return "This needs your plan to be active first.";
+  }
+  if (msg.includes("network") || msg.includes("fetch")) {
+    return "Connection hiccup — try that again in a moment.";
+  }
+  return "Couldn't do that just now — try again in a moment.";
 }
 
 async function navigateInternal(

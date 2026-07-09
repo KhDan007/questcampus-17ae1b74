@@ -41,7 +41,8 @@ import {
   type Scholarship,
   type ResearchProgress,
 } from "@/lib/apply/uniData";
-import { applyJobIdFromStartResult, useApplyActions } from "@/lib/applyQueue/client";
+import { toast } from "sonner";
+import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
 import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock, findGuide } from "@/components/apply/GuideBlock";
 import type { GuideRow } from "@/lib/apply/guidance";
@@ -423,21 +424,35 @@ function StatusPill({ found, ready }: { found: boolean; ready: boolean }) {
 }
 
 function ApplyCTA({ target, ready }: { target: BackendTarget; ready: boolean }) {
-  const { startApply } = useApplyActions();
+  const gate = useAutoApplyGate();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   async function launch() {
     if (busy) return;
     setBusy(true);
     try {
-      const res = await startApply({
-        system: target.system,
-        externalId: target.externalId,
-        targetName: target.name,
-      });
-      const id = applyJobIdFromStartResult(res);
-      void navigate({ to: "/apply/$jobId", params: { jobId: id } });
-    } catch {
+      switch (gate.evaluate()) {
+        case "signin_required": {
+          const redirect =
+            typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+          await navigate({ to: "/signin", search: { redirect } as never });
+          return;
+        }
+        case "extension_required":
+          await navigate({
+            to: "/extension",
+            search: { system: target.system, externalId: target.externalId } as never,
+          });
+          return;
+        case "profile_incomplete":
+          toast.message("Finish your Common App profile first — the extension fills from those answers.");
+          await navigate({ to: "/common-app" });
+          return;
+        case "ready":
+          toast.success("Extension ready — open its side panel on this tab to start filling.");
+          return;
+      }
+    } finally {
       setBusy(false);
     }
   }

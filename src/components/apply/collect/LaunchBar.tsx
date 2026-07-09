@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Send, Loader2, Lock } from "lucide-react";
-import { useApplyActions } from "@/lib/applyQueue/client";
+import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
 import type { AutoApplyEntitlement, BackendTarget } from "@/lib/apply/intake";
 
 type Props = {
@@ -14,9 +15,8 @@ type Props = {
 
 export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
   const navigate = useNavigate();
-  const { startApply } = useApplyActions();
+  const applyGate = useAutoApplyGate();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const gate = entitlement?.gate;
   const gateEnabled = gate === "ready_free" || gate === "ready_paid";
@@ -44,37 +44,31 @@ export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
     }
     if (!enabled) return;
     setBusy(true);
-    setError(null);
     try {
-      let firstJobId: string | null = null;
-      let firstReused = false;
-      for (const t of readyTargets) {
-        try {
-          const res = await startApply({
-            system: t.system,
-            externalId: t.externalId,
-            targetName: t.name,
-          });
-          if (!firstJobId) {
-            firstJobId = res.jobId;
-            firstReused = res.reused;
-          }
-        } catch (e) {
-          // Surface backend error message verbatim.
-          const msg = e instanceof Error ? e.message : "Couldn't start this application";
-          setError(msg);
-          if (/payment required/i.test(msg)) {
-            void navigate({ to: "/unlock" });
-            return;
-          }
+      const first = readyTargets[0];
+      switch (applyGate.evaluate()) {
+        case "signin_required": {
+          const redirect =
+            typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+          await navigate({ to: "/signin", search: { redirect } as never });
+          return;
         }
-      }
-      if (firstJobId) {
-        void navigate({
-          to: "/apply/$jobId",
-          params: { jobId: firstJobId },
-          replace: firstReused,
-        });
+        case "extension_required":
+          await navigate({
+            to: "/extension",
+            search: { system: first.system, externalId: first.externalId } as never,
+          });
+          return;
+        case "profile_incomplete":
+          toast.message("Finish your Common App profile first — the extension fills from those answers.");
+          await navigate({ to: "/common-app" });
+          return;
+        case "ready":
+          await navigate({
+            to: "/application/$system/$externalId",
+            params: { system: first.system, externalId: first.externalId },
+          });
+          return;
       }
     } finally {
       setBusy(false);
@@ -95,7 +89,6 @@ export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
                 style={{ width: `${percent}%` }}
               />
             </div>
-            {error && <p className="mt-1 text-label-sm text-on-error-container">{error}</p>}
           </div>
           <button
             type="button"

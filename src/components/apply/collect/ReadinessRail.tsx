@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Check, Loader2, CircleDashed, AlertTriangle, Send } from "lucide-react";
-import { applyJobIdFromStartResult, useApplyActions, useActiveApplyJob } from "@/lib/applyQueue/client";
+import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
 import type { IntakeTarget, EligibilityPerTarget, ChecklistResult } from "@/lib/apply/intake";
 
 type Props = {
@@ -13,8 +14,7 @@ type Props = {
 };
 
 export function ReadinessRail({ targets, eligibility, checklist }: Props) {
-  const { startApply } = useApplyActions();
-  const activeJob = useActiveApplyJob();
+  const applyGate = useAutoApplyGate();
   const navigate = useNavigate();
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
@@ -22,14 +22,31 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
     const key = `${t.system}::${t.externalId}`;
     setBusyKey(key);
     try {
-      const res = await startApply({
-        system: t.system,
-        externalId: t.externalId,
-        targetName: t.name,
-      });
-      const id = applyJobIdFromStartResult(res);
-      void navigate({ to: "/apply/$jobId", params: { jobId: id } });
-    } catch {
+      switch (applyGate.evaluate()) {
+        case "signin_required": {
+          const redirect =
+            typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+          await navigate({ to: "/signin", search: { redirect } as never });
+          return;
+        }
+        case "extension_required":
+          await navigate({
+            to: "/extension",
+            search: { system: t.system, externalId: t.externalId } as never,
+          });
+          return;
+        case "profile_incomplete":
+          toast.message("Finish your Common App profile first — the extension fills from those answers.");
+          await navigate({ to: "/common-app" });
+          return;
+        case "ready":
+          await navigate({
+            to: "/application/$system/$externalId",
+            params: { system: t.system, externalId: t.externalId },
+          });
+          return;
+      }
+    } finally {
       setBusyKey(null);
     }
   }
@@ -51,8 +68,6 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
           const researching = t.found === false || c?.found === false;
           const ineligible = e?.verdict === "ineligible";
           const ready = (c?.checklist?.ready ?? false) && !ineligible;
-          const inProgress =
-            activeJob?.system === t.system && activeJob?.externalId === t.externalId;
 
           return (
             <li
@@ -81,16 +96,14 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
                 <p className="truncate text-label-sm text-on-surface-variant">
                   {researching
                     ? "researching requirements…"
-                    : inProgress
-                      ? "In progress"
-                      : ineligible
-                        ? "Not eligible"
-                        : ready
-                          ? "Ready to apply"
-                          : "In progress"}
+                    : ineligible
+                      ? "Not eligible"
+                      : ready
+                        ? "Ready to apply"
+                        : "In progress"}
                 </p>
               </div>
-              {ready && !inProgress && (
+              {ready && (
                 <button
                   type="button"
                   onClick={() => void applyOne(t)}
