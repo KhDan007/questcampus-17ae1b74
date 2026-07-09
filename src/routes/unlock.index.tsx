@@ -101,8 +101,9 @@ function UnlockPage() {
 
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned to your profile —
-              plus polished essay drafts and every premium feature we ship. Billed monthly. Cancel
-              anytime.
+              plus polished essay drafts and every premium feature we ship. Try it free for 3 days,
+              then billed monthly at ${PRICE_MVP}/month. Cancel anytime before your trial ends to
+              avoid the charge.
             </p>
           </motion.div>
 
