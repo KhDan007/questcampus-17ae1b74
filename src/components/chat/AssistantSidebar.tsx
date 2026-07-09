@@ -73,12 +73,14 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [forceNew, setForceNew] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const activeThreadId = forceNew ? undefined : (selectedId ?? threads?.[0]?._id);
   const messages = useThreadMessages(activeThreadId);
   const send = useSendChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
 
   const latestAssistant = useMemo(
     () => (messages ?? []).slice().reverse().find((m) => m.role === "assistant"),
