@@ -94,11 +94,12 @@ const TOP_ITEMS: Item[] = [
     feature: "Activities",
   },
   {
-    kind: "waitlist",
-    key: "deadlines",
-    label: "Deadlines",
+    kind: "link",
+    key: "plan",
+    label: "Plan",
+    to: "/plan",
     icon: CalendarClock,
-    feature: "Deadline tracker",
+    match: (p) => p.startsWith("/plan"),
   },
 ];
 

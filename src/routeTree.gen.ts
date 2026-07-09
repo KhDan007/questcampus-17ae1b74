@@ -14,6 +14,7 @@ import { Route as TosRouteImport } from './routes/tos'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrepRouteImport } from './routes/prep'
+import { Route as PlanRouteImport } from './routes/plan'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as EssayRouteImport } from './routes/essay'
@@ -55,6 +56,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrepRoute = PrepRouteImport.update({
   id: '/prep',
   path: '/prep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanRoute = PlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/onboarding': typeof OnboardingRoute
+  '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/onboarding': typeof OnboardingRoute
+  '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/onboarding': typeof OnboardingRoute
+  '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
   '/signin': typeof SigninRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/onboarding'
+    | '/plan'
     | '/prep'
     | '/profile'
     | '/signin'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/onboarding'
+    | '/plan'
     | '/prep'
     | '/profile'
     | '/signin'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/onboarding'
+    | '/plan'
     | '/prep'
     | '/profile'
     | '/signin'
@@ -302,6 +314,7 @@ export interface RootRouteChildren {
   EssayRoute: typeof EssayRoute
   ExtensionRoute: typeof ExtensionRoute
   OnboardingRoute: typeof OnboardingRoute
+  PlanRoute: typeof PlanRoute
   PrepRoute: typeof PrepRoute
   ProfileRoute: typeof ProfileRoute
   SigninRoute: typeof SigninRoute
@@ -351,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/prep'
       fullPath: '/prep'
       preLoaderRoute: typeof PrepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plan': {
+      id: '/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof PlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -497,6 +517,7 @@ const rootRouteChildren: RootRouteChildren = {
   EssayRoute: EssayRoute,
   ExtensionRoute: ExtensionRoute,
   OnboardingRoute: OnboardingRoute,
+  PlanRoute: PlanRoute,
   PrepRoute: PrepRoute,
   ProfileRoute: ProfileRoute,
   SigninRoute: SigninRoute,

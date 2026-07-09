@@ -2,6 +2,7 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import {
   ArrowLeft,
   ArrowRight,
+  CalendarClock,
   CheckSquare,
   ClipboardList,
   Loader2,
@@ -19,7 +20,6 @@ import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
-import { CommonAppScheduleCard } from "@/components/apply/CommonAppScheduleCard";
 import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -103,9 +103,7 @@ function ApplyHubPage() {
             <CommonAppProfileCard />
           </SilentErrorBoundary>
 
-          <SilentErrorBoundary>
-            <CommonAppScheduleCard />
-          </SilentErrorBoundary>
+          <PlanTeaserCard />
 
           <ResumeBanner />
 
@@ -289,6 +287,39 @@ function RunLiveDemoCard() {
             </p>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function PlanTeaserCard() {
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
+            <CalendarClock className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              Your plan
+            </p>
+            <h3 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
+              Every task across your applications, balanced day by day
+            </h3>
+            <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
+              We split each application into small tasks and spread them across your days, so nothing
+              piles up at the deadline.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/plan"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          Open your plan
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
