@@ -32,7 +32,7 @@ export const Route = createFileRoute("/unlock/")({
       {
         name: "description",
         content:
-          "$15/month subscription for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
+          "Try free for 3 days, then $15/month for your full ranked university shortlist, polished essay drafts, and every premium feature we ship.",
       },
     ],
   }),
@@ -61,7 +61,7 @@ function UnlockPage() {
 
   const guarantees = [
     { Icon: ShieldCheck, label: "Secure Polar checkout" },
-    { Icon: Sparkles, label: "Monthly subscription" },
+    { Icon: Sparkles, label: "3-day free trial, then monthly" },
     { Icon: Check, label: "Refund within 7 days, no questions" },
   ];
 
@@ -84,7 +84,7 @@ function UnlockPage() {
             className="text-center"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" />${PRICE_MVP}/month subscription
+              <Sparkles className="h-3.5 w-3.5" />3-day free trial
             </span>
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
@@ -101,8 +101,9 @@ function UnlockPage() {
 
             <p className="mx-auto mt-5 max-w-[60ch] text-pretty text-body-lg text-on-surface-variant">
               The full ranked list of safety, target, and reach universities tuned to your profile —
-              plus polished essay drafts and every premium feature we ship. Billed monthly. Cancel
-              anytime.
+              plus polished essay drafts and every premium feature we ship. Try it free for 3 days,
+              then billed monthly at ${PRICE_MVP}/month. Cancel anytime before your trial ends to
+              avoid the charge.
             </p>
           </motion.div>
 
@@ -157,7 +158,8 @@ function UnlockPage() {
               )}
 
               <p className="mt-4 text-body-md text-on-surface-variant">
-                $15/month for matches, essays, and premium tools. Worth months of research,
+                Free for 3 days, then $15/month for matches, essays, and premium tools. Cancel
+                anytime before the trial ends — no charge. Worth months of research,
                 second-guessing, and college-counsellor calls.
               </p>
 
@@ -177,10 +179,15 @@ function UnlockPage() {
                     </Link>
                   </>
                 ) : (
-                  <UnlockButton
-                    token={token}
-                    className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-                  />
+                  <>
+                    <UnlockButton
+                      token={token}
+                      className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                    />
+                    <p className="text-center font-[var(--font-label)] text-label-sm text-on-surface-variant">
+                      Card required today, first charge on day 3.
+                    </p>
+                  </>
                 )}
               </div>
 
