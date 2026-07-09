@@ -3,6 +3,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { HeroOnboarding } from "@/components/landing2/HeroOnboarding";
 import { ParallaxShowcase } from "@/components/landing2/ParallaxShowcase";
 import { HowItWorks } from "@/components/landing2/HowItWorks";
+import { DemoStrip } from "@/components/landing2/DemoStrip";
 import { RoadmapV2 } from "@/components/landing2/RoadmapV2";
 import { WaitlistV2 } from "@/components/landing2/WaitlistV2";
 import { MidPageCTA } from "@/components/landing2/MidPageCTA";
@@ -40,6 +41,7 @@ function LandingPage() {
         <HeroOnboarding />
         <ParallaxShowcase />
         <HowItWorks />
+        <DemoStrip />
         <RoadmapV2 />
         <MidPageCTA />
         <WaitlistV2 />

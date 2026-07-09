@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,10 +24,10 @@ import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
-import { useApplyActions } from "@/lib/applyQueue/client";
+import { useRunDemo } from "@/lib/applyQueue/useRunDemo";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
 import { useCommonAppProfile } from "@/lib/apply/commonAppProfile";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
 export const Route = createFileRoute("/apply/")({
@@ -239,23 +239,7 @@ function SavedToPick() {
 }
 
 function RunLiveDemoCard() {
-  const navigate = useNavigate();
-  const { startDemo } = useApplyActions();
-  const [starting, setStarting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const onClick = async () => {
-    if (starting) return;
-    setError(null);
-    setStarting(true);
-    try {
-      const { jobId } = await startDemo(true);
-      await navigate({ to: "/apply/$jobId", params: { jobId } });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't start demo");
-      setStarting(false);
-    }
-  };
+  const { run: onClick, starting, error } = useRunDemo();
 
   return (
     <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">

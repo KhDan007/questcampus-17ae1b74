@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Lock,
   Loader2,
+  Play,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
@@ -27,6 +28,7 @@ import { ResumeBanner } from "@/components/apply/ResumeBanner";
 import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 import { markProgress } from "@/lib/progress";
 import { useActiveApplyJob } from "@/lib/applyQueue/client";
+import { useRunDemo } from "@/lib/applyQueue/useRunDemo";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 
 import { BestForAidSection } from "@/components/dashboard/BestForAidSection";
@@ -250,6 +252,15 @@ function DashboardPage() {
             <ResumeBanner />
           </div>
 
+          {/* See it in action — the live demo, front and center */}
+          {authed && (
+            <div className="mt-6">
+              <SilentErrorBoundary>
+                <DemoHeroCard />
+              </SilentErrorBoundary>
+            </div>
+          )}
+
           {authed && (
             <div className="mt-6">
               <SilentErrorBoundary>
@@ -438,6 +449,48 @@ function DashboardPage() {
       />
 
     </>
+  );
+}
+
+function DemoHeroCard() {
+  const { run, starting, error } = useRunDemo();
+  return (
+    <section className="rounded-2xl border-2 border-on-surface bg-primary-fixed p-5 qc-hard-shadow sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-4">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm">
+            <Play className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              See it in action
+            </p>
+            <h2 className="mt-0.5 font-display text-headline-md font-bold text-on-surface">
+              Watch us fill 3 real university applications with your answers in 60 seconds
+            </h2>
+            <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">
+              We open a live browser and fill three portals from your profile. Nothing is submitted.
+            </p>
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
+          <button
+            type="button"
+            onClick={() => void run()}
+            disabled={starting}
+            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+          >
+            {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            {starting ? "Starting demo…" : "Run the demo"}
+          </button>
+          {error && (
+            <p role="alert" className="text-label-sm font-semibold text-primary">
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 
