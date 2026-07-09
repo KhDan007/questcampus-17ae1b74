@@ -185,7 +185,15 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         ref={scrollRef}
         className="flex-1 space-y-3 overflow-y-auto bg-surface-container-lowest px-3 py-4"
       >
-        {sending && showEmpty ? (
+        {historyOpen ? (
+          <HistoryPanel
+            threads={threads}
+            activeId={activeThreadId}
+            onPick={pickThread}
+            onNew={newChat}
+            onBack={() => setHistoryOpen(false)}
+          />
+        ) : sending && showEmpty ? (
           <PendingFirstReply />
         ) : showEmpty ? (
           <EmptyState onPick={submit} disabled={disabled} />
@@ -197,6 +205,8 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
           messages.map((m) => <MessageRow key={m._id} message={m} />)
         )}
       </div>
+
+
 
       {/* Composer */}
       <form
