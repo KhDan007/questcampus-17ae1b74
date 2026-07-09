@@ -137,6 +137,23 @@ const PRIORITIES = [
   { value: "location", label: "Location" },
 ];
 
+// "Your basics" — identity + contact fields the auto-apply demo and Common App
+// intake need. Values are sent verbatim; enum labels match the backend Common
+// App profile options exactly so prefill maps cleanly.
+const CITIZENSHIP_STATUSES = [
+  { value: "U.S. Citizen or National", label: "US citizen or national" },
+  { value: "U.S. Dual Citizen", label: "US dual citizen" },
+  { value: "U.S. Permanent Resident", label: "US permanent resident" },
+  { value: "Other (non-U.S.)", label: "Other (non-US)" },
+  { value: "Undocumented / DACA", label: "Undocumented / DACA" },
+];
+
+const SEX_OPTIONS = [
+  { value: "Female", label: "Female" },
+  { value: "Male", label: "Male" },
+  { value: "X or another legal sex", label: "X or another legal sex" },
+];
+
 // ── Types matching the backend contract ──────────────────────────────────────
 type Answers = {
   firstName?: string;
@@ -153,6 +170,20 @@ type Answers = {
   campusVibe?: { selected: string[] };
   priorities?: { selected: string[] };
   futureSelf?: { choice: string };
+  // "Your basics" — identity + contact. Keys line up with the backend
+  // onboardingKey mappings so the Common App profile prefills from them.
+  lastName?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  addressStreet?: string;
+  addressCity?: string;
+  addressState?: string;
+  addressPostal?: string;
+  nationality?: string;
+  citizenshipStatus?: { choice: string };
+  graduationDate?: string;
+  sexAssignedBirth?: { choice: string };
+  highSchoolName?: string;
 };
 
 function countFilled(a: Answers): number {
@@ -692,6 +723,125 @@ function OnboardingPage() {
                   }))
                 }
                 placeholder="e.g. software engineer, doctor, founder, researcher"
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+          </Section>
+
+          {/* SECTION 5 — Your basics (identity + contact for applications) */}
+          <Section
+            title="Your basics"
+            subtitle="Optional — the details your applications need. Fill in what you can; you can skip any of it and we'll ask again later."
+          >
+            <Field label="Legal last name">
+              <input
+                type="text"
+                value={answers.lastName ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, lastName: e.target.value }))}
+                placeholder="As it appears on official documents"
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+
+            <Field label="Date of birth">
+              <input
+                type="date"
+                value={answers.dateOfBirth ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, dateOfBirth: e.target.value }))}
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+
+            <Field label="Phone number">
+              <input
+                type="tel"
+                value={answers.phone ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, phone: e.target.value }))}
+                placeholder="Include your country code"
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+
+            <Field label="Home address" hint="Where you currently live.">
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={answers.addressStreet ?? ""}
+                  onChange={(e) => setAnswers((a) => ({ ...a, addressStreet: e.target.value }))}
+                  placeholder="Street address"
+                  className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <input
+                    type="text"
+                    value={answers.addressCity ?? ""}
+                    onChange={(e) => setAnswers((a) => ({ ...a, addressCity: e.target.value }))}
+                    placeholder="City"
+                    className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={answers.addressState ?? ""}
+                    onChange={(e) => setAnswers((a) => ({ ...a, addressState: e.target.value }))}
+                    placeholder="State / province"
+                    className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={answers.addressPostal ?? ""}
+                    onChange={(e) => setAnswers((a) => ({ ...a, addressPostal: e.target.value }))}
+                    placeholder="ZIP / postal code"
+                    className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  />
+                </div>
+              </div>
+            </Field>
+
+            <Field label="Country of citizenship">
+              <input
+                type="text"
+                value={answers.nationality ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, nationality: e.target.value }))}
+                placeholder="e.g. Kazakhstan"
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+
+            <Field label="Citizenship status">
+              <PillGroup
+                options={CITIZENSHIP_STATUSES}
+                value={answers.citizenshipStatus?.choice}
+                onChange={(v) =>
+                  setAnswers((a) => ({ ...a, citizenshipStatus: { choice: v } }))
+                }
+              />
+            </Field>
+
+            <Field label="Sex assigned at birth" hint="Some application forms require this.">
+              <PillGroup
+                options={SEX_OPTIONS}
+                value={answers.sexAssignedBirth?.choice}
+                onChange={(v) =>
+                  setAnswers((a) => ({ ...a, sexAssignedBirth: { choice: v } }))
+                }
+              />
+            </Field>
+
+            <Field label="High school name">
+              <input
+                type="text"
+                value={answers.highSchoolName ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, highSchoolName: e.target.value }))}
+                placeholder="Your current or most recent school"
+                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+              />
+            </Field>
+
+            <Field label="Graduation date" hint="When you finished or will finish high school.">
+              <input
+                type="date"
+                value={answers.graduationDate ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, graduationDate: e.target.value }))}
                 className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
               />
             </Field>
