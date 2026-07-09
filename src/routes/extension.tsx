@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Chrome, ExternalLink, MousePointerClick, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Chrome, Download, ExternalLink, MousePointerClick, ShieldCheck } from "lucide-react";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useExtensionInstalled } from "@/lib/extension/detect";
@@ -23,11 +23,13 @@ export const Route = createFileRoute("/extension")({
   component: ExtensionPage,
 });
 
+const EXTENSION_ZIP = "/questcampus-extension.zip";
+
 const STEPS = [
   {
     Icon: Chrome,
-    title: "Install the extension",
-    body: "Ask the team for the current install package — it runs entirely in your own browser, in your own logged-in sessions.",
+    title: "Add it to Chrome",
+    body: "Unzip the download, open chrome://extensions, switch on Developer mode (top right), click \"Load unpacked\", and pick the questcampus-extension folder. Pin it from the puzzle-piece menu.",
   },
   {
     Icon: ShieldCheck,
@@ -102,14 +104,28 @@ function ExtensionPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-3">
+          {!installed && (
+            <a
+              href={EXTENSION_ZIP}
+              download
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <Download className="h-4 w-4" /> Download the extension
+            </a>
+          )}
           <Link
             to={targetHref}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className={`inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+              installed ? "bg-primary text-white" : "bg-surface text-on-surface"
+            }`}
           >
             {installed ? "Continue to your application" : "Back to applications"}
             <ExternalLink className="h-4 w-4" />
           </Link>
         </div>
+        <p className="mt-3 text-label-sm text-on-surface-variant">
+          Chrome Web Store listing is on its way — until then this direct install is the beta channel.
+        </p>
       </main>
     </DashboardShell>
   );
