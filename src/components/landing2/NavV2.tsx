@@ -62,6 +62,11 @@ export function NavV2() {
   }
 
   const showWaitlistButton = isLanding || isUnlock;
+  // Signed-in workspace pages get their nav from DashboardShell's drawer
+  // (bottom-left FAB) — the header hamburger there was a redundant second
+  // menu. Keep it only where it's the sole navigation: the landing page
+  // and signed-out visitors.
+  const showMobileMenu = isLanding || !isAuthenticated;
 
   return (
     <>
@@ -77,15 +82,17 @@ export function NavV2() {
       >
         <nav className="flex h-16 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setMobileOpen((open) => !open)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none md:hidden"
-            >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+            {showMobileMenu && (
+              <button
+                type="button"
+                onClick={() => setMobileOpen((open) => !open)}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileOpen}
+                className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none md:hidden"
+              >
+                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            )}
 
             <a href="/" className="group flex items-center">
               <QuestCampusLogo className="h-8" />
@@ -131,7 +138,7 @@ export function NavV2() {
 
       {mounted && createPortal(
         <AnimatePresence>
-          {mobileOpen && (
+          {mobileOpen && showMobileMenu && (
             <div className="fixed inset-0 z-[9999] md:hidden" role="dialog" aria-modal="true">
               <motion.button
                 type="button"
