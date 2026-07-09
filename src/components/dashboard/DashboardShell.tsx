@@ -221,7 +221,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="relative flex min-h-screen w-full max-w-full items-start overflow-x-hidden">
+      <div className="relative flex min-h-screen w-full max-w-full items-start overflow-x-clip">
         {/* Desktop sidebar */}
         <aside
           aria-label="Primary"
