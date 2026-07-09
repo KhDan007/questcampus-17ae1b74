@@ -12,7 +12,10 @@ import {
   Sparkles,
   Check,
   Loader2,
+  History,
+  ArrowLeft,
 } from "lucide-react";
+
 import { useAuth } from "@/lib/auth/useAuth";
 import { Markdown } from "@/components/common/Markdown";
 import {
@@ -22,7 +25,9 @@ import {
   useSetActionStatus,
   type ChatAction,
   type ChatMessage,
+  type ChatThread,
 } from "@/lib/chat";
+
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useApplyActions } from "@/lib/applyQueue/client";
 
@@ -70,12 +75,14 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [forceNew, setForceNew] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const activeThreadId = forceNew ? undefined : (selectedId ?? threads?.[0]?._id);
   const messages = useThreadMessages(activeThreadId);
   const send = useSendChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
 
   const latestAssistant = useMemo(
     () => (messages ?? []).slice().reverse().find((m) => m.role === "assistant"),
@@ -108,7 +115,15 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   function newChat() {
     setForceNew(true);
     setSelectedId(undefined);
+    setHistoryOpen(false);
   }
+
+  function pickThread(id: string) {
+    setSelectedId(id);
+    setForceNew(false);
+    setHistoryOpen(false);
+  }
+
 
   const showEmpty = !activeThreadId || messages?.length === 0;
 
@@ -134,12 +149,29 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         </div>
         <button
           type="button"
+          onClick={() => setHistoryOpen((v) => !v)}
+          aria-pressed={historyOpen}
+          className={`inline-flex items-center gap-1 rounded-md border-2 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold hover:border-on-surface ${
+            historyOpen
+              ? "border-on-surface bg-secondary-container text-on-surface"
+              : "border-on-surface/25 bg-surface text-on-surface"
+          }`}
+          title="Previous chats"
+        >
+          <History className="h-3.5 w-3.5" /> History
+          {threads && threads.length > 0 && (
+            <span className="opacity-60">({threads.length})</span>
+          )}
+        </button>
+        <button
+          type="button"
           onClick={newChat}
           className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
           title="Start a new chat"
         >
           <Plus className="h-3.5 w-3.5" /> New
         </button>
+
         <button
           type="button"
           onClick={onClose}
@@ -155,7 +187,15 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
         ref={scrollRef}
         className="flex-1 space-y-3 overflow-y-auto bg-surface-container-lowest px-3 py-4"
       >
-        {sending && showEmpty ? (
+        {historyOpen ? (
+          <HistoryPanel
+            threads={threads}
+            activeId={activeThreadId}
+            onPick={pickThread}
+            onNew={newChat}
+            onBack={() => setHistoryOpen(false)}
+          />
+        ) : sending && showEmpty ? (
           <PendingFirstReply />
         ) : showEmpty ? (
           <EmptyState onPick={submit} disabled={disabled} />
@@ -167,6 +207,8 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
           messages.map((m) => <MessageRow key={m._id} message={m} />)
         )}
       </div>
+
+
 
       {/* Composer */}
       <form
@@ -210,7 +252,83 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+function HistoryPanel({
+  threads,
+  activeId,
+  onPick,
+  onNew,
+  onBack,
+}: {
+  threads: ChatThread[] | undefined;
+  activeId?: string;
+  onPick: (id: string) => void;
+  onNew: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={onNew}
+          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <Plus className="h-3.5 w-3.5" /> New chat
+        </button>
+      </div>
+      {threads === undefined ? (
+        <div className="flex items-center justify-center py-6 text-on-surface-variant">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      ) : threads.length === 0 ? (
+        <p className="rounded-md border-2 border-dashed border-on-surface/20 bg-surface p-4 text-center text-body-sm text-on-surface-variant">
+          No previous chats yet.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {threads.map((t) => {
+            const isActive = t._id === activeId;
+            return (
+              <li key={t._id}>
+                <button
+                  type="button"
+                  onClick={() => onPick(t._id)}
+                  className={`w-full rounded-md border-2 px-3 py-2 text-left transition-colors ${
+                    isActive
+                      ? "border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
+                      : "border-on-surface/15 bg-surface text-on-surface hover:border-on-surface"
+                  }`}
+                >
+                  <p className="truncate font-[var(--font-label)] text-label-md font-semibold">
+                    {t.title?.trim() || "Untitled chat"}
+                  </p>
+                  <p className="mt-0.5 text-label-sm text-on-surface-variant">
+                    {new Date(t.updatedAt).toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function EmptyState({
+
   onPick,
   disabled,
 }: {
