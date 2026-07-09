@@ -39,11 +39,24 @@ export const Route = createFileRoute("/documents")({
 });
 
 function DocumentsHubPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isHydrated } = useAuth();
   const docs = useDocuments();
   const remove = useRemoveDocument();
   const [picker, setPicker] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  if (!isHydrated) {
+    return (
+      <DashboardShell>
+        <LivingBackground />
+        <main className="relative mx-auto w-full max-w-(--container-content) px-5 py-10 sm:px-8 lg:px-12">
+          <div className="inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading documents...
+          </div>
+        </main>
+      </DashboardShell>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/signin" search={{ redirect: "/documents" } as never} />;

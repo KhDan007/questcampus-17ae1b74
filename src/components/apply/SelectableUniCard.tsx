@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, GraduationCap, MapPin, Plus, Sparkles, X } from "lucide-react";
+import { LiveResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 
 type Props = {
@@ -64,11 +65,14 @@ export function SelectableUniCard({ source, externalId, name, city, country, res
         </span>
       </span>
 
-      {researched && (
-        <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-md border-2 border-tertiary bg-tertiary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
-          <Sparkles className="h-3 w-3" /> Already researched
-        </span>
-      )}
+      <span className="mt-3 flex flex-wrap items-center gap-2">
+        {researched && (
+          <span className="inline-flex w-fit items-center gap-1 rounded-md border-2 border-tertiary bg-tertiary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-tertiary">
+            <Sparkles className="h-3 w-3" /> Already researched
+          </span>
+        )}
+        <LiveResearchStatusBadge system={source} externalId={externalId} compact />
+      </span>
 
       <span
         className={`mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 px-3 py-2 font-[var(--font-label)] text-label-md font-bold transition-colors ${

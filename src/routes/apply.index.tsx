@@ -20,6 +20,7 @@ import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
 import { CommonAppScheduleCard } from "@/components/apply/CommonAppScheduleCard";
+import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
@@ -44,7 +45,21 @@ export const Route = createFileRoute("/apply/")({
 });
 
 function ApplyHubPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isHydrated } = useAuth();
+
+  if (!isHydrated) {
+    return (
+      <DashboardShell>
+        <LivingBackground />
+        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pt-28 sm:px-8 lg:px-12">
+          <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading auto-apply workspace...
+          </div>
+        </main>
+      </DashboardShell>
+    );
+  }
+
   if (!isAuthenticated)
     return <Navigate to="/signin" search={{ redirect: "/apply" } as never} />;
 
@@ -98,6 +113,12 @@ function ApplyHubPage() {
             <ResearchDock />
           </SilentErrorBoundary>
 
+          <SilentErrorBoundary>
+            <AgentCommandCard
+              title="Roadmap this shortlist"
+              body="The deep agent turns this shortlist into target readiness, missing prep, scholarship route, extension handoff, and application tracker state."
+            />
+          </SilentErrorBoundary>
 
           <SilentErrorBoundary>
             <NextProductiveAction />

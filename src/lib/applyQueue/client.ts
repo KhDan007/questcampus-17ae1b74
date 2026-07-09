@@ -72,6 +72,12 @@ export type ApplyJob = {
   error?: string;
 };
 
+export type StartApplyResult = { jobId: string; reused?: boolean };
+
+export function applyJobIdFromStartResult(result: StartApplyResult): string {
+  return result.jobId;
+}
+
 function normalizeJob<T extends { _id?: string; jobId?: string } | null | undefined>(
   doc: T,
 ): T extends null | undefined ? T : ApplyJob {
@@ -197,19 +203,16 @@ export function useApplyActions() {
   const startApply = useCallback(
     async (args: { system: string; externalId: string; targetName?: string }) => {
       if (!token) throw new Error("Sign in required");
-      const res = (await enqueue({ token, ...args })) as { jobId: string; reused?: boolean };
-      return { jobId: res.jobId, reused: res.reused ?? false };
+      const res = (await enqueue({ token, ...args })) as StartApplyResult;
+      return { jobId: applyJobIdFromStartResult(res), reused: res.reused ?? false };
     },
     [token, enqueue],
   );
 
   const startDemo = useCallback(async (fresh?: boolean) => {
     if (!token) throw new Error("Sign in required");
-    const res = (await enqueueDemo({ token, ...(fresh ? { fresh: true } : {}) })) as {
-      jobId: string;
-      reused?: boolean;
-    };
-    return { jobId: res.jobId, reused: res.reused ?? false };
+    const res = (await enqueueDemo({ token, ...(fresh ? { fresh: true } : {}) })) as StartApplyResult;
+    return { jobId: applyJobIdFromStartResult(res), reused: res.reused ?? false };
   }, [token, enqueueDemo]);
 
   const cancelJob = useCallback(

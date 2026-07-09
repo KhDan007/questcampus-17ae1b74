@@ -28,6 +28,8 @@ import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { RefineRecommendationsCard } from "@/components/universities/RefineRecommendationsCard";
 import { useProgress } from "@/lib/progress";
 import { ApplyButton } from "@/components/apply/ApplyButton";
+import { LiveResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
+import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 
 export const Route = createFileRoute("/universities")({
   head: () => ({
@@ -379,6 +381,18 @@ function UniversitiesPage() {
 
         {progress.refined && (
           <RefineRecommendationsCard isAuthenticated={isAuthenticated} />
+        )}
+
+        {isAuthenticated && (
+          <div className="mt-6">
+            <SilentErrorBoundary>
+              <AgentCommandCard
+                compact
+                title="Agent sees matches and saved schools"
+                body="Run a roadmap after saving targets to connect recommendations, readiness, aid routes, and application status."
+              />
+            </SilentErrorBoundary>
+          </div>
         )}
 
         {/* Search box */}
@@ -774,11 +788,13 @@ function CompactMatchCard({
   index,
   reduce,
   onDismiss,
+  showResearchStatus = false,
 }: {
   card: RecCard;
   index: number;
   reduce: boolean;
   onDismiss?: () => void;
+  showResearchStatus?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const location = [card.city, card.country].filter(Boolean).join(", ");
@@ -814,6 +830,14 @@ function CompactMatchCard({
             {card.name}
           </p>
           {location && <p className="truncate text-label-sm text-on-surface-variant">{location}</p>}
+          {showResearchStatus && (
+            <LiveResearchStatusBadge
+              system={card.source ?? "scorecard"}
+              externalId={card.externalId}
+              compact
+              className="mt-2"
+            />
+          )}
           {card.why && !open && (
             <p className="mt-1.5 line-clamp-2 break-words text-body-sm text-on-surface">
               {card.why}
@@ -972,6 +996,7 @@ function SavedTab({
                 index={i}
                 reduce={reduce}
                 onDismiss={() => void onRemove(u.id)}
+                showResearchStatus
               />
             );
           })}

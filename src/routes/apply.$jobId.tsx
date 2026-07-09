@@ -93,8 +93,25 @@ function stageGuidance(
 
 function ApplyRunPage() {
   const { jobId } = Route.useParams();
-  const { isAuthenticated, token } = useAuth();
-  if (!isAuthenticated)
+  const { isAuthenticated, token, isHydrated } = useAuth();
+
+  if (!isHydrated) {
+    return (
+      <DashboardShell>
+        <LivingBackground />
+        <main
+          id="main-content"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pt-28 sm:px-8 lg:px-12"
+        >
+          <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading live application...
+          </div>
+        </main>
+      </DashboardShell>
+    );
+  }
+
+  if (!isAuthenticated || !token)
     return <Navigate to="/signin" search={{ redirect: `/apply/${jobId}` } as never} />;
 
   return (
@@ -110,7 +127,7 @@ function ApplyRunPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Auto-Apply
         </Link>
-        <RunBody jobId={jobId} token={token!} />
+        <RunBody jobId={jobId} token={token} />
       </main>
     </DashboardShell>
   );
