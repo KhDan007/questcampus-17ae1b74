@@ -43,7 +43,7 @@ export function HeroOnboarding() {
               className="mt-6 text-display-lg-mobile text-on-surface sm:text-display-lg lg:text-[clamp(3rem,5.5vw,4.75rem)] lg:leading-[1.02]"
             >
               Your entire admissions journey, <br className="hidden sm:block" />
-              <span className="qc-text-gradient">in one place.</span>
+              <span className="text-primary">in one place.</span>
             </motion.h1>
 
             <motion.p

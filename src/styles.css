@@ -413,12 +413,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
 .qc-hard-shadow-primary { box-shadow: 5px 5px 0 0 var(--color-primary); }
 .qc-hard-shadow-sm { box-shadow: 2px 2px 0 0 var(--color-on-surface); }
 
-.qc-text-gradient {
-  background: linear-gradient(110deg, #b3272c 0%, #ff5f5d 45%, #feb700 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* .qc-text-gradient removed per DESIGN.md ban on gradient text.
+   Emphasis is achieved with solid --color-primary via the text-primary utility instead. */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

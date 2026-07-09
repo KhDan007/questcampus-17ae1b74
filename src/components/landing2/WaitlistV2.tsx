@@ -57,10 +57,7 @@ export function WaitlistV2() {
 
           <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
             <div>
-              <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-                Founding access
-              </p>
-              <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
+              <h2 className="text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
                 Be first when the full admissions workspace opens.
               </h2>
               <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">

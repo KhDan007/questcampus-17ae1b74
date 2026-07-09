@@ -50,7 +50,7 @@ export function MidPageCTA() {
 
             <h2 className="mt-5 max-w-2xl text-display-lg-mobile text-on-surface sm:text-display-lg">
               Know where you stand in{" "}
-              <span className="qc-text-gradient">under 60 seconds.</span>
+              <span className="text-primary">under 60 seconds.</span>
             </h2>
 
             <p className="mt-4 max-w-xl text-body-lg text-on-surface-variant">

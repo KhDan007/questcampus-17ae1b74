@@ -288,7 +288,7 @@ function OnboardingPage() {
           </p>
           <h1 className="mt-3 text-display-md text-on-surface text-balance sm:text-display-lg">
             Tell us more.{" "}
-            <span className="qc-text-gradient">We'll re-rank your matches.</span>
+            <span className="text-primary">We'll re-rank your matches.</span>
           </h1>
           <p className="mt-4 text-body-lg text-on-surface-variant">
             One page, fourteen quick questions. Auto-saved as you go — only{" "}

@@ -602,7 +602,7 @@ function EssayPage() {
               <PenLine className="h-3.5 w-3.5" /> Personal statement
             </p>
             <h1 className="mt-4 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
-              Write your <span className="qc-text-gradient">Common App essay</span>
+              Write your <span className="text-primary">Common App essay</span>
             </h1>
             <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
               Grounded in what you actually told us — never invented. The opening is free. Unlock
@@ -850,7 +850,7 @@ function ReviewSuggestionModal({
               id="review-suggest-title"
               className="mt-4 font-display text-headline-lg font-bold text-on-surface text-balance"
             >
-              Run the review on your <span className="qc-text-gradient">new essay</span>?
+              Run the review on your <span className="text-primary">new essay</span>?
             </h2>
             <p className="mt-3 text-body-md text-on-surface-variant">
               You'll get a score across 7 dimensions, inline notes on the exact lines that need

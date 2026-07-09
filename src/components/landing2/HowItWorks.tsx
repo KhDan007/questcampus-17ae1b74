@@ -36,7 +36,7 @@ export function HowItWorks() {
             How it works
           </p>
           <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
-            Three steps. <span className="qc-text-gradient">One admissions workspace.</span>
+            Three steps. <span className="text-primary">One admissions workspace.</span>
           </h2>
         </motion.div>
 

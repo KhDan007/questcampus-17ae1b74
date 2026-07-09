@@ -45,12 +45,9 @@ export function RoadmapV2() {
           transition={{ duration: 0.55 }}
           className="max-w-2xl"
         >
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-            What's coming
-          </p>
-          <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
+          <h2 className="text-display-lg-mobile text-on-surface sm:text-display-lg">
             Search and matching are live. <br />
-            <span className="qc-text-gradient">The full application stack is next.</span>
+            <span className="text-primary">The full application stack is next.</span>
           </h2>
           <p className="mt-4 text-body-lg text-on-surface-variant">
             Tracker, essays, documents, and an Auto-Apply agent — all landing inside the same
@@ -143,7 +140,7 @@ export function RoadmapV2() {
             </div>
             <a
               href="#waitlist"
-              className="inline-flex items-center justify-center gap-2 self-start rounded-md border-2 border-secondary-container bg-secondary-container px-6 py-3.5 font-display text-headline-sm font-bold text-on-secondary-container transition-all hover:-translate-y-0.5 hover:translate-x-0.5 lg:self-center"
+              className="inline-flex items-center justify-center gap-2 self-start rounded-md border-2 border-secondary-container bg-secondary-container px-6 py-3.5 font-display text-headline-sm font-bold text-on-secondary-fixed-variant transition-all hover:-translate-y-0.5 hover:translate-x-0.5 lg:self-center"
               style={{ boxShadow: "5px 5px 0 0 rgba(254,183,0,0.4)" }}
             >
               Get founding access
@@ -161,7 +158,7 @@ function Badge({ tone, children }: { tone: "soon" | "later" | "live"; children: 
       ? "bg-primary text-white"
       : tone === "soon"
         ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
-        : "bg-secondary-container text-on-secondary-container";
+        : "bg-secondary-container text-on-secondary-fixed-variant";
   return (
     <span
       className={`rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider ${cls}`}

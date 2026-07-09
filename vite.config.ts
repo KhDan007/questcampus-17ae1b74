@@ -12,4 +12,24 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("react-dom") || id.includes("react/") || id.includes("react\\")) {
+              return "vendor-react";
+            }
+            if (id.includes("@tanstack")) return "vendor-tanstack";
+            if (id.includes("convex")) return "vendor-convex";
+            if (id.includes("framer-motion") || id.includes("motion-dom") || id.includes("motion-utils")) {
+              return "vendor-motion";
+            }
+            if (id.includes("lucide-react")) return "vendor-icons";
+          },
+        },
+      },
+    },
+  },
 });

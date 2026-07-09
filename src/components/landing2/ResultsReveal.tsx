@@ -204,7 +204,7 @@ export function ResultsReveal({
           </p>
           <h2 className="mt-3 text-display-lg-mobile text-on-surface sm:text-display-lg">
             We searched the world. <br />
-            <span className="qc-text-gradient">Here's where you fit.</span>
+            <span className="text-primary">Here's where you fit.</span>
           </h2>
         </motion.div>
 

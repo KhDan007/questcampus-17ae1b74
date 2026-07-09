@@ -141,7 +141,7 @@ export function ParallaxShowcase() {
             className="mt-4 text-display-lg-mobile sm:text-display-lg"
           >
             Search{" "}
-            <span className="qc-text-gradient">11,000+ universities</span> worldwide —<br />
+            <span className="text-primary">11,000+ universities</span> worldwide —<br />
             shortlist, match, and apply from one place.
           </motion.h2>
         </div>

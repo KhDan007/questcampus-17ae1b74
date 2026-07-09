@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "npx --yes wrangler --cwd .output dev",
+    "qa:agent": "node scripts/qa-agent-cockpit.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -83,6 +84,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "nitro": "3.0.260603-beta",
+    "playwright": "^1.61.1",
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
