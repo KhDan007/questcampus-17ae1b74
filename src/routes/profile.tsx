@@ -23,8 +23,13 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
+import {
+  readChatPageContextEnabled,
+  writeChatPageContextEnabled,
+} from "@/lib/chat/pageContext";
 import { getSessionId } from "@/lib/onboarding/session";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { shareLinkFor } from "@/lib/referral/client";
@@ -63,12 +68,14 @@ function ProfilePage() {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [recs, setRecs] = useState<RecRow[] | null>(null);
+  const [pageContextEnabled, setPageContextEnabled] = useState(false);
   const [recStatus, setRecStatus] = useState<"idle" | "loading" | "ready" | "error" | "locked">(
     "idle",
   );
 
   useEffect(() => {
     setSessionId(getSessionId());
+    setPageContextEnabled(readChatPageContextEnabled());
   }, []);
 
   const referrals = useQuery(api.referrals.summary, token ? { token } : "skip");
@@ -139,6 +146,12 @@ function ProfilePage() {
     } finally {
       window.location.href = "/";
     }
+  }
+
+  function setAssistantPageContext(enabled: boolean) {
+    setPageContextEnabled(enabled);
+    writeChatPageContextEnabled(enabled);
+    toast.message(enabled ? "Assistant page context on" : "Assistant page context off");
   }
 
   return (
@@ -235,6 +248,13 @@ function ProfilePage() {
           <SilentErrorBoundary>
             <ReferralCard referrals={referrals} />
           </SilentErrorBoundary>
+        )}
+
+        {isAuthenticated && (
+          <AssistantSettingsCard
+            pageContextEnabled={pageContextEnabled}
+            onPageContextChange={setAssistantPageContext}
+          />
         )}
 
         {/* Quick actions */}
@@ -419,6 +439,40 @@ type ReferralSummary = {
   perReferralPercent: number;
   maxPercent: number;
 };
+
+function AssistantSettingsCard({
+  pageContextEnabled,
+  onPageContextChange,
+}: {
+  pageContextEnabled: boolean;
+  onPageContextChange: (enabled: boolean) => void;
+}) {
+  return (
+    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+            <Sparkles className="h-4 w-4 text-primary" /> Assistant settings
+          </h2>
+          <p className="mt-1 max-w-2xl text-body-sm text-on-surface-variant">
+            Current-page context is off by default. When off, the assistant only gets the page you
+            are on if your message points at something on screen.
+          </p>
+        </div>
+        <label className="flex shrink-0 items-center justify-between gap-3 rounded-lg border-2 border-on-surface/20 bg-surface-container-lowest px-3 py-2">
+          <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+            Always send page context
+          </span>
+          <Switch
+            checked={pageContextEnabled}
+            onCheckedChange={onPageContextChange}
+            aria-label="Always send current page context to the assistant"
+          />
+        </label>
+      </div>
+    </section>
+  );
+}
 
 function ReferralCard({ referrals }: { referrals: ReferralSummary }) {
   const [copied, setCopied] = useState(false);

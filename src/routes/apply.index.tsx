@@ -2,9 +2,9 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
+  BarChart3,
   CalendarClock,
   CheckSquare,
-  ClipboardList,
   Loader2,
   Play,
   Search,
@@ -21,12 +21,18 @@ import { NextProductiveAction } from "@/components/apply/NextProductiveAction";
 import { SelectableUniCard } from "@/components/apply/SelectableUniCard";
 import { BatchActionBar } from "@/components/apply/BatchActionBar";
 import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
+import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
+import { CommonAppProfile } from "@/components/apply/CommonAppProfile";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 import { useRunDemo } from "@/lib/applyQueue/useRunDemo";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
-import { useCommonAppProfile } from "@/lib/apply/commonAppProfile";
+import {
+  STRENGTH_CRITERIA,
+  strengthSummaryCopy,
+  useApplicationStrength,
+} from "@/lib/apply/applicationStrength";
 import { useMemo } from "react";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 
@@ -100,7 +106,11 @@ function ApplyHubPage() {
 
         <div className="mt-5 space-y-5 sm:mt-8 sm:space-y-8">
           <SilentErrorBoundary>
-            <CommonAppProfileCard />
+            <CommonAppProfile embedded />
+          </SilentErrorBoundary>
+
+          <SilentErrorBoundary>
+            <ApplicationStrengthCard />
           </SilentErrorBoundary>
 
           <PlanTeaserCard />
@@ -120,6 +130,10 @@ function ApplyHubPage() {
 
           <SilentErrorBoundary>
             <NextProductiveAction />
+          </SilentErrorBoundary>
+
+          <SilentErrorBoundary>
+            <ApplicationsPrepWorkspace />
           </SilentErrorBoundary>
 
           <SilentErrorBoundary>
@@ -238,6 +252,23 @@ function SavedToPick() {
   );
 }
 
+function ApplicationsPrepWorkspace() {
+  const { saved } = useSavedUniversities();
+  const targets: BackendTarget[] = useMemo(
+    () =>
+      (saved ?? []).map((u) => ({
+        system: u.source,
+        externalId: u.externalId,
+        name: u.name,
+      })),
+    [saved],
+  );
+
+  if (!saved || saved.length === 0) return null;
+
+  return <CollectWorkspace targets={targets} />;
+}
+
 function RunLiveDemoCard() {
   const { run: onClick, starting, error } = useRunDemo();
 
@@ -309,59 +340,53 @@ function PlanTeaserCard() {
   );
 }
 
-function CommonAppProfileCard() {
-  const profile = useCommonAppProfile();
-  if (profile === undefined || profile === null) return null;
-  const c = profile.completeness;
-  const percent = Math.max(0, Math.min(100, Math.round(c?.percent ?? 0)));
-  const complete = c?.complete ?? false;
+function ApplicationStrengthCard() {
+  const strength = useApplicationStrength();
+  const weakest = strength
+    ? [...strength.criteria].sort((a, b) => a.score - b.score)[0]
+    : null;
+  const weakestLabel = weakest ? STRENGTH_CRITERIA[weakest.key].shortLabel : null;
+
   return (
-    <section
-      className={
-        "rounded-2xl border-2 p-4 sm:p-6 " +
-        (complete
-          ? "border-on-surface/20 bg-surface qc-hard-shadow-sm"
-          : "border-on-surface bg-primary-fixed qc-hard-shadow")
-      }
-    >
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
-            <ClipboardList className="h-5 w-5" />
+            <BarChart3 className="h-5 w-5" />
           </span>
           <div className="min-w-0">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-              Universal profile
+              Application strength
             </p>
             <h3 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
-              Common App Profile — {percent}% complete
+              {strength ? `${strength.overall}/100 - ${strength.bandLabel}` : "Checking score..."}
             </h3>
             <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
-              {complete
-                ? "You're set. We'll auto-fill every Common App school."
-                : "Fill this once and every Common App application gets pre-filled for you."}
+              {strength
+                ? weakestLabel
+                  ? `Weakest section: ${weakestLabel}. ${strengthSummaryCopy(strength)}`
+                  : strengthSummaryCopy(strength)
+                : "See your score, weak sections, and next fixes."}
             </p>
           </div>
         </div>
         <Link
-          to="/common-app"
-          className={
-            "inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none " +
-            (complete
-              ? "bg-surface text-on-surface"
-              : "bg-primary text-white")
-          }
+          to="/apply/strength"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
         >
-          {complete ? "Review profile" : "Complete your profile"}
+          {strength === undefined ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+          Open strength
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
-        <div
-          className={"h-full transition-[width] duration-300 " + (complete ? "bg-tertiary" : "bg-primary")}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
+      {strength && (
+        <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
+          <div
+            className="h-full bg-primary transition-[width] duration-300"
+            style={{ width: `${Math.max(0, Math.min(100, strength.overall))}%` }}
+          />
+        </div>
+      )}
     </section>
   );
 }

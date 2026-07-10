@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { AnimatePresence, useReducedMotion, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useQuery } from "convex/react";
 import {
   GraduationCap,
-  PenLine,
   Activity,
   CalendarClock,
-  ClipboardList,
+  BarChart3,
   Send,
   MessageSquare,
   Settings as SettingsIcon,
@@ -20,12 +19,20 @@ import {
   ChevronLeft,
   ChevronRight,
   PanelLeft,
+  LayoutDashboard,
   X,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
+import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
+
+type SidebarUser = {
+  name?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+} | null;
 import { auth } from "@/lib/auth/client";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
@@ -46,61 +53,80 @@ type Item =
       feature: string;
     };
 
-const TOP_ITEMS: Item[] = [
+type NavGroup = { key: string; label: string; items: Item[] };
+
+// Grouped navigation. Sectioning turns a flat list of six competing links into
+// two scannable clusters — "what am I working toward" vs "the application
+// machinery" — so the eye lands on the right group first.
+const NAV_GROUPS: NavGroup[] = [
   {
-    kind: "link",
-    key: "agent",
-    label: "Agent",
-    to: "/agent",
-    icon: Sparkles,
-    match: (p) => p.startsWith("/agent"),
+    key: "workspace",
+    label: "Workspace",
+    items: [
+      {
+        kind: "link",
+        key: "dashboard",
+        label: "Dashboard",
+        to: "/dashboard",
+        icon: LayoutDashboard,
+        match: (p) => p === "/dashboard" || p.startsWith("/dashboard"),
+      },
+      {
+        kind: "link",
+        key: "agent",
+        label: "Agent",
+        to: "/agent",
+        icon: Sparkles,
+        match: (p) => p.startsWith("/agent"),
+      },
+      {
+        kind: "link",
+        key: "universities",
+        label: "Universities",
+        to: "/universities",
+        icon: GraduationCap,
+        match: (p) => p.startsWith("/universities"),
+      },
+      {
+        kind: "link",
+        key: "plan",
+        label: "Plan",
+        to: "/plan",
+        icon: CalendarClock,
+        match: (p) => p.startsWith("/plan"),
+      },
+    ],
   },
   {
-    kind: "link",
-    key: "autoapply",
+    key: "applications",
     label: "Applications",
-    to: "/apply",
-    icon: Send,
-    match: (p) => p.startsWith("/apply") || p.startsWith("/application"),
-  },
-  {
-    kind: "link",
-    key: "commonapp",
-    label: "Common App",
-    to: "/common-app",
-    icon: ClipboardList,
-    match: (p) => p.startsWith("/common-app"),
-  },
-  {
-    kind: "link",
-    key: "universities",
-    label: "Universities",
-    to: "/universities",
-    icon: GraduationCap,
-    match: (p) => p.startsWith("/universities"),
-  },
-  {
-    kind: "link",
-    key: "essays",
-    label: "Essays",
-    to: "/essay",
-    icon: PenLine,
-    match: (p) => p.startsWith("/essay"),
-  },
-  {
-    kind: "waitlist",
-    key: "activities",
-    label: "Activities",
-    icon: Activity,
-    feature: "Activities",
-  },
-  {
-    kind: "link",
-    key: "plan",
-    label: "Plan",
-    to: "/plan",
-    icon: CalendarClock,
-    match: (p) => p.startsWith("/plan"),
+    items: [
+      {
+        kind: "link",
+        key: "autoapply",
+        label: "Applications",
+        to: "/apply",
+        icon: Send,
+        match: (p) =>
+          (p.startsWith("/apply") && !p.startsWith("/apply/strength")) ||
+          p.startsWith("/application"),
+      },
+      {
+        kind: "link",
+        key: "strength",
+        label: "Strength",
+        to: "/apply/strength",
+        icon: BarChart3,
+        match: (p) => p.startsWith("/apply/strength"),
+      },
+      {
+        kind: "waitlist",
+        key: "activities",
+        label: "Activities",
+        icon: Activity,
+        feature: "Activities",
+      },
+    ],
   },
 ];
 
@@ -223,17 +249,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="relative flex min-h-screen w-full max-w-full items-start overflow-x-clip">
+      <div className="relative flex min-h-screen w-full max-w-full items-start overflow-x-clip bg-surface-container">
         {/* Desktop sidebar */}
         <aside
           aria-label="Primary"
-          className={`sticky top-16 z-40 hidden shrink-0 flex-col self-start border-r-2 border-on-surface/15 bg-surface/95 backdrop-blur-xl lg:flex ${
+          className={`sticky top-16 z-40 hidden shrink-0 flex-col self-start border-r border-on-surface/8 bg-surface lg:flex ${
             isDragging ? "" : "transition-[width] duration-200 ease-out"
           }`}
           style={{ width: effectiveWidth, height: "calc(100vh - 4rem)" }}
         >
           <SidebarBody
             pathname={pathname}
+            user={user}
             onWaitlist={(f) => setWaitlist(f)}
             hasPaidAccess={hasPaidAccess}
             collapsed={collapsed}
@@ -287,20 +314,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   className="absolute inset-0 h-full w-full bg-black/50"
                   onClick={() => setMobileOpen(false)}
                 />
-                <aside className="absolute left-0 top-0 flex h-dvh w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r-2 border-on-surface bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl">
-                  <div className="flex items-center justify-between border-b-2 border-on-surface/10 px-4 py-3">
-                    <p className="font-display text-label-lg font-bold text-on-surface">Menu</p>
+                <aside className="absolute left-0 top-0 flex h-dvh w-[86vw] max-w-[340px] flex-col overflow-y-auto border-r border-on-surface/10 bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-on-surface/10 px-4 py-3">
+                    <QuestCampusLogo className="h-7" />
                     <button
                       type="button"
                       onClick={() => setMobileOpen(false)}
                       aria-label="Close workspace menu"
-                      className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none"
+                      className="grid h-9 w-9 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface/70 transition-colors hover:text-on-surface active:scale-95"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                   <SidebarBody
                     pathname={pathname}
+                    user={user}
                     onWaitlist={(f) => {
                       setWaitlist(f);
                       setMobileOpen(false);
@@ -336,6 +364,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
 function SidebarBody({
   pathname,
+  user,
   onWaitlist,
   hasPaidAccess,
   collapsed,
@@ -344,6 +373,7 @@ function SidebarBody({
   hideCollapseToggle,
 }: {
   pathname: string;
+  user: SidebarUser;
   onWaitlist: (feature: string) => void;
   hasPaidAccess: boolean;
   collapsed: boolean;
@@ -351,85 +381,51 @@ function SidebarBody({
   onOpenPlan: () => void;
   hideCollapseToggle?: boolean;
 }) {
-  const reduce = useReducedMotion();
-  const items = useMemo(() => TOP_ITEMS, []);
   const freeHook = useFreeHook();
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-1 p-3 pt-5">
+    <div className="flex h-full min-h-0 flex-col p-3">
       {!hideCollapseToggle && (
-        <div className={`flex items-center pb-2 ${collapsed ? "justify-center" : "justify-between px-1"}`}>
-          {!collapsed && (
-            <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.16em] text-on-surface-variant">
-              Workspace
-            </p>
-          )}
+        <div className={`flex items-center pb-1 ${collapsed ? "justify-center" : "justify-end px-1"}`}>
           <button
             type="button"
             onClick={onToggleCollapsed}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={`${collapsed ? "Expand" : "Collapse"} sidebar (⌘B)`}
-            className="grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface/70 transition-colors hover:border-on-surface hover:text-on-surface"
+            className="grid h-8 w-8 place-items-center rounded-md text-on-surface/50 transition-colors hover:bg-on-surface/5 hover:text-on-surface"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         </div>
       )}
 
-      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden">
-        {items.map((it) => {
-          const Icon = it.icon;
-          if (it.kind === "link") {
-            const active = it.match ? it.match(pathname) : pathname === it.to;
-            return (
-              <Link
-                key={it.key}
-                to={it.to}
-                title={collapsed ? it.label : undefined}
-                aria-label={collapsed ? it.label : undefined}
-                className={`group flex items-center gap-3 font-[var(--font-label)] text-label-md font-semibold transition-all ${
-                  collapsed
-                    ? "mx-auto h-10 w-10 justify-center rounded-xl"
-                    : "rounded-lg px-3 py-2.5"
-                } ${
-                  active
-                    ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-                    : collapsed
-                      ? "border-2 border-on-surface/15 text-on-surface/75 hover:border-on-surface/40 hover:bg-on-surface/5 hover:text-on-surface"
-                      : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
-                }`}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                {!collapsed && <span className="truncate">{it.label}</span>}
-              </Link>
-            );
-          }
-          return (
-            <button
-              key={it.key}
-              type="button"
-              onClick={() => onWaitlist(it.feature)}
-              title={collapsed ? it.label : undefined}
-              aria-label={collapsed ? it.label : undefined}
-              className={`group flex items-center gap-3 border-2 text-left font-[var(--font-label)] text-label-md font-semibold text-on-surface/55 transition-all hover:bg-on-surface/5 hover:text-on-surface ${
-                collapsed
-                  ? "mx-auto h-10 w-10 justify-center rounded-xl border-on-surface/15 hover:border-on-surface/40"
-                  : "rounded-lg border-transparent px-3 py-2.5"
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed && (
-                <>
-                  <span className="flex-1 truncate">{it.label}</span>
-                  <Lock className="h-3 w-3 text-on-surface/40 transition-colors group-hover:text-on-surface" />
-                </>
-              )}
-            </button>
-          );
-        })}
+      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.key} className="mb-1">
+            {!collapsed && (
+              <p className="px-3 pb-1 pt-3 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant/70">
+                {group.label}
+              </p>
+            )}
+            {collapsed && group.key !== NAV_GROUPS[0].key && (
+              <div className="mx-auto my-2 h-px w-6 bg-on-surface/10" />
+            )}
+            <div className="flex flex-col gap-0.5">
+              {group.items.map((it) => (
+                <NavRow
+                  key={it.key}
+                  item={it}
+                  pathname={pathname}
+                  collapsed={collapsed}
+                  onWaitlist={onWaitlist}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      <div className="flex shrink-0 flex-col gap-2 pt-4">
+      <div className="flex shrink-0 flex-col gap-1 pt-3">
         {hasPaidAccess ? (
           collapsed ? (
             <button
@@ -437,7 +433,7 @@ function SidebarBody({
               onClick={onOpenPlan}
               aria-label="Your plan"
               title="Your plan"
-              className="mx-auto grid h-10 w-10 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container/70 text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+              className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-secondary-fixed text-on-secondary-fixed-variant transition-colors hover:bg-secondary-fixed-dim"
             >
               <Crown className="h-4 w-4" />
             </button>
@@ -445,16 +441,13 @@ function SidebarBody({
             <button
               type="button"
               onClick={onOpenPlan}
-              className="group w-full rounded-xl border-2 border-on-surface bg-secondary-container/70 p-3 text-left transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+              className="group w-full rounded-xl border border-on-surface/10 bg-secondary-fixed/50 p-3 text-left transition-colors hover:bg-secondary-fixed/70"
             >
-              <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface">
-                <Crown className="h-3.5 w-3.5" /> Your plan
+              <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-fixed-variant">
+                <Crown className="h-3.5 w-3.5" /> Full access
               </p>
-              <p className="mt-1 font-display text-label-lg font-bold text-on-surface">
-                Full access unlocked
-              </p>
-              <p className="mt-0.5 text-label-sm text-on-surface/75">
-                Monthly subscription · manage or cancel
+              <p className="mt-0.5 text-label-sm text-on-surface/65">
+                Manage your subscription
               </p>
             </button>
           )
@@ -462,83 +455,137 @@ function SidebarBody({
           <Link
             to="/unlock"
             title={collapsed ? (freeHook ? "Start free trial — $15/mo after" : "Upgrade — $15/month") : undefined}
-            className={`group relative overflow-hidden rounded-xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
-              collapsed ? "mx-auto grid h-10 w-10 place-items-center" : "p-3"
+            className={`group rounded-xl bg-primary text-white transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none ${
+              collapsed ? "mx-auto grid h-10 w-10 place-items-center" : "block p-3"
             }`}
           >
-            {!reduce && !collapsed && (
-              <motion.span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                animate={{ x: ["-120%", "220%"] }}
-                transition={{
-                  duration: 2.8,
-                  repeat: Infinity,
-                  repeatDelay: 1.2,
-                  ease: "easeInOut",
-                }}
-                style={{ width: "60%" }}
-              />
-            )}
             {collapsed ? (
               <Sparkles className="h-4 w-4" />
-            ) : freeHook ? (
-              <>
-                <p className="relative inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider">
-                  <Sparkles className="h-3.5 w-3.5" /> $0 today · 3 days free
-                </p>
-                <p className="relative mt-1 font-display text-label-lg font-bold">
-                  Start free trial
-                </p>
-                <p className="relative mt-0.5 text-label-sm text-white/85">
-                  $15/mo after · cancel anytime.
-                </p>
-              </>
             ) : (
               <>
-                <p className="relative inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider">
-                  <Sparkles className="h-3.5 w-3.5" /> Upgrade
+                <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold">
+                  <Sparkles className="h-3.5 w-3.5" /> {freeHook ? "Start free trial" : "Upgrade"}
                 </p>
-                <p className="relative mt-1 font-display text-label-lg font-bold">
-                  Unlock $15/month
-                </p>
-                <p className="relative mt-0.5 text-label-sm text-white/85">
-                  Monthly subscription. Full matches + polished essays.
+                <p className="mt-0.5 text-label-sm text-white/85">
+                  {freeHook ? "$0 today · $15/mo after" : "$15/month · full access"}
                 </p>
               </>
             )}
           </Link>
         )}
-        <Link
-          to="/feedback"
-          title={collapsed ? "Send feedback" : undefined}
-          aria-label={collapsed ? "Send feedback" : undefined}
-          className={`flex items-center gap-3 rounded-lg font-[var(--font-label)] text-label-md font-semibold transition-all ${
-            collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
-          } ${
-            pathname.startsWith("/feedback")
-              ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-              : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
-          }`}
-        >
-          <MessageSquare className="h-4 w-4 shrink-0" />
-          {!collapsed && "Send feedback"}
-        </Link>
+
+        <NavRow
+          item={{ kind: "link", key: "feedback", label: "Send feedback", to: "/feedback", icon: MessageSquare, match: (p) => p.startsWith("/feedback") }}
+          pathname={pathname}
+          collapsed={collapsed}
+          onWaitlist={onWaitlist}
+        />
+
+        <div className="my-1 h-px bg-on-surface/8" />
+
         <Link
           to="/profile"
-          title={collapsed ? "Settings" : undefined}
-          className={`flex items-center gap-3 rounded-lg font-[var(--font-label)] text-label-md font-semibold transition-all ${
-            collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
-          } ${
-            pathname.startsWith("/profile")
-              ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-              : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
-          }`}
+          title={collapsed ? user?.name || user?.email || "Account" : undefined}
+          aria-label="Account settings"
+          className={`flex items-center gap-3 rounded-lg transition-colors hover:bg-on-surface/5 ${
+            collapsed ? "justify-center p-1.5" : "px-2 py-2"
+          } ${pathname.startsWith("/profile") ? "bg-on-surface/5" : ""}`}
         >
-          <SettingsIcon className="h-4 w-4 shrink-0" />
-          {!collapsed && "Settings"}
+          <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-fixed text-on-primary-fixed-variant">
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="font-[var(--font-label)] text-label-sm font-bold">
+                {sidebarInitials(user)}
+              </span>
+            )}
+          </span>
+          {!collapsed && (
+            <>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+                  {user?.name || "Your account"}
+                </span>
+                <span className="block truncate text-label-sm text-on-surface-variant">
+                  {user?.email || "Settings"}
+                </span>
+              </span>
+              <SettingsIcon className="h-4 w-4 shrink-0 text-on-surface/40" />
+            </>
+          )}
         </Link>
       </div>
     </div>
+  );
+}
+
+function sidebarInitials(user: SidebarUser): string {
+  const source = (user?.name || user?.email || "").trim();
+  if (!source) return "?";
+  return (
+    source
+      .split(/\s+/)
+      .map((s) => s[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "?"
+  );
+}
+
+// One navigation row, shared by both nav groups and the bottom utilities so the
+// active/hover vocabulary is identical everywhere. Active = soft coral-tint
+// wash + coral text (no border, no hard shadow); inactive = muted, quiet hover.
+function NavRow({
+  item,
+  pathname,
+  collapsed,
+  onWaitlist,
+}: {
+  item: Item;
+  pathname: string;
+  collapsed: boolean;
+  onWaitlist: (feature: string) => void;
+}) {
+  const Icon = item.icon;
+  const base = `group flex items-center gap-3 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
+    collapsed ? "mx-auto h-10 w-10 justify-center rounded-xl" : "rounded-lg px-3 py-2"
+  }`;
+
+  if (item.kind === "waitlist") {
+    return (
+      <button
+        type="button"
+        onClick={() => onWaitlist(item.feature)}
+        title={collapsed ? item.label : undefined}
+        aria-label={collapsed ? item.label : undefined}
+        className={`${base} text-on-surface-variant/70 hover:bg-on-surface/5 hover:text-on-surface`}
+      >
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        {!collapsed && (
+          <>
+            <span className="flex-1 truncate text-left">{item.label}</span>
+            <Lock className="h-3.5 w-3.5 text-on-surface/35" />
+          </>
+        )}
+      </button>
+    );
+  }
+
+  const active = item.match ? item.match(pathname) : pathname === item.to;
+  return (
+    <Link
+      to={item.to}
+      title={collapsed ? item.label : undefined}
+      aria-label={collapsed ? item.label : undefined}
+      aria-current={active ? "page" : undefined}
+      className={`${base} ${
+        active
+          ? "bg-primary-fixed/70 text-primary"
+          : "text-on-surface-variant hover:bg-on-surface/5 hover:text-on-surface"
+      }`}
+    >
+      <Icon className="h-[18px] w-[18px] shrink-0" />
+      {!collapsed && <span className="truncate">{item.label}</span>}
+    </Link>
   );
 }

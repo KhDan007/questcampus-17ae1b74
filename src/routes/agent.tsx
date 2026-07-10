@@ -513,7 +513,7 @@ function TargetReadinessPanel({
                   </Link>
                 ) : (
                   <Link
-                    to="/prep"
+                    to="/apply"
                     className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm"
                   >
                     Guided prep <ArrowRight className="h-4 w-4" />
@@ -779,8 +779,8 @@ function DecisionTracePanel({
       detail: evidenceCount
         ? "Tips and roadmap actions can cite requirements, matches, documents, or scholarship facts."
         : "Run the deep roadmap to attach evidence to tips and actions.",
-      to: "/prep",
-      cta: "Open prep",
+      to: "/apply",
+      cta: "Open applications",
     },
   ] as const;
 
@@ -1244,11 +1244,11 @@ function ReasonList({ reasons }: { reasons?: unknown[] }) {
 }
 
 function routeForAction(action?: RoadmapAction): { to: string; params?: Record<string, string>; label: string } {
-  if (!action) return { to: "/prep", label: "Open prep" };
-  if (action.kind === "essay") return { to: "/essay", label: "Open essays" };
-  if (action.kind === "document") return { to: "/documents", label: "Open documents" };
+  if (!action) return { to: "/apply", label: "Open applications" };
+  if (action.kind === "essay") return { to: "/apply", label: "Open applications" };
+  if (action.kind === "document") return { to: "/apply", label: "Open applications" };
   if (action.kind === "extension") return { to: "/apply", label: "Open applications" };
-  return { to: "/prep", label: "Do next" };
+  return { to: "/apply", label: "Do next" };
 }
 
 function humanize(value: string) {

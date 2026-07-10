@@ -27,6 +27,7 @@ const WARMUP_ROUTES = [
   "/universities",
   "/plan",
   "/apply",
+  "/apply/strength",
   "/essay",
   "/common-app",
   "/agent",

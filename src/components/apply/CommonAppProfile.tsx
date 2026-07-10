@@ -26,12 +26,20 @@ import { useSetAnswer } from "@/lib/apply/intake";
 
 
 
-export function CommonAppProfile({ focusSection }: { focusSection?: string } = {}) {
+export function CommonAppProfile({
+  focusSection,
+  embedded = false,
+}: { focusSection?: string; embedded?: boolean } = {}) {
   const schema = useCommonAppSchema();
   const profile = useCommonAppProfile();
   const setAnswer = useSetAnswer();
   const prefill = usePrefillFromOnboarding();
   const [prefilling, setPrefilling] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | undefined>(focusSection);
+
+  useEffect(() => {
+    setActiveSection(focusSection);
+  }, [focusSection]);
 
   const answers = profile?.answers ?? {};
   const completeness = profile?.completeness;
@@ -90,12 +98,14 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <Link
-        to="/apply"
-        className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface/70 hover:text-on-surface"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to Applications
-      </Link>
+      {!embedded && (
+        <Link
+          to="/apply"
+          className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface/70 hover:text-on-surface"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Applications
+        </Link>
+      )}
 
       {/* Header */}
       <section className="rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-8">
@@ -151,20 +161,20 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
         </div>
       </section>
 
-      {focusSection && schema.some((s) => s.key === focusSection) && (
-        <Link
-          to="/common-app"
-          search={{} as never}
+      {activeSection && schema.some((s) => s.key === activeSection) && (
+        <button
+          type="button"
+          onClick={() => setActiveSection(undefined)}
           className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
         >
           Show all sections
-        </Link>
+        </button>
       )}
 
       {/* Sections */}
-      {focusSection ? (
+      {activeSection ? (
         schema
-          .filter((s) => s.key === focusSection)
+          .filter((s) => s.key === activeSection)
           .map((section) => (
             <SectionCard
               key={section.key}
@@ -181,6 +191,7 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
               key={section.key}
               section={section}
               status={sectionStatusByKey.get(section.key)}
+              onOpen={() => setActiveSection(section.key)}
             />
           ))}
         </div>
@@ -192,9 +203,11 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
 function SectionSummaryRow({
   section,
   status,
+  onOpen,
 }: {
   section: ProfileSection;
   status?: { complete: boolean; requiredDone: number; requiredTotal: number };
+  onOpen: () => void;
 }) {
   const done = status?.complete ?? false;
   const fieldCount = section.group
@@ -202,10 +215,10 @@ function SectionSummaryRow({
     : `${section.fields?.length ?? 0} field${section.fields?.length === 1 ? "" : "s"}`;
 
   return (
-    <Link
-      to="/common-app"
-      search={{ section: section.key } as never}
-      className="group flex items-start justify-between gap-3 rounded-2xl border-2 border-on-surface bg-surface p-4 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:p-5"
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group flex w-full items-start justify-between gap-3 rounded-2xl border-2 border-on-surface bg-surface p-4 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:p-5"
     >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
@@ -240,7 +253,7 @@ function SectionSummaryRow({
         </div>
       </div>
       <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5" />
-    </Link>
+    </button>
   );
 }
 

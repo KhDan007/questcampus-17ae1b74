@@ -32,6 +32,7 @@ import { Route as UnlockSuccessRouteImport } from './routes/unlock.success'
 import { Route as UnlockCancelRouteImport } from './routes/unlock.cancel'
 import { Route as OauthCallbackRouteImport } from './routes/oauth.callback'
 import { Route as DocumentsIdRouteImport } from './routes/documents.$id'
+import { Route as ApplyStrengthRouteImport } from './routes/apply.strength'
 import { Route as ApplyJobIdRouteImport } from './routes/apply.$jobId'
 import { Route as ApplicationSystemExternalIdRouteImport } from './routes/application.$system.$externalId'
 
@@ -150,6 +151,11 @@ const DocumentsIdRoute = DocumentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DocumentsRoute,
 } as any)
+const ApplyStrengthRoute = ApplyStrengthRouteImport.update({
+  id: '/apply/strength',
+  path: '/apply/strength',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApplyJobIdRoute = ApplyJobIdRouteImport.update({
   id: '/apply/$jobId',
   path: '/apply/$jobId',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/apply/strength': typeof ApplyStrengthRoute
   '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/apply/strength': typeof ApplyStrengthRoute
   '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
   '/apply/$jobId': typeof ApplyJobIdRoute
+  '/apply/strength': typeof ApplyStrengthRoute
   '/documents/$id': typeof DocumentsIdRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/unlock/cancel': typeof UnlockCancelRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/apply/strength'
     | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/apply/strength'
     | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/tos'
     | '/universities'
     | '/apply/$jobId'
+    | '/apply/strength'
     | '/documents/$id'
     | '/oauth/callback'
     | '/unlock/cancel'
@@ -347,6 +359,7 @@ export interface RootRouteChildren {
   TosRoute: typeof TosRoute
   UniversitiesRoute: typeof UniversitiesRoute
   ApplyJobIdRoute: typeof ApplyJobIdRoute
+  ApplyStrengthRoute: typeof ApplyStrengthRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
   UnlockCancelRoute: typeof UnlockCancelRoute
   UnlockSuccessRoute: typeof UnlockSuccessRoute
@@ -518,6 +531,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocumentsIdRouteImport
       parentRoute: typeof DocumentsRoute
     }
+    '/apply/strength': {
+      id: '/apply/strength'
+      path: '/apply/strength'
+      fullPath: '/apply/strength'
+      preLoaderRoute: typeof ApplyStrengthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apply/$jobId': {
       id: '/apply/$jobId'
       path: '/apply/$jobId'
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   TosRoute: TosRoute,
   UniversitiesRoute: UniversitiesRoute,
   ApplyJobIdRoute: ApplyJobIdRoute,
+  ApplyStrengthRoute: ApplyStrengthRoute,
   OauthCallbackRoute: OauthCallbackRoute,
   UnlockCancelRoute: UnlockCancelRoute,
   UnlockSuccessRoute: UnlockSuccessRoute,

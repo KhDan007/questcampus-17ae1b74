@@ -17,17 +17,17 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
 
   return (
     <section
-      className="mt-5 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow sm:mt-8"
+      className="overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow"
       aria-labelledby="best-for-aid-heading"
     >
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b-2 border-on-surface/10 bg-gradient-to-br from-tertiary/15 via-secondary/10 to-primary/10 p-4 sm:p-6">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b border-on-surface/8 p-4 sm:p-6">
         <div className="min-w-0">
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+          <p className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant/70">
             Money-smart picks
           </p>
           <h2
             id="best-for-aid-heading"
-            className="mt-1 font-display text-headline-md font-bold text-on-surface sm:text-headline-lg"
+            className="mt-1 font-display text-headline-md font-bold text-on-surface"
           >
             Best for scholarships &amp; aid
           </h2>
@@ -35,7 +35,7 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
             Ranked by affordability + need-based aid, from your saved schools.
           </p>
         </div>
-        <span className="hidden shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-on-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-surface qc-hard-shadow-sm sm:inline-flex">
+        <span className="hidden shrink-0 items-center gap-1.5 rounded-md bg-tertiary-fixed px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-tertiary-fixed-variant sm:inline-flex">
           <PiggyBank className="h-3.5 w-3.5" /> Aid-ranked
         </span>
       </header>
@@ -66,7 +66,7 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
       ? "bg-tertiary text-on-tertiary"
       : scorePct >= 50
         ? "bg-primary text-white"
-        : "bg-surface text-on-surface";
+        : "bg-surface-container text-on-surface";
   const isLowConf = rec.confidence === "low";
   const reasons = rec.aidReasons.slice(0, 2);
   const location = [rec.city, rec.country].filter(Boolean).join(", ");
@@ -75,12 +75,12 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
     <Link
       to="/application/$system/$externalId"
       params={{ system: rec.source, externalId: rec.externalId }}
-      className={`group flex h-full flex-col gap-3 rounded-xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+      className={`group flex h-full flex-col gap-3 rounded-xl border border-on-surface/10 bg-surface p-4 qc-soft-shadow-hover ${
         isLowConf ? "opacity-90" : ""
       }`}
     >
       <div className="flex items-start gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary/10 font-[var(--font-label)] text-label-md font-bold tabular-nums text-primary">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary-fixed font-[var(--font-label)] text-label-md font-bold tabular-nums text-on-primary-fixed-variant">
           {rank}
         </span>
         <div className="min-w-0 flex-1">
@@ -92,7 +92,7 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
           )}
         </div>
         <span
-          className={`inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-on-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-bold tabular-nums qc-hard-shadow-sm ${scoreTone}`}
+          className={`inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-bold tabular-nums ${scoreTone}`}
           title="Aid score (0–100)"
           aria-label={`Aid score ${scorePct} out of 100`}
         >
@@ -102,7 +102,7 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
 
       <div className="flex flex-wrap items-center gap-2">
         {rec.netCost !== null && (
-          <span className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/20 bg-surface-container-lowest px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+          <span className="inline-flex items-center gap-1 rounded-md bg-surface-container px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
             <Coins className="h-3 w-3 text-primary" />
             Net {formatUsdPerYear(rec.netCost)}
           </span>
@@ -119,7 +119,7 @@ function AidCard({ rec, rank }: { rec: AidRecommendation; rank: number }) {
           {reasons.map((r, i) => (
             <li
               key={i}
-              className="rounded-md border-2 border-on-surface/15 bg-tertiary/10 px-2 py-1 text-label-sm text-on-surface"
+              className="rounded-md bg-tertiary-fixed/40 px-2 py-1 text-label-sm text-on-surface"
             >
               {r}
             </li>

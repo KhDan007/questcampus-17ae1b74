@@ -51,14 +51,14 @@ export function AgentCommandCard({
         // @container so the row layout keys off the CARD's width, not the
         // viewport — this card renders in narrow grid columns where a
         // viewport sm: breakpoint row-ified it and crushed the text.
-        "@container rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow-sm",
+        "@container rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow",
         compact ? "p-4" : "p-4 sm:p-6",
         className,
       ].filter(Boolean).join(" ")}
     >
       <div className="flex flex-col gap-4 @xl:flex-row @xl:items-center @xl:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container text-primary">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
             {running || busy ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : roadmap ? (
@@ -68,7 +68,7 @@ export function AgentCommandCard({
             )}
           </span>
           <div className="min-w-0">
-            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
+            <p className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant/70">
               Autonomous roadmap
             </p>
             <h2 className="mt-0.5 font-display text-headline-sm font-bold text-on-surface">
@@ -78,7 +78,7 @@ export function AgentCommandCard({
               {summary}
             </p>
             {run?.status && (
-              <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-on-surface/15 bg-surface-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface/75">
+              <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-surface-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface/75">
                 {running && <Loader2 className="h-3 w-3 animate-spin" />}
                 {humanize(run.status)}
               </p>
@@ -95,14 +95,14 @@ export function AgentCommandCard({
             type="button"
             onClick={() => void start()}
             disabled={busy || running}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {busy || running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             {busy ? "Preparing" : running ? "Running" : "Run roadmap"}
           </button>
           <Link
             to="/agent"
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Open agent <ArrowRight className="h-4 w-4" />
           </Link>

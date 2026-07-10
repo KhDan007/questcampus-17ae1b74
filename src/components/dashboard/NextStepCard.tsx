@@ -132,8 +132,8 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
             : s.kind === "eligibility"
               ? "Quick answer to confirm you match this school's requirements."
               : "One quick answer — saved everywhere it's asked.",
-      to: s.kind === "essay" ? "/essay" : "/prep",
-      cta: s.kind === "essay" ? "Draft in Essay Assistant" : "Open guided prep",
+      to: "/apply",
+      cta: "Open guided prep",
       Icon: stepIcon(s.kind),
       tone: "primary",
     };
@@ -147,8 +147,8 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
     def = {
       eyebrow: "You're ready",
       title: `Apply to ${readyName} — you're ready`,
-      desc: "Every required item is complete. Launch auto-apply from guided prep.",
-      to: "/prep",
+      desc: "Every required item is complete. Launch auto-apply from Applications.",
+      to: "/apply",
       cta: "Launch auto-apply",
       Icon: Rocket,
       tone: "done",

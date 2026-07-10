@@ -4,6 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { useRouterState } from "@tanstack/react-router";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
+import { readChatPageContextEnabled, shouldAttachPageContext } from "@/lib/chat/pageContext";
 import { getCurrentLang } from "@/lib/i18n/I18nProvider";
 
 /**
@@ -98,11 +99,13 @@ export function useSendChat() {
   const location = useRouterState({ select: (s) => s.location });
   return async (message: string, threadId?: string) => {
     if (!token) throw new Error("Sign in");
-    // Prepend a compact page-context hint for authenticated app routes only.
-    const ctx = pageContextLine(
-      location?.pathname ?? "/",
-      (location?.search as Record<string, unknown>) ?? {},
-    );
+    const wantsPageContext = shouldAttachPageContext(message, readChatPageContextEnabled());
+    const ctx = wantsPageContext
+      ? pageContextLine(
+          location?.pathname ?? "/",
+          (location?.search as Record<string, unknown>) ?? {},
+        )
+      : "";
     const outbound = ctx ? `${ctx}\n${message}` : message;
     return (await send({ token, threadId, message: outbound, lang: getCurrentLang() } as never)) as {
       threadId: string;

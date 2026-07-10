@@ -79,9 +79,11 @@ export function NavV2() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "border-b border-on-surface/10 bg-surface/70 backdrop-blur-xl"
-            : "bg-transparent"
+          isLanding
+            ? scrolled
+              ? "border-b border-on-surface/10 bg-surface/70 backdrop-blur-xl"
+              : "bg-transparent"
+            : "border-b border-on-surface/8 bg-surface"
         }`}
       >
         <nav className="flex h-16 w-full items-center justify-between px-4">
@@ -102,13 +104,10 @@ export function NavV2() {
               </>
             ) : isUnlock ? (
               <NavLink href="/dashboard">Dashboard</NavLink>
-            ) : isAuthenticated ? (
-              <>
-                <NavLink href="/universities">Universities</NavLink>
-                <NavLink href="/documents">Documents</NavLink>
-                <NavLink href="/dashboard">Dashboard</NavLink>
-              </>
             ) : null}
+            {/* Signed-in workspace navigation lives in the DashboardShell
+                sidebar — duplicating it here as center links was a second,
+                competing nav. The header stays minimal: identity + account. */}
           </div>
 
           <div className="flex items-center gap-3">

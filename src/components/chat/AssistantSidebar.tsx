@@ -57,6 +57,12 @@ import {
   DOCK_MIN_W,
   DOCK_MAX_W,
 } from "@/lib/chat/ChatDock";
+import {
+  assistantRouteToastLabel,
+  normalizeAssistantRoute,
+} from "@/lib/chat/navigationRoutes";
+import { userVisibleChatContent } from "@/lib/chat/pageContext";
+import { friendlyStepLabels } from "@/lib/chat/stepLabels";
 
 const SUGGESTIONS = [
   "What is my safest next action?",
@@ -253,9 +259,9 @@ function SidebarPanel({
     const t = text.trim();
     // Allow sending an attachment note with no typed text.
     if ((!t && !attachment) || disabled) return;
-    // Prepend an attachment hint so the agent knows a doc was just filed.
+    // The upload already wrote to Convex; send a hidden hint so the agent reads it as saved data.
     const outbound = attachment
-      ? `[Attached: ${attachment.fileName} as ${attachment.docType}]\n${t}`
+      ? `[Attached file saved to documents: ${attachment.fileName} as ${attachment.docType}]\n${t}`
       : t;
     setInput("");
     setAttachment(null);
@@ -764,6 +770,7 @@ function useQuickActionChips(): string[] {
     } else {
       chips.push("What's my safest next action?");
     }
+    chips.push("How strong is my app?");
     chips.push("Open my applications");
     chips.push("Draft my activities list");
     return chips.slice(0, 4);
@@ -867,6 +874,7 @@ function MessageRow({
   activeThreadId: string | undefined;
 }) {
   const isUser = message.role === "user";
+  const friendlySteps = isUser ? [] : friendlyStepLabels(message.steps ?? []);
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -878,13 +886,13 @@ function MessageRow({
       >
         {isUser ? (
           <p data-i18n-skip="true" className="whitespace-pre-wrap break-words">
-            {message.content}
+            {userVisibleChatContent(message.content)}
           </p>
         ) : (
           <div data-i18n-skip="true" className="break-words">
-            {message.steps?.length ? (
+            {friendlySteps.length ? (
               <p className="mb-1 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                {message.steps.join(" · ")}
+                {friendlySteps.join(" · ")}
               </p>
             ) : null}
             <Markdown>{message.content}</Markdown>
@@ -896,7 +904,11 @@ function MessageRow({
         {!isUser && message.actions && message.actions.length > 0 && (
           <div className="mt-2 space-y-1.5">
             <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.1em] text-on-surface/60">
-              Proposed action - review before confirming
+              {message.actions.some((a) => a.status === "proposed" && a.tool !== "navigate")
+                ? "Proposed action - review before confirming"
+                : message.actions.some((a) => a.status === "proposed" && a.tool === "navigate")
+                  ? "Opening page"
+                  : "Action result"}
             </p>
             {message.actions.map((a) => (
               <ActionCard
@@ -934,16 +946,17 @@ function ActionCard({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const bypass = useContext(BypassContext);
+  const autoRuns = bypass || action.tool === "navigate";
 
-  // In bypass mode a proposed card auto-confirms exactly once (no human tap).
+  // Navigation is reversible, so it auto-opens. Bypass still auto-confirms all cards.
   const autoRanRef = useRef(false);
   useEffect(() => {
-    if (bypass && action.status === "proposed" && !busy && !autoRanRef.current) {
+    if (autoRuns && action.status === "proposed" && !busy && !autoRanRef.current) {
       autoRanRef.current = true;
       void confirmAction();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bypass, action.status]);
+  }, [autoRuns, action.status]);
 
   if (action.status !== "proposed") {
     return (
@@ -994,6 +1007,15 @@ function ActionCard({
     } finally {
       setBusy(false);
     }
+  }
+
+  if (action.tool === "navigate" && !err) {
+    return (
+      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/20 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        {busy ? "Opening..." : action.label}
+      </div>
+    );
   }
 
   return (
@@ -1079,8 +1101,8 @@ async function execute(action: ChatAction, ex: Executors): Promise<"handled" | v
           await ex.navigate({ to: "/extension", search: { system, externalId } as never });
           return "handled";
         case "profile_incomplete":
-          toast.message("Almost there — finish your Common App profile and the extension can fill from it.");
-          await ex.navigate({ to: "/common-app" });
+          toast.message("Almost there - finish the missing application details first.");
+          await ex.navigate({ to: "/apply" });
           return "handled";
         case "ready":
           await ex.navigate({ to: "/application/$system/$externalId", params: { system, externalId } });
@@ -1141,8 +1163,16 @@ async function execute(action: ChatAction, ex: Executors): Promise<"handled" | v
     case "navigate": {
       const route = str("route");
       if (!route) throw new Error("Missing route");
-      await navigateInternal(route, ex.navigate);
-      return;
+      const normalized = normalizeAssistantRoute(route);
+      if (!normalized) throw new Error(`Route not allowed: ${route}`);
+      toast.message(assistantRouteToastLabel(normalized), {
+        action: {
+          label: "Open",
+          onClick: () => void navigateInternal(normalized, ex.navigate),
+        },
+      });
+      await navigateInternal(normalized, ex.navigate);
+      return "handled";
     }
     default:
       throw new Error(`Unknown action: ${action.tool}`);
@@ -1172,12 +1202,10 @@ async function navigateInternal(
   route: string,
   navigate: ReturnType<typeof useNavigate>,
 ) {
-  // Guard: only internal absolute paths
-  if (!route.startsWith("/") || route.startsWith("//")) {
-    throw new Error("Blocked external route");
-  }
+  const normalized = normalizeAssistantRoute(route);
+  if (!normalized) throw new Error(`Route not allowed: ${route}`);
   // Parse query
-  const [pathPart, queryPart] = route.split("?");
+  const [pathPart, queryPart] = normalized.split("?");
   const search: Record<string, string> = {};
   if (queryPart) {
     for (const pair of queryPart.split("&")) {
@@ -1193,6 +1221,11 @@ async function navigateInternal(
       to: "/application/$system/$externalId",
       params: { system: segs[0 + 1], externalId: segs[2] },
     });
+    return;
+  }
+  // /apply/strength
+  if (segs[0] === "apply" && segs[1] === "strength") {
+    await navigate({ to: "/apply/strength" as never });
     return;
   }
   // /apply/<jobId>
@@ -1214,14 +1247,10 @@ async function navigateInternal(
   const known = new Set([
     "dashboard",
     "apply",
-    "essay",
-    "profile",
     "feedback",
     "extension",
-    "common-app",
     "plan",
     "agent",
-    "documents",
     "unlock",
   ]);
   if (segs.length === 1 && known.has(segs[0])) {
@@ -1231,5 +1260,5 @@ async function navigateInternal(
     });
     return;
   }
-  throw new Error(`Route not allowed: ${route}`);
+  throw new Error(`Route not allowed: ${normalized}`);
 }

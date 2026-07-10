@@ -78,7 +78,7 @@ export function NextProductiveAction() {
         title: "Preparing your requirements…",
         body: "We're pulling the exact questions each university asks. Hang tight.",
         cta: "Open guided prep",
-        to: "/prep",
+        to: "/apply",
       };
     }
     if (guided.next) {
@@ -94,8 +94,8 @@ export function NextProductiveAction() {
               : s.kind === "eligibility"
                 ? "Quick answer to confirm you match this school's requirements."
                 : "One quick answer — saved everywhere it's asked.",
-        cta: s.kind === "essay" ? "Draft in Essay Assistant" : "Open guided prep",
-        to: s.kind === "essay" ? "/essay" : "/prep",
+        cta: "Open guided prep",
+        to: "/apply",
       };
     }
     if (guided.total > 0) {
@@ -104,7 +104,7 @@ export function NextProductiveAction() {
         title: "Everything's ready — launch auto-apply",
         body: `${guided.doneCount} of ${guided.total} required items complete.`,
         cta: "Launch auto-apply",
-        to: "/prep",
+        to: "/apply",
       };
     }
     return {
