@@ -39,9 +39,51 @@ export function CollectWorkspace({
   const setAnswer = useSetAnswer();
   const answerEligibility = useAnswerEligibility();
 
-  const summary = plan?.summary;
-  const percent = summary && summary.totalAskable > 0
-    ? Math.round((summary.answered / summary.totalAskable) * 100)
+  const coverageByKey = useMemo(() => {
+    const m = new Map<string, "full" | "partial" | "error" | undefined>();
+    for (const t of plan?.targets ?? []) {
+      m.set(`${t.system}::${t.externalId}`, t.coverage);
+    }
+    return m;
+  }, [plan]);
+
+  // Progress % — count only fully-captured targets so a thin/empty catalog
+  // can't inflate readiness.
+  const fullKeys = useMemo(() => {
+    const s = new Set<string>();
+    for (const t of plan?.targets ?? []) {
+      if (t.coverage === "full") s.add(`${t.system}::${t.externalId}`);
+    }
+    return s;
+  }, [plan]);
+
+  const { answered: countedAnswered, total: countedTotal } = useMemo(() => {
+    if (!plan) return { answered: 0, total: 0 };
+    let a = 0;
+    let t = 0;
+    for (const it of plan.shared ?? []) {
+      if (!it.required) continue;
+      t += 1;
+      if (it.answered) a += 1;
+    }
+    for (const g of plan.specific ?? []) {
+      const key = `${g.system}::${g.externalId}`;
+      if (!fullKeys.has(key)) continue;
+      for (const it of g.items ?? []) {
+        if (!it.required) continue;
+        t += 1;
+        if (it.answered) a += 1;
+      }
+    }
+    // Fallback to backend summary when no per-target coverage yet exists.
+    if (t === 0 && plan.summary) {
+      return { answered: plan.summary.answered, total: plan.summary.totalAskable };
+    }
+    return { answered: a, total: t };
+  }, [plan, fullKeys]);
+
+  const percent = countedTotal > 0
+    ? Math.round((countedAnswered / countedTotal) * 100)
     : 0;
 
   const planTargets: IntakeTarget[] = useMemo(() => {
@@ -56,6 +98,8 @@ export function CollectWorkspace({
 
   const readyTargets: BackendTarget[] = useMemo(() => {
     return targets.filter((t) => {
+      const coverage = coverageByKey.get(`${t.system}::${t.externalId}`);
+      if (coverage !== "full") return false;
       const c = checklist?.perTarget.find(
         (x) => x.system === t.system && x.externalId === t.externalId,
       );
@@ -64,7 +108,15 @@ export function CollectWorkspace({
       );
       return (c?.checklist?.ready ?? false) && e?.verdict !== "ineligible";
     });
-  }, [targets, checklist, eligibility]);
+  }, [targets, checklist, eligibility, coverageByKey]);
+
+  const hiddenIncompleteCount = useMemo(() => {
+    if (!plan?.targets) return 0;
+    return targets.filter((t) => {
+      const cov = coverageByKey.get(`${t.system}::${t.externalId}`);
+      return cov !== undefined && cov !== "full";
+    }).length;
+  }, [targets, plan, coverageByKey]);
 
 
   if (targetCount === 0) {
