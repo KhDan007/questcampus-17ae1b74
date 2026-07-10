@@ -66,6 +66,7 @@ export type DemoPortalProgress = {
   state: "pending" | "filling" | "done";
   filled: number;
   total: number;
+  viewUrl?: string; // signed link to the filled snapshot, set once a portal is done
 };
 
 /**
