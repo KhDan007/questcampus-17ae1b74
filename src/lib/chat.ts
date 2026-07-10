@@ -24,6 +24,34 @@ export type ChatMessage = {
 
 export type ChatThread = { _id: string; title?: string; updatedAt: number };
 
+export type AgentJobStatus = "queued" | "running" | "done" | "error" | "cancelled";
+
+export type AgentTodoStatus = "pending" | "in_progress" | "done" | "skipped";
+
+export type AgentTodo = {
+  id: string;
+  text: string;
+  status: AgentTodoStatus;
+};
+
+export type AgentJobLogEntry = {
+  ts: number;
+  kind: string; // step|write|verify|note
+  text: string;
+};
+
+export type AgentJob = {
+  _id: string;
+  goal: string;
+  status: AgentJobStatus;
+  todos: AgentTodo[];
+  log: AgentJobLogEntry[];
+  resultSummary?: string;
+  error?: string;
+  createdAt: number;
+  finishedAt?: number;
+};
+
 export function useChatThreads(): ChatThread[] | undefined {
   const { token } = useAuth();
   return useQuery(api.chat.listThreads, token ? ({ token } as never) : "skip") as
@@ -61,5 +89,34 @@ export function useSetActionStatus() {
   ) => {
     if (!token) return;
     await m({ token, messageId, actionId, status } as never);
+  };
+}
+
+/** Reactive: agent jobs for a thread (newest activity surfaces live). */
+export function useAgentJobsForThread(threadId: string | undefined): AgentJob[] | undefined {
+  const { token } = useAuth();
+  return useQuery(
+    api.agentJobs.forThread,
+    token && threadId ? ({ token, threadId } as never) : "skip",
+  ) as AgentJob[] | undefined;
+}
+
+/** Start a multi-step agent job. Throws "one_at_a_time" if one is active. */
+export function useStartAgentJob() {
+  const m = useMutation(api.agentJobs.start);
+  const { token } = useAuth();
+  return async (threadId: string, goal: string, todos: string[]) => {
+    if (!token) throw new Error("Sign in");
+    return (await m({ token, threadId, goal, todos } as never)) as { jobId: string };
+  };
+}
+
+/** Cancel a queued/running agent job. */
+export function useCancelAgentJob() {
+  const m = useMutation(api.agentJobs.cancel);
+  const { token } = useAuth();
+  return async (jobId: string) => {
+    if (!token) return;
+    await m({ token, jobId } as never);
   };
 }

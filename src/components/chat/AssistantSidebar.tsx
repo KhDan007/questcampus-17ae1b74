@@ -23,10 +23,13 @@ import {
   useThreadMessages,
   useSendChat,
   useSetActionStatus,
+  useAgentJobsForThread,
+  useStartAgentJob,
   type ChatAction,
   type ChatMessage,
   type ChatThread,
 } from "@/lib/chat";
+import { AgentJobCard } from "@/components/chat/AgentJobCard";
 
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
@@ -204,7 +207,12 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         ) : (
-          messages.map((m) => <MessageRow key={m._id} message={m} />)
+          <>
+            {messages.map((m) => (
+              <MessageRow key={m._id} message={m} activeThreadId={activeThreadId} />
+            ))}
+            <AgentJobList threadId={activeThreadId} />
+          </>
         )}
       </div>
 
@@ -403,7 +411,25 @@ function PendingFirstReply() {
   );
 }
 
-function MessageRow({ message }: { message: ChatMessage }) {
+function AgentJobList({ threadId }: { threadId: string | undefined }) {
+  const jobs = useAgentJobsForThread(threadId);
+  if (!jobs || jobs.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      {jobs.map((job) => (
+        <AgentJobCard key={job._id} job={job} />
+      ))}
+    </div>
+  );
+}
+
+function MessageRow({
+  message,
+  activeThreadId,
+}: {
+  message: ChatMessage;
+  activeThreadId: string | undefined;
+}) {
   const isUser = message.role === "user";
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -435,7 +461,12 @@ function MessageRow({ message }: { message: ChatMessage }) {
               Proposed action - review before confirming
             </p>
             {message.actions.map((a) => (
-              <ActionCard key={a.id} messageId={message._id} action={a} />
+              <ActionCard
+                key={a.id}
+                messageId={message._id}
+                action={a}
+                activeThreadId={activeThreadId}
+              />
             ))}
           </div>
         )}
@@ -447,14 +478,17 @@ function MessageRow({ message }: { message: ChatMessage }) {
 function ActionCard({
   messageId,
   action,
+  activeThreadId,
 }: {
   messageId: string;
   action: ChatAction;
+  activeThreadId: string | undefined;
 }) {
   const setStatus = useSetActionStatus();
   const setAnswer = useSetAnswer();
   const answerEligibility = useAnswerEligibility();
   const autoApplyGate = useAutoApplyGate();
+  const startAgentJob = useStartAgentJob();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -487,7 +521,14 @@ function ActionCard({
     setBusy(true);
     setErr(null);
     try {
-      const result = await execute(action, { setAnswer, answerEligibility, autoApplyGate, navigate });
+      const result = await execute(action, {
+        setAnswer,
+        answerEligibility,
+        autoApplyGate,
+        navigate,
+        startAgentJob,
+        activeThreadId,
+      });
       await setStatus(messageId, action.id, "done");
       if (result !== "handled") toast.success("Done");
     } catch (e) {
@@ -538,6 +579,8 @@ type Executors = {
   answerEligibility: ReturnType<typeof useAnswerEligibility>;
   autoApplyGate: ReturnType<typeof useAutoApplyGate>;
   navigate: ReturnType<typeof useNavigate>;
+  startAgentJob: ReturnType<typeof useStartAgentJob>;
+  activeThreadId: string | undefined;
 };
 
 /** Return "handled" when the branch already gave the user specific feedback
@@ -587,6 +630,27 @@ async function execute(action: ChatAction, ex: Executors): Promise<"handled" | v
           return "handled";
       }
       return;
+    }
+    case "start_agent_job": {
+      const goal = str("goal");
+      const rawTodos = args.todos;
+      const todos = Array.isArray(rawTodos)
+        ? rawTodos.filter((t): t is string => typeof t === "string")
+        : [];
+      if (!goal) throw new Error("Missing goal");
+      if (!ex.activeThreadId) throw new Error("No active thread");
+      try {
+        await ex.startAgentJob(ex.activeThreadId, goal, todos);
+        // No navigation — the live job card appears in this thread reactively.
+      } catch (e) {
+        const raw = e instanceof Error ? e.message : "";
+        if (raw.includes("one_at_a_time")) {
+          toast.message("One job at a time — the current one is still running.");
+          return "handled";
+        }
+        throw e;
+      }
+      return "handled";
     }
     case "upload_document": {
       await ex.navigate({ to: "/apply" });
