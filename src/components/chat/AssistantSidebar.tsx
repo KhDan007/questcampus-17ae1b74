@@ -370,37 +370,38 @@ function SidebarPanel({
         className="absolute left-0 top-0 z-[1] hidden h-full w-1.5 -translate-x-1/2 cursor-col-resize touch-none select-none hover:bg-primary/30 active:bg-primary/60 sm:block"
       />
 
-      {/* Header */}
-      <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+      {/* Header — @container so labels/credits key off the PANEL width, not the
+          viewport (the dock is resizable 320-560px independent of screen size). */}
+      <header className="@container flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
           <Sparkles className="h-4 w-4" />
         </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="font-display text-label-md font-bold text-on-surface">Assistant</p>
-            {credits && (
-              <span
-                title={
-                  credits.remaining <= 0
-                    ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
-                    : `${credits.remaining} of ${credits.grant} left — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
-                }
-                className={`shrink-0 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
-                  credits.remaining <= 0
-                    ? "border-on-surface/30 bg-on-surface/5 text-on-surface-variant"
-                    : "border-primary/30 bg-primary/10 text-primary"
-                }`}
-              >
-                {credits.remaining} credits
-              </span>
-            )}
-          </div>
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <p className="hidden truncate font-display text-label-md font-bold text-on-surface @[340px]:block">
+            Assistant
+          </p>
+          {credits && (
+            <span
+              title={
+                credits.remaining <= 0
+                  ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+                  : `${credits.remaining} of ${credits.grant} left — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+              }
+              className={`hidden shrink-0 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold @[420px]:inline-block ${
+                credits.remaining <= 0
+                  ? "border-on-surface/30 bg-on-surface/5 text-on-surface-variant"
+                  : "border-primary/30 bg-primary/10 text-primary"
+              }`}
+            >
+              {credits.remaining} credits
+            </span>
+          )}
         </div>
         <button
           type="button"
           onClick={() => setHistoryOpen((v) => !v)}
           aria-pressed={historyOpen}
-          className={`inline-flex items-center gap-1 rounded-md border-2 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold hover:border-on-surface ${
+          className={`inline-flex shrink-0 items-center gap-1 rounded-md border-2 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold hover:border-on-surface ${
             historyOpen
               ? "border-on-surface bg-secondary-container text-on-surface"
               : "border-on-surface/25 bg-surface text-on-surface"
@@ -408,7 +409,7 @@ function SidebarPanel({
           title="Previous chats"
         >
           <History className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">
+          <span className="hidden @[440px]:inline">
             History
             {threads && threads.length > 0 && (
               <span className="opacity-60"> ({threads.length})</span>
@@ -418,11 +419,11 @@ function SidebarPanel({
         <button
           type="button"
           onClick={newChat}
-          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
           title="Start a new chat"
         >
           <Plus className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">New</span>
+          <span className="hidden @[440px]:inline">New</span>
         </button>
 
         <button
@@ -430,7 +431,7 @@ function SidebarPanel({
           onClick={() => setCollapsed(true)}
           aria-label="Collapse assistant"
           title="Collapse"
-          className="hidden h-8 w-8 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface sm:inline-flex sm:place-items-center"
+          className="hidden h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface sm:inline-flex sm:place-items-center"
         >
           <PanelRightClose className="h-4 w-4" />
         </button>
@@ -438,7 +439,7 @@ function SidebarPanel({
           type="button"
           onClick={onClose}
           aria-label="Close assistant"
-          className="grid h-8 w-8 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
         >
           <X className="h-4 w-4" />
         </button>
