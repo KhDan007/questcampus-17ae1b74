@@ -134,8 +134,22 @@ function UnlockPage() {
                 The unlock
               </div>
 
-              <div className="mt-5 flex items-end gap-3">
-                {discountPct > 0 && formattedDiscounted ? (
+              <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
+                {freeHook ? (
+                  // Lead with the $0 the student pays TODAY; the $15/mo is the
+                  // small print (only starts after the 3-day trial).
+                  <>
+                    <span className="font-display text-[3.5rem] font-black leading-none text-on-surface sm:text-[4rem]">
+                      $0
+                    </span>
+                    <span className="pb-2 font-display text-xl font-bold text-on-surface">
+                      today
+                    </span>
+                    <span className="w-full pb-1 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant sm:w-auto">
+                      then {formattedDiscounted ?? `$${PRICE_MVP}`}/month
+                    </span>
+                  </>
+                ) : discountPct > 0 && formattedDiscounted ? (
                   <>
                     <span className="font-display text-[3.5rem] font-black leading-none text-on-surface sm:text-[4rem]">
                       {formattedDiscounted}

@@ -3,13 +3,14 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LogIn, UserPlus, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
-import { useAuth } from "@/lib/auth/useAuth";
+import { LogIn, UserPlus, User as UserIcon, LogOut, LayoutDashboard, Sparkles } from "lucide-react";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 
 export function ProfileMenu() {
   const reduce = useReducedMotion();
   const { user, isAuthenticated } = useAuth();
+  const freeHook = useFreeHook();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   // Anchor position for the portaled menu (fixed, relative to the viewport).
@@ -80,6 +81,11 @@ export function ProfileMenu() {
                 </p>
               </div>
               <div className="my-1 h-px bg-on-surface/10" />
+              {freeHook && (
+                <MenuLink href="/unlock" icon={<Sparkles className="h-4 w-4" />} primary>
+                  Start free trial · $0
+                </MenuLink>
+              )}
               <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>
                 Dashboard
               </MenuLink>
