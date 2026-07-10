@@ -23,6 +23,7 @@ import {
   ArrowLeft,
   Trash2,
   ShieldAlert,
+  PanelRightClose,
 } from "lucide-react";
 
 import { useQuery } from "convex/react";
@@ -47,6 +48,12 @@ import { ConfirmDialog } from "@/components/chat/ConfirmDialog";
 
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
+import {
+  useChatDock,
+  DOCK_RAIL_W,
+  DOCK_MIN_W,
+  DOCK_MAX_W,
+} from "@/lib/chat/ChatDock";
 
 const SUGGESTIONS = [
   "What is my safest next action?",
@@ -62,7 +69,7 @@ export const BypassContext = createContext(false);
 
 export function AssistantSidebar() {
   const { isAuthenticated } = useAuth();
-  const [open, setOpen] = useState(false);
+  const { open, setOpen } = useChatDock();
   // A monotonic id makes each ask distinct (repeat asks about the same school
   // still fire; the panel dedups on id so a dev double-invoke can't double-send).
   const [pending, setPending] = useState<{ prompt: string; id: number } | null>(null);
@@ -130,6 +137,7 @@ function SidebarPanel({
   initialPrompt?: { prompt: string; id: number } | null;
   onConsumed?: () => void;
 }) {
+  const { width, collapsed, setCollapsed, setWidth, isDesktop } = useChatDock();
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [forceNew, setForceNew] = useState(false);
@@ -230,6 +238,57 @@ function SidebarPanel({
 
   const showEmpty = !activeThreadId || messages?.length === 0;
 
+  // Drag-to-resize: dragging the left edge leftward widens the dock. setWidth
+  // clamps to [DOCK_MIN_W, DOCK_MAX_W]; pointer capture keeps the drag alive
+  // even if the cursor briefly leaves the 6px handle.
+  const resizeRef = useRef<{ startX: number; startW: number } | null>(null);
+  function onResizeDown(e: React.PointerEvent<HTMLDivElement>) {
+    resizeRef.current = { startX: e.clientX, startW: width };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  function onResizeMove(e: React.PointerEvent<HTMLDivElement>) {
+    const s = resizeRef.current;
+    if (!s) return;
+    setWidth(s.startW + (s.startX - e.clientX));
+  }
+  function onResizeUp(e: React.PointerEvent<HTMLDivElement>) {
+    resizeRef.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  const railMode = isDesktop && collapsed;
+  const hasMessages = !!messages && messages.length > 0;
+
+  if (railMode) {
+    return (
+      <motion.aside
+        role="complementary"
+        aria-label="AI assistant"
+        initial={{ x: "100%", opacity: 0.6 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: "100%", opacity: 0.6 }}
+        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        style={{ width: DOCK_RAIL_W }}
+        className="fixed right-0 top-16 z-[80] flex h-[calc(100dvh-4rem)] flex-col items-center border-l-2 border-on-surface bg-surface qc-hard-shadow-sm sm:transition-[width] sm:duration-200 sm:ease-out"
+      >
+        <button
+          type="button"
+          onClick={() => setCollapsed(false)}
+          aria-label="Expand assistant"
+          title="Expand assistant"
+          className="relative mt-4 grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        >
+          <Sparkles className="h-4 w-4" />
+          {(streaming || hasMessages) && (
+            <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-surface bg-primary" />
+          )}
+        </button>
+      </motion.aside>
+    );
+  }
+
   return (
     <motion.aside
       role="complementary"
@@ -238,8 +297,20 @@ function SidebarPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: "100%", opacity: 0.6 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-[80] flex h-dvh w-full flex-col border-on-surface bg-surface qc-hard-shadow-sm sm:inset-auto sm:right-0 sm:top-16 sm:h-[calc(100dvh-4rem)] sm:max-w-[380px] sm:border-l-2"
+      style={{ width: isDesktop ? width : undefined }}
+      className="fixed inset-0 z-[80] flex h-dvh w-full flex-col border-on-surface bg-surface qc-hard-shadow-sm sm:inset-auto sm:right-0 sm:top-16 sm:h-[calc(100dvh-4rem)] sm:border-l-2 sm:transition-[width] sm:duration-200 sm:ease-out"
     >
+      {/* Resize handle (desktop only, expanded only) */}
+      <div
+        onPointerDown={onResizeDown}
+        onPointerMove={onResizeMove}
+        onPointerUp={onResizeUp}
+        onPointerCancel={onResizeUp}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize assistant"
+        className="absolute left-0 top-0 z-[1] hidden h-full w-1.5 -translate-x-1/2 cursor-col-resize touch-none select-none hover:bg-primary/30 active:bg-primary/60 sm:block"
+      />
 
       {/* Header */}
       <header className="flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
@@ -266,7 +337,6 @@ function SidebarPanel({
               </span>
             )}
           </div>
-          <p className="truncate text-label-sm text-on-surface-variant">Grounded in your app data - actions confirm first</p>
         </div>
         <button
           type="button"
@@ -297,6 +367,15 @@ function SidebarPanel({
           <span className="hidden sm:inline">New</span>
         </button>
 
+        <button
+          type="button"
+          onClick={() => setCollapsed(true)}
+          aria-label="Collapse assistant"
+          title="Collapse"
+          className="hidden h-8 w-8 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface sm:inline-flex sm:place-items-center"
+        >
+          <PanelRightClose className="h-4 w-4" />
+        </button>
         <button
           type="button"
           onClick={onClose}
@@ -375,10 +454,7 @@ function SidebarPanel({
             )}
           </button>
         </div>
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <p className="min-w-0 truncate text-label-sm text-on-surface-variant">
-            Enter to send - Shift+Enter for newline
-          </p>
+        <div className="mt-1.5 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => {

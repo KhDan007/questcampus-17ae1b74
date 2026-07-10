@@ -16,6 +16,7 @@ import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
+import { ChatDockProvider } from "@/lib/chat/ChatDock";
 import { useAuth } from "@/lib/auth/useAuth";
 
 // Core workspace routes to warm up after first paint for signed-in users, so
@@ -226,13 +227,17 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ConvexClientProvider>
         <I18nProvider>
-          <NavV2 />
-          <RouteTransitions>
-            <Outlet />
-          </RouteTransitions>
-          <EmailVerifyGate />
-          <AssistantSidebar />
-
+          <ChatDockProvider>
+            {/* The docked chat shifts page content via a body padding-right keyed
+                on --chat-dock-w (see styles.css); the panel is a real sidebar,
+                not an overlay, on desktop. */}
+            <NavV2 />
+            <RouteTransitions>
+              <Outlet />
+            </RouteTransitions>
+            <EmailVerifyGate />
+            <AssistantSidebar />
+          </ChatDockProvider>
         </I18nProvider>
       </ConvexClientProvider>
     </QueryClientProvider>
