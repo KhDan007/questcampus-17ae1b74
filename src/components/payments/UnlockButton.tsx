@@ -47,7 +47,9 @@ export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) 
           setMessage(t("unlock.notLive"));
           return;
         case "error":
-          setMessage(res.message || t("unlock.genericError"));
+          // Never surface a raw backend/Polar error (e.g. "Polar checkout 401:
+          // {…}") to the user — always a friendly, actionable message.
+          setMessage(t("unlock.genericError"));
           return;
       }
     } finally {
@@ -67,7 +69,7 @@ export function UnlockButton({ token, label, className, onAlreadyPaid }: Props) 
         disabled={disabled}
         className={
           className ??
-          "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container px-8 text-label-md font-semibold text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+          "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
         }
       >
         {loading ? t("unlock.redirecting") : resolvedLabel}
