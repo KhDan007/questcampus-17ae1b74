@@ -19,6 +19,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DocumentsRouteImport } from './routes/documents'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CommonAppRouteImport } from './routes/common-app'
 import { Route as BlankRouteImport } from './routes/blank'
@@ -81,6 +82,11 @@ const EssayRoute = EssayRouteImport.update({
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/blank': typeof BlankRoute
   '/common-app': typeof CommonAppRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/blank': typeof BlankRoute
   '/common-app': typeof CommonAppRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/blank': typeof BlankRoute
   '/common-app': typeof CommonAppRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/common-app'
     | '/dashboard'
+    | '/demo'
     | '/documents'
     | '/essay'
     | '/extension'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/common-app'
     | '/dashboard'
+    | '/demo'
     | '/documents'
     | '/essay'
     | '/extension'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/blank'
     | '/common-app'
     | '/dashboard'
+    | '/demo'
     | '/documents'
     | '/essay'
     | '/extension'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   BlankRoute: typeof BlankRoute
   CommonAppRoute: typeof CommonAppRoute
   DashboardRoute: typeof DashboardRoute
+  DemoRoute: typeof DemoRoute
   DocumentsRoute: typeof DocumentsRouteWithChildren
   EssayRoute: typeof EssayRoute
   ExtensionRoute: typeof ExtensionRoute
@@ -399,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/documents'
       preLoaderRoute: typeof DocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -513,6 +533,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlankRoute: BlankRoute,
   CommonAppRoute: CommonAppRoute,
   DashboardRoute: DashboardRoute,
+  DemoRoute: DemoRoute,
   DocumentsRoute: DocumentsRouteWithChildren,
   EssayRoute: EssayRoute,
   ExtensionRoute: ExtensionRoute,

@@ -7,17 +7,16 @@ import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
-import { useApplyActions } from "./client";
 
 export type RunDemoState = {
   /**
-   * Launch the live demo. If the user hasn't finished detailed onboarding yet,
-   * this routes them to /onboarding (with a motivating toast) so the demo can
-   * later fill their real answers instead of sample data. Otherwise it enqueues
-   * a fresh demo job and navigates to it.
+   * Launch the demo. If the user hasn't finished detailed onboarding yet, this
+   * routes them to /onboarding (with a motivating toast) so the demo can fill
+   * their real answers instead of sample data. Otherwise it navigates to the
+   * fully-frontend `/demo` simulation (no job / worker / screencast).
    */
   run: () => Promise<void>;
-  /** True while a demo is being enqueued / navigated. */
+  /** True while the demo is being launched / navigated. */
   starting: boolean;
   /** Human-readable error from the last attempt, or null. */
   error: string | null;
@@ -34,7 +33,6 @@ type OnboardingActive = { completed?: boolean; completedAt?: number } | null | u
 export function useRunDemo(): RunDemoState {
   const navigate = useNavigate();
   const { token } = useAuth();
-  const { startDemo } = useApplyActions();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,13 +58,14 @@ export function useRunDemo(): RunDemoState {
 
     setStarting(true);
     try {
-      const { jobId } = await startDemo(true);
-      await navigate({ to: "/apply/$jobId", params: { jobId } });
+      // Fully-frontend simulation — no job/worker/WS. The /demo route prefills
+      // onboarding basics and animates the plan locally.
+      await navigate({ to: "/demo" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't start the demo. Try again.");
       setStarting(false);
     }
-  }, [starting, onboardingComplete, startDemo, navigate]);
+  }, [starting, onboardingComplete, navigate]);
 
   return { run, starting, error };
 }
