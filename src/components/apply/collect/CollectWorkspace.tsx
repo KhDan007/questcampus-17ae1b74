@@ -253,7 +253,12 @@ export function CollectWorkspace({
       </div>
 
       <div className="lg:col-span-2">
-        <LaunchBar entitlement={entitlement} percent={percent} readyTargets={readyTargets} />
+        <LaunchBar
+          entitlement={entitlement}
+          percent={percent}
+          readyTargets={readyTargets}
+          hiddenIncompleteCount={hiddenIncompleteCount}
+        />
       </div>
     </div>
   );
