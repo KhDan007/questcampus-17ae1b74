@@ -13,7 +13,11 @@ import {
   Lock,
   Loader2,
   Play,
+  Bookmark,
+  BookmarkCheck,
+  Compass,
 } from "lucide-react";
+import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
@@ -21,6 +25,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import { WhyReasons } from "@/components/common/WhyReasons";
+import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 import { askAssistant } from "@/lib/assistant";
 import type { RecCard } from "@/components/profile/UniversityCard";
 import { UniversitySearchSection } from "@/components/universities/UniversitySearchSection";
@@ -61,6 +66,9 @@ type SavedMatch = {
   why: string;
   tag: string;
   website?: string;
+  // Identifiers so a match can be saved to the user's picks straight from here.
+  source?: string;
+  externalId?: string;
 };
 type SavedPayload = { matches: SavedMatch[]; at: number };
 
@@ -132,14 +140,21 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
       why: r.why || "",
       tag: r.fields?.[0] ?? r.region ?? r.country ?? "",
       website: r.website,
+      source: r.source ?? "scorecard",
+      externalId: r.externalId,
     })),
   };
 }
 
 function DashboardPage() {
   const reduce = useReducedMotion();
-  const { user, isAuthenticated, token, isHydrated } = useAuth();
+  const { user, isAuthenticated, token, isHydrated, hasPaidAccess } = useAuth();
   const { lang } = useI18n();
+  const { saved: savedUnis } = useSavedUniversities();
+  const savedCount = savedUnis?.length ?? 0;
+  // A paid user who has already built a full shortlist (20+) gets more value
+  // from a "browse everything" jump than from the same 3 quiz picks.
+  const showBrowseAll = hasPaidAccess && savedCount >= 20;
   const authed = isHydrated && isAuthenticated;
   const { refresh } = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -212,6 +227,15 @@ function DashboardPage() {
 
   const loading = authed && serverStatus === "loading" && !saved;
 
+  // The quiz subtitle is interpolated (has the match count), so the DOM-scan
+  // literal translator can't match it — translate it at runtime instead.
+  const quizSubtitleRaw = loading
+    ? "Loading matches…"
+    : saved
+      ? `${saved.matches.length} AI matches · Save the ones you like — that's how we build each application and track its deadlines.`
+      : "Take the quiz to see your first matches.";
+  const quizSubtitle = useAutoTranslate(quizSubtitleRaw) ?? quizSubtitleRaw;
+
   return (
     <>
       <LivingBackground />
@@ -257,21 +281,19 @@ function DashboardPage() {
             <ResumeBanner />
           </div>
 
+          {/* Paid power-users with a full shortlist: skip the same 3 picks and
+              send them into the full catalog instead. */}
+          {showBrowseAll && <BrowseAllCard savedCount={savedCount} />}
+
           {/* Quiz matches — surfaced right after onboarding */}
-          {(loading || (saved && saved.matches.length > 0) || !saved) && (
+          {!showBrowseAll && (loading || (saved && saved.matches.length > 0) || !saved) && (
             <section className="mt-6">
               <div className="mb-3 flex items-end justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className="font-display text-headline-sm font-bold text-on-surface">
                     From your quiz
                   </h2>
-                  <p className="text-body-sm text-on-surface-variant">
-                    {loading
-                      ? "Loading matches…"
-                      : saved
-                        ? `${saved.matches.length} AI match${saved.matches.length === 1 ? "" : "es"} · save the ones you like to your picks`
-                        : "Take the quiz to see your first matches."}
-                  </p>
+                  <p className="text-body-sm text-on-surface-variant">{quizSubtitle}</p>
                 </div>
                 {!saved && !loading && (
                   <Link
@@ -499,22 +521,58 @@ function DemoHeroCard() {
   );
 }
 
+// A single quiz-match card. Its "why" reasons + field tag are runtime-translated
+// (same as the /universities card) so nothing leaks English in RU/KK, and it
+// carries a prominent Save toggle so a match can go straight to the user's picks.
 function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?: boolean }) {
+  const reduce = useReducedMotion();
   const style = BUCKET_STYLES[match.bucket] ?? BUCKET_STYLES.Target;
   const Icon = style.icon;
+  const translatedWhy = useAutoTranslate(match.why || null);
+  const translatedTag = useAutoTranslate(match.tag || null);
+  const { isSaved, addFromRecommendation, removeByUniversity, requireAuth } =
+    useSavedUniversities();
+  const [busy, setBusy] = useState(false);
+
+  const canSave = Boolean(match.source && match.externalId);
+  const saved = canSave ? isSaved(match.source!, match.externalId!) : false;
+
+  async function toggleSave() {
+    if (!canSave || busy) return;
+    if (!requireAuth()) return;
+    setBusy(true);
+    try {
+      if (saved) {
+        await removeByUniversity(match.source!, match.externalId!);
+        toast.message(`Removed ${match.name} from your picks`);
+      } else {
+        await addFromRecommendation(match.source!, match.externalId!);
+        toast.success(`Saved ${match.name} to your picks`);
+      }
+    } catch {
+      toast.error("Couldn't update your picks — try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const hidden = reduce
+    ? { opacity: 0 }
+    : { opacity: 0, y: 22, scale: 0.96, rotate: celebrate ? -1.5 : 0 };
+  const show = reduce
+    ? { opacity: 1, transition: { duration: 0.2 } }
+    : {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotate: 0,
+        transition: { type: "spring", stiffness: 240, damping: 24, mass: 0.7 },
+      };
+
   return (
     <motion.article
-      variants={{
-        hidden: { opacity: 0, y: 24, scale: 0.95, rotate: celebrate ? -1.5 : 0 },
-        show: {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          rotate: 0,
-          transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-        },
-      }}
-      whileHover={{ y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
+      variants={{ hidden, show }}
+      whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-4 sm:p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -546,13 +604,37 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
       )}
       {match.why && (
         <div className="mt-4 flex-1">
-          <WhyReasons why={match.why} className="text-body-sm text-on-surface/80" />
+          <WhyReasons why={translatedWhy ?? match.why} className="text-body-sm text-on-surface/80" />
         </div>
       )}
-      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-4">
+
+      {/* Save — primary action, so adding a match to picks is obvious anywhere. */}
+      {canSave && (
+        <button
+          type="button"
+          onClick={toggleSave}
+          disabled={busy}
+          aria-pressed={saved}
+          className={`mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface px-3 py-2 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60 ${
+            saved ? "bg-tertiary text-on-tertiary" : "bg-primary text-white"
+          }`}
+        >
+          {saved ? (
+            <>
+              <BookmarkCheck className="h-4 w-4" /> Saved to your picks
+            </>
+          ) : (
+            <>
+              <Bookmark className="h-4 w-4" /> Save to my picks
+            </>
+          )}
+        </button>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-3">
         {match.tag && (
           <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
-            {match.tag}
+            {translatedTag ?? match.tag}
           </span>
         )}
         <div className="ml-auto flex items-center gap-2">
@@ -578,6 +660,41 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
         </div>
       </div>
     </motion.article>
+  );
+}
+
+// Shown to paid users who already saved 20+ universities: the 3 quiz picks add
+// little, so point them at the whole catalog instead.
+function BrowseAllCard({ savedCount }: { savedCount: number }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.section
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-6 flex flex-col items-start gap-4 rounded-2xl border-2 border-on-surface bg-secondary-container/60 p-5 qc-hard-shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6"
+    >
+      <div className="flex items-start gap-4">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-on-surface">
+          <Compass className="h-6 w-6" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="font-display text-headline-sm font-bold text-on-surface">
+            Your shortlist is looking strong
+          </h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">
+            {savedCount} universities saved. Explore the full catalogue of 11,000+ to find your next add.
+          </p>
+        </div>
+      </div>
+      <Link
+        to="/universities"
+        search={{} as never}
+        className="inline-flex shrink-0 items-center gap-2 rounded-xl border-2 border-on-surface bg-primary px-5 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+      >
+        <GraduationCap className="h-4 w-4" /> Browse all universities
+      </Link>
+    </motion.section>
   );
 }
 
