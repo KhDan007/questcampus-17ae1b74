@@ -35,7 +35,8 @@ export type RecCard = {
   ieltsOverall?: number;
   toeflIbt?: number;
   bucket: "safety" | "target" | "reach";
-  score: number;
+  score: number; // internal ranking composite (not shown to the student)
+  matchPercent?: number; // calibrated, student-facing 0..100 match score
   why: string;
 };
 

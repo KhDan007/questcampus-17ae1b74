@@ -35,6 +35,7 @@ type RawResult = {
   sizeBucket?: string;
   bucket: "safety" | "target" | "reach";
   score: number;
+  matchPercent?: number;
   why: string;
 };
 
@@ -96,7 +97,7 @@ function toMatch(r: RawResult): Match {
   return {
     name: r.name,
     location,
-    match: Math.max(0, Math.min(100, Math.round(r.score * 100))),
+    match: Math.max(0, Math.min(100, Math.round(r.matchPercent ?? r.score * 100))),
     bucket: capBucket(r.bucket),
     why: r.why,
     tag,

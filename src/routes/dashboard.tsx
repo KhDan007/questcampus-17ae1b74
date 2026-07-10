@@ -124,7 +124,7 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
     matches: recs.map((r) => ({
       name: r.name,
       location: [r.city, r.state, r.country].filter(Boolean).join(", "),
-      match: Math.round((r.score ?? 0.7) * 100),
+      match: Math.round(r.matchPercent ?? (r.score ?? 0.7) * 100),
       bucket: bucketCap(r.bucket),
       why: r.why || "",
       tag: r.fields?.[0] ?? r.region ?? r.country ?? "",
@@ -519,12 +519,17 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
           <Icon className="h-3.5 w-3.5" />
           {match.bucket}
         </span>
-        <div className="flex items-baseline gap-0.5">
-          <span className="font-display text-headline-lg font-bold text-primary">
-            {match.match}
-          </span>
-          <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/80">
-            %
+        <div className="flex flex-col items-end leading-none">
+          <div className="flex items-baseline gap-0.5">
+            <span className="font-display text-headline-lg font-bold text-primary">
+              {match.match}
+            </span>
+            <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/80">
+              %
+            </span>
+          </div>
+          <span className="mt-1 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant">
+            match
           </span>
         </div>
       </div>
