@@ -94,6 +94,11 @@ export function LaunchBar({ entitlement, percent, readyTargets, hiddenIncomplete
                 style={{ width: `${percent}%` }}
               />
             </div>
+            {hiddenIncompleteCount > 0 && (
+              <p className="mt-1.5 text-label-sm text-on-surface-variant">
+                {hiddenIncompleteCount} {hiddenIncompleteCount === 1 ? "university" : "universities"} hidden — requirements not fully captured yet.
+              </p>
+            )}
           </div>
           <button
             type="button"
