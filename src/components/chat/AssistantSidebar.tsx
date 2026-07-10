@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast, Toaster } from "sonner";
@@ -14,6 +21,8 @@ import {
   Loader2,
   History,
   ArrowLeft,
+  Trash2,
+  ShieldAlert,
 } from "lucide-react";
 
 import { useQuery } from "convex/react";
@@ -28,11 +37,13 @@ import {
   useSetActionStatus,
   useAgentJobsForThread,
   useStartAgentJob,
+  useDeleteThread,
   type ChatAction,
   type ChatMessage,
   type ChatThread,
 } from "@/lib/chat";
 import { AgentJobCard } from "@/components/chat/AgentJobCard";
+import { ConfirmDialog } from "@/components/chat/ConfirmDialog";
 
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
@@ -42,6 +53,12 @@ const SUGGESTIONS = [
   "Find scholarship-friendly schools for my profile",
   "What can the extension safely do now?",
 ];
+
+const SKIP_DELETE_CONFIRM_KEY = "qc.chat.skipDeleteConfirm";
+const BYPASS_KEY = "qc.chat.bypass";
+
+/** When true, proposed action cards auto-confirm without a human tap. */
+export const BypassContext = createContext(false);
 
 export function AssistantSidebar() {
   const { isAuthenticated } = useAuth();
@@ -124,6 +141,35 @@ function SidebarPanel({
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededIdRef = useRef<number>(-1);
+  const deleteThread = useDeleteThread();
+  // Bypass mode (auto-approve action cards). Persisted, OFF by default.
+  const [bypass, setBypass] = useState(false);
+  const [bypassDialogOpen, setBypassDialogOpen] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setBypass(window.localStorage.getItem(BYPASS_KEY) === "1");
+  }, []);
+
+  function enableBypass() {
+    setBypass(true);
+    setBypassDialogOpen(false);
+    if (typeof window !== "undefined") window.localStorage.setItem(BYPASS_KEY, "1");
+  }
+  function disableBypass() {
+    setBypass(false);
+    if (typeof window !== "undefined") window.localStorage.setItem(BYPASS_KEY, "0");
+  }
+
+  async function removeThread(id: string) {
+    try {
+      await deleteThread(id);
+      // If we just deleted the active thread, fall back to a fresh chat.
+      if (id === activeThreadId) newChat();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't remove chat");
+    }
+  }
+
   const { token } = useAuth();
   const credits = useQuery(
     api.agentCredits.credits,
@@ -273,6 +319,7 @@ function SidebarPanel({
             onPick={pickThread}
             onNew={newChat}
             onBack={() => setHistoryOpen(false)}
+            onRemove={removeThread}
           />
         ) : sending && showEmpty ? (
           <PendingFirstReply />
@@ -283,12 +330,12 @@ function SidebarPanel({
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         ) : (
-          <>
+          <BypassContext.Provider value={bypass}>
             {messages.map((m) => (
               <MessageRow key={m._id} message={m} activeThreadId={activeThreadId} />
             ))}
             <AgentJobList threadId={activeThreadId} />
-          </>
+          </BypassContext.Provider>
         )}
       </div>
 
@@ -328,10 +375,48 @@ function SidebarPanel({
             )}
           </button>
         </div>
-        <p className="mt-1 text-label-sm text-on-surface-variant">
-          Enter to send - Shift+Enter for newline
-        </p>
+        <div className="mt-1 flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-label-sm text-on-surface-variant">
+            Enter to send - Shift+Enter for newline
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              if (bypass) disableBypass();
+              else setBypassDialogOpen(true);
+            }}
+            aria-pressed={bypass}
+            title={
+              bypass
+                ? "Bypass on - actions run automatically. Tap to turn off."
+                : "Turn on bypass - actions run without confirming each time."
+            }
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
+              bypass
+                ? "border-primary/40 bg-primary/10 text-primary"
+                : "border-on-surface/25 bg-surface text-on-surface-variant hover:border-on-surface"
+            }`}
+          >
+            <ShieldAlert className="h-3.5 w-3.5" />
+            Bypass
+          </button>
+        </div>
+        {bypass && (
+          <p className="mt-1 text-label-sm text-primary">
+            Bypass on - actions run automatically.
+          </p>
+        )}
       </form>
+
+      <ConfirmDialog
+        open={bypassDialogOpen}
+        title="Turn on bypass mode?"
+        body="The assistant will take actions for you — navigate you around the app, fill in fields, save schools, and start applications — WITHOUT asking each time. It can never pay or submit an application. You can turn this off anytime."
+        confirmLabel="Turn on bypass"
+        destructive
+        onCancel={() => setBypassDialogOpen(false)}
+        onConfirm={enableBypass}
+      />
     </motion.aside>
   );
 }
@@ -342,13 +427,29 @@ function HistoryPanel({
   onPick,
   onNew,
   onBack,
+  onRemove,
 }: {
   threads: ChatThread[] | undefined;
   activeId?: string;
   onPick: (id: string) => void;
   onNew: () => void;
   onBack: () => void;
+  onRemove: (id: string) => void;
 }) {
+  // Which thread is pending a remove confirmation (null = dialog closed).
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  function requestRemove(id: string) {
+    if (
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(SKIP_DELETE_CONFIRM_KEY) === "1"
+    ) {
+      onRemove(id);
+      return;
+    }
+    setConfirmId(id);
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -381,32 +482,66 @@ function HistoryPanel({
             const isActive = t._id === activeId;
             return (
               <li key={t._id}>
-                <button
-                  type="button"
-                  onClick={() => onPick(t._id)}
-                  className={`w-full rounded-md border-2 px-3 py-2 text-left transition-colors ${
+                <div
+                  className={`flex items-center gap-1.5 rounded-md border-2 px-2 py-1.5 transition-colors ${
                     isActive
                       ? "border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
                       : "border-on-surface/15 bg-surface text-on-surface hover:border-on-surface"
                   }`}
                 >
-                  <p className="truncate font-[var(--font-label)] text-label-md font-semibold">
-                    {t.title?.trim() || "Untitled chat"}
-                  </p>
-                  <p className="mt-0.5 text-label-sm text-on-surface-variant">
-                    {new Date(t.updatedAt).toLocaleString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onPick(t._id)}
+                    className="min-w-0 flex-1 px-1 py-0.5 text-left"
+                  >
+                    <p className="truncate font-[var(--font-label)] text-label-md font-semibold">
+                      {t.title?.trim() || "Untitled chat"}
+                    </p>
+                    <p className="mt-0.5 text-label-sm text-on-surface-variant">
+                      {new Date(t.updatedAt).toLocaleString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Remove chat"
+                    title="Remove chat"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      requestRemove(t._id);
+                    }}
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-transparent text-on-surface-variant hover:border-on-surface hover:bg-error/10 hover:text-on-error-container"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </li>
             );
           })}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={confirmId !== null}
+        title="Remove this chat?"
+        body="This permanently deletes the conversation."
+        confirmLabel="Remove"
+        destructive
+        showDontAskAgain
+        onCancel={() => setConfirmId(null)}
+        onConfirm={(dontAskAgain) => {
+          const id = confirmId;
+          setConfirmId(null);
+          if (dontAskAgain && typeof window !== "undefined") {
+            window.localStorage.setItem(SKIP_DELETE_CONFIRM_KEY, "1");
+          }
+          if (id) onRemove(id);
+        }}
+      />
     </div>
   );
 }
@@ -568,6 +703,17 @@ function ActionCard({
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const bypass = useContext(BypassContext);
+
+  // In bypass mode a proposed card auto-confirms exactly once (no human tap).
+  const autoRanRef = useRef(false);
+  useEffect(() => {
+    if (bypass && action.status === "proposed" && !busy && !autoRanRef.current) {
+      autoRanRef.current = true;
+      void confirmAction();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bypass, action.status]);
 
   if (action.status !== "proposed") {
     return (

@@ -92,6 +92,16 @@ export function useSetActionStatus() {
   };
 }
 
+/** Permanently delete a thread and its messages (owner-checked server-side). */
+export function useDeleteThread() {
+  const m = useMutation(api.chat.deleteThread);
+  const { token } = useAuth();
+  return async (threadId: string) => {
+    if (!token) throw new Error("Sign in");
+    await m({ token, threadId } as never);
+  };
+}
+
 /** Reactive: agent jobs for a thread (newest activity surfaces live). */
 export function useAgentJobsForThread(threadId: string | undefined): AgentJob[] | undefined {
   const { token } = useAuth();
