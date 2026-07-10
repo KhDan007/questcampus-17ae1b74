@@ -29,7 +29,7 @@ function UnlockSuccessPage() {
   const [slow, setSlow] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
   const slowTimer = useRef<number | null>(null);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const reduce = useReducedMotion();
 
   const { isAdmin } = useAuth();
@@ -60,7 +60,7 @@ function UnlockSuccessPage() {
       try {
         const sessionId = getSessionId();
         if (!sessionId || !token) return;
-        await recommend({ sessionId, token, plan: "paid", force: true });
+        await recommend({ sessionId, token, plan: "paid", force: true, lang });
         if (!cancelled) {
           setPrimed(true);
           setTimeout(() => navigate({ to: "/universities", search: { q: "" } }), 800);
@@ -72,7 +72,7 @@ function UnlockSuccessPage() {
     return () => {
       cancelled = true;
     };
-  }, [isPaid, primed, recommend, token, navigate]);
+  }, [isPaid, primed, recommend, token, navigate, lang]);
 
   const onRetry = () => {
     setSlow(false);

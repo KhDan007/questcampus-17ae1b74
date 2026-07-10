@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth/client";
 import { resolveConvexSiteUrl } from "@/lib/backend";
+import { getCurrentLang, i18nHeaders } from "@/lib/i18n/I18nProvider";
 import { getSessionId } from "@/lib/onboarding/session";
 
 function base(): string {
@@ -19,12 +20,13 @@ export async function joinWaitlist(
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    ...i18nHeaders(),
   };
   if (session?.token) {
     headers["Authorization"] = `Bearer ${session.token}`;
   }
 
-  const body: Record<string, unknown> = { email };
+  const body: Record<string, unknown> = { email, lang: getCurrentLang() };
   if (opts?.name) body.name = opts.name;
   if (opts?.why) body.why = opts.why;
   if (sessionId) body.sessionId = sessionId;
@@ -44,10 +46,7 @@ export async function joinWaitlist(
   }
 
   if (!res.ok) {
-    const message =
-      json && typeof json === "object" && "error" in json && typeof (json as { error?: unknown }).error === "string"
-        ? (json as { error: string }).error
-        : `Request failed (${res.status})`;
+    const message = localizedError(json, `Request failed (${res.status})`);
     return { ok: false, error: message };
   }
 
@@ -60,4 +59,15 @@ export async function joinWaitlist(
   }
 
   return { ok: false, error: "Unexpected response" };
+}
+
+function localizedError(json: unknown, fallback: string): string {
+  if (!json || typeof json !== "object") return fallback;
+  const i18n = (json as { errorI18n?: unknown }).errorI18n;
+  if (i18n && typeof i18n === "object") {
+    const translated = (i18n as Record<string, unknown>)[getCurrentLang()];
+    if (typeof translated === "string" && translated) return translated;
+  }
+  const error = (json as { error?: unknown }).error;
+  return typeof error === "string" && error ? error : fallback;
 }

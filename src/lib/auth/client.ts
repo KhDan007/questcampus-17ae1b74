@@ -5,6 +5,7 @@
 // Referral system removed.
 
 import { resolveConvexSiteUrl } from "@/lib/backend";
+import { getCurrentLang, i18nHeaders } from "@/lib/i18n/I18nProvider";
 
 const TOKEN_KEY = "qc.auth.token";
 const USER_KEY = "qc.auth.user";
@@ -16,6 +17,7 @@ export type AuthUser = {
   avatarUrl?: string | null;
   paid?: boolean;
   hadTrial?: boolean;
+  lang?: string | null;
   emailVerified?: boolean;
 };
 
@@ -38,7 +40,7 @@ function base(): string {
 async function post<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${base()}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...i18nHeaders() },
     body: JSON.stringify(body),
   });
   const text = await res.text();
@@ -49,13 +51,22 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     /* non-JSON response */
   }
   if (!res.ok) {
-    const message =
-      (json && typeof json === "object" && "error" in json && typeof (json as { error?: unknown }).error === "string"
-        ? (json as { error: string }).error
-        : null) ?? `Request failed (${res.status})`;
+    const message = localizedError(json, `Request failed (${res.status})`);
     throw new Error(message);
   }
   return json as T;
+}
+
+function localizedError(json: unknown, fallback: string): string {
+  if (!json || typeof json !== "object") return fallback;
+  const lang = getCurrentLang();
+  const i18n = (json as { errorI18n?: unknown }).errorI18n;
+  if (i18n && typeof i18n === "object") {
+    const translated = (i18n as Record<string, unknown>)[lang];
+    if (typeof translated === "string" && translated) return translated;
+  }
+  const error = (json as { error?: unknown }).error;
+  return typeof error === "string" && error ? error : fallback;
 }
 
 // ── Reactive store ──────────────────────────────────────────────────────────
@@ -108,6 +119,7 @@ export const auth = {
       email,
       password,
       name,
+      lang: getCurrentLang(),
     });
     saveSession(session);
     return session;
@@ -121,13 +133,17 @@ export const auth = {
   },
 
   async startGoogle(returnUrl: string): Promise<{ authorizationUrl: string }> {
-    return post<{ authorizationUrl: string }>("/api/auth/google/start", { returnUrl });
+    return post<{ authorizationUrl: string }>("/api/auth/google/start", {
+      returnUrl,
+      lang: getCurrentLang(),
+    });
   },
 
   async exchangeGoogleCode(code: string, state: string): Promise<AuthSession> {
     const session = await post<AuthSession>("/api/auth/google/callback", {
       code,
       state,
+      lang: getCurrentLang(),
     });
     saveSession(session);
     return session;
@@ -163,13 +179,14 @@ export const auth = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...i18nHeaders(),
         Authorization: `Bearer ${token}`,
       },
       body: "{}",
     });
     const body = await res.json().catch(() => ({}));
     if (res.status === 429) {
-      return { error: body?.error ?? "Too many requests.", retryAfter: body?.retryAfter };
+      return { error: localizedError(body, "Too many requests."), retryAfter: body?.retryAfter };
     }
     return body ?? {};
   },
@@ -185,6 +202,7 @@ export const auth = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...i18nHeaders(),
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ code }),
@@ -196,7 +214,7 @@ export const auth = {
     return {
       ok: false,
       status: res.status,
-      error: body?.error ?? "Verification failed.",
+      error: localizedError(body, "Verification failed."),
       attemptsLeft: body?.attemptsLeft,
       expired: body?.expired,
       locked: body?.locked,

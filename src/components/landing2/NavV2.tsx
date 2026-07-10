@@ -9,6 +9,7 @@ import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
 import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
+import { LanguageSwitcher } from "@/lib/i18n/LanguageSwitcher";
 
 
 export function NavV2() {
@@ -111,6 +112,9 @@ export function NavV2() {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden sm:block">
+              <LanguageSwitcher compact />
+            </div>
             {showStartButton && (
               <a
                 href={startHref}
@@ -173,6 +177,9 @@ export function NavV2() {
                 </div>
 
                 <nav className="flex flex-col gap-1">
+                  <div className="px-3 py-2">
+                    <LanguageSwitcher />
+                  </div>
                   <MobileLink to="/" icon={Home} label="Home" active={isLanding} onClick={() => setMobileOpen(false)} />
                   {isAuthenticated && (
                     <MobileLink to="/agent" icon={Sparkles} label="Agent" active={pathname.startsWith("/agent")} onClick={() => setMobileOpen(false)} />

@@ -28,6 +28,7 @@ import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { shareLinkFor } from "@/lib/referral/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Your profile — QuestCampus" }] }),
@@ -58,6 +59,7 @@ const BUCKET_LABEL: Record<NonNullable<RecRow["bucket"]>, { label: string; chip:
 function ProfilePage() {
   const reduce = useReducedMotion();
   const { user, isAuthenticated, isAdmin, token } = useAuth();
+  const { lang } = useI18n();
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [recs, setRecs] = useState<RecRow[] | null>(null);
@@ -78,7 +80,7 @@ function ProfilePage() {
     try {
       // Try paid first if signed in; fall back to free.
       if (token) {
-        const paid = (await recommend({ sessionId, token, plan: "paid", force: false })) as
+        const paid = (await recommend({ sessionId, token, plan: "paid", force: false, lang })) as
           | PaidPayload
           | { error: string; results: never[] };
         if (!("error" in paid)) {
@@ -95,6 +97,7 @@ function ProfilePage() {
         token: token ?? undefined,
         plan: "free",
         force: false,
+        lang,
       })) as FreePayload | { error: string; results: never[] };
       if ("error" in free) {
         setRecStatus("error");
@@ -105,7 +108,7 @@ function ProfilePage() {
     } catch {
       setRecStatus("error");
     }
-  }, [recommend, sessionId, token]);
+  }, [recommend, sessionId, token, lang]);
 
   useEffect(() => {
     void loadRecs();

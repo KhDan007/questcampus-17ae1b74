@@ -5,7 +5,7 @@ import type { LangCode } from "./languages";
 
 export type Dict = Record<string, string>;
 
-export const TRANSLATIONS: Record<LangCode, Dict> = {
+export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
   en: {
     "nav.signin": "Sign in",
     "nav.getStarted": "Get started →",

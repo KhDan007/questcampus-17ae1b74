@@ -30,6 +30,7 @@ import { RefineRecommendationsCard } from "@/components/universities/RefineRecom
 import { useProgress } from "@/lib/progress";
 import { ApplyButton } from "@/components/apply/ApplyButton";
 import { LiveResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 
 export const Route = createFileRoute("/universities")({
@@ -95,6 +96,7 @@ function UniversitiesPage() {
   const initial = Route.useSearch();
   const navigate = Route.useNavigate();
   const { user, token, isAdmin, isAuthenticated } = useAuth();
+  const { lang } = useI18n();
   const progress = useProgress();
 
   // Entitlement (live)
@@ -146,6 +148,7 @@ function UniversitiesPage() {
           token: token ?? undefined,
           plan: "free",
           force,
+          lang,
         })) as FreePayload | { error: string; results: never[] };
         if ("error" in res && res.error) {
           setFreeStatus("error");
@@ -157,7 +160,7 @@ function UniversitiesPage() {
         setFreeStatus("error");
       }
     },
-    [recommend, sessionId, token],
+    [recommend, sessionId, token, lang],
   );
 
   const loadPaid = useCallback(
@@ -170,6 +173,7 @@ function UniversitiesPage() {
           token,
           plan: "paid",
           force,
+          lang,
         })) as PaidPayload | PaymentRequired;
         if ("error" in res && res.error === "payment_required") {
           setPaid(null);
@@ -182,7 +186,7 @@ function UniversitiesPage() {
         setPaidStatus("error");
       }
     },
-    [recommend, sessionId, token],
+    [recommend, sessionId, token, lang],
   );
 
   // Free users load free recommendations; paid users skip free entirely.

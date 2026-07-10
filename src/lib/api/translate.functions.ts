@@ -7,16 +7,14 @@ import { z } from "zod";
 
 const LANG_NAMES: Record<string, string> = {
   en: "English",
-  es: "Spanish",
-  zh: "Simplified Chinese",
-  hi: "Hindi",
-  ar: "Arabic",
-  pt: "Portuguese (Brazilian)",
   ru: "Russian",
-  fr: "French",
-  de: "German",
   kk: "Kazakh",
 };
+
+const LOVABLE_API_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const LOVABLE_MODEL = "google/gemini-2.5-flash";
+const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const OPENAI_MODEL = "gpt-5.4-mini";
 
 export const translateTexts = createServerFn({ method: "POST" })
   .inputValidator(
@@ -29,10 +27,12 @@ export const translateTexts = createServerFn({ method: "POST" })
     if (data.targetLang === "en") {
       return { translations: data.texts };
     }
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env.LOVABLE_API_KEY ?? process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return { translations: data.texts };
     }
+    const apiUrl = process.env.LOVABLE_API_KEY ? LOVABLE_API_URL : OPENAI_API_URL;
+    const model = process.env.LOVABLE_API_KEY ? LOVABLE_MODEL : OPENAI_MODEL;
     const langName = LANG_NAMES[data.targetLang] ?? data.targetLang;
     const system = `You are a professional translator. Translate every string in the provided JSON array into ${langName}.
 - Return ONLY a JSON object: {"items":[...]} — same order, same length, translated values.
@@ -42,27 +42,24 @@ export const translateTexts = createServerFn({ method: "POST" })
 - Tone: warm, friendly, concise, second-person.`;
 
     try {
-      const res = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [
-              { role: "system", content: system },
-              {
-                role: "user",
-                content: JSON.stringify({ items: data.texts }),
-              },
-            ],
-            response_format: { type: "json_object" },
-          }),
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
         },
-      );
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: system },
+            {
+              role: "user",
+              content: JSON.stringify({ items: data.texts }),
+            },
+          ],
+          response_format: { type: "json_object" },
+        }),
+      });
       if (!res.ok) return { translations: data.texts };
       const json = (await res.json()) as {
         choices?: { message?: { content?: string } }[];

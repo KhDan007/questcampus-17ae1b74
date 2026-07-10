@@ -877,9 +877,11 @@ function MessageRow({
         }`}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          <p data-i18n-skip="true" className="whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
         ) : (
-          <div className="break-words">
+          <div data-i18n-skip="true" className="break-words">
             {message.steps?.length ? (
               <p className="mb-1 truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
                 {message.steps.join(" · ")}

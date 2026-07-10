@@ -20,6 +20,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { LogOut, Sparkles, UserRound } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import { LanguageSwitcher } from "@/lib/i18n/LanguageSwitcher";
 
 export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal" }) {
   const reduce = useReducedMotion();
@@ -54,6 +55,7 @@ export function NavBar({ variant = "landing" }: { variant?: "landing" | "minimal
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher compact />
           {isAuthenticated && user ? (
             <UserMenu user={user} />
           ) : variant === "landing" ? (
