@@ -17,6 +17,7 @@ import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
 import { ChatDockProvider } from "@/lib/chat/ChatDock";
+import { LangSync } from "@/lib/i18n/LangSync";
 import { useAuth } from "@/lib/auth/useAuth";
 
 // Core workspace routes to warm up after first paint for signed-in users, so
@@ -236,6 +237,7 @@ function RootComponent() {
               <Outlet />
             </RouteTransitions>
             <EmailVerifyGate />
+            <LangSync />
             <AssistantSidebar />
           </ChatDockProvider>
         </I18nProvider>

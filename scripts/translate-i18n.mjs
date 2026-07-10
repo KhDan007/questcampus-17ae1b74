@@ -47,6 +47,7 @@ const VISIBLE_PROP_NAMES = new Set([
   "eyebrow",
   "helper",
   "headline",
+  "hint",
   "label",
   "message",
   "microcopy",
