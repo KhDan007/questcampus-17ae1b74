@@ -3,6 +3,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
+import { useAuth } from "@/lib/auth/useAuth";
 
 /**
  * Signed-out demo call-to-action. The demo needs an account to run against the
@@ -11,6 +12,7 @@ import { ArrowRight, Play } from "lucide-react";
  */
 export function DemoStrip() {
   const reduce = useReducedMotion();
+  const { isAuthenticated } = useAuth();
   return (
     <section className="relative px-4 py-12 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-(--container-content)">
@@ -39,8 +41,8 @@ export function DemoStrip() {
             </div>
           </div>
           <Link
-            to="/signin"
-            search={{ redirect: "/onboarding?next=demo" } as never}
+            to={isAuthenticated ? "/demo" : "/signin"}
+            search={(isAuthenticated ? undefined : { redirect: "/onboarding?next=demo" }) as never}
             className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-6 py-3.5 font-display text-headline-sm font-bold text-tertiary qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
             Watch it apply <ArrowRight className="h-5 w-5" />

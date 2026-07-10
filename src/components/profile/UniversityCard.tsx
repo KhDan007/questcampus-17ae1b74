@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+import { WhyReasons } from "@/components/common/WhyReasons";
+import { askAssistant } from "@/lib/assistant";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useAutoTranslate } from "@/lib/i18n/useAutoTranslate";
 import { EnrichmentDetails } from "./EnrichmentDetails";
@@ -126,12 +129,11 @@ export function UniversityCard({
         </span>
       </div>
 
-      {/* Why this matches (auto-translated AI copy) */}
+      {/* Why this matches (auto-translated AI copy) — concise reasons as bullets */}
       {card.why && (
-        <p className="mt-4 rounded-lg bg-primary-fixed/40 p-3.5 text-body-md leading-relaxed text-on-surface">
-          <span className="mr-1.5">✨</span>
-          {translatedWhy ?? card.why}
-        </p>
+        <div className="mt-4 rounded-lg bg-primary-fixed/40 p-3.5 text-body-md leading-relaxed text-on-surface">
+          <WhyReasons why={translatedWhy ?? card.why} />
+        </div>
       )}
 
       {/* Requirements / stats grid */}
@@ -169,6 +171,15 @@ export function UniversityCard({
           >
             {open ? t("enrich.hide") : t("enrich.show")}
             <span aria-hidden>{open ? "▲" : "▼"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              askAssistant(`Is ${card.name} a good fit for me? Give me the key pros and cons for my profile.`)
+            }
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-5 text-label-md font-medium text-on-surface transition-colors hover:bg-surface-container"
+          >
+            <Sparkles className="h-4 w-4" /> Ask AI
           </button>
           <RecommendationSaveToggle source={card.source ?? "scorecard"} externalId={card.externalId} />
           {onDismiss && (

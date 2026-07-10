@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/lib/auth/useAuth";
+import { ASSISTANT_ASK_EVENT } from "@/lib/assistant";
 import { Markdown } from "@/components/common/Markdown";
 import {
   useChatThreads,
@@ -43,6 +44,26 @@ const SUGGESTIONS = [
 export function AssistantSidebar() {
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
+  // A monotonic id makes each ask distinct (repeat asks about the same school
+  // still fire; the panel dedups on id so a dev double-invoke can't double-send).
+  const [pending, setPending] = useState<{ prompt: string; id: number } | null>(null);
+  const askIdRef = useRef(0);
+
+  // Any component can open the assistant with a seeded question (e.g. "Ask AI"
+  // on a match card) by dispatching the ASSISTANT_ASK_EVENT window event.
+  useEffect(() => {
+    const onAsk = (e: Event) => {
+      const prompt = (e as CustomEvent<{ prompt?: string }>).detail?.prompt;
+      if (typeof prompt === "string" && prompt.trim()) {
+        askIdRef.current += 1;
+        setPending({ prompt: prompt.trim(), id: askIdRef.current });
+        setOpen(true);
+      }
+    };
+    window.addEventListener(ASSISTANT_ASK_EVENT, onAsk);
+    return () => window.removeEventListener(ASSISTANT_ASK_EVENT, onAsk);
+  }, []);
+
   if (!isAuthenticated) return null;
   return (
     <>
@@ -67,14 +88,29 @@ export function AssistantSidebar() {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {open && <SidebarPanel key="panel" onClose={() => setOpen(false)} />}
+        {open && (
+          <SidebarPanel
+            key="panel"
+            onClose={() => setOpen(false)}
+            initialPrompt={pending}
+            onConsumed={() => setPending(null)}
+          />
+        )}
       </AnimatePresence>
     </>
   );
 }
 
 
-function SidebarPanel({ onClose }: { onClose: () => void }) {
+function SidebarPanel({
+  onClose,
+  initialPrompt,
+  onConsumed,
+}: {
+  onClose: () => void;
+  initialPrompt?: { prompt: string; id: number } | null;
+  onConsumed?: () => void;
+}) {
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [forceNew, setForceNew] = useState(false);
@@ -85,6 +121,7 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const seededIdRef = useRef<number>(-1);
 
 
   const latestAssistant = useMemo(
@@ -114,6 +151,16 @@ function SidebarPanel({ onClose }: { onClose: () => void }) {
       setSending(false);
     }
   }
+
+  // Auto-send a seeded prompt (from an "Ask AI" card action) exactly once per ask.
+  useEffect(() => {
+    if (initialPrompt && seededIdRef.current !== initialPrompt.id) {
+      seededIdRef.current = initialPrompt.id;
+      void submit(initialPrompt.prompt);
+      onConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPrompt]);
 
   function newChat() {
     setForceNew(true);

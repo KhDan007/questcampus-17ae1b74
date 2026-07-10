@@ -4,6 +4,8 @@ import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, Award, GraduationCap, AlertCircle, LayoutDashboard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
+import { WhyReasons } from "@/components/common/WhyReasons";
+import { askAssistant } from "@/lib/assistant";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -340,6 +342,7 @@ function MatchCard({
 }) {
   const style = BUCKET_STYLES[match.bucket];
   const Icon = style.icon;
+  const { isAuthenticated } = useAuth();
 
   return (
     <motion.article
@@ -364,22 +367,37 @@ function MatchCard({
         {match.location}
       </p>
 
-      <p className="mt-4 flex-1 text-body-md text-on-surface/80">{match.why}</p>
+      <div className="mt-4 flex-1">
+        <WhyReasons why={match.why} className="text-body-sm text-on-surface/80" />
+      </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-on-surface/10 pt-4">
         <span className="rounded-md bg-secondary-container/40 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-container">
           {match.tag}
         </span>
-        {!locked && normalizeUrl(match.website) && (
-          <a
-            href={normalizeUrl(match.website)!}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
-          >
-            Official site <ArrowRight className="h-3 w-3" />
-          </a>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {!locked && isAuthenticated && (
+            <button
+              type="button"
+              onClick={() =>
+                askAssistant(`Is ${match.name} a good fit for me? Give me the key pros and cons for my profile.`)
+              }
+              className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Ask AI
+            </button>
+          )}
+          {!locked && normalizeUrl(match.website) && (
+            <a
+              href={normalizeUrl(match.website)!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+            >
+              Official site <ArrowRight className="h-3 w-3" />
+            </a>
+          )}
+        </div>
       </div>
     </motion.article>
   );
