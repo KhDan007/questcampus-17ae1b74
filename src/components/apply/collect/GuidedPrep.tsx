@@ -278,7 +278,11 @@ function AllRequirements({
   plan: IntakePlan | undefined;
   onChange: (conceptKey: string, value: string) => void;
 }) {
+  const { rescan, isRescanning } = useRescanRequirements();
   if (!plan) return null;
+  const coverageByKey = new Map(
+    (plan.targets ?? []).map((t) => [`${t.system}::${t.externalId}`, t.coverage]),
+  );
   return (
     <div className="space-y-3">
       <RequirementsZone
@@ -290,16 +294,22 @@ function AllRequirements({
         }}
         defaultOpen
       />
-      {(plan.specific ?? []).map((s) => (
-        <RequirementsZone
-          key={`${s.system}::${s.externalId}`}
-          title={s.name}
-          items={s.items ?? []}
-          onChange={(item, value) => {
-            if (item.conceptKey) onChange(item.conceptKey, value);
-          }}
-        />
-      ))}
+      {(plan.specific ?? []).map((s) => {
+        const key = `${s.system}::${s.externalId}`;
+        return (
+          <RequirementsZone
+            key={key}
+            title={s.name}
+            items={s.items ?? []}
+            coverage={coverageByKey.get(key)}
+            onChange={(item, value) => {
+              if (item.conceptKey) onChange(item.conceptKey, value);
+            }}
+            onRescan={() => void rescan(s.system, s.externalId)}
+            rescanning={isRescanning(s.system, s.externalId)}
+          />
+        );
+      })}
     </div>
   );
 }
