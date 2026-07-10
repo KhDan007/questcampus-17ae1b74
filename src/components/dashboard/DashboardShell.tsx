@@ -12,6 +12,7 @@ import {
   CalendarClock,
   ClipboardList,
   Send,
+  MessageSquare,
   Settings as SettingsIcon,
   Sparkles,
   Crown,
@@ -508,6 +509,21 @@ function SidebarBody({
             )}
           </Link>
         )}
+        <Link
+          to="/feedback"
+          title={collapsed ? "Send feedback" : undefined}
+          aria-label={collapsed ? "Send feedback" : undefined}
+          className={`flex items-center gap-3 rounded-lg font-[var(--font-label)] text-label-md font-semibold transition-all ${
+            collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
+          } ${
+            pathname.startsWith("/feedback")
+              ? "border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
+              : "border-2 border-transparent text-on-surface/75 hover:bg-on-surface/5 hover:text-on-surface"
+          }`}
+        >
+          <MessageSquare className="h-4 w-4 shrink-0" />
+          {!collapsed && "Send feedback"}
+        </Link>
         <Link
           to="/profile"
           title={collapsed ? "Settings" : undefined}

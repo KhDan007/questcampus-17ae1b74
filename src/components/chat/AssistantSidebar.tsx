@@ -1206,10 +1206,27 @@ async function navigateInternal(
     });
     return;
   }
-  // Plain top-level routes
-  const known = new Set(["dashboard", "apply", "essay", "profile"]);
+  // Plain top-level routes the agent is allowed to send the user to. Mirrors the
+  // routes named in the agent prompt (prompt.py "Take the student to the right
+  // screen") so every proposed navigate card actually resolves.
+  const known = new Set([
+    "dashboard",
+    "apply",
+    "essay",
+    "profile",
+    "feedback",
+    "extension",
+    "common-app",
+    "plan",
+    "agent",
+    "documents",
+    "unlock",
+  ]);
   if (segs.length === 1 && known.has(segs[0])) {
-    await navigate({ to: `/${segs[0]}` as never });
+    await navigate({
+      to: `/${segs[0]}` as never,
+      ...(search.source ? { search: { source: search.source } as never } : {}),
+    });
     return;
   }
   throw new Error(`Route not allowed: ${route}`);

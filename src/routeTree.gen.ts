@@ -16,6 +16,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as EssayRouteImport } from './routes/essay'
 import { Route as DocumentsRouteImport } from './routes/documents'
@@ -67,6 +68,11 @@ const PlanRoute = PlanRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtensionRoute = ExtensionRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
+  '/feedback': typeof FeedbackRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
+  '/feedback': typeof FeedbackRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/documents': typeof DocumentsRouteWithChildren
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
+  '/feedback': typeof FeedbackRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/essay'
     | '/extension'
+    | '/feedback'
     | '/onboarding'
     | '/plan'
     | '/prep'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/essay'
     | '/extension'
+    | '/feedback'
     | '/onboarding'
     | '/plan'
     | '/prep'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/essay'
     | '/extension'
+    | '/feedback'
     | '/onboarding'
     | '/plan'
     | '/prep'
@@ -326,6 +338,7 @@ export interface RootRouteChildren {
   DocumentsRoute: typeof DocumentsRouteWithChildren
   EssayRoute: typeof EssayRoute
   ExtensionRoute: typeof ExtensionRoute
+  FeedbackRoute: typeof FeedbackRoute
   OnboardingRoute: typeof OnboardingRoute
   PlanRoute: typeof PlanRoute
   PrepRoute: typeof PrepRoute
@@ -391,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extension': {
@@ -537,6 +557,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocumentsRoute: DocumentsRouteWithChildren,
   EssayRoute: EssayRoute,
   ExtensionRoute: ExtensionRoute,
+  FeedbackRoute: FeedbackRoute,
   OnboardingRoute: OnboardingRoute,
   PlanRoute: PlanRoute,
   PrepRoute: PrepRoute,
@@ -555,3 +576,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
