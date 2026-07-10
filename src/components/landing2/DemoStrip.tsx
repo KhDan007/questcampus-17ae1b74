@@ -22,26 +22,26 @@ export function DemoStrip() {
           className="flex flex-col items-start gap-5 rounded-xl border-2 border-on-surface bg-tertiary p-6 qc-hard-shadow sm:flex-row sm:items-center sm:justify-between sm:p-8"
         >
           <div className="flex items-start gap-4">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-tertiary qc-hard-shadow-sm">
               <Play className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+              <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-white/80">
                 See it work
               </p>
-              <h2 className="mt-0.5 font-display text-headline-lg font-bold text-on-surface">
+              <h2 className="mt-0.5 font-display text-headline-lg font-bold text-white">
                 Watch it apply to 3 universities
               </h2>
-              <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">
+              <p className="mt-1 max-w-xl text-body-md text-white/90">
                 We open a live browser and fill three real application portals from your answers.
-                Nothing is submitted. Create a free account to run it on your own profile.
+                Nothing is submitted. Free to run on your own profile.
               </p>
             </div>
           </div>
           <Link
             to="/signin"
             search={{ redirect: "/onboarding?next=demo" } as never}
-            className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-6 py-3.5 font-display text-headline-sm font-bold text-tertiary qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
           >
             Watch it apply <ArrowRight className="h-5 w-5" />
           </Link>

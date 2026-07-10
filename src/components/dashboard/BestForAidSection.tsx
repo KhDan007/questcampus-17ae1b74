@@ -151,7 +151,7 @@ function EmptyState({ hasSaved }: { hasSaved: boolean }) {
   if (!hasSaved) {
     return (
       <div className="flex flex-col items-start gap-3 rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4 sm:flex-row sm:items-center sm:p-5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface qc-hard-shadow-sm">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-tertiary qc-hard-shadow-sm">
           <PiggyBank className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
