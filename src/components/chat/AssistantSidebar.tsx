@@ -16,6 +16,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { ASSISTANT_ASK_EVENT } from "@/lib/assistant";
 import { Markdown } from "@/components/common/Markdown";
@@ -122,6 +124,11 @@ function SidebarPanel({
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededIdRef = useRef<number>(-1);
+  const { token } = useAuth();
+  const credits = useQuery(
+    api.agentCredits.credits,
+    token ? { token } : "skip",
+  ) as { remaining: number; grant: number; resetsAt: number; tier: string } | undefined;
 
 
   const latestAssistant = useMemo(
@@ -194,8 +201,26 @@ function SidebarPanel({
           <Sparkles className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-display text-label-md font-bold text-on-surface">Assistant</p>
-          <p className="text-label-sm text-on-surface-variant">Grounded in your app data - actions confirm first</p>
+          <div className="flex items-center gap-2">
+            <p className="font-display text-label-md font-bold text-on-surface">Assistant</p>
+            {credits && (
+              <span
+                title={
+                  credits.remaining <= 0
+                    ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+                    : `${credits.remaining} of ${credits.grant} left — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+                }
+                className={`shrink-0 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
+                  credits.remaining <= 0
+                    ? "border-on-surface/30 bg-on-surface/5 text-on-surface-variant"
+                    : "border-primary/30 bg-primary/10 text-primary"
+                }`}
+              >
+                {credits.remaining} credits
+              </span>
+            )}
+          </div>
+          <p className="truncate text-label-sm text-on-surface-variant">Grounded in your app data - actions confirm first</p>
         </div>
         <button
           type="button"
