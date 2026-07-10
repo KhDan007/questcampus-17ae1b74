@@ -12,9 +12,10 @@ type Props = {
   entitlement: AutoApplyEntitlement | undefined;
   percent: number;
   readyTargets: BackendTarget[];
+  hiddenIncompleteCount?: number;
 };
 
-export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
+export function LaunchBar({ entitlement, percent, readyTargets, hiddenIncompleteCount = 0 }: Props) {
   const navigate = useNavigate();
   const applyGate = useAutoApplyGate();
   const freeHook = useFreeHook();
