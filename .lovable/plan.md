@@ -1,56 +1,57 @@
-# Diagnosis — dashboard white-screens after filling application info
+# Surface requirement `coverage` honestly on the intake view
 
-No code changes. Findings below map to your numbered questions.
+## Goal
+Stop presenting thin/empty requirement sets as complete. Read the backend's per-target `coverage` (`"full" | "partial" | "error" | undefined`) from the existing `applications.intakePlan` query and reflect it in the UI, with a way to re-scan.
 
-## 1. Where the mutation fires
+## Where it plugs in
 
-The only place the user can fill "application info" that reaches the dashboard is `DashboardPrepSection` → `CollectWorkspace` (`src/routes/dashboard.tsx:281–283` → `src/components/apply/collect/CollectWorkspace.tsx`).
+- Data source (unchanged): `useIntakePlan(targets)` → `api.applications.intakePlan` in `src/lib/apply/intake.ts`. No new query.
+- Rendering: per-university card in `src/components/apply/collect/GuidedPrep.tsx` (`AllRequirements` → `RequirementsZone`) and the "researching…" fallback in `src/components/apply/collect/CollectWorkspace.tsx`.
 
-- `RequirementField` (`RequirementsZone.tsx:80`) → `onChange` → `CollectWorkspace.tsx:144, 182` → `setAnswer(conceptKey, value)` from `useSetAnswer` (`src/lib/apply/intake.ts:130–158`), debounced 400 ms → `api.applications.setAnswer` (`intake.ts:150`). Writes to `applicationAnswers`.
-- `EligibilityCard` (`EligibilityCard.tsx:29`) → `onChange` → `CollectWorkspace.tsx:135` → `answerEligibility(askKey, value)` from `useAnswerEligibility` (`intake.ts:164–190`), debounced 400 ms → `api.applications.answerEligibility` (`intake.ts:170`). Buffer never cleared (`intake.ts:181`) — sends the *accumulated* answers object every subsequent call. Rewrites the onboarding profile → `profileHash` moves.
+## Type changes (`src/lib/apply/intake.ts`)
 
-## 2. Reactive dashboard queries that depend on those writes
+Extend the types to carry what the backend already sends:
 
-All args are `{ token, targets }` where each `target = { system, externalId, name }` (only 3 fields; no extras leak — verified at `dashboard.tsx:605–613, 632–640, 726–734, 799–807` and `intake.ts:9–11` `selectionToTargets`). So hypothesis 3(a) — strict arg validator throw — is **not** the cause.
+- `IntakeTarget` → add `coverage?: "full" | "partial" | "error"` and (if backend exposes it) `status?: string`, `lastCrawledAt?: number`.
+- `IntakePlan["specific"][number]` → same `coverage?` field, so the per-university group carries it alongside `items`.
 
-Subscribed on the dashboard (all inside `SilentErrorBoundary`, so a throw here disappears the *section* silently and looks like "the dashboard broke"):
+No behavior change from the type edits alone — everything downstream is additive.
 
-| Component | Query | Depends on |
-| --- | --- | --- |
-| `StatBar` (`dashboard.tsx:735`) | `api.applications.intakePlan` | answers |
-| `YourPicksSection` (`dashboard.tsx:641`) | `api.applications.intakePlan` | answers |
-| `TaskRail` (`dashboard.tsx:808`) | `api.applications.intakePlan` | answers |
-| `DashboardPrepSection` → `CollectWorkspace` (`CollectWorkspace.tsx:35–38`) | `intakePlan`, `eligibilityForTargets`, `checklistForTargets`, `autoApplyEntitlement` | answers + onboarding profile |
-| `NextProductiveAction` (unused on dashboard now, but wired via `useApplicationDocuments`) | `api.applicationDocuments.list` | not affected |
+## UI: coverage badge + notice on each university card
 
-Not reactive: `useActiveApplyJob` (one-shot `client.query` in `useEffect`, `applyQueue/client.ts:96–121`) and the recommendations action (`dashboard.tsx:144, 160`) — a `useAction` in a `useEffect` gated on `[sessionId, isAuthenticated, token, ...]`, not on profileHash. So hypothesis (4) — the dashboard reactively consuming a nulled `recommendations` cache — is **not** the cause. Recommendations only refetch on `?refresh=1` or first mount.
+In `RequirementsZone` (or a thin wrapper around it in `GuidedPrep.AllRequirements`), render next to the university title:
 
-## 3. What actually throws — most-likely root cause
+| Coverage        | Badge                        | Tone                    |
+| --------------- | ---------------------------- | ----------------------- |
+| `"full"`        | "Verified requirements"      | success / tertiary      |
+| `"partial"`     | "Partial — may be incomplete"| warning / amber         |
+| `"error"`       | "Not captured yet"           | error / muted           |
+| `undefined`     | "Gathering…"                 | neutral + spinner       |
 
-**`src/components/apply/collect/CollectWorkspace.tsx:57–67` — the `readyTargets` `useMemo`, specifically line 65:**
+When coverage is anything other than `"full"`, show an inline notice block above the items list:
 
-```ts
-return (c?.checklist.ready ?? false) && e?.verdict !== "ineligible";
-```
+> "We haven't fully captured this university's requirements yet. The list below may be incomplete — don't treat it as the full application. [Re-scan requirements]"
 
-`c` is a `checklist.perTarget[i]` entry. The `ChecklistResult` type in `intake.ts:98–107` declares `checklist: { ready: boolean; [k]: unknown }`, but backend `checklistForTargets` returns per-target entries for **still-researching** targets where `found: false` and `checklist` is `undefined` (there is no requirements set to evaluate yet). Before the first `setAnswer` / `answerEligibility` fires, `checklist` is `undefined` (still loading) → `c` is `undefined` via optional chaining → the expression short-circuits to `false` → no throw.
+For `"error"` / empty `items`, replace the list with an empty-state that says the same thing more strongly and hides the "X of Y answered" progress so an empty catalog can't read as "0/0 done → ready".
 
-The moment `setAnswer` (or `answerEligibility`) resolves, Convex reactively re-runs `checklistForTargets`. Now it returns a populated `perTarget` array that *includes* the `found:false` entries with a missing/undefined `checklist`. `c` becomes truthy, `c?.checklist` becomes `undefined`, and `.ready` throws:
+## LaunchBar / readiness guard
 
-```
-TypeError: Cannot read properties of undefined (reading 'ready')
-```
+In `CollectWorkspace.tsx`, exclude any target whose `coverage !== "full"` from `readyTargets`. Even if `checklist.ready === true` for a thin set, we must not offer "Apply" for a university we haven't fully captured. Show a small helper line in `LaunchBar` explaining why the count is lower ("N university hidden — requirements not fully captured yet").
 
-Thrown during the `useMemo` computation → propagates through render → caught by the `<SilentErrorBoundary>` around `DashboardPrepSection` (`dashboard.tsx:281–283`). The whole Prep column collapses to `null`, which — because the user was typing in it — looks like "the dashboard broke / white-screened / crashed".
+Progress percentage in the header should also be computed only over `full`-coverage targets, otherwise a 1-field partial catalog inflates the "answered %".
 
-The identical pattern in `ReadinessRail.tsx:47–52` (`c?.checklist.ready`, `c?.found`) shares the same failure mode inside the same subtree, guaranteeing a throw somewhere in that render pass even if the memo is skipped.
+## Re-scan action
 
-## 4. Recommendations cache / profileHash
+Add a "Re-scan requirements" button in the per-university card and the empty/error state. Wire it to whatever the corresponding Convex mutation is (candidates: `applications.rescanRequirements`, `universities.recrawl`, or the existing research/deep-crawl trigger — I'll grep for the actual name during implementation; if none exists yet, this becomes a backend follow-up and the button is disabled with a "we're re-crawling this university" note when `coverage === "error"`).
 
-Not consumed reactively on the dashboard. `answerEligibility` does change `profileHash` server-side, but the dashboard's `recs` are pulled once via an action into local `saved` state (`dashboard.tsx:139, 158–191`). It won't null out mid-session.
+On success we rely on Convex reactivity to re-render `intakePlan`.
 
-## Single most-likely root cause
+## Assumption to confirm
 
-`src/components/apply/collect/CollectWorkspace.tsx:65` — `(c?.checklist.ready ?? false)` throws `TypeError: Cannot read properties of undefined (reading 'ready')` on the reactive `checklistForTargets` re-run that follows `setAnswer`/`answerEligibility`, because the backend returns `perTarget` entries with `checklist` undefined for still-researching targets. Same-shape hazard at `ReadinessRail.tsx:47` and `:52`. The `SilentErrorBoundary` around `DashboardPrepSection` swallows it and empties the section, which is what the user perceives as the dashboard breaking.
+Backend exposes `coverage` on **both** `plan.targets[i]` and `plan.specific[i]` (the group the UI iterates). If it's only on `targets`, `AllRequirements` will join by `system+externalId`. Either way works; I'll match whatever `intakePlan` actually returns when I implement.
 
-Fix (for the next build turn, not now): treat `c?.checklist?.ready` (extra `?.`) at both call sites, and mirror the guard in `ReadinessRail` line 47 (`c?.checklist?.ready`, `c?.found ?? false`).
+## Out of scope
+
+- No changes to the intake Convex query itself.
+- No changes to eligibility/checklist logic beyond the readiness-guard filter.
+- No copy changes on unrelated pages.
