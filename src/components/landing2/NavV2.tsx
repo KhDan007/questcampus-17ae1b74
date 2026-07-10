@@ -62,6 +62,8 @@ export function NavV2() {
   }
 
   const showStartButton = isLanding || isUnlock;
+  // Signed-in visitors go straight to the app; signed-out ones to signup.
+  const startHref = isAuthenticated ? "/dashboard" : "/signin?mode=signup";
   // Signed-in workspace pages get their nav from DashboardShell's drawer
   // (bottom-left FAB) — the header hamburger there was a redundant second
   // menu. Keep it only where it's the sole navigation: the landing page
@@ -110,7 +112,7 @@ export function NavV2() {
           <div className="flex items-center gap-3">
             {showStartButton && (
               <a
-                href="/signin?mode=signup"
+                href={startHref}
                 className="group hidden items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none sm:inline-flex"
               >
                 Start now
@@ -187,7 +189,7 @@ export function NavV2() {
                 <div className="mt-auto pt-6">
                   {showStartButton ? (
                     <a
-                      href="/signin?mode=signup"
+                      href={startHref}
                       onClick={() => setMobileOpen(false)}
                       className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
                     >
