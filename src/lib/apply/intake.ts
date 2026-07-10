@@ -32,17 +32,27 @@ export type IntakeItem = {
   value?: string;
 };
 
+export type TargetCoverage = "full" | "partial" | "error";
+
 export type IntakeTarget = {
   system: string;
   externalId: string;
   name: string;
   found: boolean;
+  coverage?: TargetCoverage;
+  status?: string;
+  lastCrawledAt?: number;
 };
 
 export type IntakePlan = {
   targets: IntakeTarget[];
   shared: IntakeItem[];
-  specific: { system: string; externalId: string; name: string; items: IntakeItem[] }[];
+  specific: {
+    system: string;
+    externalId: string;
+    name: string;
+    items: IntakeItem[];
+  }[];
   manualNotes: { kind: "fee" | "recommender"; targetNames: string[] }[];
   summary: { totalAskable: number; answered: number; remaining: number };
 };
