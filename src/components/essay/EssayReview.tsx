@@ -19,6 +19,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 
 // -----------------------------------------------------------------------------
@@ -256,6 +257,7 @@ export function EssayReview({
   onAutoEssayConsumed?: () => void;
 }) {
   const reduce = useReducedMotion();
+  const { lang } = useI18n();
   const [mode, setMode] = useState<Mode>("paste");
   const [pasted, setPasted] = useState("");
   const [pickedEssayId, setPickedEssayId] = useState<string | null>(null);
@@ -312,7 +314,7 @@ export function EssayReview({
     setStatus("loading");
     setReviewErr(null);
     try {
-      const args: Record<string, unknown> = { sessionId, token, lang: "en" };
+      const args: Record<string, unknown> = { sessionId, token, lang };
       if (mode === "pick" && pickedEssayId) args.essayId = pickedEssayId;
       else args.essayText = pasted;
       const res = (await review(args)) as ReviewSuccess | ReviewError;
@@ -327,7 +329,7 @@ export function EssayReview({
       setReviewErr("feedback_failed");
       setStatus("error");
     }
-  }, [sessionId, token, review, mode, pasted, pickedEssayId]);
+  }, [sessionId, token, review, mode, pasted, pickedEssayId, lang]);
 
   // Auto-run when an essay was just generated and the user accepted the popup.
   const autoRanRef = useRef<string | null>(null);

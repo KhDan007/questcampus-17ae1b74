@@ -34,6 +34,7 @@ import { UnlockButton } from "@/components/payments/UnlockButton";
 import { PRICE_MVP } from "@/lib/config";
 import type { RecCard } from "@/components/profile/UniversityCard";
 import { markProgress } from "@/lib/progress";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export type EssaySearch = {
   system?: string;
@@ -289,6 +290,7 @@ function EssayPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
+  const { lang } = useI18n();
   const token = auth.getSession()?.token;
   const search = Route.useSearch();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -312,7 +314,7 @@ function EssayPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = (await recommend({ sessionId, token, plan: "free" })) as
+        const res = (await recommend({ sessionId, token, plan: "free", lang })) as
           | FreeRec
           | { error: string; results?: never[] };
         if (cancelled) return;
@@ -341,7 +343,7 @@ function EssayPage() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, token, recommend]);
+  }, [sessionId, token, recommend, lang]);
 
   // ---- Form state
   const [view, setView] = useState<"write" | "review">("write");
@@ -522,7 +524,7 @@ function EssayPage() {
         ...(search.conceptKey ? { conceptKey: search.conceptKey } : {}),
         ...(search.prompt ? { prompt: search.prompt } : {}),
         ...(search.wordLimit ? { wordLimit: search.wordLimit } : {}),
-        lang: "en",
+        lang,
       })) as EssayResult | EssayError;
       if ("error" in res) {
         setGenError(res.error);
@@ -551,7 +553,7 @@ function EssayPage() {
       setGenStatus("error");
       setGenError("generation_failed");
     }
-  }, [sessionId, token, generate, answers, target, clearDraft, search.system, search.externalId, search.conceptKey, search.prompt, search.wordLimit]);
+  }, [sessionId, token, generate, answers, target, clearDraft, search.system, search.externalId, search.conceptKey, search.prompt, search.wordLimit, lang]);
 
   const canSubmitQuestions = useMemo(() => {
     // Only the anchor story is required; everything else is optional.
@@ -2109,6 +2111,7 @@ function AssistPopover({
 }) {
   const reduce = useReducedMotion();
   const assist = useAction(api.essays.assistAnswer);
+  const { lang } = useI18n();
   const [notes, setNotes] = useState(initialNotes);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [text, setText] = useState<string>("");
@@ -2132,7 +2135,7 @@ function AssistPopover({
   const run = useCallback(async () => {
     setStatus("loading");
     try {
-      const res = (await assist({ sessionId, token, question, notes, lang: "en" })) as
+      const res = (await assist({ sessionId, token, question, notes, lang })) as
         | { ok: true; text: string }
         | { error: string };
       if ("error" in res) {
@@ -2144,7 +2147,7 @@ function AssistPopover({
     } catch {
       setStatus("error");
     }
-  }, [assist, sessionId, token, question, notes]);
+  }, [assist, sessionId, token, question, notes, lang]);
 
   if (!mounted) return null;
   return createPortal(

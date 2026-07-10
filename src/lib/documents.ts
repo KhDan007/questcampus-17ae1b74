@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
+import { getCurrentLang } from "@/lib/i18n/I18nProvider";
 
 export type DocKind =
   | "resume"
@@ -201,7 +202,7 @@ export function useGenerateDoc() {
   return useCallback(
     async (id: string, notes?: string): Promise<GenerateResult> => {
       if (!token) return { error: "Sign in required" };
-      return (await act({ token, id, notes } as never)) as GenerateResult;
+      return (await act({ token, id, notes, lang: getCurrentLang() } as never)) as GenerateResult;
     },
     [token, act],
   );
@@ -220,7 +221,7 @@ export function useImproveDoc() {
   return useCallback(
     async (id: string, goal: ImproveGoal): Promise<GenerateResult> => {
       if (!token) return { error: "Sign in required" };
-      return (await act({ token, id, goal } as never)) as GenerateResult;
+      return (await act({ token, id, goal, lang: getCurrentLang() } as never)) as GenerateResult;
     },
     [token, act],
   );

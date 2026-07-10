@@ -46,7 +46,7 @@ export function RecommendationsSection({
   reduce: boolean;
   firstName?: string;
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const recommend = useAction(api.rag.recommend.recommend);
   const [free, setFree] = useState<FreePayload | null>(null);
   const [paid, setPaid] = useState<PaidPayload | null>(null);
@@ -65,7 +65,7 @@ export function RecommendationsSection({
     async (force = false) => {
       setFreeStatus("loading");
       try {
-        const res = (await recommend({ sessionId, token, plan: "free", force })) as
+        const res = (await recommend({ sessionId, token, plan: "free", force, lang })) as
           | FreePayload
           | { error: string; results: never[] };
         if ("error" in res && res.error) {
@@ -78,7 +78,7 @@ export function RecommendationsSection({
         setFreeStatus("error");
       }
     },
-    [recommend, sessionId, token],
+    [recommend, sessionId, token, lang],
   );
 
   const loadPaid = useCallback(
@@ -86,7 +86,7 @@ export function RecommendationsSection({
       if (!token) return;
       setPaidStatus("loading");
       try {
-        const res = (await recommend({ sessionId, token, plan: "paid", force })) as
+        const res = (await recommend({ sessionId, token, plan: "paid", force, lang })) as
           | PaidPayload
           | PaymentRequired;
         if ("error" in res && res.error === "payment_required") {
@@ -100,7 +100,7 @@ export function RecommendationsSection({
         setPaidStatus("error");
       }
     },
-    [recommend, sessionId, token],
+    [recommend, sessionId, token, lang],
   );
 
   useEffect(() => {

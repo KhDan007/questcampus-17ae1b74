@@ -38,6 +38,7 @@ import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
 import { useGuidedSteps, describeGuidedStep } from "@/lib/apply/guidedSteps";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { CheckCircle2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 
 export const Route = createFileRoute("/dashboard")({
@@ -138,6 +139,7 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
 function DashboardPage() {
   const reduce = useReducedMotion();
   const { user, isAuthenticated, token, isHydrated } = useAuth();
+  const { lang } = useI18n();
   const authed = isHydrated && isAuthenticated;
   const { refresh } = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -169,6 +171,7 @@ function DashboardPage() {
           token: token ?? undefined,
           plan: "free",
           force,
+          lang,
         })) as { results?: RecCard[]; error?: string };
         if (cancelled) return;
         if (res?.error || !res?.results) {
@@ -199,7 +202,7 @@ function DashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, authed, token, recommend, refresh, navigate]);
+  }, [sessionId, authed, token, recommend, refresh, navigate, lang]);
 
   const firstName = useMemo(() => {
     if (!authed) return null;

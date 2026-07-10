@@ -4,6 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { useRouterState } from "@tanstack/react-router";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
+import { getCurrentLang } from "@/lib/i18n/I18nProvider";
 
 /**
  * Build a one-line page-context hint the agent can use to ground its reply.
@@ -103,7 +104,7 @@ export function useSendChat() {
       (location?.search as Record<string, unknown>) ?? {},
     );
     const outbound = ctx ? `${ctx}\n${message}` : message;
-    return (await send({ token, threadId, message: outbound } as never)) as {
+    return (await send({ token, threadId, message: outbound, lang: getCurrentLang() } as never)) as {
       threadId: string;
       assistantId: string;
     };

@@ -8,6 +8,7 @@ import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useApplyActions } from "@/lib/applyQueue/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -207,6 +208,7 @@ function countFilled(a: Answers): number {
 
 function OnboardingPage() {
   const { isAuthenticated, token, session } = useAuth();
+  const { lang } = useI18n();
   const reduce = useReducedMotion();
   const navigate = useNavigate();
 
@@ -289,7 +291,7 @@ function OnboardingPage() {
         completedAt: Date.now(),
       });
       // Kick off a fresh recommendation (force) so the dashboard has it ready.
-      void recommend({ sessionId, token: token ?? undefined, plan: "free", force: true });
+      void recommend({ sessionId, token: token ?? undefined, plan: "free", force: true, lang });
       // Clear stale localStorage matches so dashboard shows the new ones.
       try {
         window.localStorage.removeItem("qc.landing.matches");
