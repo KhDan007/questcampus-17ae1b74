@@ -568,6 +568,7 @@ function SidebarPanel({
           />
           <button
             type="submit"
+            aria-label={sending || streaming ? "Sending message" : "Send message"}
             disabled={disabled || (!input.trim() && !attachment)}
             className="inline-flex h-11 shrink-0 items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
           >
