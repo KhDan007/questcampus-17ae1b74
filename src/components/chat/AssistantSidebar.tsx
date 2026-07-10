@@ -24,9 +24,10 @@ import {
   Trash2,
   ShieldAlert,
   PanelRightClose,
+  Paperclip,
 } from "lucide-react";
 
-import { useQuery } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { ASSISTANT_ASK_EVENT } from "@/lib/assistant";
@@ -48,6 +49,8 @@ import { ConfirmDialog } from "@/components/chat/ConfirmDialog";
 
 import { useSetAnswer, useAnswerEligibility } from "@/lib/apply/intake";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
+import { useApplicationDocuments } from "@/lib/applyQueue/client";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
 import {
   useChatDock,
   DOCK_RAIL_W,
@@ -60,6 +63,21 @@ const SUGGESTIONS = [
   "Find scholarship-friendly schools for my profile",
   "What can the extension safely do now?",
 ];
+
+/** DocTypes the composer's attach picker offers. The backend accepts any
+ * docType string on requestUploadTicket, so this list drives only the UI. */
+const ATTACH_DOC_TYPES = [
+  { value: "resume", label: "Resume" },
+  { value: "activities", label: "Activities" },
+  { value: "sop", label: "Statement of purpose" },
+  { value: "financial", label: "Financial" },
+  { value: "transcript", label: "Transcript" },
+  { value: "recommendation", label: "Recommendation" },
+  { value: "other", label: "Other" },
+] as const;
+
+/** A finished attachment the user will reference in their next message. */
+type Attachment = { fileName: string; docType: string };
 
 const SKIP_DELETE_CONFIRM_KEY = "qc.chat.skipDeleteConfirm";
 const BYPASS_KEY = "qc.chat.bypass";
@@ -148,6 +166,40 @@ function SidebarPanel({
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // ── File attach (composer) ────────────────────────────────────────────────
+  const { upload } = useApplicationDocuments();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  // A file chosen but awaiting a docType pick (picker menu open).
+  const [pickerFile, setPickerFile] = useState<File | null>(null);
+  // In-flight upload label, e.g. "transcript.pdf".
+  const [uploadingName, setUploadingName] = useState<string | null>(null);
+  // Completed attachment (chip) to reference on the next send.
+  const [attachment, setAttachment] = useState<Attachment | null>(null);
+
+  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0] ?? null;
+    // Reset the input so choosing the same file again re-fires change.
+    e.target.value = "";
+    if (f) setPickerFile(f);
+  }
+
+  async function doUpload(docType: string) {
+    const file = pickerFile;
+    setPickerFile(null);
+    if (!file) return;
+    setAttachment(null);
+    setUploadingName(file.name);
+    try {
+      await upload(file, docType as never);
+      setAttachment({ fileName: file.name, docType });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploadingName(null);
+    }
+  }
+
   const seededIdRef = useRef<number>(-1);
   const deleteThread = useDeleteThread();
   // Bypass mode (auto-approve action cards). Persisted, OFF by default.
@@ -199,11 +251,17 @@ function SidebarPanel({
 
   async function submit(text: string) {
     const t = text.trim();
-    if (!t || disabled) return;
+    // Allow sending an attachment note with no typed text.
+    if ((!t && !attachment) || disabled) return;
+    // Prepend an attachment hint so the agent knows a doc was just filed.
+    const outbound = attachment
+      ? `[Attached: ${attachment.fileName} as ${attachment.docType}]\n${t}`
+      : t;
     setInput("");
+    setAttachment(null);
     setSending(true);
     try {
-    const res = await send(t, activeThreadId);
+    const res = await send(outbound, activeThreadId);
       setForceNew(false);
       setSelectedId(res.threadId);
     } catch (e) {
@@ -428,7 +486,73 @@ function SidebarPanel({
         }}
         className="border-t-2 border-on-surface/15 bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       >
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          onChange={onPickFile}
+        />
+
+        {/* Attachment status: docType picker → uploading chip → done chip */}
+        {pickerFile && (
+          <div className="mb-2 rounded-md border-2 border-on-surface/25 bg-surface p-2">
+            <p className="mb-1.5 truncate font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+              Attach “{pickerFile.name}” as:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {ATTACH_DOC_TYPES.map((d) => (
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => void doUpload(d.value)}
+                  className="rounded-full border-2 border-on-surface/25 bg-surface px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+                >
+                  {d.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setPickerFile(null)}
+                className="rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant hover:text-on-surface"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+        {uploadingName && (
+          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-on-surface/25 bg-surface px-2.5 py-0.5 text-label-sm text-on-surface-variant">
+            <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+            <span className="truncate">Uploading {uploadingName}…</span>
+          </div>
+        )}
+        {attachment && !uploadingName && (
+          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-2.5 py-0.5 text-label-sm font-semibold text-on-surface qc-hard-shadow-sm">
+            <span className="truncate">
+              📎 {attachment.fileName} → {attachment.docType}
+            </span>
+            <button
+              type="button"
+              aria-label="Remove attachment"
+              onClick={() => setAttachment(null)}
+              className="grid h-4 w-4 shrink-0 place-items-center rounded-full text-on-surface-variant hover:text-on-surface"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
         <div className="flex items-end gap-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={!!uploadingName || !!pickerFile}
+            aria-label="Attach a file"
+            title="Attach a file"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Paperclip className="h-4 w-4" />
+          </button>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -444,7 +568,7 @@ function SidebarPanel({
           />
           <button
             type="submit"
-            disabled={disabled || !input.trim()}
+            disabled={disabled || (!input.trim() && !attachment)}
             className="inline-flex h-11 shrink-0 items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
           >
             {sending || streaming ? (
@@ -622,6 +746,28 @@ function HistoryPanel({
   );
 }
 
+/**
+ * Context-aware chips derived from the student's saved-schools state.
+ * Falls back to the static SUGGESTIONS while state is still loading, so the
+ * empty state never renders blank. Kept to 3-4 chips, mobile-safe.
+ */
+function useQuickActionChips(): string[] {
+  const { saved } = useSavedUniversities();
+  return useMemo(() => {
+    // Still loading — use the static defaults.
+    if (saved === undefined) return SUGGESTIONS;
+    const chips: string[] = [];
+    if (saved.length === 0) {
+      chips.push("Recommend schools I should save");
+    } else {
+      chips.push("What's my safest next action?");
+    }
+    chips.push("Open my applications");
+    chips.push("Draft my activities list");
+    return chips.slice(0, 4);
+  }, [saved]);
+}
+
 function EmptyState({
 
   onPick,
@@ -630,6 +776,7 @@ function EmptyState({
   onPick: (t: string) => void;
   disabled: boolean;
 }) {
+  const chips = useQuickActionChips();
   return (
     <div className="mt-4 space-y-3">
       <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
@@ -643,7 +790,7 @@ function EmptyState({
       </div>
       <SafetyStrip />
       <div className="space-y-2">
-        {SUGGESTIONS.map((s) => (
+        {chips.map((s) => (
           <button
             key={s}
             type="button"
@@ -777,6 +924,9 @@ function ActionCard({
   const autoApplyGate = useAutoApplyGate();
   const startAgentJob = useStartAgentJob();
   const navigate = useNavigate();
+  const convex = useConvex();
+  const { upload } = useApplicationDocuments();
+  const { token } = useAuth();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const bypass = useContext(BypassContext);
@@ -826,6 +976,9 @@ function ActionCard({
         navigate,
         startAgentJob,
         activeThreadId,
+        convex,
+        uploadDocument: upload,
+        token,
       });
       await setStatus(messageId, action.id, "done");
       if (result !== "handled") toast.success("Done");
@@ -879,6 +1032,9 @@ type Executors = {
   navigate: ReturnType<typeof useNavigate>;
   startAgentJob: ReturnType<typeof useStartAgentJob>;
   activeThreadId: string | undefined;
+  convex: ReturnType<typeof useConvex>;
+  uploadDocument: ReturnType<typeof useApplicationDocuments>["upload"];
+  token: string | null | undefined;
 };
 
 /** Return "handled" when the branch already gave the user specific feedback
@@ -953,6 +1109,30 @@ async function execute(action: ChatAction, ex: Executors): Promise<"handled" | v
     case "upload_document": {
       await ex.navigate({ to: "/apply" });
       return;
+    }
+    case "attach_document": {
+      // Agent drafted a document and wants it filed against a docType. Read the
+      // draft's text, wrap it in a plain-text File, and run the normal upload
+      // pipeline (requestUploadTicket → PUT → record) via useApplicationDocuments.
+      const draftId = str("draftId");
+      const docType = str("docType") ?? "other";
+      if (!draftId) {
+        throw new Error("No draft to attach — create the document first.");
+      }
+      if (!ex.token) throw new Error("Sign in required");
+      const draft = (await ex.convex.query(api.documents.get, {
+        token: ex.token,
+        id: draftId,
+      } as never)) as { content?: string; title?: string } | null;
+      if (!draft || typeof draft.content !== "string" || !draft.content.trim()) {
+        throw new Error("That draft is empty — nothing to attach yet.");
+      }
+      const safeTitle = (draft.title ?? docType).replace(/[^\w.-]+/g, "_") || docType;
+      const fileName = `${safeTitle}.txt`;
+      const file = new File([draft.content], fileName, { type: "text/plain" });
+      await ex.uploadDocument(file, docType as never);
+      toast.success(`Attached ${docType}`);
+      return "handled";
     }
     case "navigate": {
       const route = str("route");
