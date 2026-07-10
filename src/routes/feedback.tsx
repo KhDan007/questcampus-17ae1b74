@@ -13,7 +13,13 @@ import {
   Check,
   Loader2,
   ArrowLeft,
+  Mail,
+  Phone,
 } from "lucide-react";
+
+const SUPPORT_EMAIL = "feedback@questcampus.space";
+const SUPPORT_PHONE_DISPLAY = "+7 777 270 11 33";
+const SUPPORT_PHONE_TEL = "+77772701133";
 import { api } from "@/convex/_generated/api";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -439,10 +445,38 @@ function FeedbackPage() {
                 </button>
               </div>
             </form>
+
+            <ContactStrip />
           </>
         )}
       </main>
     </DashboardShell>
+  );
+}
+
+function ContactStrip() {
+  return (
+    <div className="mt-8 rounded-2xl border-2 border-on-surface/15 bg-on-surface/[0.02] p-4">
+      <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">
+        Prefer to reach us directly
+      </p>
+      <div className="mt-2.5 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+        <a
+          href={`mailto:${SUPPORT_EMAIL}`}
+          className="inline-flex items-center gap-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface hover:underline"
+        >
+          <Mail className="h-4 w-4 shrink-0 text-on-surface-variant" />
+          {SUPPORT_EMAIL}
+        </a>
+        <a
+          href={`tel:${SUPPORT_PHONE_TEL}`}
+          className="inline-flex items-center gap-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface hover:underline"
+        >
+          <Phone className="h-4 w-4 shrink-0 text-on-surface-variant" />
+          {SUPPORT_PHONE_DISPLAY}
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -474,6 +508,14 @@ function SuccessCard({ onAnother, onHome }: { onAnother: () => void; onHome: () 
         >
           Send another
         </button>
+      </div>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t-2 border-on-surface/10 pt-5 text-label-md text-on-surface-variant">
+        <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 font-semibold hover:text-on-surface hover:underline">
+          <Mail className="h-4 w-4 shrink-0" /> {SUPPORT_EMAIL}
+        </a>
+        <a href={`tel:${SUPPORT_PHONE_TEL}`} className="inline-flex items-center gap-2 font-semibold hover:text-on-surface hover:underline">
+          <Phone className="h-4 w-4 shrink-0" /> {SUPPORT_PHONE_DISPLAY}
+        </a>
       </div>
     </div>
   );
