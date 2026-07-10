@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Check } from "lucide-react";
-import type { IntakeItem } from "@/lib/apply/intake";
+import { ChevronDown, Check, ShieldCheck, AlertTriangle, HelpCircle, Loader2, RefreshCw } from "lucide-react";
+import type { IntakeItem, TargetCoverage } from "@/lib/apply/intake";
 import { IntakeItemField } from "./RequirementField";
 
 type Props = {
@@ -11,7 +11,45 @@ type Props = {
   items: IntakeItem[];
   onChange: (item: IntakeItem, value: string) => void;
   defaultOpen?: boolean;
+  coverage?: TargetCoverage;
+  onRescan?: () => void;
+  rescanning?: boolean;
 };
+
+type CoverageMeta = {
+  label: string;
+  className: string;
+  Icon: typeof ShieldCheck;
+};
+
+function coverageMeta(coverage: TargetCoverage | undefined): CoverageMeta {
+  switch (coverage) {
+    case "full":
+      return {
+        label: "Verified requirements",
+        className: "bg-tertiary/25 text-on-surface border-tertiary/50",
+        Icon: ShieldCheck,
+      };
+    case "partial":
+      return {
+        label: "Partial — may be incomplete",
+        className: "bg-amber-100 text-amber-900 border-amber-400 dark:bg-amber-500/20 dark:text-amber-100",
+        Icon: AlertTriangle,
+      };
+    case "error":
+      return {
+        label: "Not captured yet",
+        className: "bg-on-surface/10 text-on-surface-variant border-on-surface/30",
+        Icon: HelpCircle,
+      };
+    default:
+      return {
+        label: "Gathering requirements…",
+        className: "bg-on-surface/10 text-on-surface-variant border-on-surface/30",
+        Icon: Loader2,
+      };
+  }
+}
 
 export function RequirementsZone({
   title,
@@ -19,9 +57,21 @@ export function RequirementsZone({
   items,
   onChange,
   defaultOpen = false,
+  coverage,
+  onRescan,
+  rescanning = false,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const [showAnswered, setShowAnswered] = useState(false);
+
+  const showCoverage = coverage !== undefined || onRescan !== undefined;
+  const meta = coverageMeta(coverage);
+  const isFull = coverage === "full";
+  const isError = coverage === "error" || (coverage !== "full" && coverage !== "partial" && items.length === 0 && coverage === "error");
+  const isEmpty = items.length === 0;
+  const isPartial = coverage === "partial";
+  const isGathering = coverage === undefined && showCoverage;
+  const hideProgress = !isFull && (isEmpty || coverage === "error");
 
   const answered = items.filter((i) => i.answered);
   const unanswered = items.filter((i) => !i.answered);
@@ -37,11 +87,21 @@ export function RequirementsZone({
         aria-expanded={open}
       >
         <div className="min-w-0">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
+            {showCoverage && (
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-label-sm ${meta.className}`}
+              >
+                <meta.Icon className={`h-3.5 w-3.5 ${isGathering ? "animate-spin" : ""}`} />
+                {meta.label}
+              </span>
+            )}
+          </div>
           {subtitle && <p className="mt-0.5 text-body-sm text-on-surface-variant">{subtitle}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          {complete ? (
+          {hideProgress ? null : complete ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-tertiary/25 px-2.5 py-0.5 text-label-sm text-on-surface">
               <Check className="h-3.5 w-3.5" /> Done
             </span>
@@ -57,9 +117,57 @@ export function RequirementsZone({
       </button>
 
       {open && (
-        <div className="border-t-2 border-on-surface/10 p-5">
+        <div className="border-t-2 border-on-surface/10 p-5 space-y-4">
+          {(isPartial || coverage === "error" || (isGathering && isEmpty)) && (
+            <div
+              className={`flex flex-col gap-3 rounded-xl border-2 p-4 sm:flex-row sm:items-center sm:justify-between ${
+                isPartial
+                  ? "border-amber-400 bg-amber-50 dark:bg-amber-500/10"
+                  : "border-on-surface/20 bg-on-surface/5"
+              }`}
+            >
+              <div className="min-w-0">
+                <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+                  {coverage === "error"
+                    ? "We haven't captured this university's requirements yet."
+                    : isPartial
+                      ? "We haven't fully captured this university's requirements yet."
+                      : "Still gathering this university's requirements."}
+                </p>
+                <p className="mt-0.5 text-body-sm text-on-surface-variant">
+                  {coverage === "error"
+                    ? "Don't treat this list as a complete application. Re-scan to try again."
+                    : isPartial
+                      ? "The list below may be incomplete — don't treat it as the full application."
+                      : "This can take a minute for schools we haven't seen before."}
+                </p>
+              </div>
+              {onRescan && (
+                <button
+                  type="button"
+                  onClick={onRescan}
+                  disabled={rescanning}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {rescanning ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  )}
+                  {rescanning ? "Re-scanning…" : "Re-scan requirements"}
+                </button>
+              )}
+            </div>
+          )}
+
           {items.length === 0 ? (
-            <p className="text-body-sm text-on-surface-variant">Nothing to answer here.</p>
+            <p className="text-body-sm text-on-surface-variant">
+              {coverage === "error"
+                ? "No requirements captured for this university yet."
+                : isGathering
+                  ? "We'll list questions here as soon as the crawl finishes."
+                  : "Nothing to answer here."}
+            </p>
           ) : (
             <>
               {visible.length === 0 && (
@@ -81,7 +189,7 @@ export function RequirementsZone({
                 ))}
               </div>
               {answered.length > 0 && unanswered.length > 0 && (
-                <div className="mt-4 text-right">
+                <div className="text-right">
                   <button
                     type="button"
                     onClick={() => setShowAnswered((s) => !s)}
