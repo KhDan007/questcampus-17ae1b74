@@ -219,3 +219,49 @@ export function useListAnswers() {
 export function useTargetsFromSelection(items: SelectionItem[]) {
   return useMemo(() => selectionToTargets(items), [items]);
 }
+
+/**
+ * Enqueue a fresh deep-crawl of a university's requirements. Convex reactivity
+ * will refresh `intakePlan` when the crawl completes.
+ */
+export function useRescanRequirements() {
+  const mutate = useMutation(api.ingest.deepResearch.enqueueDeepResearch);
+  const [pending, setPending] = useState<Set<string>>(new Set());
+
+  const rescan = useCallback(
+    async (system: string, externalId: string, website?: string) => {
+      const key = `${system}::${externalId}`;
+      setPending((prev) => {
+        const next = new Set(prev);
+        next.add(key);
+        return next;
+      });
+      try {
+        const args: Record<string, string> = { system, externalId };
+        if (website) args.website = website;
+        await mutate(args as never);
+      } catch (e) {
+        console.warn("enqueueDeepResearch failed", e);
+      } finally {
+        // Keep the "re-scanning…" state for a beat so users see the feedback,
+        // then clear — the real completion comes via `intakePlan` reactivity.
+        setTimeout(() => {
+          setPending((prev) => {
+            const next = new Set(prev);
+            next.delete(key);
+            return next;
+          });
+        }, 1500);
+      }
+    },
+    [mutate],
+  );
+
+  const isRescanning = useCallback(
+    (system: string, externalId: string) => pending.has(`${system}::${externalId}`),
+    [pending],
+  );
+
+  return { rescan, isRescanning };
+}
+
