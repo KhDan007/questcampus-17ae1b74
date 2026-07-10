@@ -102,7 +102,7 @@ export function UniversityCard({
       initial={reduce ? false : { opacity: 0, y: 18 }}
       animate={reduce ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.06 }}
-      className={`group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-5 transition-shadow sm:p-6 ${
+      className={`group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-4 transition-shadow sm:p-6 ${
         locked ? "select-none" : "hover:shadow-[0_8px_28px_-10px_rgba(53,37,205,0.18)]"
       }`}
     >
@@ -134,7 +134,7 @@ export function UniversityCard({
       )}
 
       {/* Requirements / stats grid */}
-      <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
+      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-5 sm:grid-cols-3 sm:gap-y-4">
         <Stat label={t("card.stat.acceptance")} value={pct(card.acceptanceRate)} />
         <Stat label={t("card.stat.sat")} value={card.satAvg ? String(card.satAvg) : null} />
         <Stat
@@ -148,7 +148,7 @@ export function UniversityCard({
       </dl>
 
       {!locked && (
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
           {card.website && (
             <a
               href={card.website.startsWith("http") ? card.website : `https://${card.website}`}

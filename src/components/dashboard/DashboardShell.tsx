@@ -266,7 +266,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         onClick={() => setMobileOpen(true)}
         aria-label="Open workspace menu"
         title="Open workspace menu"
-        className="fixed bottom-5 left-5 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none lg:hidden"
+        className="fixed bottom-5 left-5 z-[60] grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm active:translate-y-0.5 active:translate-x-0.5 active:shadow-none lg:hidden"
       >
         <PanelLeft className="h-5 w-5" />
       </button>

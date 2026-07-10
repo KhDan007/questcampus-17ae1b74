@@ -44,7 +44,7 @@ export function UniversitySearchSection({
   return (
     <section>
       <div>
-        <h2 className="font-display text-headline-lg font-bold text-on-surface">
+        <h2 className="font-display text-headline-sm font-bold text-on-surface sm:text-headline-lg">
           {title}
         </h2>
         <p className="mt-1 text-body-md text-on-surface-variant">{subtitle}</p>

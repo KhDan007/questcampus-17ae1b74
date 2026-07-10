@@ -143,10 +143,10 @@ function AgentCockpit() {
   return (
     <main
       id="main-content"
-      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-24 sm:px-8 lg:px-12"
+      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
     >
-      <header className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow sm:p-7">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <header className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-7">
+        <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
               Autonomous application cockpit
@@ -215,7 +215,7 @@ function AgentCockpit() {
           </div>
         )}
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 xl:grid-cols-4">
           <MetricCard label="Saved targets" value={targetPlans.length} detail="Profile-owned list" />
           <MetricCard label="Ready packages" value={readyCount} detail={`${blockedCount} still blocked`} tone="ready" />
           <MetricCard label="Scholarship routes" value={scholarshipPrograms.length} detail="Aid-aware programs" tone="aid" />
@@ -223,7 +223,7 @@ function AgentCockpit() {
         </div>
       </header>
 
-      <section className="mt-6 grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mt-5 grid grid-cols-1 items-start gap-4 sm:mt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-4">
           <NextActionPanel
             actions={nextActions}
@@ -262,11 +262,11 @@ function AgentLoading() {
   return (
     <main
       id="main-content"
-      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-24 sm:px-8 lg:px-12"
+      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
       aria-busy="true"
     >
-      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow sm:p-7">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-7">
+        <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <div className="h-4 w-52 rounded-full bg-primary/20" />
             <div className="mt-4 h-10 w-full max-w-xl rounded-lg bg-on-surface/10" />
@@ -278,7 +278,7 @@ function AgentLoading() {
             <div className="h-11 w-40 rounded-md border-2 border-on-surface/20 bg-primary/20" />
           </div>
         </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 xl:grid-cols-4">
           {["Saved targets", "Ready packages", "Scholarships", "Applied"].map((label) => (
             <div key={label} className="rounded-lg border-2 border-on-surface/15 bg-surface p-4">
               <div className="h-3 w-24 rounded-full bg-on-surface/10" />
@@ -288,10 +288,10 @@ function AgentLoading() {
           ))}
         </div>
       </section>
-      <section className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mt-5 grid grid-cols-1 gap-4 sm:mt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-4">
           {[0, 1, 2].map((item) => (
-            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-5">
+            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4 sm:p-5">
               <div className="h-4 w-40 rounded-full bg-on-surface/10" />
               <div className="mt-4 h-7 w-2/3 rounded bg-on-surface/10" />
               <div className="mt-3 h-4 w-full rounded-full bg-on-surface/10" />
@@ -301,7 +301,7 @@ function AgentLoading() {
         </div>
         <aside className="space-y-4">
           {[0, 1, 2].map((item) => (
-            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-5">
+            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-4 sm:p-5">
               <div className="h-4 w-32 rounded-full bg-on-surface/10" />
               <div className="mt-4 space-y-2">
                 <div className="h-12 rounded-lg bg-surface" />
@@ -318,8 +318,8 @@ function AgentLoading() {
 
 function AgentFallback() {
   return (
-    <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-24 sm:px-8 lg:px-12">
-      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow">
+    <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12">
+      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-6">
         <div className="flex items-start gap-4">
           <AlertTriangle className="mt-1 h-6 w-6 shrink-0 text-primary" />
           <div>
@@ -395,7 +395,7 @@ function NextActionPanel({
     ? "The agent has generated usable roadmap artifacts. Check readiness, recommendations, affordability signals, evidence, and extension sync below."
     : "The agent will synthesize saved targets, matching results, scholarships, requirements, and extension readiness into one actionable plan.";
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-secondary-container p-5 qc-hard-shadow">
+    <section className="rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
@@ -465,7 +465,7 @@ function TargetReadinessPanel({
   }
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow-sm">
+    <section className="rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm sm:p-5">
       <PanelHeader
         icon={ShieldCheck}
         title="Target readiness"
@@ -541,7 +541,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
     );
   }
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-5">
+    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
       <PanelHeader
         icon={Sparkles}
         title="Unsaved recommendations"
@@ -609,7 +609,7 @@ function ScholarshipPanel({
   programs: ScholarshipProgram[];
 }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-secondary-container/70 p-5">
+    <section className="rounded-xl border-2 border-on-surface/20 bg-secondary-container/70 p-4 sm:p-5">
       <PanelHeader
         icon={Trophy}
         title="Scholarship path"
@@ -661,7 +661,7 @@ function ExtensionSyncPanel({
   eventCount: number;
 }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow-sm">
+    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
       <PanelHeader
         icon={BadgeCheck}
         title="Extension sync"
@@ -785,7 +785,7 @@ function DecisionTracePanel({
   ] as const;
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow-sm">
+    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
       <PanelHeader
         icon={CalendarClock}
         title="Decision trace"
@@ -844,7 +844,7 @@ function GuardrailsPanel() {
   ] as const;
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow-sm">
+    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
       <PanelHeader
         icon={ShieldCheck}
         title="Agent guardrails"
@@ -890,7 +890,7 @@ function TipsPanel({
   });
 
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-5">
+    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
       <PanelHeader icon={FileText} title="Grounded tips" body="No generic advice passes the backend validator." />
       {hasBlockerTip && (
         <p className="mt-3 rounded-lg border border-on-surface/15 bg-surface-container px-3 py-2 text-label-sm text-on-surface-variant">
@@ -1001,7 +1001,7 @@ function BlockerTipCard({
 
 function EventLog({ events }: { events: AgentEvent[] }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-5">
+    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
       <PanelHeader icon={ScrollText} title="Run log" body="What the agent, web, worker, and extension checked." />
       {events.length ? (
         <ol className="mt-4 space-y-3">
@@ -1030,7 +1030,7 @@ function EventLog({ events }: { events: AgentEvent[] }) {
 
 function AppliedTracker({ submissions }: { submissions: ApplicationSubmission[] }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-5">
+    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
       <PanelHeader icon={CheckCircle2} title="Applied tracker" body="Fill success is not submission. Human confirmation wins." />
       {submissions.length ? (
         <div className="mt-4 space-y-2">
@@ -1082,7 +1082,7 @@ function EmptyPanel({
   cta: string;
 }) {
   return (
-    <section className="rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-6">
+    <section className="rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-4 sm:p-6">
       <div className="flex items-start gap-4">
         <Icon className="mt-1 h-6 w-6 shrink-0 text-primary" />
         <div>

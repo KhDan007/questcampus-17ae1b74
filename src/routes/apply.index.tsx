@@ -51,7 +51,7 @@ function ApplyHubPage() {
     return (
       <DashboardShell>
         <LivingBackground />
-        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pt-28 sm:px-8 lg:px-12">
+        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12">
           <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading auto-apply workspace...
           </div>
@@ -68,7 +68,7 @@ function ApplyHubPage() {
       <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-28 sm:px-8 sm:pb-32 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-20 sm:px-8 sm:pb-32 sm:pt-28 lg:px-12"
       >
         <Link
           to="/dashboard"
@@ -81,7 +81,7 @@ function ApplyHubPage() {
           <ApplyStepper current="pick" />
         </div>
 
-        <header className="mt-8">
+        <header className="mt-5 sm:mt-8">
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
             Auto-Apply
           </p>
@@ -98,7 +98,7 @@ function ApplyHubPage() {
           </div>
         </header>
 
-        <div className="mt-8 space-y-8">
+        <div className="mt-5 space-y-5 sm:mt-8 sm:space-y-8">
           <SilentErrorBoundary>
             <CommonAppProfileCard />
           </SilentErrorBoundary>
@@ -194,7 +194,7 @@ function SavedToPick() {
   };
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 backdrop-blur-md qc-hard-shadow sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <h2 className="font-display text-headline-md font-bold text-on-surface">
@@ -242,7 +242,7 @@ function RunLiveDemoCard() {
   const { run: onClick, starting, error } = useRunDemo();
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
       <div className="flex flex-wrap items-center gap-4 sm:flex-nowrap">
         <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
           <Play className="h-5 w-5 text-primary" />
@@ -278,7 +278,7 @@ function RunLiveDemoCard() {
 
 function PlanTeaserCard() {
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
@@ -318,7 +318,7 @@ function CommonAppProfileCard() {
   return (
     <section
       className={
-        "rounded-2xl border-2 p-5 sm:p-6 " +
+        "rounded-2xl border-2 p-4 sm:p-6 " +
         (complete
           ? "border-on-surface/20 bg-surface qc-hard-shadow-sm"
           : "border-on-surface bg-primary-fixed qc-hard-shadow")

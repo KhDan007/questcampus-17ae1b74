@@ -19,15 +19,15 @@ export function RefineRecommendationsCard({
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="mt-8"
+      className="mt-5 sm:mt-8"
     >
-      <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+      <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm">
               <Compass className="h-5 w-5" />
             </span>
-            <div>
+            <div className="min-w-0">
               <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Refined once — re-rank any time

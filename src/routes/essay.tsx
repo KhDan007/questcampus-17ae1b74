@@ -585,7 +585,7 @@ function EssayPage() {
       <DashboardShell>
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
         >
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -611,7 +611,7 @@ function EssayPage() {
             </p>
           </motion.div>
 
-          <div className="mt-8">
+          <div className="mt-5 sm:mt-8">
             <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
               {(
                 [
@@ -648,7 +648,7 @@ function EssayPage() {
           )}
 
           {view === "review" && (
-            <div className="mt-8">
+            <div className="mt-5 sm:mt-8">
               <EssayReview
                 sessionId={sessionId}
                 token={token}
@@ -714,7 +714,7 @@ function EssayPage() {
           )}
 
           {view === "write" && past && past.length > 0 && (
-            <section className="mt-20">
+            <section className="mt-12 sm:mt-20">
               <h2 className="font-display text-headline-md font-bold text-on-surface">
                 My personal statements
               </h2>
@@ -948,7 +948,7 @@ function StepWrap({ children }: { children: React.ReactNode }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="mt-8"
+      className="mt-5 sm:mt-8"
     >
       {children}
     </motion.div>
@@ -976,7 +976,7 @@ function TargetPicker({
 }) {
   const loading = matches === null && !matchesErr;
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
       <h2 className="font-display text-headline-md font-bold text-on-surface">
         Which school is this for?
       </h2>
@@ -1133,7 +1133,7 @@ function QuestionsForm({
   const [flashKey, setFlashKey] = useState<string | null>(null);
 
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
       {supplementPrompt && (
         <div className="mb-6 rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm">
           <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-primary">
@@ -1158,7 +1158,7 @@ function QuestionsForm({
         concrete detail per question matters.
       </p>
 
-      <div className="mt-8 grid gap-7">
+      <div className="mt-6 grid gap-5 sm:mt-8 sm:gap-7">
         {QUESTIONS.map((q) => {
           const v = answers[q.key] ?? {};
           const text = v.text ?? "";
@@ -1579,8 +1579,8 @@ function ResultView({
 
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-      <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px] lg:gap-8">
+      <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
@@ -1779,7 +1779,7 @@ function ResultView({
         )}
 
         {result.placeholders && result.placeholders.length > 0 && (
-          <div className="rounded-2xl border-2 border-on-surface bg-secondary-container p-5 qc-hard-shadow-sm">
+          <div className="rounded-2xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm sm:p-5">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
               Make it yours
             </p>
@@ -1804,7 +1804,7 @@ function ResultView({
           </div>
         )}
 
-        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/85 p-5 backdrop-blur-sm">
+        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/85 p-4 backdrop-blur-sm sm:p-5">
           <h3 className="font-display text-headline-sm font-bold text-on-surface">
             Backed by your data
           </h3>

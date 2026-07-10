@@ -24,11 +24,11 @@ export function MyUniversitiesSection() {
 
   if (!isAuthenticated) {
     return (
-      <section className="mt-14">
-        <h2 className="font-display text-headline-lg font-bold text-on-surface">
+      <section className="mt-8 sm:mt-14">
+        <h2 className="font-display text-headline-sm font-bold text-on-surface sm:text-headline-lg">
           My universities
         </h2>
-        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 backdrop-blur-sm">
+        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4 backdrop-blur-sm sm:p-6">
           <p className="text-body-md text-on-surface-variant">
             Sign in to build your shortlist —{" "}
             <Link to="/signin" className="text-primary underline">
@@ -46,10 +46,10 @@ export function MyUniversitiesSection() {
   const remaining = Math.max(0, list.length - PREVIEW_COUNT);
 
   return (
-    <section className="mt-14">
+    <section className="mt-8 sm:mt-14">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="font-display text-headline-lg font-bold text-on-surface">
+        <div className="min-w-0">
+          <h2 className="font-display text-headline-sm font-bold text-on-surface sm:text-headline-lg">
             My universities
           </h2>
           <p className="mt-1 text-body-md text-on-surface-variant">
@@ -67,7 +67,7 @@ export function MyUniversitiesSection() {
         </Link>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4 sm:mt-6">
         {saved === undefined ? (
           <div className="flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-5 qc-hard-shadow-sm">
             <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
@@ -76,7 +76,7 @@ export function MyUniversitiesSection() {
             </span>
           </div>
         ) : list.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
+          <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm sm:p-8">
             <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
             <p className="mt-3 text-body-lg text-on-surface-variant">
               Search for universities you already know, or save schools from

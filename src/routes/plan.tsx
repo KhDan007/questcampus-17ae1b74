@@ -116,7 +116,7 @@ function PlanPage() {
     return (
       <DashboardShell>
         <LivingBackground />
-        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12">
+        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12">
           <div className="inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading your plan...
           </div>
@@ -134,7 +134,7 @@ function PlanPage() {
       <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12"
       >
         <header>
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -161,7 +161,7 @@ function PlanPage() {
         </header>
 
         {/* View toggle */}
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
             {(
               [
@@ -188,7 +188,7 @@ function PlanPage() {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           {plan === undefined ? (
             <div className="inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
               <Loader2 className="h-4 w-4 animate-spin" /> Building your plan…
@@ -349,7 +349,7 @@ function TodoView({
   onToggle: (task: UnifiedTask, next: boolean) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6">
       {plan.days.map((day) => (
         <section
           key={day.date}
@@ -548,7 +548,7 @@ function CalendarView({
 
       {/* Selected-day panel */}
       {selectedDay && (
-        <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-5">
+        <section className="mt-5 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:mt-6 sm:p-5">
           <header className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-display text-headline-sm font-bold text-on-surface">
               {dayHeading(selectedDay.date, nowMs)}

@@ -175,12 +175,12 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
       className="h-full"
     >
       <div
-        className={`relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-on-surface p-6 qc-hard-shadow sm:p-7 ${
+        className={`relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-on-surface p-4 qc-hard-shadow sm:p-7 ${
           isDone ? "bg-primary text-white" : "bg-secondary-container"
         }`}
       >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+          <div className="flex items-start gap-3 sm:gap-4">
             <span
               className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-on-surface qc-hard-shadow-sm ${
                 isDone ? "bg-white text-on-surface" : "bg-surface text-on-surface"
@@ -188,7 +188,7 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
             >
               <Icon className="h-5 w-5" />
             </span>
-            <div>
+            <div className="min-w-0">
               <p
                 className={`font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] ${
                   isDone ? "text-white/85" : "text-on-surface/70"
@@ -197,7 +197,7 @@ export function NextStepCard({ isAuthenticated }: { isAuthenticated: boolean }) 
                 {def.eyebrow}
               </p>
               <h2
-                className={`mt-1 font-display text-headline-md font-bold ${
+                className={`mt-1 font-display text-headline-sm font-bold sm:text-headline-md ${
                   isDone ? "text-white" : "text-on-surface"
                 }`}
               >

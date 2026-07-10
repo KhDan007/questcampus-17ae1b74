@@ -144,7 +144,7 @@ function ProfilePage() {
       <DashboardShell>
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
       >
         {/* Hero card */}
         <motion.section
@@ -152,7 +152,7 @@ function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-10">
+          <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:p-10">
             <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
               <div
                 className="animate-aurora-1 absolute -left-20 -top-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
@@ -206,7 +206,7 @@ function ProfilePage() {
             </div>
 
             {/* Quick stats */}
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <div className="mt-5 sm:mt-8 grid gap-3 sm:grid-cols-3">
               <Stat
                 label="Your matches"
                 value={String(recs?.length ?? 0)}
@@ -235,7 +235,7 @@ function ProfilePage() {
         )}
 
         {/* Quick actions */}
-        <section className="mt-12 grid gap-5 lg:grid-cols-2">
+        <section className="mt-8 sm:mt-12 grid gap-4 sm:gap-5 lg:grid-cols-2">
           <ActionCard
             to="/dashboard"
             Icon={Compass}
@@ -254,7 +254,7 @@ function ProfilePage() {
         </section>
 
         {/* Your matches — names-only list */}
-        <section className="mt-14">
+        <section className="mt-10 sm:mt-14">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-headline-lg font-bold text-on-surface">
@@ -345,7 +345,7 @@ function ProfilePage() {
         </SilentErrorBoundary>
 
         {/* Upcoming */}
-        <section className="mt-16">
+        <section className="mt-10 sm:mt-16">
           <h2 className="font-display text-headline-lg font-bold text-on-surface">
             Coming soon to your account
           </h2>
@@ -387,7 +387,7 @@ function ProfilePage() {
         </section>
 
         {!isAuthenticated && (
-          <p className="mt-10 text-center text-body-sm text-on-surface-variant">
+          <p className="mt-6 sm:mt-10 text-center text-body-sm text-on-surface-variant">
             You're browsing as a guest.{" "}
             <a href="/signin?mode=signup" className="text-primary hover:underline">
               Create a free account
@@ -435,7 +435,7 @@ function ReferralCard({ referrals }: { referrals: ReferralSummary }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">

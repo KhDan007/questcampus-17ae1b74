@@ -17,10 +17,10 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
 
   return (
     <section
-      className="mt-8 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow"
+      className="mt-5 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow sm:mt-8"
       aria-labelledby="best-for-aid-heading"
     >
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b-2 border-on-surface/10 bg-gradient-to-br from-tertiary/15 via-secondary/10 to-primary/10 p-5 sm:p-6">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b-2 border-on-surface/10 bg-gradient-to-br from-tertiary/15 via-secondary/10 to-primary/10 p-4 sm:p-6">
         <div className="min-w-0">
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
             Money-smart picks
@@ -40,7 +40,7 @@ export function BestForAidSection({ limit = 12 }: { limit?: number }) {
         </span>
       </header>
 
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-6">
         {recs === undefined ? (
           <SkeletonList />
         ) : recs.length === 0 ? (
@@ -150,7 +150,7 @@ function SkeletonList() {
 function EmptyState({ hasSaved }: { hasSaved: boolean }) {
   if (!hasSaved) {
     return (
-      <div className="flex flex-col items-start gap-3 rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-5 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start gap-3 rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4 sm:flex-row sm:items-center sm:p-5">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface qc-hard-shadow-sm">
           <PiggyBank className="h-5 w-5" />
         </span>

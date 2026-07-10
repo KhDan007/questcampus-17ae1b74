@@ -318,7 +318,7 @@ function UniversitiesPage() {
       <DashboardShell>
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
         >
         <button
           type="button"
@@ -384,7 +384,7 @@ function UniversitiesPage() {
         )}
 
         {/* Search box */}
-        <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:p-5">
+        <section className="mt-5 rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:mt-6 sm:p-5">
           <label className="block">
             <span className="font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
               Search universities
@@ -402,13 +402,13 @@ function UniversitiesPage() {
 
         </section>
 
-        <div className="mt-6">
+        <div className="mt-5 sm:mt-6">
 
           {/* Main column */}
           <div className="min-w-0">
             {/* Search results */}
             {canSearch && (
-              <section className="mb-10">
+              <section className="mb-6 sm:mb-10">
                 <h2 className="font-display text-headline-md font-bold text-on-surface">
                   Search results
                 </h2>
@@ -477,7 +477,7 @@ function UniversitiesPage() {
                     You hid all current matches. Use "Restore hidden" to bring them back.
                   </EmptyHint>
                 ) : visibleBuckets ? (
-                  <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                  <div className="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-3">
                     <MatchColumn
                       title="Safety"
                       subtitle="Likely admits"
@@ -504,7 +504,7 @@ function UniversitiesPage() {
                     />
                   </div>
                 ) : (
-                  <div className="mt-6 grid gap-5">
+                  <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-5">
                     {visibleMatches.map((card, i) => (
                       <UniversityCard
                         key={universityKey(card)}
@@ -645,7 +645,7 @@ function Paywall({
   paidStatus: "idle" | "loading" | "ready" | "error" | "payment_required";
 }) {
   return (
-    <div className="mt-8 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-6 qc-hard-shadow-sm sm:p-8">
+    <div className="mt-5 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-4 qc-hard-shadow-sm sm:mt-8 sm:p-8">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary text-white">
@@ -695,11 +695,11 @@ function LoadingHint() {
 
 function MatchesSkeleton() {
   return (
-    <div className="mt-6 grid gap-5">
+    <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-5">
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-6"
+          className="rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-6"
         >
           <div className="h-5 w-48 rounded-full bg-surface-container-high" />
           <div className="mt-3 h-3 w-28 rounded-full bg-surface-container-high" />
@@ -949,12 +949,12 @@ function SavedTab({
         </div>
       </div>
       {saved === undefined ? (
-        <div className="mt-6 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm">
+        <div className="mt-5 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm sm:mt-6">
           <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
           <span className="text-body-sm text-on-surface-variant">Loading your saved list…</span>
         </div>
       ) : saved.length === 0 ? (
-        <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
+        <div className="mt-5 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm sm:mt-6 sm:p-8">
           <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
           <p className="mt-3 text-body-md text-on-surface-variant">
             Search for universities you already know, or save schools from your matches using the
@@ -962,7 +962,7 @@ function SavedTab({
           </p>
         </div>
       ) : (
-        <ul className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-5 grid min-w-0 gap-3 sm:mt-6 sm:grid-cols-2 lg:grid-cols-3">
           {saved.map((u, i) => {
             const card: RecCard = {
               externalId: u.externalId,

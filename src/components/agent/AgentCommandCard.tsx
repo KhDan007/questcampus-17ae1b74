@@ -52,7 +52,7 @@ export function AgentCommandCard({
         // viewport — this card renders in narrow grid columns where a
         // viewport sm: breakpoint row-ified it and crushed the text.
         "@container rounded-2xl border-2 border-on-surface bg-surface/95 qc-hard-shadow-sm",
-        compact ? "p-4" : "p-5 sm:p-6",
+        compact ? "p-4" : "p-4 sm:p-6",
         className,
       ].filter(Boolean).join(" ")}
     >

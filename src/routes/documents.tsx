@@ -87,7 +87,7 @@ function DocumentsHubPage() {
           </button>
         </header>
 
-        <section className="mt-8">
+        <section className="mt-5 sm:mt-8">
           {docs === undefined ? (
             <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading…
@@ -108,7 +108,7 @@ function DocumentsHubPage() {
           )}
         </section>
 
-        <p className="mt-10 text-label-sm text-on-surface-variant">
+        <p className="mt-6 sm:mt-10 text-label-sm text-on-surface-variant">
           Writing a personal statement or supplemental essay?{" "}
           <Link to="/essay" className="font-semibold text-on-surface underline underline-offset-4">
             Head to the Essay Assistant

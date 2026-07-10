@@ -74,7 +74,7 @@ export function BatchActionBar() {
           frame on throttled mobile browsers). */}
       {count > 0 && (
         <div
-          className="fixed inset-x-0 bottom-4 z-40 mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 backdrop-blur-md qc-hard-shadow sm:flex-row sm:items-center sm:gap-3"
+          className="fixed inset-x-0 bottom-20 z-40 mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 backdrop-blur-md qc-hard-shadow sm:bottom-4 sm:flex-row sm:items-center sm:gap-3"
           style={{ width: "calc(100% - 2rem)" }}
         >
           <div className="flex items-center gap-2 sm:gap-3">

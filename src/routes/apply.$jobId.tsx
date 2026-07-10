@@ -104,7 +104,7 @@ function ApplyRunPage() {
         <LivingBackground />
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pt-28 sm:px-8 lg:px-12"
+          className="relative mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12"
         >
           <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading live application...
@@ -122,7 +122,7 @@ function ApplyRunPage() {
       <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
       >
         <Link
           to="/apply"
@@ -321,7 +321,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         </>
       )}
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[1fr_320px]">
         {/* Live canvas / waiting state */}
         <div className="min-w-0">
           {/* Demo: portal chapter rail above the stage */}
@@ -747,7 +747,7 @@ function Modal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+      <div className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
         <div className="flex items-start gap-2">
           {icon}
           <h3 className="min-w-0 flex-1 font-display text-headline-sm font-bold text-on-surface">

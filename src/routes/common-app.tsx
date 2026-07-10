@@ -38,7 +38,7 @@ function CommonAppProfilePage() {
       <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-32 pt-24 sm:px-8 lg:px-12"
+        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-32 pt-20 sm:px-8 sm:pt-24 lg:px-12"
       >
         <CommonAppProfile focusSection={section} />
       </main>

@@ -89,7 +89,7 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
   const complete = completeness?.complete ?? false;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       <Link
         to="/apply"
         className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface/70 hover:text-on-surface"
@@ -98,18 +98,18 @@ export function CommonAppProfile({ focusSection }: { focusSection?: string } = {
       </Link>
 
       {/* Header */}
-      <section className="rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow sm:p-8">
+      <section className="rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-8">
         <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
           Universal profile
         </p>
-        <h1 className="mt-1 font-display text-display-sm font-bold text-on-surface sm:text-display-md">
+        <h1 className="mt-1 font-display text-headline-lg font-bold text-on-surface sm:text-display-md">
           Common App Profile
         </h1>
         <p className="mt-2 max-w-2xl text-body-md text-on-surface-variant">
           Fill this once — we auto-fill it into every Common App school.
         </p>
 
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-4 sm:mt-6">
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-3">
               <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
@@ -257,7 +257,7 @@ function SectionCard({
 }) {
   const done = status?.complete ?? false;
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="font-display text-headline-sm font-bold text-on-surface">
@@ -288,9 +288,9 @@ function SectionCard({
         )}
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4 sm:mt-5">
         {section.fields && section.fields.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
             {section.fields.map((f) => (
               <ScalarField
                 key={f.conceptKey}
@@ -341,7 +341,7 @@ function ScalarField({
 
 
   const isFullWidth = field.type === "longtext" || field.type === "essay";
-  const wrapperClass = isFullWidth ? "sm:col-span-2" : "";
+  const wrapperClass = "min-w-0 " + (isFullWidth ? "sm:col-span-2" : "");
 
   if (field.type === "essay") {
     return (
@@ -368,7 +368,7 @@ function ScalarField({
   }
 
   const inputClass =
-    "w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none";
+    "w-full min-w-0 rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none";
 
   const maxAttr = field.maxChars ? { maxLength: field.maxChars } : {};
   const counter =
@@ -500,7 +500,7 @@ function RepeatGroupEditor({
   const indexes = Array.from({ length: count }, (_, i) => i + 1);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {indexes.map((index) => (
         <div
           key={index}
@@ -518,7 +518,7 @@ function RepeatGroupEditor({
               <Trash2 className="h-3.5 w-3.5" /> Clear
             </button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
             {group.itemFields.map((f) => {
               const key = `${group.groupKey}_${index}_${f.conceptKey}`;
               return (

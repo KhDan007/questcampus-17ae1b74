@@ -252,99 +252,11 @@ function DashboardPage() {
             <ResumeBanner />
           </div>
 
-          {/* See it in action — the live demo, front and center */}
-          {authed && (
-            <div className="mt-6">
-              <SilentErrorBoundary>
-                <DemoHeroCard />
-              </SilentErrorBoundary>
-            </div>
-          )}
-
-          {authed && (
-            <div className="mt-6">
-              <SilentErrorBoundary>
-                <AgentCommandCard
-                  title="Let the deep agent plan the next move"
-                  body="One roadmap uses your profile, saved schools, requirements, documents, scholarship signals, extension state, and applied tracker."
-                />
-              </SilentErrorBoundary>
-            </div>
-          )}
-
-          {/* Split hero: next-step (8) + task rail (4) */}
-          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-8">
-              <NextStepCard isAuthenticated={authed} />
-            </div>
-            <div className="lg:col-span-4">
-              <SilentErrorBoundary>
-                <TaskRail isAuthenticated={authed} />
-              </SilentErrorBoundary>
-            </div>
-          </div>
-
-          {/* Your picks — main picks grid */}
-          {authed && (
-            <SilentErrorBoundary>
-              <YourPicksSection />
-            </SilentErrorBoundary>
-          )}
-
-          {/* Best for scholarships & aid — ranked from saved schools */}
-          {authed && (
-            <SilentErrorBoundary>
-              <BestForAidSection />
-            </SilentErrorBoundary>
-          )}
-
-          {/* Secondary utility row: prep progress + search (quiet tier) */}
-          <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {authed ? (
-              <SilentErrorBoundary>
-                <PrepSummaryCard />
-              </SilentErrorBoundary>
-            ) : (
-              <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md">
-                <h2 className="font-display text-headline-sm font-bold text-on-surface">
-                  Save this workspace
-                </h2>
-                <p className="mt-1 text-body-sm text-on-surface-variant">
-                  Create a free account to save picks, essays, and answers across devices.
-                </p>
-                <Link
-                  to="/signin"
-                  search={{ mode: "signup" } as never}
-                  className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  Create account <ArrowRight className="h-4 w-4" />
-                </Link>
-              </section>
-            )}
-
-            {/* Search — quiet utility (essay lives in the task rail + sidebar) */}
-            <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md">
-              <SilentErrorBoundary>
-                <UniversitySearchSection
-                  title="Search 11,000+ universities"
-                  subtitle="Add any school to your shortlist."
-                />
-              </SilentErrorBoundary>
-              <Link
-                to="/universities"
-                search={{ q: "" }}
-                className="mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
-              >
-                Open full workspace <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </section>
-          </div>
-
-          {/* Quiz matches — collapsed compact strip */}
+          {/* Quiz matches — surfaced right after onboarding */}
           {(loading || (saved && saved.matches.length > 0) || !saved) && (
-            <section className="mt-10">
+            <section className="mt-6">
               <div className="mb-3 flex items-end justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <h2 className="font-display text-headline-sm font-bold text-on-surface">
                     From your quiz
                   </h2>
@@ -395,7 +307,7 @@ function DashboardPage() {
                   ))}
                 </motion.div>
               ) : (
-                <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+                <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4 sm:p-6 text-center backdrop-blur-sm">
                   <p className="text-body-md text-on-surface-variant">
                     No matches yet. Take the 60-second quiz to populate this.
                   </p>
@@ -404,8 +316,96 @@ function DashboardPage() {
             </section>
           )}
 
+          {/* See it in action — the live demo, front and center */}
+          {authed && (
+            <div className="mt-6">
+              <SilentErrorBoundary>
+                <DemoHeroCard />
+              </SilentErrorBoundary>
+            </div>
+          )}
+
+          {authed && (
+            <div className="mt-6">
+              <SilentErrorBoundary>
+                <AgentCommandCard
+                  title="Let the deep agent plan the next move"
+                  body="One roadmap uses your profile, saved schools, requirements, documents, scholarship signals, extension state, and applied tracker."
+                />
+              </SilentErrorBoundary>
+            </div>
+          )}
+
+          {/* Split hero: next-step (8) + task rail (4) */}
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <NextStepCard isAuthenticated={authed} />
+            </div>
+            <div className="lg:col-span-4">
+              <SilentErrorBoundary>
+                <TaskRail isAuthenticated={authed} />
+              </SilentErrorBoundary>
+            </div>
+          </div>
+
+          {/* Your picks — main picks grid */}
+          {authed && (
+            <SilentErrorBoundary>
+              <YourPicksSection />
+            </SilentErrorBoundary>
+          )}
+
+          {/* Best for scholarships & aid — ranked from saved schools */}
+          {authed && (
+            <SilentErrorBoundary>
+              <BestForAidSection />
+            </SilentErrorBoundary>
+          )}
+
+          {/* Secondary utility row: prep progress + search (quiet tier) */}
+          <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {authed ? (
+              <SilentErrorBoundary>
+                <PrepSummaryCard />
+              </SilentErrorBoundary>
+            ) : (
+              <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-4 sm:p-5 backdrop-blur-md">
+                <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                  Save this workspace
+                </h2>
+                <p className="mt-1 text-body-sm text-on-surface-variant">
+                  Create a free account to save picks, essays, and answers across devices.
+                </p>
+                <Link
+                  to="/signin"
+                  search={{ mode: "signup" } as never}
+                  className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                >
+                  Create account <ArrowRight className="h-4 w-4" />
+                </Link>
+              </section>
+            )}
+
+            {/* Search — quiet utility (essay lives in the task rail + sidebar) */}
+            <section className="rounded-2xl border border-on-surface/15 bg-surface/60 p-4 sm:p-5 backdrop-blur-md">
+              <SilentErrorBoundary>
+                <UniversitySearchSection
+                  title="Search 11,000+ universities"
+                  subtitle="Add any school to your shortlist."
+                />
+              </SilentErrorBoundary>
+              <Link
+                to="/universities"
+                search={{ q: "" }}
+                className="mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+              >
+                Open full workspace <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </section>
+          </div>
+
           {/* Coming soon compact */}
-          <section className="mt-10">
+          <section className="mt-6 sm:mt-10">
             <div className="mb-3 flex items-baseline justify-between gap-3">
               <h2 className="font-display text-headline-sm font-bold text-on-surface">
                 What's next
@@ -429,7 +429,7 @@ function DashboardPage() {
           </section>
 
           {!authed && (
-            <p className="mt-8 text-center text-body-sm text-on-surface-variant">
+            <p className="mt-5 sm:mt-8 text-center text-body-sm text-on-surface-variant">
               You're browsing as a guest.{" "}
               <a href="/signin?mode=signup" className="text-primary hover:underline">
                 Create a free account
@@ -455,10 +455,10 @@ function DashboardPage() {
 function DemoHeroCard() {
   const { run, starting, error } = useRunDemo();
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-primary-fixed p-5 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border-2 border-on-surface bg-primary-fixed p-4 qc-hard-shadow sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <span className="grid h-10 w-10 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm">
             <Play className="h-5 w-5" />
           </span>
           <div className="min-w-0">
@@ -510,7 +510,7 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
         },
       }}
       whileHover={{ y: -4, transition: { type: "spring", stiffness: 260, damping: 22 } }}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-lg border-2 border-on-surface bg-surface-container-lowest p-4 sm:p-5 ${style.border} qc-hard-shadow hover:shadow-[6px_6px_0_0_var(--color-primary)] transition-shadow`}
     >
       <div className="flex items-start justify-between gap-3">
         <span
@@ -661,7 +661,7 @@ function PrepSummaryCard() {
   return (
     <section
       id="dashboard-prep"
-      className="flex h-full flex-col rounded-2xl border border-on-surface/15 bg-surface/60 p-5 backdrop-blur-md"
+      className="flex h-full flex-col rounded-2xl border border-on-surface/15 bg-surface/60 p-4 sm:p-5 backdrop-blur-md"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -995,7 +995,7 @@ function TaskRail({ isAuthenticated }: { isAuthenticated: boolean }) {
     d === "tertiary" ? "bg-tertiary" : d === "muted" ? "bg-on-surface/30" : "bg-primary";
 
   return (
-    <aside className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow">
+    <aside className="flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface/95 p-4 sm:p-5 backdrop-blur-md qc-hard-shadow">
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <h3 className="font-display text-headline-sm font-bold text-on-surface">Task rail</h3>
         <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
