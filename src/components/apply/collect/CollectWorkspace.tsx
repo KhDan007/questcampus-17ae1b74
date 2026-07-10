@@ -161,7 +161,7 @@ export function CollectWorkspace({
             <div className="hidden text-right sm:block">
               <p className="font-display text-display-sm font-bold text-on-surface">{percent}%</p>
               <p className="text-label-sm text-on-surface-variant">
-                {summary?.answered ?? 0} / {summary?.totalAskable ?? 0} answered
+                {countedAnswered} / {countedTotal} answered
               </p>
             </div>
           </div>
