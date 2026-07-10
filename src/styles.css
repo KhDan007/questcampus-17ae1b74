@@ -425,3 +425,22 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
   }
   .animate-blob-in { opacity: 1; transform: none; }
 }
+
+/* Touch tap targets: on coarse (touch) pointers, interactive controls get a
+   comfortable minimum hit height (≥44px, the mobile standard) so small text
+   buttons/tabs/inputs aren't fiddly to tap. Desktop/mouse is untouched. Opt an
+   element out with data-no-tap when a control is intentionally tiny + inline. */
+@media (pointer: coarse), (max-width: 767px) {
+  button:not(:disabled):not([data-no-tap]),
+  [role="button"]:not([data-no-tap]),
+  a.inline-flex:not([data-no-tap]),
+  a[data-tap]:not([data-no-tap]),
+  select,
+  summary {
+    min-height: 44px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  textarea {
+    min-height: 44px;
+  }
+}
