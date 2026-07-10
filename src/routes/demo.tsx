@@ -74,23 +74,29 @@ function DemoBody({ token }: { token: string }) {
 
   // Idempotent onboarding prefill so basics show as the user's own data. Fire
   // once on mount; ignore errors (it's best-effort and safe to skip).
-  const prefilledRef = useRef(false);
   const [prefillDone, setPrefillDone] = useState(false);
   useEffect(() => {
-    if (prefilledRef.current) return;
-    prefilledRef.current = true;
-    let mounted = true;
+    let cancelled = false;
+    // Hard cap: a slow or failed prefill must never block the demo. Whichever
+    // settles first — the mutation or this cap — unblocks the plan query.
+    // No ref-guard: prefillFromOnboarding is idempotent, and a ref-guard would
+    // deadlock the gate under React's dev effect double-invoke (the first run's
+    // finally sees a stale flag, the re-armed run early-returns → never flips).
+    const cap = setTimeout(() => {
+      if (!cancelled) setPrefillDone(true);
+    }, 2500);
     void (async () => {
       try {
         await prefill({ token });
       } catch {
         // best-effort — the plan still returns fallback portals.
       } finally {
-        if (mounted) setPrefillDone(true);
+        if (!cancelled) setPrefillDone(true);
       }
     })();
     return () => {
-      mounted = false;
+      cancelled = true;
+      clearTimeout(cap);
     };
   }, [prefill, token]);
 
