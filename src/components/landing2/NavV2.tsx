@@ -61,7 +61,7 @@ export function NavV2() {
     setPopup(true);
   }
 
-  const showWaitlistButton = isLanding || isUnlock;
+  const showStartButton = isLanding || isUnlock;
   // Signed-in workspace pages get their nav from DashboardShell's drawer
   // (bottom-left FAB) — the header hamburger there was a redundant second
   // menu. Keep it only where it's the sole navigation: the landing page
@@ -108,13 +108,12 @@ export function NavV2() {
           </div>
 
           <div className="flex items-center gap-3">
-            {showWaitlistButton && (
+            {showStartButton && (
               <a
-                href={isLanding ? "/#waitlist" : "#waitlist"}
-                onClick={joinWaitlist}
-                className="group hidden items-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none sm:inline-flex"
+                href="/signin?mode=signup"
+                className="group hidden items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none sm:inline-flex"
               >
-                Join waitlist
+                Start now
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             )}
@@ -186,13 +185,13 @@ export function NavV2() {
                 </nav>
 
                 <div className="mt-auto pt-6">
-                  {showWaitlistButton ? (
+                  {showStartButton ? (
                     <a
-                      href={isLanding ? "/#waitlist" : "#waitlist"}
-                      onClick={(e) => { setMobileOpen(false); joinWaitlist(e); }}
-                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-secondary-container px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm"
+                      href="/signin?mode=signup"
+                      onClick={() => setMobileOpen(false)}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
                     >
-                      Join waitlist <ArrowRight className="h-4 w-4" />
+                      Start now <ArrowRight className="h-4 w-4" />
                     </a>
                   ) : !isAuthenticated ? (
                     <Link
