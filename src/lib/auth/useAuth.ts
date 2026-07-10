@@ -56,3 +56,14 @@ export function useAuth(): {
     isHydrated,
   };
 }
+
+/**
+ * Whether to show the "$0 · free to start" framing.
+ * Signed-out visitors always see it; signed-in users see it only when they
+ * are not paid and have not yet used their free trial. Paid users and users
+ * who already trialed must NOT see the $0 hooks.
+ */
+export function useFreeHook(): boolean {
+  const { isAuthenticated, hasPaidAccess, user } = useAuth();
+  return !isAuthenticated ? true : !hasPaidAccess && !user?.hadTrial;
+}

@@ -8,7 +8,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { ProfileMenu } from "./ProfileMenu";
 import { WaitlistPopup } from "./WaitlistPopup";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
 
 
 export function NavV2() {
@@ -21,6 +21,7 @@ export function NavV2() {
   const isLanding = pathname === "/" || pathname === "";
   const isUnlock = pathname.startsWith("/unlock");
   const { isAuthenticated } = useAuth();
+  const freeHook = useFreeHook();
 
   useEffect(() => {
     setMounted(true);
@@ -115,7 +116,12 @@ export function NavV2() {
                 href={startHref}
                 className="group hidden items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none sm:inline-flex"
               >
-                Start now
+                {freeHook && (
+                  <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-label-sm font-bold leading-none">
+                    $0
+                  </span>
+                )}
+                {freeHook ? "Start free" : "Start now"}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             )}
@@ -193,7 +199,12 @@ export function NavV2() {
                       onClick={() => setMobileOpen(false)}
                       className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
                     >
-                      Start now <ArrowRight className="h-4 w-4" />
+                      {freeHook && (
+                        <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-label-sm font-bold leading-none">
+                          $0
+                        </span>
+                      )}
+                      {freeHook ? "Start free" : "Start now"} <ArrowRight className="h-4 w-4" />
                     </a>
                   ) : !isAuthenticated ? (
                     <Link
@@ -209,7 +220,8 @@ export function NavV2() {
                       onClick={() => setMobileOpen(false)}
                       className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm"
                     >
-                      <Sparkles className="h-4 w-4" /> Unlock for $15
+                      <Sparkles className="h-4 w-4" />
+                      {freeHook ? "Start free trial" : "Unlock for $15"}
                     </Link>
                   )}
                 </div>

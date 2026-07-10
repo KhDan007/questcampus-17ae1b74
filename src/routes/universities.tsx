@@ -22,7 +22,8 @@ import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
 import { EnrichmentDetails } from "@/components/profile/EnrichmentDetails";
 import { UnlockButton } from "@/components/payments/UnlockButton";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
+import { FreeBadge } from "@/components/common/FreeBadge";
 import { getSessionId } from "@/lib/onboarding/session";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { RefineRecommendationsCard } from "@/components/universities/RefineRecommendationsCard";
@@ -644,6 +645,7 @@ function Paywall({
   token: string | undefined;
   paidStatus: "idle" | "loading" | "ready" | "error" | "payment_required";
 }) {
+  const freeHook = useFreeHook();
   return (
     <div className="mt-5 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-4 qc-hard-shadow-sm sm:mt-8 sm:p-8">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -655,8 +657,11 @@ function Paywall({
             <h3 className="font-display text-headline-sm font-bold text-on-surface">
               Unlock your full match list
             </h3>
+            {freeHook && <FreeBadge variant="line" className="mt-1.5" />}
             <p className="mt-1 max-w-md text-body-md text-on-surface-variant">
-              $15/month subscription. Up to 20 universities across Safety, Target, and Reach.
+              {freeHook
+                ? "$15/month after your trial. Up to 20 universities across Safety, Target, and Reach."
+                : "$15/month subscription. Up to 20 universities across Safety, Target, and Reach."}
             </p>
             {paidStatus === "payment_required" && (
               <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -665,7 +670,10 @@ function Paywall({
             )}
           </div>
         </div>
-        <UnlockButton token={token} label="$15/month subscription" />
+        <UnlockButton
+          token={token}
+          label={freeHook ? "Start free trial" : "$15/month subscription"}
+        />
       </div>
     </div>
   );

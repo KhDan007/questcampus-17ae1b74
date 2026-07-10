@@ -17,9 +17,10 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { auth } from "@/lib/auth/client";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
 import { UnlockButton } from "@/components/payments/UnlockButton";
 import { TiltCard } from "@/components/payments/TiltCard";
+import { FreeBadge } from "@/components/common/FreeBadge";
 
 import { SIGNIN_PATH } from "@/lib/routes";
 import { PRICE_MVP } from "@/lib/config";
@@ -42,7 +43,9 @@ export const Route = createFileRoute("/unlock/")({
 function UnlockPage() {
   const { t } = useI18n();
   const reduce = useReducedMotion();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
+  const freeHook = useFreeHook();
+  const notTrialed = !user?.hadTrial;
   const token = auth.getSession()?.token;
   const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
     | { paid: boolean }
@@ -86,6 +89,12 @@ function UnlockPage() {
             <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />3-day free trial
             </span>
+
+            {freeHook && (
+              <div className="mt-4">
+                <FreeBadge variant="line" />
+              </div>
+            )}
 
             <h1 className="mt-6 text-balance font-display text-[2.5rem] font-black leading-[1.04] tracking-tight text-on-surface sm:text-[3.5rem] lg:text-[4rem]">
               Stop guessing.{" "}
@@ -182,6 +191,7 @@ function UnlockPage() {
                   <>
                     <UnlockButton
                       token={token}
+                      label={notTrialed ? "Start free trial" : undefined}
                       className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
                     />
                     <p className="text-center font-[var(--font-label)] text-label-sm text-on-surface-variant">

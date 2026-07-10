@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Send, Loader2, Lock } from "lucide-react";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
+import { useFreeHook } from "@/lib/auth/useAuth";
 import type { AutoApplyEntitlement, BackendTarget } from "@/lib/apply/intake";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
   const navigate = useNavigate();
   const applyGate = useAutoApplyGate();
+  const freeHook = useFreeHook();
   const [busy, setBusy] = useState(false);
 
   const gate = entitlement?.gate;
@@ -30,7 +32,9 @@ export function LaunchBar({ entitlement, percent, readyTargets }: Props) {
     : gate === "not_ready"
       ? "Finish your requirements to continue"
       : needsPayment
-        ? "Unlock full auto-apply — $15/mo"
+        ? freeHook
+          ? "Start free trial — $15/mo after"
+          : "Unlock full auto-apply — $15/mo"
         : !hasReady
           ? "Finish a university's requirements to apply"
           : gate === "ready_free"

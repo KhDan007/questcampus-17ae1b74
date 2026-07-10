@@ -15,6 +15,7 @@ export type AuthUser = {
   name?: string | null;
   avatarUrl?: string | null;
   paid?: boolean;
+  hadTrial?: boolean;
   emailVerified?: boolean;
 };
 

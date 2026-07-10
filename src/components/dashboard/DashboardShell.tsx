@@ -24,7 +24,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 
@@ -352,6 +352,7 @@ function SidebarBody({
 }) {
   const reduce = useReducedMotion();
   const items = useMemo(() => TOP_ITEMS, []);
+  const freeHook = useFreeHook();
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-1 p-3 pt-5">
@@ -459,7 +460,7 @@ function SidebarBody({
         ) : (
           <Link
             to="/unlock"
-            title={collapsed ? "Upgrade — $15/month" : undefined}
+            title={collapsed ? (freeHook ? "Start free trial — $15/mo after" : "Upgrade — $15/month") : undefined}
             className={`group relative overflow-hidden rounded-xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
               collapsed ? "mx-auto grid h-10 w-10 place-items-center" : "p-3"
             }`}
@@ -480,13 +481,25 @@ function SidebarBody({
             )}
             {collapsed ? (
               <Sparkles className="h-4 w-4" />
+            ) : freeHook ? (
+              <>
+                <p className="relative inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider">
+                  <Sparkles className="h-3.5 w-3.5" /> $0 today · 3 days free
+                </p>
+                <p className="relative mt-1 font-display text-label-lg font-bold">
+                  Start free trial
+                </p>
+                <p className="relative mt-0.5 text-label-sm text-white/85">
+                  $15/mo after · cancel anytime.
+                </p>
+              </>
             ) : (
               <>
                 <p className="relative inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider">
                   <Sparkles className="h-3.5 w-3.5" /> Upgrade
                 </p>
                 <p className="relative mt-1 font-display text-label-lg font-bold">
-                  Unlock for $15/month
+                  Unlock $15/month
                 </p>
                 <p className="relative mt-0.5 text-label-sm text-white/85">
                   Monthly subscription. Full matches + polished essays.

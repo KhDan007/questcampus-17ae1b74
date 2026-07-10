@@ -7,12 +7,14 @@ import { AlertTriangle, ArrowRight, Search, Sparkles, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { HeroQuiz, type QuizAnswers } from "./HeroQuiz";
 import { ResultsReveal } from "./ResultsReveal";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
+import { FreeBadge } from "@/components/common/FreeBadge";
 
 export function HeroOnboarding() {
   const reduce = useReducedMotion();
   const [answers, setAnswers] = useState<QuizAnswers | null>(null);
   const { isAuthenticated } = useAuth();
+  const freeHook = useFreeHook();
   const [warnOpen, setWarnOpen] = useState(false);
   const [ack, setAck] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -92,6 +94,7 @@ export function HeroOnboarding() {
               <p className="mt-2 text-body-sm text-on-surface-variant">
                 Browse the full catalog or jump straight to schools you already know.
               </p>
+              {freeHook && <FreeBadge variant="line" className="mt-3" />}
             </motion.div>
           </div>
 
