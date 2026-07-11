@@ -28,3 +28,12 @@ test("uses clear popup labels", () => {
   assert.equal(assistantRouteToastLabel("/apply/strength"), "Opening application strength");
   assert.equal(assistantRouteToastLabel("/apply"), "Opening applications");
 });
+
+// Regression: a malformed/null route on an action must not throw.
+test("never throws on null/undefined route", () => {
+  assert.equal(normalizeAssistantRoute(null as unknown as string), null);
+  assert.equal(normalizeAssistantRoute(undefined as unknown as string), null);
+  assert.equal(normalizeAssistantRoute(42 as unknown as string), null);
+  assert.equal(assistantRouteToastLabel(null as unknown as string), "Opening page");
+  assert.equal(assistantRouteToastLabel(undefined as unknown as string), "Opening page");
+});

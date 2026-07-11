@@ -20,7 +20,8 @@ const ALLOWED_ROUTE_PATTERNS = [
   /^\/application\/[^/]+\/[^/]+$/,
 ];
 
-export function normalizeAssistantRoute(rawRoute: string): string | null {
+export function normalizeAssistantRoute(rawRoute: string | null | undefined): string | null {
+  if (typeof rawRoute !== "string") return null;
   const route = rawRoute.trim();
   if (!route || !route.startsWith("/") || route.startsWith("//")) return null;
   const path = route.split("?")[0] ?? route;
@@ -29,8 +30,8 @@ export function normalizeAssistantRoute(rawRoute: string): string | null {
   return route;
 }
 
-export function assistantRouteToastLabel(route: string): string {
-  const normalized = normalizeAssistantRoute(route) ?? route;
+export function assistantRouteToastLabel(route: string | null | undefined): string {
+  const normalized = normalizeAssistantRoute(route) ?? (typeof route === "string" ? route : "");
   if (normalized === APPLICATION_STRENGTH_ROUTE) return "Opening application strength";
   if (normalized === "/apply") return "Opening applications";
   if (normalized.startsWith("/universities")) return "Opening universities";
