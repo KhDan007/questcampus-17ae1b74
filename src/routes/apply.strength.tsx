@@ -166,9 +166,12 @@ function StrengthBody() {
 }
 
 // Each weak area is fixed somewhere concrete: essays in the Essay Assistant,
-// everything else in the Applications collect workspace.
+// extracurriculars/honors on the Activities page, academics in the
+// Applications collect workspace.
 function criterionRoute(key: StrengthCriterion["key"]): string {
-  return key === "essays" ? "/essay" : "/apply";
+  if (key === "essays") return "/essay";
+  if (key === "ecs" || key === "honors") return "/activities";
+  return "/apply";
 }
 
 function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {

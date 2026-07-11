@@ -257,7 +257,7 @@ function SectionSummaryRow({
   );
 }
 
-function SectionCard({
+export function SectionCard({
   section,
   status,
   answers,
