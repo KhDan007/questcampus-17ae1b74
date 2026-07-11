@@ -232,7 +232,12 @@ async function extractUiLiterals(existingSource) {
 
       if (ts.isJsxAttribute(node)) {
         const attr = node.name.getText(source);
-        if (VISIBLE_ATTRS.has(attr) && node.initializer) {
+        // VISIBLE_ATTRS = real HTML attributes (title/placeholder/alt/aria-*).
+        // VISIBLE_PROP_NAMES = component props that render user-visible copy
+        // (subtitle, body, desc, label, cta, ...). Both forms carry translatable
+        // strings when passed as a JSX attribute, e.g. <SectionHeading
+        // subtitle="Answer once" /> — without this the calm-primitive props leak.
+        if ((VISIBLE_ATTRS.has(attr) || VISIBLE_PROP_NAMES.has(attr)) && node.initializer) {
           if (ts.isStringLiteral(node.initializer)) add(node.initializer.text);
           else collectStringLeaves(node.initializer, add);
         }
