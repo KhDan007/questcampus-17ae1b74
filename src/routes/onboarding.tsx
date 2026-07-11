@@ -838,30 +838,30 @@ function OnboardingPage() {
 
         </div>
 
-        {/* Submit */}
-        <div className="sticky bottom-4 z-20 mt-12">
+        <div className="sticky bottom-4 z-20 mt-12 pr-24 sm:pr-0">
           <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="font-[var(--font-label)] text-label-md text-on-surface-variant">
                 {countFilled(answers)} of 14 answered
                 {!canSubmit && (
-                  <span className="ml-1 text-primary">· pick at least one study field</span>
+                  <span className="ml-1 block text-primary sm:inline">· pick at least one study field</span>
                 )}
               </p>
               <button
                 type="button"
                 disabled={!canSubmit || submitting}
                 onClick={onSubmit}
-                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                className="group inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-display text-title-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3.5 sm:text-headline-sm"
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                    <Loader2 className="h-4 w-4 animate-spin shrink-0" /> Saving…
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" /> Re-rank my matches
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    <Sparkles className="h-4 w-4 shrink-0" />
+                    <span className="truncate">Re-rank my matches</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </>
                 )}
               </button>
@@ -871,6 +871,7 @@ function OnboardingPage() {
             )}
           </div>
         </div>
+
       </main>
     </>
   );
