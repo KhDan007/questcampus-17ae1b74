@@ -8,10 +8,10 @@ import {
   Loader2,
   Play,
   Search,
-  Send,
   Square,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { SectionHeading } from "@/components/ui/calm";
 import { DocumentManager } from "@/components/apply/DocumentManager";
 import { ApplyStepper } from "@/components/apply/ApplyStepper";
 import { ResearchDock } from "@/components/apply/ResearchDock";
@@ -71,7 +71,7 @@ function ApplyHubPage() {
     <DashboardShell>
       <main
         id="main-content"
-        className="mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-20 sm:px-8 sm:pb-32 sm:pt-28 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-4 pb-44 pt-20 sm:px-6 sm:pb-32 lg:px-8"
       >
         <Link
           to="/dashboard"
@@ -80,73 +80,89 @@ function ApplyHubPage() {
           <ArrowLeft className="h-4 w-4" /> Back to dashboard
         </Link>
 
-        <div className="mt-6">
+        <div className="mt-5">
           <ApplyStepper current="pick" />
         </div>
 
-        <header className="mt-5 sm:mt-8">
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-            Auto-Apply
-          </p>
-          <h1 className="mt-2 font-display text-display-md text-on-surface">
-            <Send className="mr-2 inline h-7 w-7 text-primary" />
-            Pick universities. We do the rest.
+        <header className="mt-6">
+          <h1 className="font-display text-headline-lg font-bold text-on-surface">
+            Applications
           </h1>
-          <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
-            Select one or many. Prep your details once. We deep-research each portal, fill it in a
-            live browser, and hand you the wheel before submit.
+          <p className="mt-1 max-w-2xl text-body-md text-on-surface-variant">
+            Pick your universities, prep your details once, and we deep-research and fill every
+            portal in a live browser — you take the wheel before submit.
           </p>
-          <div className="mt-6">
-            <RunLiveDemoCard />
-          </div>
         </header>
 
-        <div className="mt-5 space-y-5 sm:mt-8 sm:space-y-8">
-          <SilentErrorBoundary>
-            <CommonAppProfile embedded />
-          </SilentErrorBoundary>
-
-          <SilentErrorBoundary>
-            <ApplicationStrengthCard />
-          </SilentErrorBoundary>
-
-          <PlanTeaserCard />
-
+        {/* Guidance + any live job, above the split */}
+        <div className="mt-5 flex flex-col gap-4">
           <ResumeBanner />
-
-          <SilentErrorBoundary>
-            <ResearchDock />
-          </SilentErrorBoundary>
-
-          <SilentErrorBoundary>
-            <AgentCommandCard
-              title="Roadmap this shortlist"
-              body="The deep agent turns this shortlist into target readiness, missing prep, scholarship route, extension handoff, and application tracker state."
-            />
-          </SilentErrorBoundary>
-
           <SilentErrorBoundary>
             <NextProductiveAction />
           </SilentErrorBoundary>
+        </div>
 
-          <SilentErrorBoundary>
-            <ApplicationsPrepWorkspace />
-          </SilentErrorBoundary>
-
-          <SilentErrorBoundary>
-            <SavedToPick />
-          </SilentErrorBoundary>
-
-          <details className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
-            <summary className="cursor-pointer font-display text-headline-sm font-bold text-on-surface">
-              Your documents
-            </summary>
-            <div className="mt-4">
+        {/* Primary flow in the main column; tools + tracking in the rail */}
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
+            <section>
+              <SectionHeading
+                title="1. Your shortlist"
+                subtitle="Select the universities to deep-research and apply to."
+                className="mb-4"
+              />
               <SilentErrorBoundary>
-                <DocumentManager />
+                <SavedToPick />
               </SilentErrorBoundary>
-            </div>
-          </details>
+            </section>
+
+            <section>
+              <SectionHeading
+                title="2. Prepare your details"
+                subtitle="Answer once — reused across every portal we fill."
+                className="mb-4"
+              />
+              <div className="flex flex-col gap-5">
+                <SilentErrorBoundary>
+                  <CommonAppProfile embedded />
+                </SilentErrorBoundary>
+                <SilentErrorBoundary>
+                  <ApplicationsPrepWorkspace />
+                </SilentErrorBoundary>
+              </div>
+            </section>
+
+            <section>
+              <SectionHeading title="3. Research status" className="mb-4" />
+              <SilentErrorBoundary>
+                <ResearchDock />
+              </SilentErrorBoundary>
+            </section>
+          </div>
+
+          <aside className="flex min-w-0 flex-col gap-4 lg:col-span-4">
+            <SilentErrorBoundary>
+              <ApplicationStrengthCard />
+            </SilentErrorBoundary>
+            <PlanTeaserCard />
+            <SilentErrorBoundary>
+              <AgentCommandCard
+                title="Roadmap this shortlist"
+                body="Turn your shortlist into target readiness, missing prep, scholarship route, and tracker state."
+              />
+            </SilentErrorBoundary>
+            <RunLiveDemoCard />
+            <details className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
+              <summary className="cursor-pointer font-display text-headline-sm font-bold text-on-surface">
+                Your documents
+              </summary>
+              <div className="mt-4">
+                <SilentErrorBoundary>
+                  <DocumentManager />
+                </SilentErrorBoundary>
+              </div>
+            </details>
+          </aside>
         </div>
       </main>
       <BatchActionBar />
@@ -270,36 +286,34 @@ function RunLiveDemoCard() {
   const { run: onClick, starting, error } = useRunDemo();
 
   return (
-    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
-      <div className="flex flex-wrap items-center gap-4 sm:flex-nowrap">
-        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
-          <Play className="h-5 w-5" />
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
+      <div className="flex items-start gap-3">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
+          <Play className="h-[18px] w-[18px]" />
         </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="font-display text-headline-md font-bold text-on-surface">
-            See it in action — live demo
+        <div className="min-w-0">
+          <h2 className="font-display text-headline-sm font-bold text-on-surface">
+            See it in action
           </h2>
-          <p className="mt-1 text-body-md text-on-surface-variant">
-            Watch auto-apply open a real browser and fill a test form in ~60 seconds. Nothing is submitted.
+          <p className="mt-0.5 text-body-sm text-on-surface-variant">
+            Watch auto-apply fill a real portal in ~60 seconds. Nothing is submitted.
           </p>
         </div>
-        <div className="flex flex-col items-start gap-1 sm:items-end">
-          <button
-            type="button"
-            onClick={onClick}
-            disabled={starting}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            {starting ? "Starting demo…" : "Run live demo"}
-          </button>
-          {error && (
-            <p role="alert" className="text-label-sm font-semibold text-primary">
-              {error}
-            </p>
-          )}
-        </div>
       </div>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={starting}
+        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+        {starting ? "Starting demo…" : "Run live demo"}
+      </button>
+      {error && (
+        <p role="alert" className="mt-2 text-label-sm font-semibold text-primary">
+          {error}
+        </p>
+      )}
     </section>
   );
 }
