@@ -110,10 +110,8 @@ export function NavV2() {
                 competing nav. The header stays minimal: identity + account. */}
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block">
-              <LanguageSwitcher compact />
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSwitcher compact />
             {showStartButton && (
               <a
                 href={startHref}
