@@ -165,15 +165,25 @@ function StrengthBody() {
   );
 }
 
+// Each weak area is fixed somewhere concrete: essays in the Essay Assistant,
+// everything else in the Applications collect workspace.
+function criterionRoute(key: StrengthCriterion["key"]): string {
+  return key === "essays" ? "/essay" : "/apply";
+}
+
 function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {
   const meta = STRENGTH_CRITERIA[criterion.key];
   const strong = criterion.score >= 70;
   return (
-    <article className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
+    <Link
+      to={criterionRoute(criterion.key) as never}
+      className="group block rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow qc-soft-shadow-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-display text-headline-sm font-bold text-on-surface">
+          <p className="inline-flex items-center gap-1.5 font-display text-headline-sm font-bold text-on-surface">
             {meta.label}
+            <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/30 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
           </p>
           <p className="mt-1 text-body-sm text-on-surface-variant">{criterion.gapLine}</p>
         </div>
@@ -190,8 +200,8 @@ function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {
           style={{ width: `${Math.max(0, Math.min(100, criterion.score))}%` }}
         />
       </div>
-      <p className="mt-3 text-label-sm text-on-surface-variant">{meta.fillHint}</p>
-    </article>
+      <p className="mt-3 text-label-sm font-semibold text-primary">{meta.fillHint}</p>
+    </Link>
   );
 }
 
