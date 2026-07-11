@@ -895,7 +895,7 @@ function MessageRow({
                 {friendlySteps.join(" · ")}
               </p>
             ) : null}
-            <Markdown>{message.content}</Markdown>
+            <Markdown>{message.content ?? ""}</Markdown>
             {message.streaming && (
               <span className="ml-0.5 inline-block h-3 w-[2px] animate-pulse bg-current align-middle" />
             )}

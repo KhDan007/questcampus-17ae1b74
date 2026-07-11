@@ -40,7 +40,11 @@ export function shouldAttachPageContext(message: string, settingEnabled: boolean
   return PAGE_REFERENCE_RE.test(message);
 }
 
-export function userVisibleChatContent(content: string): string {
+export function userVisibleChatContent(content: string | null | undefined): string {
+  // Messages can carry a null/empty body (an action- or steps-only assistant
+  // reply), so guard before string ops — a throw here crashes the whole chat
+  // panel (it renders inside the root error boundary → "this page didn't load").
+  if (typeof content !== "string") return "";
   return content
     .replace(/^\[Context:[^\n]*\]\n+/g, "")
     .replace(/^\[Attached file saved to documents: (.+?) as ([^\]\n]+)\]\n?/g, "Attached $1 ($2)\n")

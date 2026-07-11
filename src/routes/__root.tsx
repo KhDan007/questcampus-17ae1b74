@@ -16,6 +16,7 @@ import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { EmailVerifyGate } from "@/components/auth/EmailVerifyGate";
 import { NavV2 } from "@/components/landing2/NavV2";
 import { AssistantSidebar } from "@/components/chat/AssistantSidebar";
+import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { ChatDockProvider } from "@/lib/chat/ChatDock";
 import { LangSync } from "@/lib/i18n/LangSync";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -239,7 +240,12 @@ function RootComponent() {
             </RouteTransitions>
             <EmailVerifyGate />
             <LangSync />
-            <AssistantSidebar />
+            {/* Isolate the chat dock: a render error inside it (e.g. a
+                malformed message) must not take down the whole app via the
+                root error boundary ("this page didn't load"). */}
+            <SilentErrorBoundary>
+              <AssistantSidebar />
+            </SilentErrorBoundary>
           </ChatDockProvider>
         </I18nProvider>
       </ConvexClientProvider>

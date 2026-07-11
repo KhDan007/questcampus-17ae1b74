@@ -30,6 +30,7 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export function friendlyStepLabel(label: string): string {
+  if (typeof label !== "string") return "";
   const clean = label.trim();
   const checked = clean.match(/^Checked\s+(.+)$/i)?.[1]?.trim();
   if (checked) return QUERY_LABELS[checked] ?? "Checked your saved information";
@@ -47,10 +48,10 @@ export function friendlyStepLabel(label: string): string {
   return clean.replace(/_/g, " ");
 }
 
-export function friendlyStepLabels(labels: string[], limit = 4): string[] {
+export function friendlyStepLabels(labels: string[] | null | undefined, limit = 4): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const label of labels) {
+  for (const label of Array.isArray(labels) ? labels : []) {
     const friendly = friendlyStepLabel(label);
     if (!friendly || seen.has(friendly)) continue;
     seen.add(friendly);

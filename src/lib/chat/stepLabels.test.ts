@@ -27,3 +27,19 @@ test("dedupes and limits visible activity", () => {
     ["Read your application context", "Reviewed application strength", "Saved your answer"],
   );
 });
+
+// Regression: a malformed step (null, non-string, or a whole non-array) must
+// not throw — it renders inside the chat panel, and a throw there crashed the
+// whole app to the root error boundary ("this page didn't load") on mobile,
+// where the message list always renders.
+test("never throws on malformed step data", () => {
+  assert.equal(friendlyStepLabel(null as unknown as string), "");
+  assert.equal(friendlyStepLabel(undefined as unknown as string), "");
+  assert.equal(friendlyStepLabel({ tool: "x" } as unknown as string), "");
+  assert.deepEqual(friendlyStepLabels(null as unknown as string[]), []);
+  assert.deepEqual(friendlyStepLabels(undefined as unknown as string[]), []);
+  assert.deepEqual(
+    friendlyStepLabels([null, "Checked chat_context", 42] as unknown as string[]),
+    ["Read your application context"],
+  );
+});

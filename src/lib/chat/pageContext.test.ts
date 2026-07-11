@@ -50,3 +50,12 @@ test("hidden context and upload hints do not render as debug text in the chat", 
     "Attached transcript.pdf (transcript)\nReview it",
   );
 });
+
+// Regression: an action-/steps-only assistant reply can carry a null content.
+// Rendering it must not throw (that crashed the chat panel to the root error
+// boundary — "this page didn't load" — on mobile, which always renders messages).
+test("never throws on null/undefined message content", () => {
+  assert.equal(userVisibleChatContent(null as unknown as string), "");
+  assert.equal(userVisibleChatContent(undefined as unknown as string), "");
+  assert.equal(userVisibleChatContent(""), "");
+});
