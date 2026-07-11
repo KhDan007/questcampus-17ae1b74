@@ -50,7 +50,7 @@ export function UniversitySearchSection({
         <p className="mt-1 text-body-md text-on-surface-variant">{subtitle}</p>
       </div>
 
-      <div className="mt-5 flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 qc-hard-shadow-sm focus-within:-translate-y-0.5 focus-within:translate-x-0.5 focus-within:shadow-none">
+      <div className="mt-5 flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 transition-colors focus-within:border-on-surface/30">
         <Search className="h-4 w-4 text-on-surface/60" />
         <input
           value={query}
@@ -77,9 +77,9 @@ export function UniversitySearchSection({
                 return (
                   <li
                     key={r.id}
-                    className="flex items-center gap-3 rounded-lg border border-on-surface/15 bg-surface/95 p-3"
+                    className="flex items-center gap-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow"
                   >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-on-surface/20 bg-secondary-container">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-container text-on-surface-variant">
                       <GraduationCap className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1">

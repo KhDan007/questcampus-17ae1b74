@@ -19,7 +19,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -56,7 +55,6 @@ function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
   const { system, externalId } = Route.useParams();
   return (
     <DashboardShell>
-      <LivingBackground />
       <ApplicationFallback
         target={{ system, externalId, name: "This university" }}
         onRetry={() => {
@@ -81,9 +79,9 @@ function ApplicationFallback({
       className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12"
     >
       <BackLink />
-      <section className="mt-4 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow sm:p-8">
+      <section className="mt-4 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow sm:p-8">
         <div className="flex items-start gap-4">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-fixed text-primary">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
             <GraduationCap className="h-7 w-7" />
           </span>
           <div className="min-w-0">
@@ -101,14 +99,14 @@ function ApplicationFallback({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
                 >
                   Try again
                 </button>
               )}
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 Dashboard <ArrowRight className="h-4 w-4" />
               </Link>
@@ -143,7 +141,6 @@ function ApplicationDetailPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <SilentErrorBoundary fallback={<ApplicationFallback target={fallbackTarget} />}>
         {isHydrated ? (
           <ApplicationDetailContent system={system} externalId={externalId} />
@@ -213,10 +210,10 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
         <BackLink />
 
         {/* Hero */}
-        <header className="mt-4 rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-6 qc-hard-shadow sm:p-8">
+        <header className="mt-4 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary-fixed text-primary">
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
                 <GraduationCap className="h-7 w-7" />
               </span>
               <div className="min-w-0">
@@ -373,8 +370,8 @@ function TabButton({
       aria-selected={active}
       onClick={onClick}
       className={
-        "rounded-md border-2 border-on-surface px-4 py-1.5 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none " +
-        (active ? "bg-on-surface text-surface" : "bg-surface text-on-surface")
+        "rounded-md px-4 py-1.5 font-[var(--font-label)] text-label-md font-bold transition-colors " +
+        (active ? "bg-primary-fixed/70 text-primary" : "text-on-surface/70 hover:bg-on-surface/5")
       }
     >
       {children}
@@ -404,20 +401,20 @@ function BackLink() {
 function StatusPill({ found, ready }: { found: boolean; ready: boolean }) {
   if (ready) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-tertiary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-tertiary">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-tertiary-fixed-variant">
         <CheckCircle2 className="h-3.5 w-3.5" /> Ready to apply
       </span>
     );
   }
   if (found) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-secondary-fixed-variant">
         <Sparkles className="h-3.5 w-3.5" /> Research complete
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-primary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-primary">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed-variant">
       <Loader2 className="h-3.5 w-3.5 animate-spin" /> Researching
     </span>
   );
@@ -461,7 +458,7 @@ function ApplyCTA({ target, ready }: { target: BackendTarget; ready: boolean }) 
       type="button"
       onClick={launch}
       disabled={!ready || busy}
-      className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
       Start auto-apply
@@ -473,7 +470,7 @@ function Anchor({ href, children }: { href: string; children: React.ReactNode })
   return (
     <a
       href={href}
-      className="rounded-full border-2 border-on-surface/20 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface/80 hover:border-on-surface hover:text-on-surface"
+      className="rounded-full bg-surface-container px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface/80 transition-colors hover:bg-on-surface/10 hover:text-on-surface"
     >
       {children}
     </a>
@@ -498,12 +495,12 @@ function SectionCard({
   return (
     <section
       id={id}
-      className="scroll-mt-24 rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm sm:p-6"
+      className="scroll-mt-24 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
           {icon && (
-            <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+            <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary-fixed text-on-primary-fixed-variant">
               {icon}
             </span>
           )}
@@ -639,7 +636,7 @@ function DeadlinesCard({ facts }: { facts: UniFacts | null | undefined }) {
       {loading ? (
         <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
       ) : rows.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+        <div className="rounded-lg border border-dashed border-on-surface/15 bg-surface-container p-4 text-body-sm text-on-surface-variant">
           We don&apos;t have structured deadlines for this school yet.
           {facts?.website && (
             <>
@@ -676,7 +673,7 @@ function DeadlinesCard({ facts }: { facts: UniFacts | null | undefined }) {
                       <span className="text-label-sm text-on-surface-variant">{d.intake}</span>
                     )}
                     {d.category === "admission" && (
-                      <span className="rounded-full border border-on-surface/20 bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-primary">
+                      <span className="rounded-full bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-primary-fixed-variant">
                         admission
                       </span>
                     )}
@@ -836,7 +833,7 @@ function RequirementsList({
       subtitle={subtitle}
       right={
         found && research?.status === "ready" && research.coverage ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+          <span className="inline-flex items-center gap-1 rounded-full bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
             {research.coverage} coverage
           </span>
         ) : undefined
@@ -862,10 +859,10 @@ function RequirementsList({
               >
                 <div className="flex items-start gap-3">
                   <span
-                    className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md border-2 ${
+                    className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md ${
                       it.answered
-                        ? "border-on-surface bg-tertiary text-white"
-                        : "border-on-surface/40 bg-surface text-on-surface/40"
+                        ? "bg-tertiary text-white"
+                        : "bg-on-surface/8 text-on-surface/40"
                     }`}
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
@@ -891,7 +888,7 @@ function RequirementsList({
                   <button
                     type="button"
                     onClick={() => setEditing(it)}
-                    className="shrink-0 rounded-md border-2 border-on-surface/30 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+                    className="shrink-0 rounded-md border border-on-surface/15 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                   >
                     {it.answered ? "Edit" : "Fill in"}
                   </button>
@@ -947,7 +944,7 @@ function ScholarshipsCard({ scholarships }: { scholarships: Scholarship[] | unde
       {loading ? (
         <div className="h-24 animate-pulse rounded-lg border border-on-surface/10 bg-surface/70" />
       ) : items.length === 0 ? (
-        <p className="rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+        <p className="rounded-lg border border-dashed border-on-surface/15 bg-surface-container p-4 text-body-sm text-on-surface-variant">
           No scholarship data for this school yet — we surface aid programs as we research them.
         </p>
       ) : (
@@ -976,7 +973,7 @@ function ScholarshipsCard({ scholarships }: { scholarships: Scholarship[] | unde
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   {tag && (
-                    <span className="rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
+                    <span className="rounded-full bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wider text-on-surface/70">
                       {tag}
                     </span>
                   )}
@@ -1021,7 +1018,7 @@ function ReadinessCard({
     .filter(([k]) => k !== "ready")
     .slice(0, 6);
   return (
-    <aside className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+    <aside className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
       <h3 className="font-display text-headline-sm font-bold text-on-surface">Readiness</h3>
       <p className="mt-0.5 text-body-sm text-on-surface-variant">
         {ready
@@ -1035,8 +1032,8 @@ function ReadinessCard({
           {items.map(([k, v]) => (
             <li key={k} className="flex items-center gap-2 text-body-sm">
               <span
-                className={`grid h-5 w-5 shrink-0 place-items-center rounded-md border-2 ${
-                  v ? "border-on-surface bg-tertiary text-white" : "border-on-surface/30 bg-surface text-transparent"
+                className={`grid h-5 w-5 shrink-0 place-items-center rounded-md ${
+                  v ? "bg-tertiary text-white" : "bg-on-surface/8 text-transparent"
                 }`}
               >
                 <CheckCircle2 className="h-3 w-3" />
@@ -1052,7 +1049,7 @@ function ReadinessCard({
 
 function QuickLinks({ uni }: { uni?: { website?: string; name: string } }) {
   return (
-    <aside className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+    <aside className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
       <h3 className="font-display text-headline-sm font-bold text-on-surface">Quick links</h3>
       <ul className="mt-3 space-y-2">
         {uni?.website && (

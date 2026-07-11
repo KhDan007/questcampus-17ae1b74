@@ -32,7 +32,7 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
   }
 
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface p-3 qc-hard-shadow-sm">
+    <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow">
       {/* Goal + status + cancel */}
       <div className="flex items-start gap-2">
         <p className="min-w-0 flex-1 truncate font-display text-body-sm font-bold text-on-surface">
@@ -45,7 +45,7 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
             onClick={onCancel}
             disabled={busy}
             aria-label="Cancel job"
-            className="grid h-6 w-6 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface disabled:opacity-60"
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
           </button>
@@ -77,7 +77,7 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
 
       {/* Error line */}
       {job.status === "error" && job.error && (
-        <p className="mt-2 rounded-md border-2 border-error/30 bg-error/10 px-1.5 py-0.5 text-label-sm text-on-error-container">
+        <p className="mt-2 rounded-md bg-error/10 px-1.5 py-0.5 text-label-sm text-on-error-container">
           {job.error}
         </p>
       )}
@@ -87,10 +87,10 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
 
 function StatusChip({ status, reduce }: { status: AgentJob["status"]; reduce: boolean }) {
   const base =
-    "inline-flex shrink-0 items-center gap-1 rounded-full border-2 px-2 py-0.5 font-[var(--font-label)] text-label-sm";
+    "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold";
   if (status === "running") {
     return (
-      <span className={`${base} border-on-surface bg-surface text-on-surface`}>
+      <span className={`${base} bg-primary-fixed text-on-primary-fixed-variant`}>
         <Loader2 className={`h-3 w-3 ${reduce ? "" : "animate-spin"}`} />
         working
       </span>
@@ -98,22 +98,22 @@ function StatusChip({ status, reduce }: { status: AgentJob["status"]; reduce: bo
   }
   if (status === "done") {
     return (
-      <span className={`${base} border-tertiary bg-tertiary/20 text-on-surface`}>
+      <span className={`${base} bg-tertiary-fixed text-on-tertiary-fixed-variant`}>
         <CheckCircle2 className="h-3 w-3" />
         done
       </span>
     );
   }
   if (status === "error") {
-    return <span className={`${base} border-on-surface/20 bg-surface text-on-surface-variant`}>error</span>;
+    return <span className={`${base} bg-surface-container text-on-surface-variant`}>error</span>;
   }
   if (status === "cancelled") {
     return (
-      <span className={`${base} border-on-surface/20 bg-surface text-on-surface-variant`}>cancelled</span>
+      <span className={`${base} bg-surface-container text-on-surface-variant`}>cancelled</span>
     );
   }
   // queued
-  return <span className={`${base} border-on-surface/20 bg-surface text-on-surface-variant`}>queued</span>;
+  return <span className={`${base} bg-surface-container text-on-surface-variant`}>queued</span>;
 }
 
 function TodoRow({ todo, reduce }: { todo: AgentTodo; reduce: boolean }) {

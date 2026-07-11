@@ -52,7 +52,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
   }
 
   return (
-    <aside className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+    <aside className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
       <h3 className="font-display text-headline-sm font-bold text-on-surface">Your list</h3>
       <p className="mt-0.5 text-body-sm text-on-surface-variant">Readiness per university.</p>
 
@@ -72,7 +72,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
           return (
             <li
               key={key}
-              className="flex items-center gap-3 rounded-lg border-2 border-on-surface/10 bg-surface px-3 py-2"
+              className="flex items-center gap-3 rounded-lg border border-on-surface/8 bg-surface-container-lowest px-3 py-2"
             >
               <div className="shrink-0">
                 {researching ? (
@@ -82,8 +82,8 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
                     <AlertTriangle className="h-3.5 w-3.5 text-on-error-container" />
                   </div>
                 ) : ready ? (
-                  <div className="grid h-6 w-6 place-items-center rounded-full bg-tertiary/30">
-                    <Check className="h-3.5 w-3.5 text-on-surface" />
+                  <div className="grid h-6 w-6 place-items-center rounded-full bg-tertiary-fixed">
+                    <Check className="h-3.5 w-3.5 text-on-tertiary-fixed-variant" />
                   </div>
                 ) : (
                   <CircleDashed className="h-5 w-5 text-on-surface-variant" />
@@ -109,7 +109,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
                   onClick={() => void applyOne(t)}
                   disabled={busyKey === key}
                   aria-label={`Auto-apply to ${t.name ?? t.externalId}`}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-50"
+                  className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
                 >
                   {busyKey === key ? (
                     <Loader2 className="h-3 w-3 animate-spin" />

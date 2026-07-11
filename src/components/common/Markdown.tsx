@@ -49,7 +49,7 @@ export function Markdown({ children, className }: Props) {
             </code>
           ),
           pre: ({ children }) => (
-            <pre className="my-2 overflow-x-auto rounded-md border-2 border-on-surface/15 bg-surface-container-lowest p-2 text-label-sm">
+            <pre className="my-2 overflow-x-auto rounded-md border border-on-surface/10 bg-surface-container p-2 text-label-sm">
               {children}
             </pre>
           ),

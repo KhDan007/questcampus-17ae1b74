@@ -70,14 +70,7 @@ function UnlockPage() {
 
   return (
     <>
-      <main className="relative min-h-screen overflow-hidden bg-surface px-4 pb-24 pt-28 sm:px-6 sm:pt-32">
-        {/* Ambient backdrop */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute bottom-0 right-[-10%] h-[420px] w-[420px] rounded-full bg-secondary-container/60 blur-3xl" />
-          <div className="absolute left-[-10%] top-1/3 h-[360px] w-[360px] rounded-full bg-primary-container/40 blur-3xl" />
-        </div>
-
+      <main className="relative min-h-screen bg-surface px-4 pb-24 pt-28 sm:px-6 sm:pt-32">
         <div className="mx-auto w-full" style={{ maxWidth: "920px" }}>
           {/* HERO */}
           <motion.div
@@ -86,7 +79,7 @@ function UnlockPage() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="text-center"
           >
-            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface qc-hard-shadow-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-secondary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-fixed-variant">
               <Sparkles className="h-3.5 w-3.5" />3-day free trial
             </span>
 
@@ -124,11 +117,7 @@ function UnlockPage() {
             className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr]"
           >
             {/* Left: Price + CTA (cursor-tilt) */}
-            <TiltCard className="group relative overflow-hidden rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/15 blur-2xl"
-              />
+            <TiltCard className="group relative overflow-hidden rounded-3xl border border-on-surface/8 bg-surface-container-lowest p-7 qc-soft-shadow sm:p-9">
               <div className="flex items-center gap-2 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.18em] text-primary">
                 <Lock className="h-3.5 w-3.5" />
                 The unlock
@@ -174,7 +163,7 @@ function UnlockPage() {
               </div>
 
               {discountPct > 0 && formattedDiscounted && (
-                <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-secondary-fixed px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-secondary-fixed-variant">
                   <Sparkles className="h-3.5 w-3.5" />
                   {discountPct}% off from your invites
                 </p>
@@ -195,7 +184,7 @@ function UnlockPage() {
                     <Link
                       to="/universities"
                       search={{ q: "" }}
-                      className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none"
+                      className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90"
                     >
                       {t("unlock.seeList")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -206,7 +195,7 @@ function UnlockPage() {
                     <UnlockButton
                       token={token}
                       label={notTrialed ? "Start free trial" : undefined}
-                      className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                      className="group relative inline-flex min-h-[56px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                     />
                     <p className="text-center font-[var(--font-label)] text-label-sm text-on-surface-variant">
                       Card required today, first charge on day 3.
@@ -215,7 +204,7 @@ function UnlockPage() {
                 )}
               </div>
 
-              <ul className="mt-6 flex flex-col gap-2 border-t-2 border-dashed border-on-surface/15 pt-5">
+              <ul className="mt-6 flex flex-col gap-2 border-t border-dashed border-on-surface/15 pt-5">
                 {guarantees.map(({ Icon, label }) => (
                   <li
                     key={label}
@@ -229,7 +218,7 @@ function UnlockPage() {
             </TiltCard>
 
             {/* Right: What you get */}
-            <div className="rounded-3xl border-2 border-on-surface bg-secondary-container p-7 qc-hard-shadow-sm sm:p-9">
+            <div className="rounded-3xl border border-on-surface/8 bg-secondary-fixed/40 p-7 qc-soft-shadow sm:p-9">
               <div className="flex items-center gap-2 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.18em] text-on-surface/80">
                 <Star className="h-3.5 w-3.5" />
                 What you get
@@ -247,7 +236,7 @@ function UnlockPage() {
                     }}
                     className="flex items-start gap-3"
                   >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface-container-lowest text-on-surface">
                       <Icon className="h-4 w-4" />
                     </span>
                     <span className="pt-1 text-body-md font-medium text-on-surface">{text}</span>
@@ -262,18 +251,18 @@ function UnlockPage() {
             initial={reduce ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-on-surface/20 bg-surface/60 px-5 py-5 text-center sm:flex-row sm:gap-6 sm:text-left"
+            className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-on-surface/15 bg-surface-container/50 px-5 py-5 text-center sm:flex-row sm:gap-6 sm:text-left"
           >
             <div className="flex -space-x-2">
               {[
-                "bg-primary",
-                "bg-secondary-container",
-                "bg-primary-container",
-                "bg-on-surface/15",
+                "bg-primary-fixed text-on-primary-fixed-variant",
+                "bg-secondary-fixed text-on-secondary-fixed-variant",
+                "bg-tertiary-fixed text-on-tertiary-fixed-variant",
+                "bg-surface-container text-on-surface-variant",
               ].map((bg, i) => (
                 <span
                   key={i}
-                  className={`grid h-9 w-9 place-items-center rounded-full border-2 border-on-surface ${bg} font-[var(--font-label)] text-label-sm font-bold text-on-surface`}
+                  className={`grid h-9 w-9 place-items-center rounded-full border border-surface-container-lowest ${bg} font-[var(--font-label)] text-label-sm font-bold`}
                 >
                   {["A", "M", "J", "S"][i]}
                 </span>

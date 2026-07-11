@@ -37,7 +37,7 @@ export function IntakeItemField({ item, onChange }: Props) {
         : `Asked by ${item.targetNames.slice(0, 1).join(", ")} +${item.targetNames.length - 1}`;
 
   return (
-    <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
+    <div className="rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <label className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
@@ -49,7 +49,7 @@ export function IntakeItemField({ item, onChange }: Props) {
           )}
         </div>
         {answered && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-tertiary/25 px-2 py-0.5 text-label-sm text-on-surface">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-tertiary-fixed px-2 py-0.5 text-label-sm text-on-tertiary-fixed-variant">
             <Check className="h-3 w-3" /> Saved
           </span>
         )}
@@ -63,7 +63,7 @@ export function IntakeItemField({ item, onChange }: Props) {
         <select
           value={value}
           onChange={(e) => update(e.target.value)}
-          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+          className="mt-3 w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
         >
           <option value="">Select…</option>
           {(item.enumOptions ?? []).map((o) => (
@@ -77,14 +77,14 @@ export function IntakeItemField({ item, onChange }: Props) {
           value={value}
           onChange={(e) => update(e.target.value)}
           rows={3}
-          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+          className="mt-3 w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
         />
       ) : (
         <input
           type={item.type === "date" ? "date" : item.type === "number" ? "number" : item.type === "email" ? "email" : item.type === "tel" ? "tel" : "text"}
           value={value}
           onChange={(e) => update(e.target.value)}
-          className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+          className="mt-3 w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
         />
       )}
     </div>
@@ -97,7 +97,7 @@ function EssayInput({ item, value, onChange }: { item: IntakeItem; value: string
   return (
     <>
       {item.prompt && (
-        <p className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-3 py-2 text-body-sm text-on-surface-variant">
+        <p className="mt-2 rounded-lg bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
           {item.prompt}
         </p>
       )}
@@ -105,7 +105,7 @@ function EssayInput({ item, value, onChange }: { item: IntakeItem; value: string
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={6}
-        className="mt-3 w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+        className="mt-3 w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
       />
       {item.wordLimit && (
         <p className={`mt-1 text-label-sm ${over ? "text-on-error-container" : "text-on-surface-variant"}`}>
@@ -170,7 +170,7 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
   return (
     <div className="mt-3">
       {existing && missingBytes ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-on-surface/25 bg-secondary-container/20 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-secondary-fixed/40 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface-variant" />
           <div className="min-w-0 flex-1">
             <p className="text-body-sm font-semibold text-on-surface">Needs re-upload</p>
@@ -194,7 +194,7 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
           </button>
         </div>
       ) : existing ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-tertiary-fixed/30 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface" />
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">{existing.fileName}</span>
           <button
@@ -224,7 +224,7 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-on-surface/30 bg-surface px-3 py-3 font-[var(--font-label)] text-label-md text-on-surface hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-on-surface/20 bg-surface px-3 py-3 font-[var(--font-label)] text-label-md text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {busy ? "Uploading…" : `Upload ${item.label.toLowerCase()}`}

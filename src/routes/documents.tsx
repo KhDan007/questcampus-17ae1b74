@@ -11,7 +11,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -48,7 +47,6 @@ function DocumentsHubPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
         <main className="relative mx-auto w-full max-w-(--container-content) px-5 py-10 sm:px-8 lg:px-12">
           <div className="inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading documents...
@@ -64,7 +62,6 @@ function DocumentsHubPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main className="relative mx-auto w-full max-w-(--container-content) px-5 py-10 sm:px-8 lg:px-12">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -78,11 +75,9 @@ function DocumentsHubPage() {
           <button
             type="button"
             onClick={() => setPicker(true)}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
-            <span className="grid h-4 w-4 place-items-center rounded-full bg-primary text-white">
-              <Plus className="h-3 w-3" />
-            </span>
+            <Plus className="h-4 w-4" />
             New document
           </button>
         </header>
@@ -139,8 +134,8 @@ function DocumentsHubPage() {
 
 function EmptyState({ onNew }: { onNew: () => void }) {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-10 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+    <div className="rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-10 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-surface-container text-on-surface-variant">
         <FileText className="h-5 w-5" />
       </div>
       <h2 className="mt-4 font-display text-title-lg font-bold text-on-surface">
@@ -152,9 +147,9 @@ function EmptyState({ onNew }: { onNew: () => void }) {
       <button
         type="button"
         onClick={onNew}
-        className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
       >
-        <span className="h-2 w-2 rounded-full bg-primary" /> New document
+        <Plus className="h-4 w-4" /> New document
       </button>
     </div>
   );
@@ -178,7 +173,7 @@ function DocCard({
   const kindLabel =
     DOC_KIND_OPTIONS.find((o) => o.kind === doc.docKind)?.label ?? doc.docKind;
   return (
-    <div className="group relative flex h-full flex-col rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none">
+    <div className="group relative flex h-full flex-col rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow qc-soft-shadow-hover">
       <Link
         to="/documents/$id"
         params={{ id: doc.id }}
@@ -224,13 +219,13 @@ function DocCard({
 function FormatBadge({ ok }: { ok: boolean }) {
   if (ok)
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 text-label-sm text-on-surface">
-        <CheckCircle2 className="h-3 w-3 text-tertiary" /> OK
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-tertiary-fixed px-2 py-0.5 text-label-sm font-semibold text-on-tertiary-fixed-variant">
+        <CheckCircle2 className="h-3 w-3" /> OK
       </span>
     );
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 text-label-sm text-on-surface">
-      <AlertTriangle className="h-3 w-3 text-error" /> Check
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-secondary-fixed px-2 py-0.5 text-label-sm font-semibold text-on-secondary-fixed-variant">
+      <AlertTriangle className="h-3 w-3" /> Check
     </span>
   );
 }
@@ -248,7 +243,7 @@ function ConfirmDelete({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-sm rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow"
+        className="w-full max-w-sm rounded-2xl border border-on-surface/10 bg-surface-container-lowest p-5 qc-soft-shadow"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-display text-title-md font-bold text-on-surface">
@@ -260,13 +255,13 @@ function ConfirmDelete({
         <div className="mt-4 flex justify-end gap-2">
           <button
             onClick={onCancel}
-            className="rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 text-label-md font-semibold text-on-surface hover:border-on-surface"
+            className="rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="rounded-md border-2 border-on-surface bg-error px-3 py-1.5 text-label-md font-semibold text-on-error qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="rounded-lg bg-error px-3 py-2 text-label-md font-bold text-on-error transition-colors hover:bg-error/90"
           >
             Delete
           </button>
@@ -320,7 +315,7 @@ function NewDocPicker({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+        className="w-full max-w-3xl rounded-2xl border border-on-surface/10 bg-surface-container-lowest p-6 qc-soft-shadow"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -349,7 +344,7 @@ function NewDocPicker({ onClose }: { onClose: () => void }) {
             <select
               value={targetKey}
               onChange={(e) => setTargetKey(e.target.value)}
-              className="mt-1 w-full rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-on-surface focus:outline-none"
+              className="mt-1 w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-on-surface/30 focus:outline-none"
             >
               <option value="">General (no specific portal)</option>
               {targetsList.map((t) => (
@@ -418,8 +413,10 @@ function KindTile({
         onPick();
       }}
       disabled={busy}
-      className={`flex h-full w-full flex-col rounded-xl border-2 bg-surface p-4 text-left transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none disabled:opacity-70 ${
-        selected ? "border-on-surface" : "border-on-surface/25 hover:border-on-surface"
+      className={`flex h-full w-full flex-col rounded-xl border p-4 text-left transition-colors disabled:opacity-70 ${
+        selected
+          ? "border-primary/30 bg-primary-fixed/40"
+          : "border-on-surface/10 bg-surface-container-lowest hover:bg-on-surface/5"
       }`}
     >
       <div className="flex items-center justify-between gap-2">

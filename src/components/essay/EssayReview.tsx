@@ -107,27 +107,27 @@ function tierColor(
       return {
         ring: "#b45309",
         text: "text-amber-800",
-        chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+        chip: "bg-secondary-fixed text-on-secondary-fixed-variant",
         label: bandLabel ?? "Exceptional",
       };
     if (band === "strong")
       return {
         ring: "#0d9488",
         text: "text-teal-700",
-        chip: "border-2 border-on-surface bg-primary text-white",
+        chip: "bg-primary-fixed text-on-primary-fixed-variant",
         label: bandLabel ?? "Strong",
       };
     if (band === "competitive")
       return {
         ring: "#0369a1",
         text: "text-sky-800",
-        chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+        chip: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
         label: bandLabel ?? "Competitive",
       };
     return {
       ring: "#6b7280",
       text: "text-on-surface",
-      chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+      chip: "bg-surface-container text-on-surface-variant",
       label: bandLabel ?? "Needs work",
     };
   }
@@ -136,27 +136,27 @@ function tierColor(
     return {
       ring: "#b45309",
       text: "text-amber-800",
-      chip: "border-2 border-on-surface bg-amber-100 text-amber-900",
+      chip: "bg-secondary-fixed text-on-secondary-fixed-variant",
       label: "Exceptional",
     };
   if (overall >= 70)
     return {
       ring: "#0d9488",
       text: "text-teal-700",
-      chip: "border-2 border-on-surface bg-primary text-white",
+      chip: "bg-primary-fixed text-on-primary-fixed-variant",
       label: "Strong",
     };
   if (overall >= 55)
     return {
       ring: "#0369a1",
       text: "text-sky-800",
-      chip: "border-2 border-on-surface bg-tertiary-container text-on-tertiary-container",
+      chip: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
       label: "Competitive",
     };
   return {
     ring: "#6b7280",
     text: "text-on-surface",
-    chip: "border-2 border-on-surface/40 bg-surface text-on-surface",
+    chip: "bg-surface-container text-on-surface-variant",
     label: "Needs work",
   };
 }
@@ -395,7 +395,7 @@ export function EssayReview({
   return (
     <div className="grid gap-8">
       {/* Source switcher */}
-      <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-6 qc-hard-shadow backdrop-blur-md sm:p-8">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow sm:p-8">
         <h2 className="font-display text-headline-md font-bold text-on-surface">
           Get feedback on your personal statement
         </h2>
@@ -404,7 +404,7 @@ export function EssayReview({
           everyone — unlock inline notes + rewrites for ${PRICE_MVP}/month.
         </p>
 
-        <div className="mt-6 inline-flex flex-wrap gap-2 rounded-full border-2 border-on-surface/20 bg-surface p-1">
+        <div className="mt-6 inline-flex flex-wrap gap-1 rounded-lg border border-on-surface/8 bg-surface-container p-1">
           {(
             [
               { k: "paste", label: "Paste" },
@@ -418,9 +418,9 @@ export function EssayReview({
                 key={t.k}
                 type="button"
                 onClick={() => setMode(t.k)}
-                className={`rounded-full px-4 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all ${
+                className={`rounded-md px-4 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
                   active
-                    ? "bg-primary text-white qc-hard-shadow-sm"
+                    ? "bg-surface-container-lowest text-primary qc-soft-shadow"
                     : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
@@ -434,7 +434,7 @@ export function EssayReview({
           <div className="mt-5">
             {mode === "upload" && (
               <div className="mb-3">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5">
                   <Upload className="h-4 w-4" /> Choose a file (.txt)
                   <input
                     type="file"
@@ -463,7 +463,7 @@ export function EssayReview({
               onChange={(e) => setPasted(e.target.value)}
               rows={12}
               placeholder="Paste your full personal statement here…"
-              className="w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+              className="w-full resize-y rounded-xl border border-on-surface/15 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-primary focus:outline-none"
             />
             <p className="mt-1.5 text-label-sm text-on-surface-variant">
               {pasted.trim()
@@ -495,10 +495,10 @@ export function EssayReview({
                       <button
                         type="button"
                         onClick={() => setPickedEssayId(e.essayId)}
-                        className={`flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
+                        className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
                           active
-                            ? "border-on-surface bg-secondary-container"
-                            : "border-on-surface/15 bg-surface/80"
+                            ? "border-primary/30 bg-primary-fixed/70"
+                            : "border-on-surface/8 bg-surface-container-lowest qc-soft-shadow hover:bg-on-surface/[0.03]"
                         }`}
                       >
                         <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -527,7 +527,7 @@ export function EssayReview({
             type="button"
             disabled={!canRun || status === "loading"}
             onClick={run}
-            className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {status === "loading" ? (
               <>
@@ -542,7 +542,7 @@ export function EssayReview({
         </div>
 
         {status === "error" && reviewErr && (
-          <div className="mt-5 flex items-start justify-between gap-3 rounded-lg border-2 border-on-surface bg-error-container/40 p-4 text-body-sm text-on-surface">
+          <div className="mt-5 flex items-start justify-between gap-3 rounded-lg border border-error/30 bg-error-container/40 p-4 text-body-sm text-on-surface">
             <span className="inline-flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {errorMsg(reviewErr)}
             </span>
@@ -550,7 +550,7 @@ export function EssayReview({
               <button
                 type="button"
                 onClick={run}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 <RefreshCw className="h-3.5 w-3.5" /> Retry
               </button>
@@ -583,7 +583,7 @@ export function EssayReview({
                 <button
                   type="button"
                   onClick={() => openPast(p.reviewId)}
-                  className="flex w-full items-start gap-3 rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none"
+                  className="flex w-full items-start gap-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4 text-left qc-soft-shadow transition-colors hover:bg-on-surface/[0.03]"
                 >
                   <ScoreBadge overall={p.overall} small />
                   <div className="min-w-0 flex-1">
@@ -743,7 +743,7 @@ function ResultCard({
       initial={reduce ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow backdrop-blur-md sm:p-6"
+      className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6"
     >
       {/* Compact hero: score + verdict + top tip, all in one row on desktop */}
       <div className="grid grid-cols-1 items-center gap-5 sm:grid-cols-[auto_1fr_auto]">
@@ -771,7 +771,7 @@ function ResultCard({
             </p>
           </div>
         </div>
-        <p className="font-display text-headline-sm text-on-surface text-balance sm:border-l-2 sm:border-on-surface/10 sm:pl-5">
+        <p className="font-display text-headline-sm text-on-surface text-balance sm:border-l sm:border-on-surface/10 sm:pl-5">
           {free.verdict}
         </p>
         {paid && !locked && (
@@ -780,7 +780,7 @@ function ResultCard({
               type="button"
               onClick={applyAll}
               disabled={paid.rewrites.length === 0 || appliedIdx.size === paid.rewrites.length}
-              className="group inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="group inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               title="Apply every suggested rewrite at once"
             >
               <Wand2 className="h-3.5 w-3.5" /> Apply all
@@ -789,7 +789,7 @@ function ResultCard({
               type="button"
               onClick={undo}
               disabled={undoStack.length === 0}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Undo2 className="h-3.5 w-3.5" /> Undo
             </button>
@@ -797,7 +797,7 @@ function ResultCard({
               type="button"
               onClick={resetAll}
               disabled={workingText === originalBody}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset
             </button>
@@ -821,7 +821,7 @@ function ResultCard({
       </div>
 
       {/* Top tip — slim banner */}
-      <div className="mt-4 flex items-start gap-3 rounded-xl border-2 border-on-surface bg-secondary-container px-4 py-3 qc-hard-shadow-sm">
+      <div className="mt-4 flex items-start gap-3 rounded-xl bg-secondary-fixed/50 px-4 py-3">
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <div>
           <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-on-surface/70">
@@ -834,7 +834,7 @@ function ResultCard({
       </div>
 
       {missMsg && (
-        <p className="mt-3 inline-flex items-start gap-2 rounded-lg border-2 border-on-surface/30 bg-surface px-3 py-2 text-label-sm text-on-surface">
+        <p className="mt-3 inline-flex items-start gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-label-sm text-on-surface">
           <AlertCircle className="mt-0.5 h-3.5 w-3.5 text-primary" /> {missMsg}
         </p>
       )}
@@ -956,7 +956,7 @@ function Workspace({
     <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       {/* Essay column — sticky on desktop so the user never scrolls away from text */}
       <div className="lg:sticky lg:top-24 lg:self-start">
-        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/95 p-5">
+        <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
           <div className="flex items-center justify-between gap-3">
             <h3 className="font-display text-headline-sm font-bold text-on-surface">Your essay</h3>
             <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
@@ -966,7 +966,7 @@ function Workspace({
           <p className="mt-1 text-label-sm text-on-surface-variant">
             Tap any highlight to jump to its note.
           </p>
-          <div className="mt-3 max-h-[calc(100vh-260px)] overflow-y-auto whitespace-pre-wrap rounded-xl border-2 border-on-surface/10 bg-surface px-4 py-4 font-serif text-body-md leading-relaxed text-on-surface">
+          <div className="mt-3 max-h-[calc(100vh-260px)] overflow-y-auto whitespace-pre-wrap rounded-xl border border-on-surface/10 bg-surface px-4 py-4 font-serif text-body-md leading-relaxed text-on-surface">
             {segments}
           </div>
         </div>
@@ -974,7 +974,7 @@ function Workspace({
 
       {/* Sidebar with tabs */}
       <div>
-        <div className="sticky top-24 z-10 -mx-1 mb-3 flex flex-wrap gap-1 rounded-full border-2 border-on-surface/20 bg-surface/95 p-1 backdrop-blur-md">
+        <div className="sticky top-24 z-10 -mx-1 mb-3 flex flex-wrap gap-1 rounded-lg border border-on-surface/8 bg-surface-container p-1">
           {tabs.map((t) => {
             const active = activeTab === t.k;
             return (
@@ -982,16 +982,16 @@ function Workspace({
                 key={t.k}
                 type="button"
                 onClick={() => setActiveTab(t.k)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all ${
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
                   active
-                    ? "bg-primary text-white qc-hard-shadow-sm"
+                    ? "bg-surface-container-lowest text-primary qc-soft-shadow"
                     : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
                 {t.label}
                 {t.count !== undefined && (
                   <span
-                    className={`rounded-full px-1.5 text-label-sm ${active ? "bg-white/20" : "bg-on-surface/10"}`}
+                    className={`rounded-full px-1.5 text-label-sm ${active ? "bg-primary-fixed text-on-primary-fixed-variant" : "bg-on-surface/10"}`}
                   >
                     {t.count}
                   </span>
@@ -1012,7 +1012,7 @@ function Workspace({
               className="grid gap-2"
             >
               {paid.comments.length === 0 && (
-                <p className="rounded-xl border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+                <p className="rounded-xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4 text-body-sm text-on-surface-variant">
                   No inline notes for this draft.
                 </p>
               )}
@@ -1047,7 +1047,7 @@ function Workspace({
               className="grid gap-3"
             >
               {paid.rewrites.length === 0 && (
-                <p className="rounded-xl border-2 border-dashed border-on-surface/20 bg-surface/70 p-4 text-body-sm text-on-surface-variant">
+                <p className="rounded-xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4 text-body-sm text-on-surface-variant">
                   No rewrites suggested.
                 </p>
               )}
@@ -1056,10 +1056,10 @@ function Workspace({
                 return (
                   <div
                     key={idx}
-                    className={`rounded-2xl border-2 p-4 transition-colors ${
+                    className={`rounded-2xl border p-4 transition-colors ${
                       applied
-                        ? "border-primary/60 bg-primary/5"
-                        : "border-on-surface/15 bg-surface/90"
+                        ? "border-primary/40 bg-primary/5"
+                        : "border-on-surface/8 bg-surface-container-lowest qc-soft-shadow"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1067,14 +1067,14 @@ function Workspace({
                         Rewrite {idx + 1}
                       </p>
                       {applied ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-white">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-tertiary-fixed-variant">
                           <CheckCircle2 className="h-3 w-3" /> Applied
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => onApply(idx, r)}
-                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
                         >
                           <Wand2 className="h-3.5 w-3.5" /> Apply
                         </button>
@@ -1102,7 +1102,7 @@ function Workspace({
               animate={{ opacity: 1, y: 0 }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
-              className="rounded-2xl border-2 border-on-surface/15 bg-surface/90 p-4"
+              className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow"
             >
               {paid.strengths.length === 0 ? (
                 <p className="text-body-sm text-on-surface-variant">
@@ -1132,7 +1132,7 @@ function Workspace({
               {dimensions.map((d) => (
                 <div
                   key={d.key}
-                  className="rounded-xl border-2 border-on-surface/15 bg-surface/90 p-3.5"
+                  className="rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3.5 qc-soft-shadow"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <p className="font-display text-label-lg font-bold text-on-surface">
@@ -1141,7 +1141,7 @@ function Workspace({
                     <Dots score={d.score} />
                   </div>
                   {d.quote && (
-                    <p className="mt-1 border-l-2 border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
+                    <p className="mt-1 border-l border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
                       &ldquo;…{d.quote}…&rdquo;
                     </p>
                   )}
@@ -1235,8 +1235,8 @@ function Dots({ score }: { score: number }) {
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`h-2.5 w-2.5 rounded-full border-2 ${
-            n <= score ? "border-on-surface bg-primary" : "border-on-surface/30 bg-surface"
+          className={`h-2.5 w-2.5 rounded-full ${
+            n <= score ? "bg-primary" : "bg-on-surface/15"
           }`}
         />
       ))}
@@ -1248,7 +1248,7 @@ function ScoreBadge({ overall, small }: { overall: number; small?: boolean }) {
   const t = tierColor(overall);
   return (
     <span
-      className={`grid shrink-0 place-items-center rounded-full border-2 border-on-surface font-display font-bold text-white ${
+      className={`grid shrink-0 place-items-center rounded-full font-display font-bold text-white ${
         small ? "h-10 w-10 text-label-md" : "h-14 w-14 text-headline-sm"
       }`}
       style={{ background: t.ring }}
@@ -1300,14 +1300,14 @@ function LockedTeaser({
             initial={reduce ? false : { opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.28, delay: i * 0.04 }}
-            className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-3.5"
+            className="rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3.5 qc-soft-shadow"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-display text-label-lg font-bold text-on-surface">{d.label}</p>
               <Dots score={d.score} />
             </div>
             {d.quote && (
-              <p className="mt-1 border-l-2 border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
+              <p className="mt-1 border-l border-on-surface/20 pl-2 text-body-sm italic text-on-surface-variant">
                 &ldquo;…{d.quote}…&rdquo;
               </p>
             )}
@@ -1315,9 +1315,9 @@ function LockedTeaser({
           </motion.li>
         ))}
       </ul>
-      <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/80 p-5 text-center lg:max-w-sm">
-        <div className="grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-secondary-container">
-          <Lock className="h-5 w-5 text-on-surface" />
+      <div className="relative overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 text-center qc-soft-shadow lg:max-w-sm">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-secondary-fixed text-on-secondary-fixed-variant">
+          <Lock className="h-5 w-5" />
         </div>
         <h3 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
           Unlock inline notes & one-click rewrites
@@ -1330,7 +1330,7 @@ function LockedTeaser({
           <UnlockButton
             token={token}
             label={`Unlock for $${PRICE_MVP}/month`}
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90"
           />
         </div>
         {isPaid && (
@@ -1355,7 +1355,7 @@ function renderRewriteAfter(after: string): React.ReactNode {
     parts.push(
       <span
         key={`a-${i++}`}
-        className="mx-0.5 inline-flex items-center rounded-full border-2 border-dashed border-primary/60 bg-primary/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-primary"
+        className="mx-0.5 inline-flex items-center rounded-full border border-dashed border-primary/50 bg-primary/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-primary"
       >
         {m[0].replace(/^\[ADD:\s*/, "").replace(/\]$/, "") || "fill this in"}
       </span>,
@@ -1394,7 +1394,7 @@ function CommentCard({
     <button
       type="button"
       onClick={onFocus}
-      className={`block w-full rounded-xl border-2 ${sc.border} bg-surface p-3.5 text-left transition-all ${
+      className={`block w-full rounded-xl border ${sc.border} bg-surface p-3.5 text-left transition-all ${
         highlighted ? "ring-2 ring-primary ring-offset-1" : ""
       }`}
     >

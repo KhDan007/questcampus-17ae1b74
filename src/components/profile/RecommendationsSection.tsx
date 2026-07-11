@@ -199,7 +199,7 @@ function PaidResults({
   const { t } = useI18n();
   if (status === "loading" || status === "idle") {
     return (
-      <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
+      <div className="mt-8 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-8 text-center qc-soft-shadow">
         <motion.span
           className="mx-auto block h-6 w-6 rounded-full border-2 border-primary/30 border-t-primary"
           animate={{ rotate: 360 }}
@@ -213,14 +213,14 @@ function PaidResults({
   }
   if (status === "error" || !buckets) {
     return (
-      <div className="mt-8 rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-8 text-center">
+      <div className="mt-8 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-8 text-center qc-soft-shadow">
         <p className="text-body-md text-on-surface-variant">
           {t("rec.paid.error")}
         </p>
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-primary-container px-6 text-label-md text-on-primary"
+          className="mt-4 inline-flex min-h-[44px] items-center rounded-lg bg-primary px-6 text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           {t("rec.tryAgain")}
         </button>
@@ -268,8 +268,7 @@ function WaitlistPrompt({ reduce }: { reduce: boolean }) {
       whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="mt-6 rounded-xl border-l-[3px] border-secondary-container p-5 sm:p-6"
-      style={{ background: "rgba(254,166,25,0.12)" }}
+      className="mt-6 rounded-2xl border border-on-surface/8 bg-secondary-fixed/40 p-5 qc-soft-shadow sm:p-6"
     >
       <h3 className="text-headline-sm text-on-background">
         {t("rec.waitlist.title")}
@@ -282,7 +281,7 @@ function WaitlistPrompt({ reduce }: { reduce: boolean }) {
       </p>
       <a
         href={WAITLIST_PATH}
-        className="mt-5 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-secondary-container px-7 text-label-md font-semibold text-on-secondary-container shadow-[0_8px_24px_-6px_rgba(254,166,25,0.45)] transition-[filter,transform] hover:scale-[1.03] hover:brightness-95"
+        className="mt-5 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-secondary-fixed px-7 text-label-md font-semibold text-on-secondary-fixed-variant transition-colors hover:bg-secondary-fixed-dim"
       >
         {t("rec.waitlist.cta")}
         <span aria-hidden>→</span>
@@ -299,7 +298,7 @@ function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: bool
       initial={reduce ? false : { opacity: 0, y: 20 }}
       animate={reduce ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-      className="relative mt-8 overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-low p-6 sm:p-8"
+      className="relative mt-8 overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow sm:p-8"
     >
       {/* Blurred teaser cards behind overlay */}
       <div
@@ -323,7 +322,7 @@ function PaidUpsell({ token, reduce }: { token: string | undefined; reduce: bool
 
       {/* Overlay CTA */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-xl text-on-primary shadow-[0_8px_24px_-6px_rgba(53,37,205,0.45)]">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-fixed text-xl text-on-primary-fixed-variant">
           🔓
         </span>
         <h3 className="mt-4 text-headline-sm text-on-background">

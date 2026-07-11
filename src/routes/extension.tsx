@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Chrome, Download, ExternalLink, MousePointerClick, ShieldCheck } from "lucide-react";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useExtensionInstalled } from "@/lib/extension/detect";
 
@@ -51,10 +50,9 @@ function ExtensionPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-24 sm:px-8 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 lg:px-12"
       >
         <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
           Auto-apply
@@ -70,10 +68,10 @@ function ExtensionPage() {
 
         {checked && (
           <div
-            className={`mt-6 inline-flex items-center gap-2 rounded-full border-2 px-4 py-2 font-[var(--font-label)] text-label-md font-semibold ${
+            className={`mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 font-[var(--font-label)] text-label-md font-semibold ${
               installed
-                ? "border-tertiary/50 bg-tertiary/10 text-on-surface"
-                : "border-on-surface/25 bg-surface text-on-surface-variant"
+                ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+                : "border border-on-surface/15 bg-surface text-on-surface-variant"
             }`}
           >
             {installed ? (
@@ -90,9 +88,9 @@ function ExtensionPage() {
           {STEPS.map(({ Icon, title, body }) => (
             <div
               key={title}
-              className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm"
+              className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow"
             >
-              <span className="grid h-11 w-11 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container text-on-surface">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
                 <Icon className="h-5 w-5" />
               </span>
               <h2 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
@@ -108,15 +106,17 @@ function ExtensionPage() {
             <a
               href={EXTENSION_ZIP}
               download
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
             >
               <Download className="h-4 w-4" /> Download the extension
             </a>
           )}
           <Link
             to={targetHref}
-            className={`inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
-              installed ? "bg-primary text-white" : "bg-surface text-on-surface"
+            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold transition-colors ${
+              installed
+                ? "bg-primary text-white hover:bg-primary/90"
+                : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
             }`}
           >
             {installed ? "Continue to your application" : "Back to applications"}

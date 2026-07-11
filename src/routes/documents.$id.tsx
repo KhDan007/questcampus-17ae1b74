@@ -2,6 +2,7 @@ import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-ro
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Loader2,
   Wand2,
   Sparkles,
@@ -11,7 +12,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import {
@@ -62,7 +62,6 @@ function DocumentEditorPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
         <main className="relative mx-auto max-w-(--container-content) px-6 py-10">
           <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading document...
@@ -78,7 +77,6 @@ function DocumentEditorPage() {
   if (doc === undefined) {
     return (
       <DashboardShell>
-        <LivingBackground />
         <main className="relative mx-auto max-w-(--container-content) px-6 py-10">
           <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading document…
@@ -163,7 +161,6 @@ function DocumentEditorPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main className="relative mx-auto w-full max-w-(--container-content) px-5 py-8 sm:px-8 lg:px-12 print:hidden">
         <button
           type="button"
@@ -175,7 +172,7 @@ function DocumentEditorPage() {
 
         <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           {/* LEFT — writing */}
-          <section className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6">
+          <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
             <input
               value={title}
               onChange={(e) => onTitleChange(e.target.value)}
@@ -185,7 +182,7 @@ function DocumentEditorPage() {
             <p className="mt-1 text-label-sm text-on-surface-variant">{spec.rule}</p>
 
             {essay ? (
-              <div className="mt-6 rounded-xl border-2 border-on-surface/25 bg-surface p-5 text-center">
+              <div className="mt-6 rounded-xl border border-on-surface/10 bg-surface-container/50 p-5 text-center">
                 <h3 className="font-display text-title-md font-bold text-on-surface">
                   Essays live in the Essay Assistant
                 </h3>
@@ -194,9 +191,9 @@ function DocumentEditorPage() {
                 </p>
                 <Link
                   to="/essay"
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                 >
-                  <span className="h-2 w-2 rounded-full bg-primary" /> Open Essay Assistant
+                  Open Essay Assistant <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             ) : (
@@ -212,7 +209,7 @@ function DocumentEditorPage() {
                   onChange={(e) => onContentChange(e.target.value)}
                   spellCheck
                   placeholder="Start writing…"
-                  className="mt-4 min-h-[50vh] w-full resize-y rounded-xl border-2 border-on-surface/20 bg-surface-container-lowest p-4 font-[var(--font-body)] text-body-md leading-relaxed text-on-surface focus:border-on-surface focus:outline-none"
+                  className="mt-4 min-h-[50vh] w-full resize-y rounded-xl border border-on-surface/15 bg-surface-container/40 p-4 font-[var(--font-body)] text-body-md leading-relaxed text-on-surface focus:border-on-surface/30 focus:outline-none"
                 />
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-label-sm">
@@ -236,7 +233,7 @@ function DocumentEditorPage() {
           {/* RIGHT — assist */}
           {!essay && (
             <aside className="flex flex-col gap-5">
-              <div className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm">
+              <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
                 <h3 className="flex items-center gap-2 font-display text-title-sm font-bold text-on-surface">
                   <Wand2 className="h-4 w-4 text-primary" /> Draft with AI
                 </h3>
@@ -248,13 +245,13 @@ function DocumentEditorPage() {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Anything to include? (optional)"
-                  className="mt-2 w-full resize-y rounded-md border-2 border-on-surface/20 bg-surface-container-lowest p-2.5 text-body-sm text-on-surface focus:border-on-surface focus:outline-none"
+                  className="mt-2 w-full resize-y rounded-lg border border-on-surface/15 bg-surface-container/40 p-2.5 text-body-sm text-on-surface focus:border-on-surface/30 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={runGenerate}
                   disabled={genBusy}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {genBusy ? (
                     <>
@@ -268,7 +265,7 @@ function DocumentEditorPage() {
                 </button>
               </div>
 
-              <div className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm">
+              <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
                 <h3 className="font-display text-title-sm font-bold text-on-surface">
                   Improve
                 </h3>
@@ -287,7 +284,7 @@ function DocumentEditorPage() {
                       type="button"
                       onClick={() => runImprove(g)}
                       disabled={improveBusy !== null}
-                      className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1.5 text-label-sm font-semibold text-on-surface hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-2.5 py-2 text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {improveBusy === g ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -298,7 +295,7 @@ function DocumentEditorPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm">
+              <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
                 <h3 className="font-display text-title-sm font-bold text-on-surface">
                   Export
                 </h3>
@@ -307,7 +304,7 @@ function DocumentEditorPage() {
                     <button
                       type="button"
                       onClick={copyText}
-                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                     >
                       <Copy className="h-4 w-4" /> Copy text
                     </button>
@@ -315,7 +312,7 @@ function DocumentEditorPage() {
                     <button
                       type="button"
                       onClick={printDoc}
-                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                     >
                       <Printer className="h-4 w-4" /> Print / Save as PDF
                     </button>
@@ -323,7 +320,7 @@ function DocumentEditorPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-2 border-on-surface/25 bg-surface p-4">
+              <div className="rounded-2xl border border-on-surface/8 bg-surface-container/50 p-4">
                 <p className="text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant">
                   Format rule
                 </p>
@@ -409,12 +406,12 @@ function FormatStatus({
 }) {
   if (ok)
     return (
-      <span className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 bg-surface px-2 py-1 text-tertiary">
+      <span className="inline-flex items-center gap-1 rounded-md bg-tertiary-fixed px-2 py-1 font-semibold text-on-tertiary-fixed-variant">
         <CheckCircle2 className="h-3.5 w-3.5" /> Ready for {label}
       </span>
     );
   return (
-    <div className="w-full rounded-md border border-on-surface/20 bg-surface-container-lowest px-3 py-2">
+    <div className="w-full rounded-md border border-on-surface/8 bg-surface-container/50 px-3 py-2">
       <p className="flex items-center gap-1 font-semibold text-on-surface">
         <AlertTriangle className="h-3.5 w-3.5 text-error" /> Needs fixes
       </p>

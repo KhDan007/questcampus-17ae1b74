@@ -11,7 +11,6 @@ import {
   Send,
   Square,
 } from "lucide-react";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { DocumentManager } from "@/components/apply/DocumentManager";
 import { ApplyStepper } from "@/components/apply/ApplyStepper";
@@ -56,9 +55,8 @@ function ApplyHubPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
-        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12">
-          <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
+        <main className="mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12">
+          <div className="inline-flex items-center gap-2 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface-variant qc-soft-shadow">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading auto-apply workspace...
           </div>
         </main>
@@ -71,10 +69,9 @@ function ApplyHubPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-20 sm:px-8 sm:pb-32 sm:pt-28 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-5 pb-44 pt-20 sm:px-8 sm:pb-32 sm:pt-28 lg:px-12"
       >
         <Link
           to="/dashboard"
@@ -140,7 +137,7 @@ function ApplyHubPage() {
             <SavedToPick />
           </SilentErrorBoundary>
 
-          <details className="rounded-2xl border-2 border-on-surface/15 bg-surface/70 p-4 backdrop-blur-sm">
+          <details className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
             <summary className="cursor-pointer font-display text-headline-sm font-bold text-on-surface">
               Your documents
             </summary>
@@ -175,7 +172,7 @@ function SavedToPick() {
 
   if (!saved || saved.length === 0) {
     return (
-      <section className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
+      <section className="rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-8 text-center">
         <p className="font-display text-headline-sm font-bold text-on-surface">
           Start by saving a few universities
         </p>
@@ -185,7 +182,7 @@ function SavedToPick() {
         <Link
           to="/universities"
           search={{ q: "" }}
-          className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="mt-5 inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           <Search className="h-4 w-4" /> Find universities <ArrowRight className="h-4 w-4" />
         </Link>
@@ -208,7 +205,7 @@ function SavedToPick() {
   };
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 backdrop-blur-md qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <h2 className="font-display text-headline-md font-bold text-on-surface">
@@ -221,7 +218,7 @@ function SavedToPick() {
         <button
           type="button"
           onClick={selectAll}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
           {allSelected ? "Clear all" : "Select all"}
@@ -229,7 +226,7 @@ function SavedToPick() {
       </header>
 
       {count === 0 && (
-        <p className="mt-3 rounded-md border-2 border-dashed border-on-surface/20 bg-surface-container-lowest px-3 py-2 text-label-sm text-on-surface-variant">
+        <p className="mt-3 rounded-md border border-dashed border-on-surface/20 bg-surface-container px-3 py-2 text-label-sm text-on-surface-variant">
           Tip: select one or more universities below, then choose <span className="font-semibold text-on-surface">Deep research</span> or <span className="font-semibold text-on-surface">Apply</span> from the action bar.
         </p>
       )}
@@ -273,10 +270,10 @@ function RunLiveDemoCard() {
   const { run: onClick, starting, error } = useRunDemo();
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
       <div className="flex flex-wrap items-center gap-4 sm:flex-nowrap">
-        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
-          <Play className="h-5 w-5 text-primary" />
+        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
+          <Play className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-headline-md font-bold text-on-surface">
@@ -291,7 +288,7 @@ function RunLiveDemoCard() {
             type="button"
             onClick={onClick}
             disabled={starting}
-            className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             {starting ? "Starting demo…" : "Run live demo"}
@@ -309,10 +306,10 @@ function RunLiveDemoCard() {
 
 function PlanTeaserCard() {
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-secondary-fixed text-on-secondary-fixed-variant">
             <CalendarClock className="h-5 w-5" />
           </span>
           <div className="min-w-0">
@@ -330,7 +327,7 @@ function PlanTeaserCard() {
         </div>
         <Link
           to="/plan"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           Open your plan
           <ArrowRight className="h-4 w-4" />
@@ -348,10 +345,10 @@ function ApplicationStrengthCard() {
   const weakestLabel = weakest ? STRENGTH_CRITERIA[weakest.key].shortLabel : null;
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant">
             <BarChart3 className="h-5 w-5" />
           </span>
           <div className="min-w-0">
@@ -372,7 +369,7 @@ function ApplicationStrengthCard() {
         </div>
         <Link
           to="/apply/strength"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           {strength === undefined ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           Open strength

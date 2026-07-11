@@ -84,7 +84,7 @@ export function EnrichmentDetails({
 
   if (status === "loading") {
     return (
-      <div className="mt-4 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/60 p-4 text-body-sm text-on-surface-variant">
+      <div className="mt-4 rounded-lg border border-on-surface/8 bg-surface-container/50 p-4 text-body-sm text-on-surface-variant">
         <span className="inline-block h-3 w-3 animate-pulse rounded-full bg-primary/60 align-middle" />
         <span className="ml-2">{t("enrich.loading")}</span>
       </div>
@@ -92,7 +92,7 @@ export function EnrichmentDetails({
   }
   if (status === "error") {
     return (
-      <div className="mt-4 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/60 p-4 text-body-sm text-on-surface-variant">
+      <div className="mt-4 rounded-lg border border-on-surface/8 bg-surface-container/50 p-4 text-body-sm text-on-surface-variant">
         {t("enrich.error")}
         {siteHref && (
           <>
@@ -133,7 +133,7 @@ export function EnrichmentDetails({
 
   if (!data.found && data.deadlines.length === 0) {
     return (
-      <div className="mt-4 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/60 p-4 text-body-sm">
+      <div className="mt-4 rounded-lg border border-on-surface/8 bg-surface-container/50 p-4 text-body-sm">
         {fallback}
       </div>
     );
@@ -159,7 +159,7 @@ export function EnrichmentDetails({
   const entryText = entryParts.length ? entryParts.join(" · ") : null;
 
   return (
-    <div className="mt-5 space-y-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/60 p-4">
+    <div className="mt-5 space-y-3 rounded-lg border border-on-surface/8 bg-surface-container/50 p-4">
       <Row
         label={t("enrich.fees")}
         value={feeText}
@@ -214,7 +214,7 @@ export function EnrichmentDetails({
           <ul className="mt-1 space-y-1.5">
             {data.insights.map((it, i) => (
               <li key={i} className="text-body-sm text-on-surface">
-                <span className="mr-1.5 inline-flex items-center rounded-full bg-secondary-container/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-secondary-container">
+                <span className="mr-1.5 inline-flex items-center rounded-md bg-secondary-fixed px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-secondary-fixed-variant">
                   {it.category}
                 </span>
                 {it.text}{" "}

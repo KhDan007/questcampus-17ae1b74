@@ -40,8 +40,10 @@ export function SaveToggle({
         onClick={handle}
         aria-pressed={saved}
         aria-label={saved ? "Remove from My universities" : "Save to My universities"}
-        className={`grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
-          saved ? "bg-primary text-white" : "bg-surface text-on-surface"
+        className={`grid h-9 w-9 place-items-center rounded-lg transition-colors ${
+          saved
+            ? "bg-primary-fixed text-primary"
+            : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
         } ${className}`}
       >
         {busy ? (
@@ -60,10 +62,10 @@ export function SaveToggle({
       type="button"
       onClick={handle}
       aria-pressed={saved}
-      className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-full border px-4 text-label-md font-medium transition-colors ${
+      className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-lg px-4 text-label-md font-semibold transition-colors ${
         saved
-          ? "border-primary bg-primary-container text-on-primary"
-          : "border-outline-variant/60 bg-surface-container-lowest text-on-surface hover:bg-surface-container"
+          ? "bg-primary-fixed text-primary"
+          : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
       } ${className}`}
     >
       {busy ? (

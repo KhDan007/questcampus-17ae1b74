@@ -60,7 +60,7 @@ export function RequirementEditorDialog({ open, onClose, item, system, externalI
         role="dialog"
         aria-modal="true"
         aria-label={`Edit ${item.label}`}
-        className="relative w-full max-w-xl rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow sm:p-6"
+        className="relative w-full max-w-xl rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
@@ -79,7 +79,7 @@ export function RequirementEditorDialog({ open, onClose, item, system, externalI
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface hover:border-on-surface"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <X className="h-4 w-4" />
           </button>
@@ -91,7 +91,7 @@ export function RequirementEditorDialog({ open, onClose, item, system, externalI
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
             Done
           </button>

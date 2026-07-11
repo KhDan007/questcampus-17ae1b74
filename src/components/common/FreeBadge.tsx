@@ -32,7 +32,7 @@ export function FreeBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border-2 border-on-surface bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full bg-secondary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-secondary-fixed-variant ${className}`}
     >
       $0 · free to start
     </span>

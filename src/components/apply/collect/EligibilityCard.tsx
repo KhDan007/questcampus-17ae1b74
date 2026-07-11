@@ -31,7 +31,7 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
   }
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 qc-hard-shadow-sm">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -39,7 +39,7 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
         aria-expanded={open}
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/15 text-primary">
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-secondary-fixed text-on-secondary-fixed-variant">
             <AlertTriangle className="h-5 w-5" />
           </div>
           <div>
@@ -60,7 +60,7 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
       </button>
 
       {open && (
-        <div className="space-y-5 border-t-2 border-on-surface/10 p-5">
+        <div className="space-y-5 border-t border-on-surface/8 p-5">
           {showQuestions && questions.length > 0 && (
             <div className="grid gap-3 md:grid-cols-2">
               {questions.map((q) => (
@@ -88,12 +88,12 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
                       <button
                         type="button"
                         onClick={() => setOpenWhy(isOpen ? null : key)}
-                        className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-error-container bg-error-container/30 px-3 py-1 text-label-sm text-on-surface"
+                        className="inline-flex items-center gap-1.5 rounded-md bg-error-container/40 px-3 py-1 text-label-sm text-on-error-container"
                       >
                         {t.name} · Why?
                       </button>
                       {isOpen && (
-                        <div className="absolute left-0 top-full z-20 mt-2 w-72 rounded-xl border-2 border-on-surface bg-surface p-3 qc-hard-shadow-sm">
+                        <div className="absolute left-0 top-full z-20 mt-2 w-72 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow">
                           <ul className="space-y-2">
                             {t.blockers.map((b, i) => (
                               <li key={i} className="text-body-sm text-on-surface">
@@ -135,7 +135,7 @@ function EligibilityQuestionField({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
+    <div className="rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4">
       <label className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
         {q.label}
       </label>
@@ -144,7 +144,7 @@ function EligibilityQuestionField({
           <select
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+            className="w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
           >
             <option value="">Select…</option>
             {(q.options ?? []).map((o) => (
@@ -162,7 +162,7 @@ function EligibilityQuestionField({
                   key={opt}
                   type="button"
                   onClick={() => onChange(opt)}
-                  className={`rounded-md border-2 px-3 py-1.5 text-label-sm capitalize ${on ? "border-on-surface bg-primary text-white" : "border-on-surface/25 bg-surface text-on-surface"}`}
+                  className={`rounded-lg px-3 py-1.5 text-label-sm capitalize transition-colors ${on ? "bg-primary-fixed/70 text-primary" : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"}`}
                 >
                   {opt}
                 </button>
@@ -174,7 +174,7 @@ function EligibilityQuestionField({
             type={q.kind === "number" ? "number" : "text"}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
+            className="w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none"
           />
         )}
       </div>

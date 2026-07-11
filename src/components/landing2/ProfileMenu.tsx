@@ -68,7 +68,7 @@ export function ProfileMenu() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -6, scale: 0.98 }}
           transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed z-[90] w-64 origin-top-right overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow"
+          className="fixed z-[90] w-64 origin-top-right overflow-hidden rounded-2xl border border-on-surface/10 bg-surface-container-lowest qc-soft-shadow"
         >
           {isAuthenticated ? (
             <div className="p-2">
@@ -141,7 +141,7 @@ export function ProfileMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="group relative grid h-10 w-10 place-items-center overflow-hidden rounded-full border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="group relative grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-on-surface/10 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
       >
         {user?.avatarUrl ? (
           <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />

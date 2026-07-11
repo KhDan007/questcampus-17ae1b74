@@ -84,7 +84,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
           <button
             type="button"
             onClick={() => setOpen((s) => !s)}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:border-on-surface"
+            className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
             aria-expanded={open}
           >
             <BookOpen className="h-3.5 w-3.5" />
@@ -98,7 +98,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
           type="button"
           onClick={ask}
           disabled={asking}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {asking ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -112,7 +112,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
             type="button"
             onClick={handleWriteHere}
             disabled={creating}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-white qc-hard-shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {creating ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -125,7 +125,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
       </div>
 
       {hasGuide && open && guide && (
-        <div className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-3">
+        <div className="rounded-lg border border-on-surface/8 bg-surface-container p-3">
           <p className="font-display text-label-md font-bold text-on-surface flex flex-wrap items-center gap-2">
             {guide.title}
             {guide.timeEstimate && (
@@ -183,7 +183,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
       )}
 
       {answer && (
-        <div className="rounded-lg border-2 border-secondary/60 bg-secondary/10 p-3">
+        <div className="rounded-lg border border-secondary/25 bg-secondary/10 p-3">
           <div className="flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface">
             <Sparkles className="h-3.5 w-3.5" /> AI helper
           </div>
@@ -194,7 +194,7 @@ export function GuideBlock({ guide, explainArgs, compact }: Props) {
       )}
 
       {error && (
-        <p className="rounded-md border-2 border-error/40 bg-error/10 px-2 py-1 text-label-sm text-on-error-container">
+        <p className="rounded-md border border-error/30 bg-error/10 px-2 py-1 text-label-sm text-on-error-container">
           {error}
         </p>
       )}

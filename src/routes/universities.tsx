@@ -16,7 +16,6 @@ import {
   Loader2,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SaveToggle } from "@/components/universities/SaveToggle";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { UniversityCard, type RecCard } from "@/components/profile/UniversityCard";
@@ -319,7 +318,6 @@ function UniversitiesPage() {
 
   return (
     <>
-      <LivingBackground />
       <DashboardShell>
         <main
           id="main-content"
@@ -356,14 +354,14 @@ function UniversitiesPage() {
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
-          <div className="inline-flex items-center gap-1 rounded-lg border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+          <div className="inline-flex items-center gap-1 rounded-lg border border-on-surface/10 bg-surface-container p-1">
             <button
               type="button"
               onClick={() => setTab("matches")}
-              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
                 tab === "matches"
-                  ? "bg-primary text-white"
-                  : "text-on-surface/70 hover:text-on-surface"
+                  ? "bg-primary-fixed/70 text-primary"
+                  : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
               <Sparkles className="mr-1 inline h-3.5 w-3.5" />
@@ -372,10 +370,10 @@ function UniversitiesPage() {
             <button
               type="button"
               onClick={() => setTab("saved")}
-              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+              className={`rounded-md px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
                 tab === "saved"
-                  ? "bg-primary text-white"
-                  : "text-on-surface/70 hover:text-on-surface"
+                  ? "bg-primary-fixed/70 text-primary"
+                  : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
               <Bookmark className="mr-1 inline h-3.5 w-3.5" />
@@ -389,12 +387,12 @@ function UniversitiesPage() {
         )}
 
         {/* Search box */}
-        <section className="mt-5 rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:mt-6 sm:p-5">
+        <section className="mt-5 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:mt-6 sm:p-5">
           <label className="block">
             <span className="font-[var(--font-label)] text-label-sm uppercase tracking-wider text-on-surface-variant">
               Search universities
             </span>
-            <div className="mt-2 flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 qc-hard-shadow-sm focus-within:-translate-y-0.5 focus-within:translate-x-0.5 focus-within:shadow-none">
+            <div className="mt-2 flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 transition-colors focus-within:border-on-surface/30">
               <Search className="h-4 w-4 text-on-surface/60" />
               <input
                 value={query}
@@ -449,7 +447,7 @@ function UniversitiesPage() {
                       <button
                         type="button"
                         onClick={restoreAll}
-                        className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                       >
                         <RotateCcw className="h-3.5 w-3.5" />
                         Restore hidden ({hiddenCount})
@@ -544,7 +542,7 @@ function UniversitiesPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 24 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit items-center gap-3 rounded-full border-2 border-on-surface bg-surface px-4 py-2 qc-hard-shadow"
+              className="fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit items-center gap-3 rounded-full border border-on-surface/10 bg-surface-container-lowest px-4 py-2 qc-soft-shadow"
             >
               <span className="font-[var(--font-label)] text-label-md text-on-surface">
                 Match hidden
@@ -584,9 +582,9 @@ function SearchRow({
       initial={reduce ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index, 6) * 0.04 }}
-      className="flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm"
+      className="flex items-center gap-3 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow"
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container text-on-surface">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-container text-on-surface-variant">
         <GraduationCap className="h-5 w-5" />
       </span>
       <div className="min-w-0 flex-1">
@@ -651,10 +649,10 @@ function Paywall({
 }) {
   const freeHook = useFreeHook();
   return (
-    <div className="mt-5 rounded-2xl border-2 border-on-surface bg-primary-fixed/40 p-4 qc-hard-shadow-sm sm:mt-8 sm:p-8">
+    <div className="mt-5 rounded-2xl border border-on-surface/8 bg-primary-fixed/40 p-4 qc-soft-shadow sm:mt-8 sm:p-8">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-primary text-white">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
             <Lock className="h-5 w-5" />
           </span>
           <div>
@@ -685,7 +683,7 @@ function Paywall({
 
 function EmptyHint({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm">
+    <div className="mt-4 rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-6 text-center">
       <p className="text-body-md text-on-surface-variant">{children}</p>
     </div>
   );
@@ -693,13 +691,8 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
 
 function LoadingHint() {
   return (
-    <div className="mt-4 rounded-2xl border-2 border-on-surface bg-surface/85 p-6 text-center qc-hard-shadow-sm">
-      <motion.span
-        aria-hidden
-        className="mx-auto block h-5 w-5 rounded-full border-2 border-primary/30 border-t-primary"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-      />
+    <div className="mt-4 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 text-center qc-soft-shadow">
+      <Loader2 className="mx-auto h-5 w-5 animate-spin text-primary" />
       <p className="mt-2 text-body-sm text-on-surface-variant">Searching…</p>
     </div>
   );
@@ -723,9 +716,9 @@ function MatchesSkeleton() {
 }
 
 const TONE_BADGE: Record<"safety" | "target" | "reach", string> = {
-  safety: "bg-tertiary-container/40 text-tertiary border-tertiary/40",
-  target: "bg-primary-fixed text-primary border-primary/40",
-  reach: "bg-secondary-container/40 text-secondary border-secondary/40",
+  safety: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
+  target: "bg-primary-fixed text-on-primary-fixed-variant",
+  reach: "bg-secondary-fixed text-on-secondary-fixed-variant",
 };
 
 function MatchColumn({
@@ -744,7 +737,7 @@ function MatchColumn({
   onDismiss?: (key: string) => void;
 }) {
   return (
-    <div className="flex min-w-0 flex-col rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow-sm">
+    <div className="flex min-w-0 flex-col rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
       <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
         <h3 className="min-w-0 truncate font-display text-headline-sm font-bold text-on-surface">
           {title}{" "}
@@ -753,7 +746,7 @@ function MatchColumn({
           </span>
         </h3>
         <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 text-label-sm font-medium ${TONE_BADGE[tone]}`}
+          className={`shrink-0 rounded-full px-2 py-0.5 text-label-sm font-semibold ${TONE_BADGE[tone]}`}
         >
           {subtitle}
         </span>
@@ -961,12 +954,12 @@ function SavedTab({
         </div>
       </div>
       {saved === undefined ? (
-        <div className="mt-5 flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-4 qc-hard-shadow-sm sm:mt-6">
+        <div className="mt-5 flex items-center gap-2 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:mt-6">
           <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
           <span className="text-body-sm text-on-surface-variant">Loading your saved list…</span>
         </div>
       ) : saved.length === 0 ? (
-        <div className="mt-5 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm sm:mt-6 sm:p-8">
+        <div className="mt-5 rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-6 text-center sm:mt-6 sm:p-8">
           <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
           <p className="mt-3 text-body-md text-on-surface-variant">
             Search for universities you already know, or save schools from your matches using the

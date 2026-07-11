@@ -25,7 +25,7 @@ export function ApplyStepper({ current }: { current: "pick" | "prep" | "research
                 done
                   ? "border-on-surface bg-tertiary text-on-tertiary"
                   : active
-                    ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
+                    ? "border-on-surface bg-primary text-white"
                     : "border-on-surface/30 bg-surface text-on-surface-variant"
               }`}
             >

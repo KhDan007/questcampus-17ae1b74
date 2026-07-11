@@ -128,7 +128,7 @@ export function LiveCanvas({
   }
 
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border-2 border-on-surface bg-black qc-hard-shadow">
+    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-on-surface/8 bg-black qc-soft-shadow">
       <canvas
         ref={canvasRef}
         width={SRC_W}

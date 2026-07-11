@@ -129,7 +129,7 @@ export function TaskGuideDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-on-surface bg-surface-container-lowest qc-hard-shadow">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow">
         <DialogHeader>
           <DialogTitle className="font-display text-headline-sm font-bold text-on-surface">
             {task.title}
@@ -144,13 +144,13 @@ export function TaskGuideDialog({
         {/* Guide */}
         <section className="mt-2">
           {guideLoading ? (
-            <div className="flex items-center gap-2 rounded-lg border-2 border-on-surface/15 bg-surface p-4 text-body-sm text-on-surface-variant">
+            <div className="flex items-center gap-2 rounded-lg border border-on-surface/8 bg-surface p-4 text-body-sm text-on-surface-variant">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading step-by-step guide…
             </div>
           ) : guide ? (
             <GuideBody guide={guide} />
           ) : (
-            <div className="rounded-lg border-2 border-on-surface/15 bg-surface p-4 text-body-sm text-on-surface-variant">
+            <div className="rounded-lg border border-on-surface/8 bg-surface p-4 text-body-sm text-on-surface-variant">
               We don&apos;t have a curated guide yet — ask the AI helper below for
               a personalized walkthrough.
             </div>
@@ -163,7 +163,7 @@ export function TaskGuideDialog({
             type="button"
             onClick={ask}
             disabled={asking}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {asking ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -173,7 +173,7 @@ export function TaskGuideDialog({
             {answer ? "Ask AI again" : "Ask AI to explain further"}
           </button>
           {answer && (
-            <div className="mt-2 rounded-lg border-2 border-secondary/60 bg-secondary/10 p-3">
+            <div className="mt-2 rounded-lg border border-on-surface/8 bg-secondary-fixed/30 p-3">
               <div className="flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface">
                 <Sparkles className="h-3.5 w-3.5" /> AI helper
               </div>
@@ -183,14 +183,14 @@ export function TaskGuideDialog({
             </div>
           )}
           {askError && (
-            <p className="mt-2 rounded-md border-2 border-error/40 bg-error/10 px-2 py-1 text-label-sm text-on-error-container">
+            <p className="mt-2 rounded-md border border-error/20 bg-error/10 px-2 py-1 text-label-sm text-on-error-container">
               {askError}
             </p>
           )}
         </section>
 
         {/* Actions */}
-        <section className="mt-4 border-t-2 border-on-surface/10 pt-4">
+        <section className="mt-4 border-t border-on-surface/10 pt-4">
           <p className="mb-2 font-[var(--font-label)] text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
             Do it now
           </p>
@@ -207,7 +207,7 @@ export function TaskGuideDialog({
                 type="button"
                 onClick={() => void openWriteEditor()}
                 disabled={creating}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {creating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -221,7 +221,7 @@ export function TaskGuideDialog({
               <button
                 type="button"
                 onClick={() => void navigate({ to: "/apply" })}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
               >
                 <ExternalLink className="h-4 w-4" />
                 Open profile step
@@ -234,7 +234,7 @@ export function TaskGuideDialog({
                   void onDone();
                   onOpenChange(false);
                 }}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface hover:border-on-surface"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 <CheckCircle2 className="h-4 w-4 text-tertiary" />
                 {task.done ? "Mark not done" : "Mark done"}
@@ -249,7 +249,7 @@ export function TaskGuideDialog({
 
 function GuideBody({ guide }: { guide: Guide }) {
   return (
-    <div className="rounded-lg border-2 border-on-surface/15 bg-surface p-4">
+    <div className="rounded-lg border border-on-surface/8 bg-surface p-4">
       <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface">
         <BookOpen className="h-3.5 w-3.5" /> How to get this
         {guide.timeEstimate && (
@@ -353,7 +353,7 @@ function UploadInline({
   return (
     <div>
       {existing && missingBytes ? (
-        <div className="flex items-center gap-2 rounded-md border-2 border-on-surface/25 bg-secondary-container/20 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-md border border-on-surface/8 bg-secondary-fixed/30 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface-variant" />
           <div className="min-w-0 flex-1">
             <p className="text-body-sm font-semibold text-on-surface">Needs re-upload</p>
@@ -370,12 +370,12 @@ function UploadInline({
           </button>
         </div>
       ) : existing ? (
-        <div className="flex items-center gap-2 rounded-md border-2 border-tertiary/40 bg-tertiary/10 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-md border border-on-surface/8 bg-tertiary-fixed/40 px-3 py-2">
           <FileText className="h-4 w-4 text-on-surface" />
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface">
             {existing.fileName}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-tertiary/25 px-2 py-0.5 text-label-sm text-on-surface">
+          <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-2 py-0.5 text-label-sm text-on-tertiary-fixed-variant">
             <Check className="h-3 w-3" /> Saved
           </span>
           <button
@@ -391,7 +391,7 @@ function UploadInline({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-on-surface/30 bg-surface px-3 py-4 font-[var(--font-label)] text-label-md text-on-surface hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-on-surface/25 bg-surface px-3 py-4 font-[var(--font-label)] text-label-md text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
         >
           {busy ? (
             <Loader2 className="h-4 w-4 animate-spin" />

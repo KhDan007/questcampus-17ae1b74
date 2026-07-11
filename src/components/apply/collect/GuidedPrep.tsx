@@ -44,30 +44,30 @@ const KIND_META: Record<
   eligibility: {
     label: "Eligibility",
     Icon: ShieldCheck,
-    tone: "bg-secondary text-on-surface",
-    ring: "border-secondary/60",
-    chip: "bg-secondary/25 text-on-surface",
+    tone: "bg-secondary-fixed text-on-secondary-fixed-variant",
+    ring: "border-on-surface/8",
+    chip: "bg-secondary-fixed text-on-secondary-fixed-variant",
   },
   document: {
     label: "Document",
     Icon: FileText,
-    tone: "bg-primary text-white",
-    ring: "border-primary/50",
-    chip: "bg-primary/15 text-primary",
+    tone: "bg-primary-fixed text-on-primary-fixed-variant",
+    ring: "border-on-surface/8",
+    chip: "bg-primary-fixed text-on-primary-fixed-variant",
   },
   field: {
     label: "Question",
     Icon: HelpCircle,
-    tone: "bg-tertiary text-on-surface",
-    ring: "border-tertiary/60",
-    chip: "bg-tertiary/25 text-on-surface",
+    tone: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
+    ring: "border-on-surface/8",
+    chip: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
   },
   essay: {
     label: "Essay",
     Icon: PenLine,
-    tone: "bg-on-surface text-white",
-    ring: "border-on-surface/50",
-    chip: "bg-on-surface/10 text-on-surface",
+    tone: "bg-surface-container-high text-on-surface",
+    ring: "border-on-surface/8",
+    chip: "bg-surface-container-high text-on-surface",
   },
 };
 
@@ -97,18 +97,18 @@ export function GuidedPrep({
     return (
       <div className="space-y-3">
         <div className="h-6 w-40 animate-pulse rounded bg-on-surface/10" />
-        <div className="h-48 animate-pulse rounded-2xl border-2 border-on-surface/15 bg-surface/60" />
+        <div className="h-48 animate-pulse rounded-2xl border border-on-surface/8 bg-surface-container-lowest" />
       </div>
     );
   }
 
   return (
     <section
-      className="overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow-sm"
+      className="overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow"
       id="guided-prep"
     >
       {/* Header band */}
-      <header className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-tertiary/10 p-5 sm:p-6">
+      <header className="relative p-5 sm:p-6">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
           <div className="min-w-0">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -133,7 +133,7 @@ export function GuidedPrep({
             <button
               type="button"
               onClick={() => setShowAll((s) => !s)}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
             >
               <ListChecks className="h-3.5 w-3.5" />
               {showAll ? "Step-by-step" : "See all"}
@@ -151,7 +151,7 @@ export function GuidedPrep({
                 {percent}%
               </span>
             </div>
-            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface">
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-on-surface/10">
               <div
                 className="h-full rounded-full bg-primary transition-[width] duration-500"
                 style={{ width: `${percent}%` }}
@@ -172,7 +172,7 @@ export function GuidedPrep({
       </header>
 
       {/* Body */}
-      <div className="border-t-2 border-on-surface/15 bg-surface p-5 sm:p-6">
+      <div className="border-t border-on-surface/8 p-5 sm:p-6">
         {showAll ? (
           <AllRequirements plan={plan} onChange={onSetAnswer} />
         ) : step ? (
@@ -221,10 +221,10 @@ function StepDots({
         const isCurrent = s.id === currentId;
         const remIdx = remaining.findIndex((r) => r.id === s.id);
         const cls = isCurrent
-          ? "bg-primary border-on-surface w-6"
+          ? "bg-primary w-6"
           : isDone
-            ? "bg-tertiary border-on-surface/60"
-            : "bg-surface border-on-surface/30 hover:border-on-surface";
+            ? "bg-tertiary"
+            : "bg-on-surface/20 hover:bg-on-surface/40";
         return (
           <button
             key={s.id}
@@ -232,7 +232,7 @@ function StepDots({
             disabled={isDone || remIdx < 0}
             onClick={() => remIdx >= 0 && onJump(remIdx)}
             aria-label={s.label}
-            className={`h-2.5 w-2.5 rounded-full border-2 transition-all ${cls}`}
+            className={`h-2.5 w-2.5 rounded-full transition-all ${cls}`}
           />
         );
       })}
@@ -242,7 +242,7 @@ function StepDots({
 
 function EmptyState() {
   return (
-    <div className="flex items-start gap-3 rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4">
+    <div className="flex items-start gap-3 rounded-xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4">
       <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-on-surface-variant" />
       <p className="text-body-sm text-on-surface-variant">
         Requirements will populate as each university finishes researching. Nothing you need to do right now.
@@ -253,9 +253,9 @@ function EmptyState() {
 
 function ReadyState() {
   return (
-    <div className="rounded-xl border-2 border-tertiary bg-tertiary/15 p-5 qc-hard-shadow-sm">
+    <div className="rounded-xl border border-on-surface/8 bg-tertiary-fixed/30 p-5">
       <div className="flex items-start gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant">
           <CheckCircle2 className="h-6 w-6" />
         </span>
         <div className="min-w-0">
@@ -344,19 +344,19 @@ function StepCard({
       {/* Step head */}
       <div className="flex items-start gap-4">
         <span
-          className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface qc-hard-shadow-sm ${meta.tone}`}
+          className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl ${meta.tone}`}
         >
           <Icon className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex items-center rounded-full border-2 border-on-surface/15 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide ${meta.chip}`}
+              className={`inline-flex items-center rounded-md px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide ${meta.chip}`}
             >
               {meta.label}
             </span>
             {step.targetName && (
-              <span className="inline-flex max-w-[16rem] items-center truncate rounded-full border-2 border-on-surface/15 bg-surface-container-lowest px-2 py-0.5 text-label-sm text-on-surface-variant">
+              <span className="inline-flex max-w-[16rem] items-center truncate rounded-md bg-surface-container px-2 py-0.5 text-label-sm text-on-surface-variant">
                 {step.targetName}
               </span>
             )}
@@ -368,7 +368,7 @@ function StepCard({
             {step.label}
           </h4>
           {step.prompt && (
-            <p className="mt-3 rounded-lg border-l-4 border-primary/60 bg-primary/5 px-3 py-2 text-body-sm italic text-on-surface-variant">
+            <p className="mt-3 rounded-lg bg-surface-container px-3 py-2 text-body-sm italic text-on-surface-variant">
               "{step.prompt}"
               {step.wordLimit ? (
                 <span className="not-italic"> · {step.wordLimit} words</span>
@@ -379,7 +379,7 @@ function StepCard({
       </div>
 
       {/* Input */}
-      <div className={`rounded-xl border-2 ${meta.ring} bg-surface-container-lowest p-4`}>
+      <div className={`rounded-xl border ${meta.ring} bg-surface-container-lowest p-4`}>
         {step.kind === "eligibility" && step.question ? (
           <EligibilityInput
             q={step.question}
@@ -404,12 +404,12 @@ function StepCard({
 
 
       {/* Nav */}
-      <div className="flex items-center justify-between gap-2 border-t-2 border-dashed border-on-surface/15 pt-4">
+      <div className="flex items-center justify-between gap-2 border-t border-dashed border-on-surface/15 pt-4">
         <button
           type="button"
           onClick={onBack}
           disabled={!hasBack}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
@@ -426,7 +426,7 @@ function StepCard({
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
             {hasNext ? "Next" : "Finish"} <ArrowRight className="h-4 w-4" />
           </button>
@@ -458,10 +458,10 @@ function EligibilityInput({
               key={o}
               type="button"
               onClick={() => update(o)}
-              className={`rounded-md border-2 px-3 py-2 font-[var(--font-label)] text-label-md capitalize transition-transform hover:-translate-y-0.5 ${
+              className={`rounded-lg px-3 py-2 font-[var(--font-label)] text-label-md capitalize transition-colors ${
                 on
-                  ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
-                  : "border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
+                  ? "bg-primary-fixed/70 text-primary"
+                  : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
               }`}
             >
               {o}
@@ -484,10 +484,10 @@ function EligibilityInput({
               key={opt.v}
               type="button"
               onClick={() => update(opt.v)}
-              className={`rounded-md border-2 px-3 py-2.5 font-[var(--font-label)] text-label-md font-semibold transition-transform hover:-translate-y-0.5 ${
+              className={`rounded-lg px-3 py-2.5 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
                 on
-                  ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
-                  : "border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
+                  ? "bg-primary-fixed/70 text-primary"
+                  : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
               }`}
             >
               {opt.label}
@@ -503,7 +503,7 @@ function EligibilityInput({
       value={value}
       onChange={(e) => update(e.target.value)}
       placeholder={q.kind === "number" ? "Enter a number" : "Type your answer"}
-      className="w-full rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
+      className="w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none"
     />
   );
 }
@@ -533,8 +533,8 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
   return (
     <div>
       {existing ? (
-        <div className="flex items-center gap-3 rounded-md border-2 border-tertiary bg-tertiary/15 px-3 py-2.5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-tertiary text-on-surface">
+        <div className="flex items-center gap-3 rounded-lg bg-tertiary-fixed/30 px-3 py-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-tertiary-fixed text-on-tertiary-fixed-variant">
             <CheckCircle2 className="h-4 w-4" />
           </span>
           <div className="min-w-0 flex-1">
@@ -546,7 +546,7 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="shrink-0 rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+            className="shrink-0 rounded-lg border border-on-surface/15 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Replace
           </button>
@@ -556,9 +556,9 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="group flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-on-surface/30 bg-surface px-3 py-6 text-center transition-colors hover:border-on-surface hover:bg-primary/5 disabled:opacity-60"
+          className="group flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-on-surface/20 bg-surface px-3 py-6 text-center transition-colors hover:bg-on-surface/5 disabled:opacity-60"
         >
-          <span className="grid h-11 w-11 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-transform group-hover:-translate-y-0.5">
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
             {busy ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
@@ -580,7 +580,7 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
         onChange={(e) => pick(e.target.files?.[0])}
       />
       {error && (
-        <p className="mt-2 rounded-md border-2 border-error/30 bg-error/10 px-2.5 py-1.5 text-label-sm text-on-error-container">
+        <p className="mt-2 rounded-lg bg-error-container/40 px-2.5 py-1.5 text-label-sm text-on-error-container">
           {error}
         </p>
       )}
@@ -592,7 +592,7 @@ function EssayStep() {
   return (
     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-on-surface text-white">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-container-high text-on-surface">
           <PenLine className="h-5 w-5" />
         </span>
         <p className="text-body-sm text-on-surface">
@@ -601,7 +601,7 @@ function EssayStep() {
       </div>
       <Link
         to="/essay"
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
       >
         <Sparkles className="h-4 w-4" /> Open Essay Assistant
       </Link>

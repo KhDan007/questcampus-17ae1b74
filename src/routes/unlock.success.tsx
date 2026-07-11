@@ -83,17 +83,12 @@ function UnlockSuccessPage() {
 
   return (
     <>
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 pt-24">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
-          <div className="absolute bottom-0 right-[-10%] h-[420px] w-[420px] rounded-full bg-secondary-container/60 blur-3xl" />
-        </div>
-
+      <main className="relative flex min-h-screen items-center justify-center bg-surface px-4 pt-24">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto w-full max-w-[560px] rounded-3xl border-2 border-on-surface bg-surface p-8 text-center qc-hard-shadow sm:p-10"
+          className="relative mx-auto w-full max-w-[560px] rounded-3xl border border-on-surface/8 bg-surface-container-lowest p-8 text-center qc-soft-shadow sm:p-10"
         >
           {!token ? (
             <SignedOutState />
@@ -103,7 +98,7 @@ function UnlockSuccessPage() {
                 initial={reduce ? false : { scale: 0.6, rotate: -20, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 220, damping: 14, delay: 0.05 }}
-                className="inline-grid h-16 w-16 place-items-center rounded-2xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm"
+                className="inline-grid h-16 w-16 place-items-center rounded-2xl bg-primary-fixed text-on-primary-fixed-variant"
               >
                 <PartyPopper className="h-7 w-7" />
               </motion.span>
@@ -117,7 +112,7 @@ function UnlockSuccessPage() {
               <Link
                 to="/universities"
                 search={{ q: "" }}
-                className="group mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none"
+                className="group mt-8 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-primary px-7 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90"
               >
                 {t("unlockOk.go")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -136,7 +131,7 @@ function WaitingState({ slow, onRetry }: { slow: boolean; onRetry: () => void })
   const { t } = useI18n();
   return (
     <div>
-      <span className="inline-grid h-14 w-14 place-items-center rounded-2xl border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm">
+      <span className="inline-grid h-14 w-14 place-items-center rounded-2xl bg-surface-container text-on-surface-variant">
         <Loader2 className="h-6 w-6 animate-spin" />
       </span>
       <h1 className="mt-6 font-display text-2xl font-black tracking-tight text-on-surface sm:text-3xl">
@@ -151,7 +146,7 @@ function WaitingState({ slow, onRetry }: { slow: boolean; onRetry: () => void })
         <button
           type="button"
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           <RefreshCw className="h-4 w-4" /> Retry
         </button>
@@ -172,7 +167,7 @@ function SignedOutState() {
       </p>
       <Link
         to="/signin"
-        className="group mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border-2 border-on-surface bg-primary px-6 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="group mt-6 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
       >
         {t("unlockOk.signin")}
         <ArrowRight className="h-4 w-4" />

@@ -1,29 +1,39 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
-  Award,
   ArrowRight,
   PenLine,
   Mail,
   LogOut,
   UserCircle2,
   Compass,
-  Bookmark,
   Gift,
   Copy,
   Check,
+  GraduationCap,
+  Bookmark,
+  Pencil,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
 import { useAction, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSection";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Switch } from "@/components/ui/switch";
+import {
+  Card,
+  Tabs,
+  IconTile,
+  Chip,
+  PrimaryButton,
+  EmptyState,
+  cx,
+} from "@/components/ui/calm";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
 import {
@@ -31,6 +41,8 @@ import {
   writeChatPageContextEnabled,
 } from "@/lib/chat/pageContext";
 import { getSessionId } from "@/lib/onboarding/session";
+import { useProgress, nextStep } from "@/lib/progress";
+import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { WAITLIST_BASE_DISCOUNT } from "@/lib/config";
 import { shareLinkFor } from "@/lib/referral/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -55,23 +67,27 @@ type PaidPayload = {
   results: RecRow[];
 };
 
-const BUCKET_LABEL: Record<NonNullable<RecRow["bucket"]>, { label: string; chip: string }> = {
-  safety: { label: "Safety", chip: "bg-[#bcf0ae] text-[#073707]" },
-  target: { label: "Target", chip: "bg-[#c7d8f0] text-[#0d2240]" },
-  reach: { label: "Reach", chip: "bg-[#f0c7e6] text-[#3a0e2e]" },
+const BUCKET_CHIP: Record<NonNullable<RecRow["bucket"]>, { label: string; tone: "green" | "amber" | "coral" }> = {
+  safety: { label: "Safety", tone: "green" },
+  target: { label: "Target", tone: "amber" },
+  reach: { label: "Reach", tone: "coral" },
 };
 
+type TabKey = "matches" | "universities" | "invite" | "settings";
+
 function ProfilePage() {
-  const reduce = useReducedMotion();
-  const { user, isAuthenticated, isAdmin, token } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const { lang } = useI18n();
+  const progress = useProgress();
+  const { saved } = useSavedUniversities();
+  const savedCount = saved?.length ?? 0;
+
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [recs, setRecs] = useState<RecRow[] | null>(null);
   const [pageContextEnabled, setPageContextEnabled] = useState(false);
-  const [recStatus, setRecStatus] = useState<"idle" | "loading" | "ready" | "error" | "locked">(
-    "idle",
-  );
+  const [recStatus, setRecStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [tab, setTab] = useState<TabKey>("matches");
 
   useEffect(() => {
     setSessionId(getSessionId());
@@ -85,7 +101,6 @@ function ProfilePage() {
     if (!sessionId) return;
     setRecStatus("loading");
     try {
-      // Try paid first if signed in; fall back to free.
       if (token) {
         const paid = (await recommend({ sessionId, token, plan: "paid", force: false, lang })) as
           | PaidPayload
@@ -120,7 +135,6 @@ function ProfilePage() {
   useEffect(() => {
     void loadRecs();
   }, [loadRecs]);
-  void isAdmin;
 
   const firstName = useMemo(() => {
     const n = user?.name?.trim();
@@ -154,271 +168,163 @@ function ProfilePage() {
     toast.message(enabled ? "Assistant page context on" : "Assistant page context off");
   }
 
+  // Activation checklist — every item is derivable from state we already have.
+  const step = nextStep(progress);
+  const refined = step !== "refine";
+  const drafted = step === "review" || step === "done";
+  const invited = (referrals?.counts?.total ?? 0) > 0;
+  const hasMatches = (recs?.length ?? 0) > 0;
+
+  const completion = [
+    { key: "account", label: "Create your account", done: isAuthenticated, weight: 10, to: "/signin" },
+    { key: "quiz", label: "Complete the matching quiz", done: hasMatches, weight: 20, to: "/onboarding" },
+    { key: "refine", label: "Refine your recommendations", done: refined, weight: 20, to: "/onboarding" },
+    { key: "save", label: "Save 3+ universities", done: savedCount >= 3, weight: 15, to: "/universities" },
+    { key: "essay", label: "Draft a personal statement", done: drafted, weight: 20, to: "/essay" },
+    { key: "invite", label: "Invite a friend", done: invited, weight: 15, to: "/profile" },
+  ];
+  const percent = completion.reduce((sum, c) => sum + (c.done ? c.weight : 0), 0);
+  const nextIncomplete = completion.find((c) => !c.done);
+
+  const tabs: Array<{ key: TabKey; label: string; count?: number }> = [
+    { key: "matches", label: "Matches", count: recs?.length ?? 0 },
+    { key: "universities", label: "My universities", count: savedCount },
+    ...(token ? [{ key: "invite" as const, label: "Invite" }] : []),
+    { key: "settings", label: "Settings" },
+  ];
+
   return (
     <>
-      <LivingBackground />
       <DashboardShell>
-      <main
-        id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
-      >
-        {/* Hero card */}
-        <motion.section
-          initial={reduce ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        <main
+          id="main-content"
+          className="mx-auto w-full max-w-(--container-content) px-4 pb-16 pt-20 sm:px-6 lg:px-8"
         >
-          <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface/85 p-4 backdrop-blur-md qc-hard-shadow sm:p-10">
-            <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-60">
-              <div
-                className="animate-aurora-1 absolute -left-20 -top-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
-                style={{
-                  background: "radial-gradient(circle, rgba(179,39,44,0.28), transparent 65%)",
-                }}
-              />
-              <div
-                className="animate-aurora-2 absolute -right-20 -bottom-20 h-[40vh] w-[40vh] rounded-full blur-[110px]"
-                style={{
-                  background: "radial-gradient(circle, rgba(254,183,0,0.22), transparent 65%)",
-                }}
-              />
-            </div>
-
-            <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-              <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
-                <span className="font-display text-display-md font-bold leading-none">
-                  {initials || <UserCircle2 className="h-10 w-10" />}
-                </span>
-              </div>
-
-              <div className="w-full min-w-0 flex-1">
-                <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
-                  Your profile
-                </p>
-                <h1 className="mt-1.5 text-display-md text-on-surface text-balance">
-                  {firstName ? `${firstName}'s QuestCampus` : "Welcome to QuestCampus"}
-                </h1>
-                {user?.email && (
-                  <p className="mt-1.5 flex min-w-0 items-center gap-1.5 font-[var(--font-label)] text-label-md text-on-surface-variant">
-                    <Mail className="h-3.5 w-3.5 shrink-0" />
-                    <span className="min-w-0 truncate">{user.email}</span>
-                  </p>
-                )}
-                <p className="mt-3 max-w-2xl text-body-md text-on-surface-variant">
-                  Everything you've matched and built lives here. We'll keep adding tools as they
-                  ship — waitlist members get {WAITLIST_BASE_DISCOUNT}% off monthly access.
-                </p>
-              </div>
-
-              {isAuthenticated && (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-                >
-                  <LogOut className="h-4 w-4" /> Sign out
-                </button>
-              )}
-            </div>
-
-            {/* Quick stats */}
-            <div className="mt-5 sm:mt-8 grid gap-3 sm:grid-cols-3">
-              <Stat
-                label="Your matches"
-                value={String(recs?.length ?? 0)}
-                tone="primary"
-              />
-              <Stat label="Account" value={isAuthenticated ? "Active" : "Guest"} tone="neutral" />
-              <Stat
-                label="Your discount"
-                value={
-                  token
-                    ? referrals
-                      ? `${referrals.discountPercent}% off`
-                      : "…"
-                    : `${WAITLIST_BASE_DISCOUNT}% off`
-                }
-                tone="accent"
-              />
-            </div>
-          </div>
-        </motion.section>
-
-        {token && referrals && referrals.referralCode && (
-          <SilentErrorBoundary>
-            <ReferralCard referrals={referrals} />
-          </SilentErrorBoundary>
-        )}
-
-        {isAuthenticated && (
-          <AssistantSettingsCard
-            pageContextEnabled={pageContextEnabled}
-            onPageContextChange={setAssistantPageContext}
-          />
-        )}
-
-        {/* Quick actions */}
-        <section className="mt-8 sm:mt-12 grid gap-4 sm:gap-5 lg:grid-cols-2">
-          <ActionCard
-            to="/dashboard"
-            Icon={Compass}
-            title="Open dashboard"
-            body="See your matched universities and explore the next steps in one place."
-            cta="Go to dashboard"
-          />
-          <ActionCard
-            to="/essay"
-            Icon={PenLine}
-            title="Write your personal statement"
-            body="Generate a Common App essay grounded in what you've told us. First draft is free."
-            cta="Start writing"
-            accent
-          />
-        </section>
-
-        {/* Your matches — names-only list */}
-        <section className="mt-10 sm:mt-14">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="font-display text-headline-lg font-bold text-on-surface">
-                Your university matches
-              </h2>
-              <p className="mt-1 text-body-md text-on-surface-variant">
-                {recs && recs.length > 0
-                  ? `${recs.length} matches · open the full list for details`
-                  : "Run the quiz to generate your matches."}
-              </p>
-            </div>
-            <Link
-              to="/universities"
-              search={{ q: "" }}
-              className="hidden shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:inline-flex"
-            >
-              See full list <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          {recStatus === "loading" && (
-            <div className="mt-6 grid gap-2 sm:grid-cols-2">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-11 animate-pulse rounded-lg border-2 border-on-surface/10 bg-surface/60"
-                />
-              ))}
-            </div>
-          )}
-
-          {recStatus === "ready" && recs && recs.length > 0 && (
-            <ol className="mt-6 grid gap-2 sm:grid-cols-2">
-              {recs.map((r, i) => {
-                const loc = [r.city, r.state, r.country].filter(Boolean).join(", ");
-                const bucket = r.bucket ? BUCKET_LABEL[r.bucket] : null;
-                return (
-                  <li
-                    key={r.externalId}
-                    className="flex min-w-0 items-center gap-3 overflow-hidden rounded-lg border-2 border-on-surface bg-surface/85 px-3 py-2.5 qc-hard-shadow-sm"
-                  >
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 font-[var(--font-label)] text-label-sm font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-display text-label-lg font-semibold text-on-surface">
-                        {r.name}
-                      </p>
-                      {loc && (
-                        <p className="truncate font-[var(--font-label)] text-label-sm text-on-surface-variant">
-                          {loc}
-                        </p>
-                      )}
-                    </div>
-                    {bucket && (
-                      <span
-                        className={`shrink-0 rounded-md px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-bold ${bucket.chip}`}
-                      >
-                        {bucket.label}
-                      </span>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Identity + tabs */}
+            <div className="flex flex-col gap-6 lg:col-span-8">
+              <Card className="px-4 py-8 sm:px-8">
+                <div className="flex flex-col items-center text-center">
+                  <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-fixed text-on-primary-fixed-variant">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
+                    ) : initials ? (
+                      <span className="font-display text-headline-lg font-bold leading-none">{initials}</span>
+                    ) : (
+                      <UserCircle2 className="h-10 w-10" />
                     )}
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-
-          {(recStatus === "error" || (recStatus === "ready" && (!recs || recs.length === 0))) && (
-            <div className="mt-6 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-8 text-center backdrop-blur-sm">
-              <p className="text-body-lg text-on-surface-variant">
-                {recStatus === "error"
-                  ? "Couldn't load your matches — try again."
-                  : "No matches yet."}
-              </p>
-              <Link
-                to="/universities"
-                search={{ q: "" }}
-                className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-              >
-                Open universities <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          )}
-        </section>
-
-        <SilentErrorBoundary>
-          <MyUniversitiesSection />
-        </SilentErrorBoundary>
-
-        {/* Upcoming */}
-        <section className="mt-10 sm:mt-16">
-          <h2 className="font-display text-headline-lg font-bold text-on-surface">
-            Coming soon to your account
-          </h2>
-          <p className="mt-1 text-body-md text-on-surface-variant">
-            Join the waitlist to lock in {WAITLIST_BASE_DISCOUNT}% off monthly access.
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <UpcomingTile
-              Icon={Bookmark}
-              title="Bookmark & compare"
-              body="Save your favourite schools side-by-side with deadlines and costs."
-              onClick={() => setWaitlistOpen(true)}
-            />
-            <Link
-              to={isAuthenticated ? "/onboarding" : "/signin"}
-              search={isAuthenticated ? undefined : ({ redirect: "/onboarding" } as never)}
-              className="group flex w-full items-start gap-4 rounded-2xl border-2 border-on-surface bg-primary p-5 text-left text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[5px_5px_0_0_var(--color-on-surface)]"
-            >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-white text-primary">
-                <Sparkles className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-display text-headline-sm font-bold">
-                    Refined recommendations
-                  </h3>
-                  <span className="rounded-full bg-white px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-primary">
-                    Live
                   </span>
+                  <h1 className="mt-4 font-display text-headline-lg font-bold text-on-surface">
+                    {user?.name || (firstName ? firstName : "Welcome to QuestCampus")}
+                  </h1>
+                  {user?.email && (
+                    <p className="mt-1 inline-flex items-center gap-1.5 text-body-sm text-on-surface-variant">
+                      <Mail className="h-3.5 w-3.5" />
+                      <span className="max-w-full truncate">{user.email}</span>
+                    </p>
+                  )}
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <Chip tone={user?.paid ? "amber" : "muted"}>
+                      {user?.paid ? "Full access" : "Free plan"}
+                    </Chip>
+                    <Chip tone="coral">
+                      <GraduationCap className="h-3.5 w-3.5" /> {recs?.length ?? 0} matches
+                    </Chip>
+                    <Chip tone="green">
+                      <Bookmark className="h-3.5 w-3.5" /> {savedCount} saved
+                    </Chip>
+                  </div>
+                  <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                    <Link
+                      to="/onboarding"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
+                    >
+                      <Pencil className="h-4 w-4" /> Edit profile
+                    </Link>
+                    {isAuthenticated && (
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface"
+                      >
+                        <LogOut className="h-4 w-4" /> Sign out
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <p className="mt-1 text-body-md text-white/85">
-                  Answer a few more questions and we'll re-rank your matches with much more
-                  precision.
-                </p>
-              </div>
-              <ArrowRight className="h-5 w-5 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </section>
 
-        {!isAuthenticated && (
-          <p className="mt-6 sm:mt-10 text-center text-body-sm text-on-surface-variant">
-            You're browsing as a guest.{" "}
-            <a href="/signin?mode=signup" className="text-primary hover:underline">
-              Create a free account
-            </a>{" "}
-            to keep this synced across devices.
-          </p>
-        )}
-      </main>
+                <Tabs
+                  className="mt-8"
+                  tabs={tabs}
+                  value={tab}
+                  onChange={(k) => setTab(k)}
+                />
+
+                <div className="mt-6">
+                  {tab === "matches" && (
+                    <MatchesTab recStatus={recStatus} recs={recs} />
+                  )}
+                  {tab === "universities" && (
+                    <SilentErrorBoundary>
+                      <MyUniversitiesSection />
+                    </SilentErrorBoundary>
+                  )}
+                  {tab === "invite" && token && referrals && referrals.referralCode && (
+                    <SilentErrorBoundary>
+                      <ReferralPanel referrals={referrals} />
+                    </SilentErrorBoundary>
+                  )}
+                  {tab === "invite" && token && !(referrals && referrals.referralCode) && (
+                    <p className="text-body-sm text-on-surface-variant">Loading your invite link…</p>
+                  )}
+                  {tab === "settings" && (
+                    <AssistantSettingsPanel
+                      pageContextEnabled={pageContextEnabled}
+                      onPageContextChange={setAssistantPageContext}
+                    />
+                  )}
+                </div>
+              </Card>
+            </div>
+
+            {/* Completion + quick actions */}
+            <aside className="flex flex-col gap-6 lg:col-span-4">
+              <CompletionCard
+                percent={percent}
+                items={completion}
+                nextLabel={nextIncomplete?.label}
+                nextTo={nextIncomplete?.to}
+              />
+
+              <Card className="p-4 sm:p-5">
+                <p className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant/70">
+                  Quick actions
+                </p>
+                <div className="mt-3 flex flex-col gap-2">
+                  <QuickAction to="/dashboard" icon={Compass} tone="coral" title="Open dashboard" desc="Your next steps in one place." />
+                  <QuickAction to="/essay" icon={PenLine} tone="amber" title="Write your essay" desc="First draft is free." />
+                  <QuickAction to="/universities" icon={GraduationCap} tone="green" title="Browse universities" desc="Search 11,000+ schools." />
+                </div>
+              </Card>
+
+              {!isAuthenticated && (
+                <Card className="p-4 sm:p-5">
+                  <h2 className="font-display text-headline-sm font-bold text-on-surface">Save your work</h2>
+                  <p className="mt-1 text-body-sm text-on-surface-variant">
+                    Create a free account to keep this synced across devices.
+                  </p>
+                  <Link
+                    to="/signin"
+                    search={{ mode: "signup" } as never}
+                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
+                  >
+                    Create account <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Card>
+              )}
+            </aside>
+          </div>
+        </main>
       </DashboardShell>
 
       <WaitlistPopup
@@ -431,6 +337,195 @@ function ProfilePage() {
   );
 }
 
+function MatchesTab({
+  recStatus,
+  recs,
+}: {
+  recStatus: "idle" | "loading" | "ready" | "error";
+  recs: RecRow[] | null;
+}) {
+  if (recStatus === "loading") {
+    return (
+      <div className="grid gap-2 sm:grid-cols-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="h-12 animate-pulse rounded-xl border border-on-surface/8 bg-surface-container" />
+        ))}
+      </div>
+    );
+  }
+  if (recStatus === "error" || !recs || recs.length === 0) {
+    return (
+      <EmptyState
+        icon={GraduationCap}
+        title={recStatus === "error" ? "Couldn't load your matches" : "No matches yet"}
+        body="Run the 60-second quiz to generate your university matches."
+        action={
+          <Link
+            to="/universities"
+            search={{ q: "" }}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
+          >
+            Open universities <ArrowRight className="h-4 w-4" />
+          </Link>
+        }
+      />
+    );
+  }
+  return (
+    <>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-body-sm text-on-surface-variant">{recs.length} matches</p>
+        <Link
+          to="/universities"
+          search={{ q: "" }}
+          className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+        >
+          See full list <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+      <ol className="grid gap-2 sm:grid-cols-2">
+        {recs.map((r, i) => {
+          const loc = [r.city, r.state, r.country].filter(Boolean).join(", ");
+          const bucket = r.bucket ? BUCKET_CHIP[r.bucket] : null;
+          return (
+            <li
+              key={r.externalId}
+              className="flex min-w-0 items-center gap-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2.5 qc-soft-shadow"
+            >
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary-fixed font-[var(--font-label)] text-label-sm font-bold tabular-nums text-on-primary-fixed-variant">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+                  {r.name}
+                </p>
+                {loc && <p className="truncate text-label-sm text-on-surface-variant">{loc}</p>}
+              </div>
+              {bucket && <Chip tone={bucket.tone}>{bucket.label}</Chip>}
+            </li>
+          );
+        })}
+      </ol>
+    </>
+  );
+}
+
+function CompletionCard({
+  percent,
+  items,
+  nextLabel,
+  nextTo,
+}: {
+  percent: number;
+  items: Array<{ key: string; label: string; done: boolean; to: string }>;
+  nextLabel?: string;
+  nextTo?: string;
+}) {
+  return (
+    <Card className="overflow-hidden">
+      <div className="flex items-center gap-4 border-b border-on-surface/8 bg-primary-fixed/40 p-4 sm:p-5">
+        <CompletionRing percent={percent} />
+        <div className="min-w-0">
+          <p className="font-display text-headline-md font-bold text-on-surface tabular-nums">{percent}%</p>
+          <p className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant">
+            Profile complete
+          </p>
+        </div>
+      </div>
+      <div className="p-4 sm:p-5">
+        <ul className="flex flex-col gap-2">
+          {items.map((c) => (
+            <li key={c.key}>
+              <Link
+                to={c.to as never}
+                className={cx(
+                  "group flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition-colors",
+                  c.done ? "" : "hover:bg-on-surface/[0.03]",
+                )}
+              >
+                {c.done ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-tertiary" />
+                ) : (
+                  <Circle className="h-4 w-4 shrink-0 text-on-surface/30" />
+                )}
+                <span
+                  className={cx(
+                    "text-body-sm",
+                    c.done ? "text-on-surface-variant/60 line-through" : "text-on-surface",
+                  )}
+                >
+                  {c.label}
+                </span>
+                {!c.done && (
+                  <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-on-surface/20 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {nextLabel && nextTo && (
+          <Link
+            to={nextTo as never}
+            className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
+          >
+            {nextLabel} <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function CompletionRing({ percent }: { percent: number }) {
+  const r = 20;
+  const c = 2 * Math.PI * r;
+  const dash = (Math.max(0, Math.min(100, percent)) / 100) * c;
+  return (
+    <svg width="52" height="52" viewBox="0 0 52 52" className="shrink-0" aria-hidden>
+      <circle cx="26" cy="26" r={r} fill="none" stroke="var(--color-on-surface)" strokeOpacity="0.1" strokeWidth="5" />
+      <circle
+        cx="26"
+        cy="26"
+        r={r}
+        fill="none"
+        stroke="var(--color-primary)"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${c}`}
+        transform="rotate(-90 26 26)"
+      />
+    </svg>
+  );
+}
+
+function QuickAction({
+  to,
+  icon,
+  tone,
+  title,
+  desc,
+}: {
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "coral" | "amber" | "green";
+  title: string;
+  desc: string;
+}) {
+  return (
+    <Link
+      to={to as never}
+      className="group -mx-1.5 flex items-center gap-3 rounded-xl px-1.5 py-2 transition-colors hover:bg-on-surface/[0.03]"
+    >
+      <IconTile icon={icon} tone={tone} size="sm" />
+      <div className="min-w-0 flex-1">
+        <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">{title}</p>
+        <p className="truncate text-label-sm text-on-surface-variant">{desc}</p>
+      </div>
+      <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/30 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
+    </Link>
+  );
+}
+
 type ReferralSummary = {
   referralCode: string | null;
   referredBy: boolean;
@@ -440,7 +535,7 @@ type ReferralSummary = {
   maxPercent: number;
 };
 
-function AssistantSettingsCard({
+function AssistantSettingsPanel({
   pageContextEnabled,
   onPageContextChange,
 }: {
@@ -448,18 +543,16 @@ function AssistantSettingsCard({
   onPageContextChange: (enabled: boolean) => void;
 }) {
   return (
-    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
-            <Sparkles className="h-4 w-4 text-primary" /> Assistant settings
-          </h2>
-          <p className="mt-1 max-w-2xl text-body-sm text-on-surface-variant">
-            Current-page context is off by default. When off, the assistant only gets the page you
-            are on if your message points at something on screen.
-          </p>
-        </div>
-        <label className="flex shrink-0 items-center justify-between gap-3 rounded-lg border-2 border-on-surface/20 bg-surface-container-lowest px-3 py-2">
+    <div className="flex flex-col gap-4">
+      <div className="rounded-xl border border-on-surface/8 bg-surface-container/50 p-4">
+        <h3 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+          <Sparkles className="h-4 w-4 text-primary" /> Assistant
+        </h3>
+        <p className="mt-1 text-body-sm text-on-surface-variant">
+          Current-page context is off by default. When off, the assistant only sees the page you're
+          on if your message points at something on screen.
+        </p>
+        <label className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-on-surface/10 bg-surface-container-lowest px-3 py-2.5">
           <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
             Always send page context
           </span>
@@ -470,11 +563,11 @@ function AssistantSettingsCard({
           />
         </label>
       </div>
-    </section>
+    </div>
   );
 }
 
-function ReferralCard({ referrals }: { referrals: ReferralSummary }) {
+function ReferralPanel({ referrals }: { referrals: ReferralSummary }) {
   const [copied, setCopied] = useState(false);
   const link = shareLinkFor(referrals.referralCode);
   const pct = Math.min(referrals.discountPercent, referrals.maxPercent);
@@ -492,158 +585,43 @@ function ReferralCard({ referrals }: { referrals: ReferralSummary }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
+    <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
+          <h3 className="inline-flex items-center gap-2 font-display text-headline-sm font-bold text-on-surface">
             <Gift className="h-4 w-4 text-primary" /> Invite friends
-          </h2>
+          </h3>
           <p className="mt-1 max-w-xl text-body-sm text-on-surface-variant">
-            They get {referrals.perReferralPercent}% off when they join with your link. You get
-            +{referrals.perReferralPercent}% off for every friend who finishes onboarding, up to{" "}
+            They get {referrals.perReferralPercent}% off when they join with your link. You get +
+            {referrals.perReferralPercent}% off for every friend who finishes onboarding, up to{" "}
             {referrals.maxPercent}%.
           </p>
         </div>
-        <span className="shrink-0 rounded-full border border-on-surface/25 bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-          {pct}% / {referrals.maxPercent}%
-        </span>
+        <Chip tone="amber">{pct}% / {referrals.maxPercent}%</Chip>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border-2 border-on-surface/20 bg-surface-container-lowest px-3 py-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-on-surface/10 bg-surface-container/50 px-3 py-2.5">
           <span className="min-w-0 flex-1 truncate text-body-sm text-on-surface" title={link}>
             {link}
           </span>
-          <span className="shrink-0 rounded-full bg-on-surface/10 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
+          <span className="shrink-0 rounded-full bg-on-surface/8 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
             {referrals.referralCode}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={copyLink}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
-        >
+        <PrimaryButton onClick={copyLink} className="shrink-0">
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           {copied ? "Copied" : "Copy link"}
-        </button>
+        </PrimaryButton>
       </div>
 
       {(qualified > 0 || pending > 0) && (
-        <p className="mt-3 text-label-sm text-on-surface-variant">
-          {qualified > 0 &&
-            `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
+        <p className="text-label-sm text-on-surface-variant">
+          {qualified > 0 && `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
           {qualified > 0 && pending > 0 && " "}
-          {pending > 0 &&
-            `${pending} more signed up, waiting on onboarding to qualify.`}
+          {pending > 0 && `${pending} more signed up, waiting on onboarding to qualify.`}
         </p>
       )}
-    </section>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: "primary" | "neutral" | "accent";
-}) {
-  const bg =
-    tone === "primary"
-      ? "bg-primary text-white"
-      : tone === "accent"
-        ? "bg-secondary-container text-on-surface"
-        : "bg-surface text-on-surface";
-  return (
-    <div className={`rounded-xl border-2 border-on-surface p-4 qc-hard-shadow-sm ${bg}`}>
-      <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] opacity-80">
-        {label}
-      </p>
-      <p className="mt-1 font-display text-headline-md font-bold">{value}</p>
     </div>
-  );
-}
-
-function ActionCard({
-  to,
-  Icon,
-  title,
-  body,
-  cta,
-  accent,
-}: {
-  to: string;
-  Icon: typeof Award;
-  title: string;
-  body: string;
-  cta: string;
-  accent?: boolean;
-}) {
-  return (
-    <Link
-      to={to}
-      className={`group relative flex items-start gap-4 overflow-hidden rounded-2xl border-2 border-on-surface p-5 qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[3px_3px_0_0_var(--color-on-surface)] ${
-        accent ? "bg-primary text-white" : "bg-surface text-on-surface"
-      }`}
-    >
-      <span
-        className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface ${
-          accent ? "bg-white text-primary" : "bg-secondary-container text-on-surface"
-        }`}
-      >
-        <Icon className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-display text-headline-sm font-bold">{title}</h3>
-        <p className={`mt-1 text-body-md ${accent ? "text-white/85" : "text-on-surface-variant"}`}>
-          {body}
-        </p>
-        <span
-          className={`mt-3 inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-md font-semibold ${
-            accent ? "text-white" : "text-primary"
-          }`}
-        >
-          {cta}
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-
-function UpcomingTile({
-  Icon,
-  title,
-  body,
-  onClick,
-}: {
-  Icon: typeof Award;
-  title: string;
-  body: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex w-full items-start gap-4 rounded-2xl border-2 border-on-surface bg-surface/85 p-5 text-left backdrop-blur-md qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[5px_5px_0_0_var(--color-primary)]"
-    >
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-secondary-container text-on-surface">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
-          <span className="rounded-full bg-on-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-surface">
-            Coming soon
-          </span>
-        </div>
-        <p className="mt-1 text-body-md text-on-surface-variant">{body}</p>
-      </div>
-      <ArrowRight className="h-5 w-5 shrink-0 text-on-surface/40 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
-    </button>
   );
 }

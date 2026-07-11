@@ -24,13 +24,13 @@ type LiveProps = Omit<Props, "research"> & {
 };
 
 const TONE_CLASS: Record<ResearchStatusTone, string> = {
-  loading: "border-on-surface/20 bg-surface text-on-surface-variant",
-  queued: "border-on-surface/20 bg-surface-container-lowest text-on-surface-variant",
-  researching: "border-primary/40 bg-primary-fixed text-primary",
-  ready: "border-tertiary/50 bg-tertiary-fixed text-tertiary",
-  partial: "border-amber-700/40 bg-amber-50 text-amber-700",
-  blocked: "border-secondary/50 bg-secondary-container text-on-surface",
-  error: "border-error/40 bg-error-container text-on-error-container",
+  loading: "bg-surface-container text-on-surface-variant",
+  queued: "bg-surface-container text-on-surface-variant",
+  researching: "bg-primary-fixed text-on-primary-fixed-variant",
+  ready: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
+  partial: "bg-secondary-fixed text-on-secondary-fixed-variant",
+  blocked: "bg-surface-container-high text-on-surface",
+  error: "bg-error-container text-on-error-container",
 };
 
 const ICON_BY_TONE = {
@@ -57,7 +57,7 @@ export function ResearchStatusBadge({ research, compact = false, className }: Pr
       <span
         aria-live={view.tone === "researching" || view.tone === "loading" ? "polite" : undefined}
         className={cx(
-          "inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold",
+          "inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold",
           TONE_CLASS[view.tone],
           className,
         )}
@@ -75,7 +75,7 @@ export function ResearchStatusBadge({ research, compact = false, className }: Pr
     <div
       aria-live={view.tone === "researching" || view.tone === "loading" ? "polite" : undefined}
       className={cx(
-        "rounded-xl border-2 p-3",
+        "rounded-xl p-3",
         TONE_CLASS[view.tone],
         className,
       )}

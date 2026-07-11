@@ -27,25 +27,25 @@ function coverageMeta(coverage: TargetCoverage | undefined): CoverageMeta {
     case "full":
       return {
         label: "Verified requirements",
-        className: "bg-tertiary/25 text-on-surface border-tertiary/50",
+        className: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
         Icon: ShieldCheck,
       };
     case "partial":
       return {
         label: "Partial — may be incomplete",
-        className: "bg-amber-100 text-amber-900 border-amber-400 dark:bg-amber-500/20 dark:text-amber-100",
+        className: "bg-secondary-fixed text-on-secondary-fixed-variant",
         Icon: AlertTriangle,
       };
     case "error":
       return {
         label: "Not captured yet",
-        className: "bg-on-surface/10 text-on-surface-variant border-on-surface/30",
+        className: "bg-surface-container text-on-surface-variant",
         Icon: HelpCircle,
       };
     default:
       return {
         label: "Gathering requirements…",
-        className: "bg-on-surface/10 text-on-surface-variant border-on-surface/30",
+        className: "bg-surface-container text-on-surface-variant",
         Icon: Loader2,
       };
   }
@@ -79,7 +79,7 @@ export function RequirementsZone({
   const visible = showAnswered ? items : unanswered;
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 qc-hard-shadow-sm">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -91,7 +91,7 @@ export function RequirementsZone({
             <h3 className="font-display text-headline-sm font-bold text-on-surface">{title}</h3>
             {showCoverage && (
               <span
-                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-label-sm ${meta.className}`}
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-label-sm ${meta.className}`}
               >
                 <meta.Icon className={`h-3.5 w-3.5 ${isGathering ? "animate-spin" : ""}`} />
                 {meta.label}
@@ -102,7 +102,7 @@ export function RequirementsZone({
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {hideProgress ? null : complete ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-tertiary/25 px-2.5 py-0.5 text-label-sm text-on-surface">
+            <span className="inline-flex items-center gap-1 rounded-md bg-tertiary-fixed px-2.5 py-0.5 text-label-sm text-on-tertiary-fixed-variant">
               <Check className="h-3.5 w-3.5" /> Done
             </span>
           ) : (
@@ -117,13 +117,13 @@ export function RequirementsZone({
       </button>
 
       {open && (
-        <div className="border-t-2 border-on-surface/10 p-5 space-y-4">
+        <div className="border-t border-on-surface/8 p-5 space-y-4">
           {(isPartial || coverage === "error" || (isGathering && isEmpty)) && (
             <div
-              className={`flex flex-col gap-3 rounded-xl border-2 p-4 sm:flex-row sm:items-center sm:justify-between ${
+              className={`flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between ${
                 isPartial
-                  ? "border-amber-400 bg-amber-50 dark:bg-amber-500/10"
-                  : "border-on-surface/20 bg-on-surface/5"
+                  ? "bg-secondary-fixed/40"
+                  : "bg-surface-container"
               }`}
             >
               <div className="min-w-0">
@@ -147,7 +147,7 @@ export function RequirementsZone({
                   type="button"
                   onClick={onRescan}
                   disabled={rescanning}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {rescanning ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

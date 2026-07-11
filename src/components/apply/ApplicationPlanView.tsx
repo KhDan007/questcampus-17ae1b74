@@ -63,21 +63,21 @@ export function ApplicationPlanView({
 
   if (plan === undefined) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border-2 border-on-surface/20 bg-surface p-10">
+      <div className="flex items-center justify-center rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-10 qc-soft-shadow">
         <Loader2 className="h-5 w-5 animate-spin text-on-surface-variant" />
       </div>
     );
   }
   if (plan === null) {
     return (
-      <div className="rounded-2xl border-2 border-on-surface/20 bg-surface p-6 text-body-md text-on-surface-variant">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 text-body-md text-on-surface-variant qc-soft-shadow">
         Sign in to see your plan.
       </div>
     );
   }
   if (plan.found === false) {
     return (
-      <div className="rounded-2xl border-2 border-on-surface/20 bg-surface p-6 text-body-md text-on-surface-variant">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 text-body-md text-on-surface-variant qc-soft-shadow">
         We&apos;re still researching this university&apos;s requirements.
       </div>
     );
@@ -88,7 +88,7 @@ export function ApplicationPlanView({
   return (
     <div className="space-y-5">
       {/* Deadline header */}
-      <section className="rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-5 qc-hard-shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-on-surface-variant">
@@ -124,7 +124,7 @@ export function ApplicationPlanView({
               onChange={(e) => {
                 void setDeadline({ system, externalId, iso: e.target.value });
               }}
-              className="rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-md text-on-surface qc-hard-shadow-sm"
+              className="rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-md text-on-surface"
             />
           </label>
         </div>
@@ -134,7 +134,7 @@ export function ApplicationPlanView({
       {plan.phases.map((phase) => (
         <section
           key={phase.key}
-          className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm sm:p-6"
+          className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6"
         >
           <h3 className="mb-3 font-display text-headline-sm font-bold text-on-surface">
             {phase.label}
@@ -185,7 +185,7 @@ function SourceTag({ source }: { source: "scraped" | "user" | "default" }) {
       ? "you set this"
       : "estimated — edit";
   return (
-    <span className="inline-flex items-center rounded-full border border-on-surface/25 bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+    <span className="inline-flex items-center rounded-full bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm text-on-surface-variant">
       {label}
     </span>
   );
@@ -262,10 +262,10 @@ function TaskRow({
           </p>
           <span
             className={
-              "rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm " +
+              "rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm " +
               (overdue
-                ? "border-error bg-error-container/40 text-on-error-container"
-                : "border-on-surface/20 bg-surface text-on-surface-variant")
+                ? "bg-error-container/60 text-on-error-container"
+                : "bg-surface-container text-on-surface-variant")
             }
           >
             {overdue ? "Overdue" : `due ${fmtDate(task.dueMs)}`}
@@ -283,7 +283,7 @@ function TaskRow({
           <p className="mt-1 text-body-sm text-on-surface-variant">{task.detail}</p>
         )}
         {isEssay && draftsOpen && matchingEssays.length > 0 && (
-          <ul className="mt-2 divide-y divide-on-surface/10 rounded-md border-2 border-on-surface/20 bg-surface">
+          <ul className="mt-2 divide-y divide-on-surface/10 rounded-md border border-on-surface/8 bg-surface-container-lowest">
             {matchingEssays.map((d) => (
               <li key={d.essayId}>
                 <button
@@ -315,7 +315,7 @@ function TaskRow({
             type="button"
             onClick={() => setGuideOpen(true)}
             aria-label="Open step-by-step guide"
-            className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/30 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface hover:border-on-surface"
+            className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 bg-surface px-2.5 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <BookOpen className="h-3.5 w-3.5" />
             Guide
@@ -323,7 +323,7 @@ function TaskRow({
           <button
             type="button"
             onClick={writeEssay}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
           >
             Write
           </button>
@@ -332,7 +332,7 @@ function TaskRow({
               type="button"
               onClick={() => setDraftsOpen((v) => !v)}
               aria-expanded={draftsOpen}
-              className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface hover:border-on-surface"
+              className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm text-on-surface transition-colors hover:bg-on-surface/5"
             >
               Use a draft ({matchingEssays.length})
               <ChevronDown
@@ -348,7 +348,7 @@ function TaskRow({
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
-          className="shrink-0 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
         >
           <BookOpen className="h-3.5 w-3.5" />
           {nonEssayLabel}
@@ -381,7 +381,7 @@ function ConditionalSection({
     [fieldLabel, tasks.length],
   );
   return (
-    <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

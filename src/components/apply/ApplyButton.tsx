@@ -31,7 +31,7 @@ export function ApplyButton({
 
   const cls =
     className ??
-    `inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-${size === "md" ? "3.5" : "2.5"} py-${size === "md" ? "2" : "1"} font-[var(--font-label)] ${size === "md" ? "text-label-md" : "text-label-sm"} font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60`;
+    `inline-flex items-center gap-1.5 rounded-md bg-primary px-${size === "md" ? "3.5" : "2.5"} py-${size === "md" ? "2" : "1"} font-[var(--font-label)] ${size === "md" ? "text-label-md" : "text-label-sm"} font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60`;
 
   return (
     <button

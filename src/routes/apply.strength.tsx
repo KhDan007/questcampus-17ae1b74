@@ -7,7 +7,6 @@ import {
   Loader2,
   Target,
 } from "lucide-react";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ApplyStepper } from "@/components/apply/ApplyStepper";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
@@ -40,7 +39,6 @@ function ApplicationStrengthPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
         <main className="relative mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12">
           <LoadingPill copy="Loading application strength..." />
         </main>
@@ -54,7 +52,6 @@ function ApplicationStrengthPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
@@ -90,7 +87,7 @@ function StrengthBody() {
 
   return (
     <div className="mt-6 space-y-5 sm:mt-8">
-      <section className="overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow">
+      <section className="overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow">
         <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div className="min-w-0">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -102,7 +99,7 @@ function StrengthBody() {
             <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
               {strength.bandLabel}. {strengthSummaryCopy(strength)}
             </p>
-            <div className="mt-5 h-3 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface">
+            <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-on-surface/10">
               <div
                 className="h-full bg-primary transition-[width] duration-500"
                 style={{ width: `${Math.max(0, Math.min(100, strength.overall))}%` }}
@@ -110,9 +107,9 @@ function StrengthBody() {
             </div>
           </div>
 
-          <div className="rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-4">
+          <div className="rounded-xl border border-on-surface/8 bg-surface-container p-4">
             <div className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-primary text-white">
+              <span className="grid h-9 w-9 place-items-center rounded-md bg-primary-fixed text-on-primary-fixed-variant">
                 <Target className="h-4 w-4" />
               </span>
               <div>
@@ -129,7 +126,7 @@ function StrengthBody() {
             </p>
             <Link
               to="/apply"
-              className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
             >
               Fill gaps in Applications <ArrowRight className="h-4 w-4" />
             </Link>
@@ -143,7 +140,7 @@ function StrengthBody() {
         ))}
       </section>
 
-      <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm sm:p-6">
+      <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -158,7 +155,7 @@ function StrengthBody() {
           </div>
           <Link
             to="/apply"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Open Applications <ArrowRight className="h-4 w-4" />
           </Link>
@@ -172,7 +169,7 @@ function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {
   const meta = STRENGTH_CRITERIA[criterion.key];
   const strong = criterion.score >= 70;
   return (
-    <article className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+    <article className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-display text-headline-sm font-bold text-on-surface">
@@ -181,7 +178,7 @@ function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {
           <p className="mt-1 text-body-sm text-on-surface-variant">{criterion.gapLine}</p>
         </div>
         <span
-          className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold ${criterionTone(criterion.score)}`}
+          className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold ${criterionTone(criterion.score)}`}
         >
           {strong ? <CheckCircle2 className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
           {criterion.score}
@@ -200,7 +197,7 @@ function CriterionCard({ criterion }: { criterion: StrengthCriterion }) {
 
 function LoadingPill({ copy }: { copy: string }) {
   return (
-    <div className="mt-6 inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
+    <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-on-surface/8 bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface-variant">
       <Loader2 className="h-4 w-4 animate-spin" /> {copy}
     </div>
   );

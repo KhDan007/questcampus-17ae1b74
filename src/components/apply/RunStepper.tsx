@@ -45,7 +45,7 @@ export function RunStepper({ status }: { status: string }) {
   const cancelled = status === "cancelled";
 
   return (
-    <ol className="flex flex-col gap-2 rounded-2xl border-2 border-on-surface bg-surface/90 p-3 backdrop-blur-md qc-hard-shadow-sm sm:flex-row sm:items-stretch sm:gap-0 sm:p-4">
+    <ol className="flex flex-col gap-2 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow sm:flex-row sm:items-stretch sm:gap-0 sm:p-4">
       {PHASES.map((p, i) => {
         const isDone = i < current || (status === "done" && i <= current);
         const isActive = i === current && !isDone;
@@ -62,7 +62,7 @@ export function RunStepper({ status }: { status: string }) {
             : isDone
               ? "border-on-surface bg-primary text-white"
               : isActive
-                ? "border-on-surface bg-surface text-on-surface qc-hard-shadow-sm"
+                ? "border-on-surface bg-surface text-on-surface"
                 : "border-dashed border-on-surface/30 bg-surface text-on-surface/50";
 
         const labelCls = isPending
@@ -80,12 +80,6 @@ export function RunStepper({ status }: { status: string }) {
         return (
           <li key={p.key} className="flex items-center gap-2 sm:min-w-0 sm:flex-1">
             <div className="relative flex items-center">
-              {isActive && !errored && !cancelled && (
-                <span
-                  aria-hidden
-                  className="absolute inset-0 -m-1 animate-pulse rounded-full bg-primary/25"
-                />
-              )}
               <span
                 className={`relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${circleCls}`}
               >

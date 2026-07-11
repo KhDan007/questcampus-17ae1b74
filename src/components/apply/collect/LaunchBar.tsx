@@ -82,7 +82,7 @@ export function LaunchBar({ entitlement, percent, readyTargets, hiddenIncomplete
 
   return (
     <div className="sticky bottom-4 z-30 mx-auto w-full max-w-(--container-content) px-2">
-      <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-4 shadow-lg backdrop-blur qc-hard-shadow-sm">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
@@ -104,7 +104,7 @@ export function LaunchBar({ entitlement, percent, readyTargets, hiddenIncomplete
             type="button"
             onClick={launch}
             disabled={!enabled && !needsPayment}
-            className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />

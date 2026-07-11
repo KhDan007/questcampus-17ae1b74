@@ -123,9 +123,9 @@ export function NextProductiveAction() {
       : null;
 
   return (
-    <section className="overflow-hidden rounded-2xl border-2 border-on-surface bg-gradient-to-br from-primary-fixed via-surface to-tertiary-fixed p-5 qc-hard-shadow sm:p-6">
+    <section className="overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
           <Icon className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
@@ -146,14 +146,14 @@ export function NextProductiveAction() {
           <button
             type="button"
             onClick={action.onClick}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
             {action.cta} <ArrowRight className="h-4 w-4" />
           </button>
         ) : action.to ? (
           <Link
             to={action.to}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
             {action.cta} <ArrowRight className="h-4 w-4" />
           </Link>

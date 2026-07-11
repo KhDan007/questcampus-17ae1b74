@@ -136,9 +136,9 @@ function Modal({
       aria-labelledby="verify-email-title"
       className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
     >
-      <div className="relative w-full max-w-[440px] rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-8">
+      <div className="relative w-full max-w-[440px] rounded-3xl border border-on-surface/10 bg-surface-container-lowest p-7 qc-soft-shadow sm:p-8">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-container text-on-primary-container">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
             <MailCheck className="h-5 w-5" />
           </span>
           <div className="flex-1">
@@ -162,7 +162,7 @@ function Modal({
             onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="123456"
             aria-label="6-digit verification code"
-            className="block w-full min-h-[56px] rounded-2xl border border-outline-variant bg-surface px-4 text-center text-2xl font-semibold tracking-[0.5em] text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="block w-full min-h-[56px] rounded-2xl border border-on-surface/15 bg-surface px-4 text-center text-2xl font-semibold tracking-[0.5em] text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
 
           {err && (
@@ -179,7 +179,7 @@ function Modal({
           <button
             type="submit"
             disabled={submitting || code.length !== 6}
-            className="mt-1 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary-container px-7 text-label-md text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-1 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary px-7 text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify email"}
           </button>

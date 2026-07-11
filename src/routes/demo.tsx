@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import {
   PortalReplica,
   type PortalReplicaSpec,
@@ -52,10 +51,9 @@ function DemoPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-28 sm:px-8 lg:px-12"
       >
         <Link
           to="/apply"
@@ -291,9 +289,9 @@ function DemoStage({ plan }: { plan: DemoPlan }) {
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
             Live demo
           </p>
-          <h1 className="mt-2 flex flex-wrap items-center gap-2 font-display text-display-md text-on-surface">
+          <h1 className="mt-2 flex flex-wrap items-center gap-2 font-display text-headline-lg font-bold text-on-surface">
             <span>Auto-apply demo</span>
-            <span className="rounded-md border-2 border-on-surface bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-on-surface">
+            <span className="rounded-md bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant">
               Demo — nothing is submitted
             </span>
           </h1>
@@ -305,7 +303,7 @@ function DemoStage({ plan }: { plan: DemoPlan }) {
           <button
             type="button"
             onClick={replay}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Replay
           </button>
@@ -313,7 +311,7 @@ function DemoStage({ plan }: { plan: DemoPlan }) {
             <button
               type="button"
               onClick={skipToEnd}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
             >
               Skip to end
             </button>
@@ -351,7 +349,7 @@ function DemoStage({ plan }: { plan: DemoPlan }) {
                 portalRefs.current[i] = el;
               }}
               className={`scroll-mt-28 rounded-2xl transition-shadow ${
-                i === activePortalIdx && !complete ? "ring-2 ring-primary/40" : ""
+                i === activePortalIdx && !complete ? "ring-1 ring-primary/30" : ""
               }`}
             >
               <PortalReplica
@@ -365,17 +363,12 @@ function DemoStage({ plan }: { plan: DemoPlan }) {
         </div>
 
         {/* Activity feed */}
-        <aside className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 backdrop-blur-md qc-hard-shadow-sm lg:sticky lg:top-28 lg:self-start">
+        <aside className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow lg:sticky lg:top-28 lg:self-start">
           <h2 className="flex items-center gap-1.5 font-display text-headline-sm font-bold text-on-surface">
             <ListChecks className="h-4 w-4 text-primary" /> Activity
             {!complete && (
-              <span className="ml-1 inline-flex items-center gap-1 text-label-sm font-normal text-on-surface-variant">
-                <span className="relative inline-flex h-2 w-2">
-                  {!reduce && (
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
-                  )}
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                </span>
+              <span className="ml-1 inline-flex items-center gap-1.5 text-label-sm font-normal text-on-surface-variant">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 live
               </span>
             )}
@@ -442,8 +435,8 @@ function PortalChip({
         type="button"
         onClick={onClick}
         title={`Scroll to ${university}`}
-        className={`flex w-full min-w-0 items-center gap-2.5 rounded-2xl border-2 border-on-surface bg-surface px-3 py-2.5 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
-          active ? "ring-2 ring-primary/40" : ""
+        className={`flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2.5 text-left qc-soft-shadow transition-colors hover:bg-on-surface/[0.03] ${
+          active ? "ring-1 ring-primary/30" : ""
         }`}
       >
         <span className="shrink-0">{icon}</span>
@@ -472,7 +465,7 @@ function DemoTickerLine({
   const yours = field.source === "yours";
   return (
     <div
-      className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border-2 border-on-surface/20 bg-surface px-3 py-2 qc-hard-shadow-sm"
+      className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2 qc-soft-shadow"
       aria-live="polite"
     >
       <span
@@ -485,10 +478,10 @@ function DemoTickerLine({
         Filling <span className="font-semibold">{field.label}</span>
       </span>
       <span
-        className={`inline-flex items-center rounded-md border-2 px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
+        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
           yours
-            ? "border-tertiary/60 bg-tertiary-container/50 text-on-surface"
-            : "border-secondary/50 bg-secondary-container/60 text-on-surface"
+            ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+            : "bg-secondary-fixed text-on-secondary-fixed-variant"
         }`}
       >
         {yours ? "your answer" : "example"}
@@ -506,7 +499,7 @@ function DemoSummary({
 }) {
   const fields = totals.fields || totalFields;
   return (
-    <div className="mt-8 rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+    <div className="mt-8 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <p className="flex items-center gap-1.5 font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
         <Sparkles className="h-4 w-4" aria-hidden /> Demo complete
       </p>
@@ -527,7 +520,7 @@ function DemoSummary({
       <div className="mt-5">
         <Link
           to="/extension"
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           This, on your real application — get the extension
           <ArrowRight className="h-4 w-4" aria-hidden />

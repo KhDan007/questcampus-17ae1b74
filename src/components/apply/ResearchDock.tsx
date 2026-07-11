@@ -35,9 +35,9 @@ function JobChip({ job }: { job: ApplyJob }) {
     <Link
       to="/apply/$jobId"
       params={{ jobId: job.jobId }}
-      className="group relative flex items-center gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface-container-lowest px-3 py-2.5 transition-transform hover:-translate-y-0.5 hover:translate-x-0.5"
+      className="group relative flex items-center gap-3 overflow-hidden rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2.5 qc-soft-shadow transition-colors hover:bg-on-surface/5"
     >
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-fixed text-on-surface">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-secondary-fixed text-on-secondary-fixed-variant">
         <GraduationCap className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
@@ -73,12 +73,12 @@ function ResearchDockInner() {
   if (!token || list.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <header className="flex items-center justify-between gap-3">
         <h2 className="font-display text-headline-sm font-bold text-on-surface">
           In progress
         </h2>
-        <span className="rounded-full border-2 border-on-surface bg-surface px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm">
+        <span className="rounded-full bg-surface-container px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
           {list.length} running
         </span>
       </header>

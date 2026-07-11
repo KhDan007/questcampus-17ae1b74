@@ -28,7 +28,7 @@ export function MyUniversitiesSection() {
         <h2 className="font-display text-headline-sm font-bold text-on-surface sm:text-headline-lg">
           My universities
         </h2>
-        <div className="mt-4 rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-4 backdrop-blur-sm sm:p-6">
+        <div className="mt-4 rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4 sm:p-6">
           <p className="text-body-md text-on-surface-variant">
             Sign in to build your shortlist —{" "}
             <Link to="/signin" className="text-primary underline">
@@ -61,7 +61,7 @@ export function MyUniversitiesSection() {
         <Link
           to="/universities"
           search={{ q: "" }}
-          className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           Manage universities <ArrowRight className="h-3.5 w-3.5" />
         </Link>
@@ -69,14 +69,14 @@ export function MyUniversitiesSection() {
 
       <div className="mt-4 sm:mt-6">
         {saved === undefined ? (
-          <div className="flex items-center gap-2 rounded-xl border-2 border-on-surface bg-surface/85 p-5 qc-hard-shadow-sm">
+          <div className="flex items-center gap-2 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
             <Loader2 className="h-4 w-4 animate-spin text-on-surface/60" />
             <span className="text-body-md text-on-surface-variant">
               Loading your list…
             </span>
           </div>
         ) : list.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-6 text-center backdrop-blur-sm sm:p-8">
+          <div className="rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-6 text-center sm:p-8">
             <Bookmark className="mx-auto h-6 w-6 text-on-surface/40" />
             <p className="mt-3 text-body-lg text-on-surface-variant">
               Search for universities you already know, or save schools from
@@ -85,7 +85,7 @@ export function MyUniversitiesSection() {
             <Link
               to="/universities"
               search={{ q: "" }}
-              className="mt-5 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
             >
               Open universities <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -137,9 +137,9 @@ function SavedRow({
       initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index, 6) * 0.04 }}
-      className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm"
+      className="flex min-w-0 items-start gap-3 overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow"
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-container">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-container text-on-surface-variant">
         <GraduationCap className="h-5 w-5" />
       </span>
       <div className="min-w-0 flex-1">
@@ -168,7 +168,7 @@ function SavedRow({
             setBusy(false);
           }
         }}
-        className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-50"
+        className="grid h-9 w-9 place-items-center rounded-lg border border-on-surface/15 bg-surface text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface disabled:opacity-50"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
       </button>

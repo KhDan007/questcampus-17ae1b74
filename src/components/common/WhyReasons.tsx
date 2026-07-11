@@ -17,7 +17,7 @@ export function WhyReasons({ why, className }: { why?: string | null; className?
     <ul className={`space-y-1.5 ${className ?? ""}`}>
       {reasons.slice(0, 4).map((r, i) => (
         <li key={i} className="flex gap-2">
-          <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+          <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-on-surface/25" aria-hidden />
           <span className="min-w-0">{r}</span>
         </li>
       ))}

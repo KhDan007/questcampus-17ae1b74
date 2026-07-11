@@ -33,7 +33,7 @@ export function DocumentManager() {
   }
 
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface/90 p-5 backdrop-blur-md qc-hard-shadow sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <header className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-headline-sm font-bold text-on-surface">
@@ -43,7 +43,7 @@ export function DocumentManager() {
             Upload once — the agent reuses these across every portal.
           </p>
         </div>
-        <span className="hidden shrink-0 rounded-full border-2 border-on-surface bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm sm:inline-flex">
+        <span className="hidden shrink-0 rounded-full bg-surface-container px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant sm:inline-flex">
           {docs?.length ?? 0} files
         </span>
       </header>
@@ -64,7 +64,7 @@ export function DocumentManager() {
           return (
             <li
               key={t.value}
-              className="flex flex-col rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-3"
+              className="flex flex-col rounded-xl border border-on-surface/8 bg-surface-container p-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -192,7 +192,7 @@ function UploadButton({
         type="button"
         disabled={busy}
         onClick={() => inputRef.current?.click()}
-        className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {busy ? (
           <>

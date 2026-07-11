@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { ArrowLeft } from "lucide-react";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { CollectWorkspace } from "@/components/apply/collect/CollectWorkspace";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
@@ -45,7 +44,6 @@ function PrepPage() {
 
   return (
     <>
-      <LivingBackground />
       <DashboardShell>
         <main
           id="main-content"
@@ -53,12 +51,12 @@ function PrepPage() {
         >
           <Link
             to="/dashboard"
-            className="mb-4 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="mb-4 inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to dashboard
           </Link>
 
-          <header className="mb-6 rounded-2xl border-2 border-on-surface bg-surface/95 p-5 backdrop-blur-md qc-hard-shadow sm:p-7">
+          <header className="mb-6 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="min-w-0">
                 <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -89,7 +87,7 @@ function PrepPage() {
               )}
             </div>
             {guided.total > 0 && (
-              <div className="mt-4 h-2 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface">
+              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-on-surface/10">
                 <div
                   className="h-full bg-primary transition-[width] duration-500"
                   style={{ width: `${percent}%` }}

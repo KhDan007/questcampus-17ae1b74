@@ -25,7 +25,6 @@ import {
 import { formatVersionTime, type EssayVersion } from "@/lib/essays/history";
 import { EssayReview } from "@/components/essay/EssayReview";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
@@ -573,17 +572,11 @@ function EssayPage() {
     | undefined;
 
   if (!sessionId) {
-    return (
-      <>
-        <LivingBackground />
-        <Splash />
-      </>
-    );
+    return <Splash />;
   }
 
   return (
     <>
-      <LivingBackground />
       <DashboardShell>
         <main
           id="main-content"
@@ -600,7 +593,7 @@ function EssayPage() {
             >
               <ArrowLeft className="h-4 w-4" /> Back to dashboard
             </Link>
-            <p className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
+            <p className="mt-6 inline-flex items-center gap-2 rounded-md bg-secondary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-fixed-variant">
               <PenLine className="h-3.5 w-3.5" /> Personal statement
             </p>
             <h1 className="mt-4 text-display-lg-mobile text-on-surface sm:text-display-lg text-balance">
@@ -614,7 +607,7 @@ function EssayPage() {
           </motion.div>
 
           <div className="mt-5 sm:mt-8">
-            <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+            <div className="inline-flex flex-wrap gap-1 rounded-lg border border-on-surface/8 bg-surface-container p-1">
               {(
                 [
                   { k: "write", label: "Write" },
@@ -630,9 +623,9 @@ function EssayPage() {
                       setView(t.k);
                       if (t.k === "review") markProgress("essayReviewed", true);
                     }}
-                    className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                    className={`rounded-md px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
                       active
-                        ? "bg-primary text-white qc-hard-shadow-sm"
+                        ? "bg-surface-container-lowest text-primary qc-soft-shadow"
                         : "text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
@@ -747,10 +740,10 @@ function EssayPage() {
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }
                         }}
-                        className={`group flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left backdrop-blur-sm transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none ${
+                        className={`group flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
                           active
-                            ? "border-on-surface bg-secondary-container"
-                            : "border-on-surface/15 bg-surface/80"
+                            ? "border-primary/30 bg-primary-fixed/70"
+                            : "border-on-surface/8 bg-surface-container-lowest qc-soft-shadow hover:bg-on-surface/[0.03]"
                         }`}
                       >
                         <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -835,18 +828,18 @@ function ReviewSuggestionModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 6 }}
             transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-lg rounded-3xl border-2 border-on-surface bg-surface p-7 qc-hard-shadow sm:p-9"
+            className="relative w-full max-w-lg rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-7 qc-soft-shadow sm:p-9"
           >
             <button
               type="button"
               onClick={onClose}
               aria-label="Dismiss"
-              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-2 border-on-surface/20 bg-surface text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-on-surface/15 bg-surface text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface"
             >
               <X className="h-4 w-4" />
             </button>
-            <div className="inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-secondary-container px-3 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-surface">
-              <Sparkles className="h-3.5 w-3.5 text-primary" /> Next step
+            <div className="inline-flex items-center gap-2 rounded-md bg-secondary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-fixed-variant">
+              <Sparkles className="h-3.5 w-3.5" /> Next step
             </div>
             <h2
               id="review-suggest-title"
@@ -879,14 +872,14 @@ function ReviewSuggestionModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center justify-center rounded-md border-2 border-on-surface/30 bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+                className="inline-flex items-center justify-center rounded-lg border border-on-surface/15 bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 Maybe later
               </button>
               <button
                 type="button"
                 onClick={onConfirm}
-                className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90"
               >
                 <Sparkles className="h-4 w-4" /> Review my essay
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -918,12 +911,12 @@ function Stepper({ step }: { step: "target" | "questions" | "result" }) {
         return (
           <li key={it.key} className="flex items-center gap-3">
             <span
-              className={`grid h-7 w-7 place-items-center rounded-full border-2 border-on-surface font-display text-label-sm font-bold ${
+              className={`grid h-7 w-7 place-items-center rounded-full font-display text-label-sm font-bold ${
                 done
                   ? "bg-primary text-white"
                   : active
-                    ? "bg-secondary-container text-on-surface qc-hard-shadow-sm"
-                    : "bg-surface text-on-surface/50"
+                    ? "bg-primary-fixed text-on-primary-fixed-variant"
+                    : "bg-surface-container text-on-surface-variant"
               }`}
             >
               {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
@@ -978,7 +971,7 @@ function TargetPicker({
 }) {
   const loading = matches === null && !matchesErr;
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
+    <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-8">
       <h2 className="font-display text-headline-md font-bold text-on-surface">
         Which school is this for?
       </h2>
@@ -1002,26 +995,24 @@ function TargetPicker({
                 key={m.externalId}
                 type="button"
                 onClick={() => onChange({ externalId: m.externalId, name: m.name })}
-                className={`group flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+                className={`group flex items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
                   active
-                    ? "border-on-surface bg-primary text-white"
-                    : "border-on-surface bg-surface"
+                    ? "border-primary/30 bg-primary-fixed/70"
+                    : "border-on-surface/8 bg-surface-container-lowest qc-soft-shadow hover:bg-on-surface/[0.03]"
                 }`}
               >
                 <span
-                  className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${
-                    active ? "border-white bg-white text-primary" : "border-on-surface bg-surface"
+                  className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full ${
+                    active ? "bg-primary text-white" : "border border-on-surface/25 bg-surface"
                   }`}
                 >
                   {active && <CheckCircle2 className="h-3.5 w-3.5" />}
                 </span>
                 <div className="min-w-0">
-                  <p className="font-display text-label-lg font-bold">{m.name}</p>
-                  <p
-                    className={`mt-0.5 text-label-sm ${
-                      active ? "text-white/85" : "text-on-surface-variant"
-                    }`}
-                  >
+                  <p className={`font-display text-label-lg font-bold ${active ? "text-primary" : "text-on-surface"}`}>
+                    {m.name}
+                  </p>
+                  <p className="mt-0.5 text-label-sm text-on-surface-variant">
                     {[m.city, m.state, m.country].filter(Boolean).join(", ")}
                   </p>
                 </div>
@@ -1034,8 +1025,10 @@ function TargetPicker({
       <button
         type="button"
         onClick={() => onChange({ name: "No specific school" })}
-        className={`mt-4 flex w-full items-center gap-3 rounded-xl border-2 border-dashed border-on-surface/40 bg-surface/60 p-4 text-left transition-all hover:border-on-surface ${
-          value && !value.externalId ? "border-solid border-on-surface bg-secondary-container" : ""
+        className={`mt-4 flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors ${
+          value && !value.externalId
+            ? "border-primary/30 bg-primary-fixed/70"
+            : "border-dashed border-on-surface/20 bg-surface-container-lowest hover:bg-on-surface/[0.03]"
         }`}
       >
         <Sparkles className="h-5 w-5 shrink-0 text-on-surface-variant" />
@@ -1057,7 +1050,7 @@ function TargetPicker({
       )}
 
       {/* Free-text fallback — type any school name. */}
-      <div className="mt-4 rounded-xl border-2 border-on-surface/30 bg-surface/80 p-4">
+      <div className="mt-4 rounded-xl border border-on-surface/8 bg-surface-container/50 p-4">
         <label className="block font-[var(--font-label)] text-label-md font-semibold text-on-surface">
           Or type a school name
         </label>
@@ -1075,7 +1068,7 @@ function TargetPicker({
             else onChange({ name });
           }}
           placeholder="e.g. Northwestern University"
-          className="mt-2 w-full rounded-lg border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-primary focus:outline-none"
         />
       </div>
 
@@ -1083,7 +1076,7 @@ function TargetPicker({
         <button
           type="button"
           onClick={onSkip}
-          className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/40 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface-variant transition-all hover:border-on-surface hover:text-on-surface"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           Skip — write a generic essay
         </button>
@@ -1091,7 +1084,7 @@ function TargetPicker({
           type="button"
           disabled={!value}
           onClick={onNext}
-          className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[var(--qc-hard-shadow)]"
+          className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next: your story
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -1135,9 +1128,9 @@ function QuestionsForm({
   const [flashKey, setFlashKey] = useState<string | null>(null);
 
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
+    <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-8">
       {supplementPrompt && (
-        <div className="mb-6 rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm">
+        <div className="mb-6 rounded-xl bg-secondary-fixed/50 p-4">
           <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.14em] text-primary">
             Prompt
           </p>
@@ -1212,10 +1205,10 @@ function QuestionsForm({
                         key={c.value}
                         type="button"
                         onClick={() => setField(q.key, { choice: active ? undefined : c.value })}
-                        className={`rounded-full border-2 px-3.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${
+                        className={`rounded-full px-3.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
                           active
-                            ? "border-on-surface bg-primary text-white"
-                            : "border-on-surface bg-surface text-on-surface"
+                            ? "bg-primary-fixed/70 text-primary"
+                            : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
                         }`}
                       >
                         {active && <CheckCircle2 className="mr-1.5 inline h-3.5 w-3.5" />}
@@ -1241,7 +1234,7 @@ function QuestionsForm({
                           // Seed only if the textarea is empty — never overwrite real writing.
                           if (!text.trim()) setField(q.key, { text: p.seed });
                         }}
-                        className="rounded-full border-2 border-on-surface/40 bg-surface/80 px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface transition-all hover:-translate-y-0.5 hover:border-on-surface hover:bg-secondary-container"
+                        className="rounded-full border border-on-surface/15 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface transition-colors hover:bg-on-surface/5"
                       >
                         {p.label}
                       </button>
@@ -1253,10 +1246,10 @@ function QuestionsForm({
                     rows={4}
                     placeholder={q.textPlaceholder}
                     maxLength={800}
-                    className={`mt-3 w-full resize-y rounded-lg border-2 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none transition-colors ${
+                    className={`mt-3 w-full resize-y rounded-lg border bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-primary focus:outline-none transition-colors ${
                       flashKey === q.key
                         ? "border-primary ring-2 ring-primary/30"
-                        : "border-on-surface/30"
+                        : "border-on-surface/15"
                     }`}
                   />
                   <div className="mt-1.5 flex items-start justify-between gap-3">
@@ -1280,10 +1273,10 @@ function QuestionsForm({
                   onChange={(e) => setField(q.key, { text: e.target.value })}
                   placeholder={q.textPlaceholder}
                   maxLength={220}
-                  className={`mt-3 w-full rounded-lg border-2 bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none transition-colors ${
+                  className={`mt-3 w-full rounded-lg border bg-surface px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-on-surface/40 focus:border-primary focus:outline-none transition-colors ${
                     flashKey === q.key
                       ? "border-primary ring-2 ring-primary/30"
-                      : "border-on-surface/30"
+                      : "border-on-surface/15"
                   }`}
                 />
               )}
@@ -1293,7 +1286,7 @@ function QuestionsForm({
       </div>
 
       {error && (
-        <div className="mt-6 rounded-lg border-2 border-on-surface bg-error-container/40 p-4">
+        <div className="mt-6 rounded-lg border border-error/30 bg-error-container/40 p-4">
           <div className="flex items-start gap-2 text-body-sm">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-on-surface" />
             <span className="text-on-surface">{errorMessage(error)}</span>
@@ -1303,7 +1296,7 @@ function QuestionsForm({
               <UnlockButton
                 token={token}
                 label={`Unlock for $${PRICE_MVP}/month & generate`}
-                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 font-display text-label-md font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary px-5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
               />
             </div>
           )}
@@ -1314,7 +1307,7 @@ function QuestionsForm({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
@@ -1322,7 +1315,7 @@ function QuestionsForm({
           type="button"
           onClick={onSubmit}
           disabled={!canSubmit || loading}
-          className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -1582,7 +1575,7 @@ function ResultView({
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px] lg:gap-8">
-      <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow backdrop-blur-md sm:p-8">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
@@ -1598,7 +1591,7 @@ function ResultView({
               </motion.span>{" "}
               words
               {edited && (
-                <span className="ml-2 rounded-full bg-secondary-container px-2 py-0.5 text-label-sm normal-case tracking-normal text-on-surface">
+                <span className="ml-2 rounded-full bg-secondary-fixed px-2 py-0.5 text-label-sm normal-case tracking-normal text-on-secondary-fixed-variant">
                   Edited
                 </span>
               )}
@@ -1612,7 +1605,7 @@ function ResultView({
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit text
               </button>
@@ -1638,7 +1631,7 @@ function ResultView({
                     setEditing(false);
                     setDraft(result.fullText ?? "");
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                 >
                   Done
                 </button>
@@ -1650,10 +1643,10 @@ function ResultView({
                   type="button"
                   onClick={() => setHistoryOpen((v) => !v)}
                   aria-expanded={historyOpen}
-                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                 >
                   <History className="h-3.5 w-3.5" /> Versions
-                  <span className="ml-0.5 rounded-full bg-secondary-container px-1.5 text-label-sm">
+                  <span className="ml-0.5 rounded-full bg-on-surface/8 px-1.5 text-label-sm text-on-surface-variant">
                     {versions.length}
                   </span>
                 </button>
@@ -1664,7 +1657,7 @@ function ResultView({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.18, ease: "easeOut" }}
-                      className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border-2 border-on-surface bg-surface p-2 qc-hard-shadow"
+                      className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-on-surface/8 bg-surface-container-lowest p-2 qc-soft-shadow"
                     >
                       <p className="px-2 pb-1 pt-1 font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface-variant">
                         Version history
@@ -1678,7 +1671,7 @@ function ResultView({
                                 type="button"
                                 disabled={isCurrent || !editable}
                                 onClick={() => restoreVersion(v)}
-                                className="group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-secondary-container/70 disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent"
+                                className="group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-on-surface/[0.03] disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent"
                               >
                                 <div className="min-w-0 flex-1">
                                   <p className="font-display text-label-md font-bold text-on-surface">
@@ -1710,7 +1703,7 @@ function ResultView({
             <button
               type="button"
               onClick={onRegenerate}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
             >
               <RefreshCw className="h-3.5 w-3.5" /> Edit answers
             </button>
@@ -1723,7 +1716,7 @@ function ResultView({
             onChange={(e) => setDraft(e.target.value)}
             onBlur={() => void doSave(draft)}
             rows={22}
-            className="mt-6 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface focus:border-on-surface focus:outline-none"
+            className="mt-6 w-full resize-y rounded-xl border border-on-surface/15 bg-surface px-4 py-3 font-serif text-body-lg leading-relaxed text-on-surface focus:border-primary focus:outline-none"
           />
         ) : (
           <div className={`relative ${revising ? "opacity-70" : ""}`}>
@@ -1762,7 +1755,7 @@ function ResultView({
         
 
         {reviseErr && (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border-2 border-on-surface bg-error-container/40 p-3 text-body-sm text-on-surface">
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-error/30 bg-error-container/40 p-3 text-body-sm text-on-surface">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>Revision didn't go through. Try a different tweak.</span>
           </div>
@@ -1781,7 +1774,7 @@ function ResultView({
         )}
 
         {result.placeholders && result.placeholders.length > 0 && (
-          <div className="rounded-2xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow-sm sm:p-5">
+          <div className="rounded-2xl bg-secondary-fixed/50 p-4 sm:p-5">
             <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
               Make it yours
             </p>
@@ -1797,7 +1790,7 @@ function ResultView({
               {result.placeholders.map((p, i) => (
                 <li
                   key={`${p}-${i}`}
-                  className="rounded-lg border-2 border-on-surface/30 bg-surface px-3 py-2 text-body-sm text-on-surface"
+                  className="rounded-lg border border-on-surface/10 bg-surface px-3 py-2 text-body-sm text-on-surface"
                 >
                   {p}
                 </li>
@@ -1806,7 +1799,7 @@ function ResultView({
           </div>
         )}
 
-        <div className="rounded-2xl border-2 border-on-surface/15 bg-surface/85 p-4 backdrop-blur-sm sm:p-5">
+        <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
           <h3 className="font-display text-headline-sm font-bold text-on-surface">
             Backed by your data
           </h3>
@@ -1890,7 +1883,7 @@ function PlaceholderEditor({
         exit={{ y: 8, opacity: 0 }}
         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+        className="w-full max-w-lg rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -1902,7 +1895,7 @@ function PlaceholderEditor({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-on-surface-variant transition-colors hover:bg-secondary-container hover:text-on-surface"
+            className="rounded-md p-1 text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -1917,13 +1910,13 @@ function PlaceholderEditor({
           onChange={(e) => setDraft(e.target.value)}
           rows={5}
           placeholder="Write a specific, sensory memory in your own words"
-          className="mt-4 w-full resize-y rounded-xl border-2 border-on-surface/30 bg-surface px-3.5 py-2.5 font-serif text-body-md leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+          className="mt-4 w-full resize-y rounded-xl border border-on-surface/15 bg-surface px-3.5 py-2.5 font-serif text-body-md leading-relaxed text-on-surface placeholder:font-sans placeholder:text-on-surface/40 focus:border-primary focus:outline-none"
         />
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant transition-colors hover:border-on-surface hover:text-on-surface"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3.5 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             Cancel
           </button>
@@ -1931,7 +1924,7 @@ function PlaceholderEditor({
             type="button"
             onClick={() => draft.trim() && onSave(draft.trim())}
             disabled={!draft.trim()}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <CheckCircle2 className="h-3.5 w-3.5" /> Save into essay
           </button>
@@ -1967,7 +1960,7 @@ function ReviseSideblock({
               type="button"
               disabled={disabled}
               onClick={() => onRevise(a.key)}
-              className="group flex w-full items-center justify-between gap-3 rounded-xl border-2 border-on-surface/20 bg-surface px-3.5 py-2.5 text-left transition-all qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:border-on-surface hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="group flex w-full items-center justify-between gap-3 rounded-xl border border-on-surface/10 bg-surface px-3.5 py-2.5 text-left transition-colors hover:bg-on-surface/[0.03] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="min-w-0">
                 <span className="block font-display text-label-md font-bold text-on-surface">
@@ -1990,7 +1983,7 @@ function ReviseSideblock({
             type="button"
             disabled={disabled}
             onClick={onUndo}
-            className="mt-1 inline-flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface disabled:opacity-50"
+            className="mt-1 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-50"
           >
             <Undo2 className="h-3.5 w-3.5" /> Undo last revision
           </button>
@@ -2001,9 +1994,9 @@ function ReviseSideblock({
 
   return (
     <>
-      <div className="hidden rounded-2xl border-2 border-on-surface bg-surface/95 p-5 qc-hard-shadow-sm lg:block">
-        <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
-          ✨ Improve
+      <div className="hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow lg:block">
+        <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-primary">
+          <Sparkles className="h-3.5 w-3.5" /> Improve
         </p>
         <h3 className="mt-1 font-display text-headline-sm font-bold text-on-surface">
           One-tap revisions
@@ -2018,10 +2011,10 @@ function ReviseSideblock({
         <button
           type="button"
           onClick={() => setOpenMobile((v) => !v)}
-          className="flex w-full items-center justify-between rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 qc-hard-shadow-sm"
+          className="flex w-full items-center justify-between rounded-2xl border border-on-surface/8 bg-surface-container-lowest px-4 py-3 qc-soft-shadow"
         >
-          <span className="font-display text-label-lg font-bold text-on-surface">
-            ✨ Improve essay
+          <span className="inline-flex items-center gap-1.5 font-display text-label-lg font-bold text-on-surface">
+            <Sparkles className="h-4 w-4" /> Improve essay
           </span>
           <ChevronDown
             className={`h-4 w-4 text-on-surface transition-transform ${openMobile ? "rotate-180" : ""}`}
@@ -2070,7 +2063,7 @@ function AssistTrigger({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/30 bg-gradient-to-r from-primary/10 via-secondary-container/40 to-primary/10 px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-all hover:-translate-y-0.5 hover:border-on-surface active:scale-[0.97]"
+        className="inline-flex items-center gap-1.5 rounded-full border border-on-surface/15 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
       >
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         {hasValue ? "Improve" : "Help me write this"}
@@ -2166,14 +2159,14 @@ function AssistPopover({
         transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow"
+        className="relative w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow"
       >
         <div className="flex items-start justify-between gap-2">
-          <p className="font-display text-label-md font-bold text-on-surface">✨ AI assist</p>
+          <p className="inline-flex items-center gap-1.5 font-display text-label-md font-bold text-on-surface"><Sparkles className="h-4 w-4" /> AI assist</p>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1 text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
+            className="rounded-full p-1 text-on-surface-variant transition-colors hover:bg-on-surface/5 hover:text-on-surface"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -2187,7 +2180,7 @@ function AssistPopover({
           onChange={(e) => setNotes(e.target.value)}
           rows={4}
           placeholder="rough notes, fragments, anything…"
-          className="mt-3 w-full resize-y rounded-lg border-2 border-on-surface/25 bg-surface px-3 py-2 text-body-sm text-on-surface placeholder:text-on-surface/40 focus:border-on-surface focus:outline-none"
+          className="mt-3 w-full resize-y rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-body-sm text-on-surface placeholder:text-on-surface/40 focus:border-primary focus:outline-none"
         />
 
         {status === "ready" && text && (
@@ -2195,7 +2188,7 @@ function AssistPopover({
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.22 }}
-            className="mt-3 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-body-sm text-on-surface"
+            className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-body-sm text-on-surface"
           >
             {text}
           </motion.div>
@@ -2214,14 +2207,14 @@ function AssistPopover({
           </div>
         )}
         {status === "error" && (
-          <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border-2 border-on-surface/20 bg-error-container/30 p-2 text-label-sm text-on-surface">
+          <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-error/30 bg-error-container/30 p-2 text-label-sm text-on-surface">
             <span className="inline-flex items-center gap-1.5">
               <AlertCircle className="h-3.5 w-3.5" /> That didn't work
             </span>
             <button
               type="button"
               onClick={() => void run()}
-              className="rounded-md border-2 border-on-surface px-2 py-0.5 text-label-sm font-semibold"
+              className="rounded-md border border-on-surface/15 bg-surface px-2 py-0.5 text-label-sm font-semibold transition-colors hover:bg-on-surface/5"
             >
               Try again
             </button>
@@ -2234,14 +2227,14 @@ function AssistPopover({
               <button
                 type="button"
                 onClick={() => void run()}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/30 bg-surface px-3 py-1.5 text-label-sm font-semibold text-on-surface hover:border-on-surface"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-1.5 text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 <RefreshCw className="h-3.5 w-3.5" /> Regenerate
               </button>
               <button
                 type="button"
                 onClick={() => onAccept(text)}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
               >
                 <Save className="h-3.5 w-3.5" /> Use this
               </button>
@@ -2259,7 +2252,7 @@ function AssistPopover({
                 type="button"
                 disabled={status === "loading"}
                 onClick={() => void run()}
-                className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-1.5 font-display text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {status === "loading" ? (
                   <>
@@ -2304,7 +2297,7 @@ function EssayBody({
         occurrence += 1;
         const myOcc = occurrence;
         const className =
-          "rounded-md bg-secondary-container px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface";
+          "rounded-md bg-secondary-fixed px-1.5 py-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-secondary-fixed-variant";
         if (!onPlaceholderClick) {
           return (
             <mark key={i} className={className}>
@@ -2317,7 +2310,7 @@ function EssayBody({
             key={i}
             type="button"
             onClick={() => onPlaceholderClick(p, myOcc)}
-            className={`${className} cursor-pointer border-2 border-on-surface/30 underline decoration-dotted underline-offset-4 transition-colors hover:border-on-surface hover:bg-primary hover:text-white`}
+            className={`${className} cursor-pointer underline decoration-dotted underline-offset-4 transition-colors hover:bg-primary hover:text-white`}
             title="Click to fill this moment in"
           >
             {p}

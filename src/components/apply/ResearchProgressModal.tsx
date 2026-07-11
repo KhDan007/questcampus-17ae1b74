@@ -104,26 +104,22 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
             exit={{ y: 40, opacity: 0, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-3xl overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow"
+            className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow"
           >
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface hover:bg-surface-container"
+              className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="border-b-2 border-on-surface/15 bg-gradient-to-br from-primary-fixed via-surface to-tertiary-fixed p-5 sm:p-6">
+            <div className="border-b border-on-surface/8 bg-primary-fixed/30 p-5 sm:p-6">
               <div className="flex items-center gap-3">
-                <motion.span
-                  animate={{ rotate: [0, 12, -8, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-on-surface bg-surface text-primary qc-hard-shadow-sm"
-                >
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
                   <Sparkles className="h-5 w-5" />
-                </motion.span>
+                </span>
                 <div className="min-w-0">
                   <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
                     Deep research
@@ -162,9 +158,9 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
                   {rows.map((r) => (
                     <li
                       key={r.key}
-                      className="flex items-center gap-3 rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest px-3 py-2.5"
+                      className="flex items-center gap-3 rounded-xl border border-on-surface/8 bg-surface-container/50 px-3 py-2.5"
                     >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-secondary-fixed">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-secondary-fixed text-on-secondary-fixed-variant">
                         <GraduationCap className="h-4 w-4" />
                       </span>
                       <p className="min-w-0 flex-1 truncate font-display text-label-md font-bold text-on-surface">
@@ -204,9 +200,9 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
                         <Link
                           to={a.to}
                           onClick={onClose}
-                          className="group flex items-center gap-3 rounded-xl border-2 border-on-surface bg-surface px-3 py-2.5 qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                          className="group flex items-center gap-3 rounded-xl border border-on-surface/8 bg-surface-container/50 px-3 py-2.5 transition-colors hover:bg-on-surface/5"
                         >
-                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary-fixed text-primary">
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary-fixed text-on-primary-fixed-variant">
                             <Icon className="h-4 w-4" />
                           </span>
                           <div className="min-w-0 flex-1">
@@ -226,7 +222,7 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
               </section>
             </div>
 
-            <div className="flex flex-col items-stretch gap-2 border-t-2 border-on-surface/15 bg-surface-container-lowest p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col items-stretch gap-2 border-t border-on-surface/8 bg-surface-container/50 p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-label-sm text-on-surface-variant">
                 {allDone
                   ? "All set — taking you to the prep stage."
@@ -238,7 +234,7 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
                   onClose();
                   void navigate({ to: "/dashboard" });
                 }}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
               >
                 Continue to prep <ArrowRight className="h-4 w-4" />
               </button>

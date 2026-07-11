@@ -122,7 +122,7 @@ export function CollectWorkspace({
   if (targetCount === 0) {
 
     return (
-      <div className="mx-auto w-full max-w-2xl rounded-2xl border-2 border-dashed border-on-surface/30 bg-surface/80 p-8 text-center qc-hard-shadow-sm">
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-8 text-center">
         <h2 className="font-display text-headline-md font-bold text-on-surface">
           Pick universities first
         </h2>
@@ -132,7 +132,7 @@ export function CollectWorkspace({
         <button
           type="button"
           onClick={() => void navigate({ to: "/apply" })}
-          className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           <ArrowLeft className="h-4 w-4" /> Choose universities
         </button>
@@ -145,7 +145,7 @@ export function CollectWorkspace({
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-5">
-        <header className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+        <header className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
@@ -212,7 +212,7 @@ export function CollectWorkspace({
                   return (
                     <div
                       key={`${s.system}::${s.externalId}`}
-                      className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-on-surface/20 bg-surface/80 p-4"
+                      className="flex items-center gap-3 rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4"
                     >
                       <Loader2 className="h-4 w-4 animate-spin text-on-surface-variant" />
                       <p className="text-body-sm text-on-surface-variant">
@@ -226,7 +226,7 @@ export function CollectWorkspace({
             )}
 
             {(plan?.manualNotes ?? []).length > 0 && (
-              <section className="rounded-2xl border-2 border-on-surface/20 bg-surface/95 p-5 qc-hard-shadow-sm">
+              <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow">
                 <h3 className="font-display text-headline-sm font-bold text-on-surface">
                   Handle manually
                 </h3>
@@ -266,7 +266,7 @@ export function CollectWorkspace({
 
 function SkeletonRow() {
   return (
-    <div className="animate-pulse rounded-2xl border-2 border-on-surface/10 bg-surface/70 p-5">
+    <div className="animate-pulse rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5">
       <div className="h-4 w-40 rounded bg-on-surface/10" />
       <div className="mt-3 h-3 w-full rounded bg-on-surface/10" />
       <div className="mt-2 h-3 w-3/4 rounded bg-on-surface/10" />

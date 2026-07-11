@@ -1,6 +1,5 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { CommonAppProfile } from "@/components/apply/CommonAppProfile";
 import { useAuth } from "@/lib/auth/useAuth";
 
@@ -35,7 +34,6 @@ function CommonAppProfilePage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-(--container-content) px-5 pb-32 pt-20 sm:px-8 sm:pt-24 lg:px-12"

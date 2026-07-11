@@ -63,7 +63,7 @@ function PortalChip({
     </>
   );
 
-  const base = `flex min-w-0 items-center gap-2.5 rounded-2xl border-2 border-on-surface bg-surface px-3 py-2.5 qc-hard-shadow-sm ${
+  const base = `flex min-w-0 items-center gap-2.5 rounded-2xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2.5 qc-soft-shadow ${
     active ? "ring-2 ring-primary/40" : ""
   }`;
 
@@ -75,7 +75,7 @@ function PortalChip({
           target="_blank"
           rel="noopener noreferrer"
           title={`View your filled ${name}`}
-          className={`${base} w-full text-left transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none`}
+          className={`${base} w-full text-left transition-colors hover:bg-surface-container`}
         >
           {inner}
         </a>

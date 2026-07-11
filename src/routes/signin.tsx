@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck, Bookmark } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { auth } from "@/lib/auth/client";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -158,7 +157,6 @@ function SignInPage() {
 
   return (
     <>
-      <LivingBackground />
       <main
         id="main-content"
         className="relative mx-auto flex min-h-screen w-full max-w-(--container-content) items-center justify-center px-5 pb-16 pt-28 sm:px-8 lg:px-12"
@@ -199,7 +197,7 @@ function SignInPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-            className="mx-auto w-full max-w-[460px] rounded-3xl border-2 border-on-surface bg-surface/85 p-7 backdrop-blur-xl qc-hard-shadow sm:p-9"
+            className="mx-auto w-full max-w-[460px] rounded-3xl border border-on-surface/8 bg-surface-container-lowest p-7 qc-soft-shadow sm:p-9"
           >
             <h1 className="font-display text-display-md text-on-surface text-balance">
               {mode === "signin" ? t("signin.title.signin") : t("signin.title.signup")}
@@ -291,7 +289,7 @@ function SignInPage() {
               <button
                 type="submit"
                 disabled={submitting || googleLoading}
-                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-on-surface bg-primary px-7 font-display text-label-lg font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 inline-flex min-h-[52px] items-center justify-center rounded-full bg-primary px-7 font-display text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -336,7 +334,7 @@ function Perk({
 }) {
   return (
     <li className="flex items-start gap-3">
-      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-primary-container text-on-primary-container qc-hard-shadow-sm">
+      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
         {icon}
       </span>
       <div>

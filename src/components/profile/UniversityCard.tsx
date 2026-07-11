@@ -44,9 +44,9 @@ export type RecCard = {
 };
 
 const BUCKET_CHIP: Record<RecCard["bucket"], string> = {
-  safety: "bg-tertiary-container/15 text-tertiary",
-  target: "bg-primary-fixed text-primary",
-  reach: "bg-secondary-container/20 text-secondary",
+  safety: "bg-tertiary-fixed text-on-tertiary-fixed-variant",
+  target: "bg-primary-fixed text-on-primary-fixed-variant",
+  reach: "bg-secondary-fixed text-on-secondary-fixed-variant",
 };
 
 function pct(n?: number): string | null {
@@ -106,8 +106,8 @@ export function UniversityCard({
       initial={reduce ? false : { opacity: 0, y: 18 }}
       animate={reduce ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.06 }}
-      className={`group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-4 transition-shadow sm:p-6 ${
-        locked ? "select-none" : "hover:shadow-[0_8px_28px_-10px_rgba(53,37,205,0.18)]"
+      className={`group relative overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6 ${
+        locked ? "select-none" : "qc-soft-shadow-hover"
       }`}
     >
       {/* Header: name + bucket chip — name is a proper noun, kept untranslated */}
@@ -157,7 +157,7 @@ export function UniversityCard({
               href={card.website.startsWith("http") ? card.website : `https://${card.website}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-primary-container px-5 text-label-md font-medium text-on-primary transition-transform hover:scale-[1.02]"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-5 text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
             >
               {t("card.visit")}
               <span aria-hidden>→</span>
@@ -167,7 +167,7 @@ export function UniversityCard({
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-5 text-label-md font-medium text-on-surface transition-colors hover:bg-surface-container"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-on-surface/15 px-5 text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             {open ? t("enrich.hide") : t("enrich.show")}
             <span aria-hidden>{open ? "▲" : "▼"}</span>
@@ -177,7 +177,7 @@ export function UniversityCard({
             onClick={() =>
               askAssistant(`Is ${card.name} a good fit for me? Give me the key pros and cons for my profile.`)
             }
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-5 text-label-md font-medium text-on-surface transition-colors hover:bg-surface-container"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-on-surface/15 px-5 text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <Sparkles className="h-4 w-4" /> Ask AI
           </button>
@@ -187,7 +187,7 @@ export function UniversityCard({
               type="button"
               onClick={onDismiss}
               aria-label="Remove from matches"
-              className="ml-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-outline-variant/60 px-4 text-label-md font-medium text-on-surface-variant transition-colors hover:bg-error-container hover:text-on-error-container"
+              className="ml-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-on-surface/15 px-4 text-label-md font-semibold text-on-surface-variant transition-colors hover:bg-error-container hover:text-on-error-container"
             >
               Remove
             </button>

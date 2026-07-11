@@ -129,7 +129,7 @@ export function AssistantSidebar() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 8 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border-2 border-on-surface bg-surface px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="fixed bottom-5 right-5 z-[80] inline-flex items-center gap-2 rounded-full border border-on-surface/10 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-soft-shadow transition-colors hover:bg-on-surface/5"
           >
             <span className="h-2 w-2 rounded-full bg-primary" />
             <MessageCircle className="h-5 w-5" />
@@ -335,14 +335,14 @@ function SidebarPanel({
         exit={{ x: "100%", opacity: 0.6 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         style={{ width: DOCK_RAIL_W }}
-        className="fixed right-0 top-16 z-[80] flex h-[calc(100dvh-4rem)] flex-col items-center border-l-2 border-on-surface bg-surface qc-hard-shadow-sm sm:transition-[width] sm:duration-200 sm:ease-out"
+        className="fixed right-0 top-16 z-[80] flex h-[calc(100dvh-4rem)] flex-col items-center border-l border-on-surface/10 bg-surface qc-soft-shadow sm:transition-[width] sm:duration-200 sm:ease-out"
       >
         <button
           type="button"
           onClick={() => setCollapsed(false)}
           aria-label="Expand assistant"
           title="Expand assistant"
-          className="relative mt-4 grid h-10 w-10 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="relative mt-4 grid h-10 w-10 place-items-center rounded-lg bg-primary text-white transition-colors hover:bg-primary/90"
         >
           <Sparkles className="h-4 w-4" />
           {(streaming || hasMessages) && (
@@ -362,7 +362,7 @@ function SidebarPanel({
       exit={{ x: "100%", opacity: 0.6 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       style={{ width: isDesktop ? width : undefined }}
-      className="fixed inset-0 z-[80] flex h-dvh w-full flex-col border-on-surface bg-surface qc-hard-shadow-sm sm:inset-auto sm:right-0 sm:top-16 sm:h-[calc(100dvh-4rem)] sm:border-l-2 sm:transition-[width] sm:duration-200 sm:ease-out"
+      className="fixed inset-0 z-[80] flex h-dvh w-full flex-col border-on-surface/10 bg-surface qc-soft-shadow sm:inset-auto sm:right-0 sm:top-16 sm:h-[calc(100dvh-4rem)] sm:border-l sm:transition-[width] sm:duration-200 sm:ease-out"
     >
       {/* Resize handle (desktop only, expanded only) */}
       <div
@@ -378,8 +378,8 @@ function SidebarPanel({
 
       {/* Header — @container so labels/credits key off the PANEL width, not the
           viewport (the dock is resizable 320-560px independent of screen size). */}
-      <header className="@container flex items-center gap-2 border-b-2 border-on-surface/15 bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+      <header className="@container flex items-center gap-2 border-b border-on-surface/10 bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-fixed text-on-primary-fixed-variant">
           <Sparkles className="h-4 w-4" />
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -393,10 +393,10 @@ function SidebarPanel({
                   ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
                   : `${credits.remaining} of ${credits.grant} left — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
               }
-              className={`hidden shrink-0 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold @[420px]:inline-block ${
+              className={`hidden shrink-0 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold @[420px]:inline-block ${
                 credits.remaining <= 0
-                  ? "border-on-surface/30 bg-on-surface/5 text-on-surface-variant"
-                  : "border-primary/30 bg-primary/10 text-primary"
+                  ? "bg-surface-container text-on-surface-variant"
+                  : "bg-primary-fixed/70 text-primary"
               }`}
             >
               {credits.remaining} credits
@@ -407,10 +407,10 @@ function SidebarPanel({
           type="button"
           onClick={() => setHistoryOpen((v) => !v)}
           aria-pressed={historyOpen}
-          className={`inline-flex shrink-0 items-center gap-1 rounded-md border-2 px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold hover:border-on-surface ${
+          className={`inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
             historyOpen
-              ? "border-on-surface bg-secondary-container text-on-surface"
-              : "border-on-surface/25 bg-surface text-on-surface"
+              ? "bg-primary-fixed/70 text-primary"
+              : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
           }`}
           title="Previous chats"
         >
@@ -425,7 +425,7 @@ function SidebarPanel({
         <button
           type="button"
           onClick={newChat}
-          className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border border-on-surface/15 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           title="Start a new chat"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -437,7 +437,7 @@ function SidebarPanel({
           onClick={() => setCollapsed(true)}
           aria-label="Collapse assistant"
           title="Collapse"
-          className="hidden h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface sm:inline-flex sm:place-items-center"
+          className="hidden h-8 w-8 shrink-0 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5 sm:inline-flex sm:place-items-center"
         >
           <PanelRightClose className="h-4 w-4" />
         </button>
@@ -445,7 +445,7 @@ function SidebarPanel({
           type="button"
           onClick={onClose}
           aria-label="Close assistant"
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
         >
           <X className="h-4 w-4" />
         </button>
@@ -491,7 +491,7 @@ function SidebarPanel({
           e.preventDefault();
           void submit(input);
         }}
-        className="border-t-2 border-on-surface/15 bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="border-t border-on-surface/10 bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       >
         <input
           ref={fileInputRef}
@@ -502,7 +502,7 @@ function SidebarPanel({
 
         {/* Attachment status: docType picker → uploading chip → done chip */}
         {pickerFile && (
-          <div className="mb-2 rounded-md border-2 border-on-surface/25 bg-surface p-2">
+          <div className="mb-2 rounded-lg border border-on-surface/10 bg-surface-container p-2">
             <p className="mb-1.5 truncate font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
               Attach “{pickerFile.name}” as:
             </p>
@@ -512,7 +512,7 @@ function SidebarPanel({
                   key={d.value}
                   type="button"
                   onClick={() => void doUpload(d.value)}
-                  className="rounded-full border-2 border-on-surface/25 bg-surface px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+                  className="rounded-full border border-on-surface/15 bg-surface px-2.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                 >
                   {d.label}
                 </button>
@@ -528,13 +528,13 @@ function SidebarPanel({
           </div>
         )}
         {uploadingName && (
-          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-on-surface/25 bg-surface px-2.5 py-0.5 text-label-sm text-on-surface-variant">
+          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full border border-on-surface/15 bg-surface px-2.5 py-0.5 text-label-sm text-on-surface-variant">
             <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
             <span className="truncate">Uploading {uploadingName}…</span>
           </div>
         )}
         {attachment && !uploadingName && (
-          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-on-surface bg-secondary-container px-2.5 py-0.5 text-label-sm font-semibold text-on-surface qc-hard-shadow-sm">
+          <div className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-secondary-fixed px-2.5 py-0.5 text-label-sm font-semibold text-on-secondary-fixed-variant">
             <span className="truncate">
               📎 {attachment.fileName} → {attachment.docType}
             </span>
@@ -556,7 +556,7 @@ function SidebarPanel({
             disabled={!!uploadingName || !!pickerFile}
             aria-label="Attach a file"
             title="Attach a file"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-md border-2 border-on-surface/25 bg-surface text-on-surface hover:border-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Paperclip className="h-4 w-4" />
           </button>
@@ -571,13 +571,13 @@ function SidebarPanel({
             }}
             rows={2}
             placeholder="Ask anything about your applications..."
-            className="min-h-[44px] flex-1 resize-none rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-2 text-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
+            className="min-h-[44px] flex-1 resize-none rounded-lg border border-on-surface/15 bg-surface px-2.5 py-2 text-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none"
           />
           <button
             type="submit"
             aria-label={sending || streaming ? "Sending message" : "Send message"}
             disabled={disabled || (!input.trim() && !attachment)}
-            className="inline-flex h-11 shrink-0 items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-3 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-11 shrink-0 items-center gap-1 rounded-lg bg-primary px-3 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {sending || streaming ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -599,10 +599,10 @@ function SidebarPanel({
                 ? "Bypass on - actions run automatically. Tap to turn off."
                 : "Turn on bypass - actions run without confirming each time."
             }
-            className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
               bypass
-                ? "border-primary/40 bg-primary/10 text-primary"
-                : "border-on-surface/25 bg-surface text-on-surface-variant hover:border-on-surface"
+                ? "bg-primary-fixed/70 text-primary"
+                : "border border-on-surface/15 bg-surface text-on-surface-variant hover:bg-on-surface/5"
             }`}
           >
             <ShieldAlert className="h-3.5 w-3.5" />
@@ -664,14 +664,14 @@ function HistoryPanel({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface/25 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+          className="inline-flex items-center gap-1 rounded-md border border-on-surface/15 bg-surface px-2 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back
         </button>
         <button
           type="button"
           onClick={onNew}
-          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
         >
           <Plus className="h-3.5 w-3.5" /> New chat
         </button>
@@ -681,7 +681,7 @@ function HistoryPanel({
           <Loader2 className="h-4 w-4 animate-spin" />
         </div>
       ) : threads.length === 0 ? (
-        <p className="rounded-md border-2 border-dashed border-on-surface/20 bg-surface p-4 text-center text-body-sm text-on-surface-variant">
+        <p className="rounded-lg border border-dashed border-on-surface/20 bg-surface p-4 text-center text-body-sm text-on-surface-variant">
           No previous chats yet.
         </p>
       ) : (
@@ -691,10 +691,10 @@ function HistoryPanel({
             return (
               <li key={t._id}>
                 <div
-                  className={`flex items-center gap-1.5 rounded-md border-2 px-2 py-1.5 transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-lg border px-2 py-1.5 transition-colors ${
                     isActive
-                      ? "border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-                      : "border-on-surface/15 bg-surface text-on-surface hover:border-on-surface"
+                      ? "border-transparent bg-primary-fixed/70 text-primary"
+                      : "border-on-surface/10 bg-surface text-on-surface hover:bg-on-surface/5"
                   }`}
                 >
                   <button
@@ -722,7 +722,7 @@ function HistoryPanel({
                       e.stopPropagation();
                       requestRemove(t._id);
                     }}
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-transparent text-on-surface-variant hover:border-on-surface hover:bg-error/10 hover:text-on-error-container"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-transparent text-on-surface-variant transition-colors hover:bg-error/10 hover:text-on-error-container"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -788,7 +788,7 @@ function EmptyState({
   const chips = useQuickActionChips();
   return (
     <div className="mt-4 space-y-3">
-      <div className="rounded-xl border-2 border-on-surface/15 bg-surface p-4">
+      <div className="rounded-xl border border-on-surface/8 bg-surface-container p-4">
         <p className="font-display text-label-md font-bold text-on-surface">
           Hi - how can I help?
         </p>
@@ -805,7 +805,7 @@ function EmptyState({
             type="button"
             disabled={disabled}
             onClick={() => onPick(s)}
-            className="w-full rounded-md border-2 border-on-surface/25 bg-surface px-3 py-2 text-left text-body-sm text-on-surface transition-colors hover:border-on-surface disabled:opacity-60"
+            className="w-full rounded-lg border border-on-surface/15 bg-surface px-3 py-2 text-left text-body-sm text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
           >
             {s}
           </button>
@@ -822,7 +822,7 @@ function SafetyStrip() {
     "No auto-submit without confirmation",
   ];
   return (
-    <div className="rounded-xl border-2 border-on-surface/15 bg-secondary-container/45 p-3">
+    <div className="rounded-xl border border-on-surface/8 bg-secondary-fixed/40 p-3">
       <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-on-surface/70">
         Guardrails active
       </p>
@@ -840,7 +840,7 @@ function SafetyStrip() {
 
 function PendingFirstReply() {
   return (
-    <div className="mt-4 rounded-xl border-2 border-on-surface/15 bg-surface p-4">
+    <div className="mt-4 rounded-xl border border-on-surface/8 bg-surface-container p-4">
       <div className="flex items-start gap-3">
         <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-primary" />
         <div>
@@ -878,10 +878,10 @@ function MessageRow({
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[85%] rounded-lg border-2 px-3 py-2 text-body-sm ${
+        className={`max-w-[85%] rounded-2xl px-3 py-2 text-body-sm ${
           isUser
-            ? "border-on-surface bg-on-surface text-surface qc-hard-shadow-sm"
-            : "border-on-surface/15 bg-surface text-on-surface"
+            ? "bg-on-surface text-surface"
+            : "border border-on-surface/8 bg-surface-container text-on-surface"
         }`}
       >
         {isUser ? (
@@ -961,10 +961,10 @@ function ActionCard({
   if (action.status !== "proposed") {
     return (
       <div
-        className={`inline-flex items-center gap-1 rounded-full border-2 px-2 py-0.5 text-label-sm ${
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-label-sm font-semibold ${
           action.status === "done"
-            ? "border-tertiary bg-tertiary/20 text-on-surface"
-            : "border-on-surface/20 bg-surface text-on-surface-variant"
+            ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+            : "bg-surface-container text-on-surface-variant"
         }`}
       >
         {action.status === "done" && <Check className="h-3 w-3" />}
@@ -1011,7 +1011,7 @@ function ActionCard({
 
   if (action.tool === "navigate" && !err) {
     return (
-      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/20 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+      <div className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-2.5 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
         <Loader2 className="h-3 w-3 animate-spin" />
         {busy ? "Opening..." : action.label}
       </div>
@@ -1019,7 +1019,7 @@ function ActionCard({
   }
 
   return (
-    <div className="rounded-md border-2 border-on-surface/25 bg-surface p-2">
+    <div className="rounded-lg border border-on-surface/10 bg-surface-container p-2">
       <p className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
         {action.label}
       </p>
@@ -1028,7 +1028,7 @@ function ActionCard({
           type="button"
           onClick={confirmAction}
           disabled={busy}
-          className="inline-flex items-center gap-1 rounded-md border-2 border-on-surface bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+          className="inline-flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
           Confirm
@@ -1037,13 +1037,13 @@ function ActionCard({
           type="button"
           onClick={dismiss}
           disabled={busy}
-          className="rounded-md border-2 border-on-surface/25 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface disabled:opacity-60"
+          className="rounded-lg border border-on-surface/15 bg-surface px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
         >
           Dismiss
         </button>
       </div>
       {err && (
-        <p className="mt-1 rounded border-2 border-error/30 bg-error/10 px-1.5 py-0.5 text-label-sm text-on-error-container">
+        <p className="mt-1 rounded bg-error/10 px-1.5 py-0.5 text-label-sm text-on-error-container">
           {err}
         </p>
       )}

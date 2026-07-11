@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { ArrowRight, Check, Loader2, Sparkles } from "lucide-react";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useApplyActions } from "@/lib/applyQueue/client";
@@ -330,7 +329,6 @@ function OnboardingPage() {
 
   return (
     <>
-      <LivingBackground />
       <main
         id="main-content"
         className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-28 sm:px-8"
@@ -371,14 +369,14 @@ function OnboardingPage() {
                   value={answers.firstName ?? ""}
                   onChange={(e) => setAnswers((a) => ({ ...a, firstName: e.target.value }))}
                   placeholder="Legal first name"
-                  className="w-full min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  className="w-full min-w-0 rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <input
                   type="text"
                   value={answers.lastName ?? ""}
                   onChange={(e) => setAnswers((a) => ({ ...a, lastName: e.target.value }))}
                   placeholder="Legal last name"
-                  className="w-full min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  className="w-full min-w-0 rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </Field>
@@ -388,7 +386,7 @@ function OnboardingPage() {
                 type="date"
                 value={answers.dateOfBirth ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, dateOfBirth: e.target.value }))}
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -398,7 +396,7 @@ function OnboardingPage() {
                 value={answers.phone ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, phone: e.target.value }))}
                 placeholder="Include your country code"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -409,7 +407,7 @@ function OnboardingPage() {
                   value={answers.addressStreet ?? ""}
                   onChange={(e) => setAnswers((a) => ({ ...a, addressStreet: e.target.value }))}
                   placeholder="Street address"
-                  className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                  className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <div className="grid gap-3 sm:grid-cols-3">
                   <input
@@ -417,21 +415,21 @@ function OnboardingPage() {
                     value={answers.addressCity ?? ""}
                     onChange={(e) => setAnswers((a) => ({ ...a, addressCity: e.target.value }))}
                     placeholder="City"
-                    className="min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                    className="min-w-0 rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <input
                     type="text"
                     value={answers.addressState ?? ""}
                     onChange={(e) => setAnswers((a) => ({ ...a, addressState: e.target.value }))}
                     placeholder="State / province"
-                    className="min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                    className="min-w-0 rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <input
                     type="text"
                     value={answers.addressPostal ?? ""}
                     onChange={(e) => setAnswers((a) => ({ ...a, addressPostal: e.target.value }))}
                     placeholder="ZIP / postal code"
-                    className="min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                    className="min-w-0 rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -443,7 +441,7 @@ function OnboardingPage() {
                 value={answers.nationality ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, nationality: e.target.value }))}
                 placeholder="e.g. Kazakhstan"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -473,7 +471,7 @@ function OnboardingPage() {
                 value={answers.highSchoolName ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, highSchoolName: e.target.value }))}
                 placeholder="Your current or most recent school"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -482,7 +480,7 @@ function OnboardingPage() {
                 type="date"
                 value={answers.graduationDate ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, graduationDate: e.target.value }))}
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
           </Section>
@@ -497,7 +495,7 @@ function OnboardingPage() {
                   setAnswers((a) => ({ ...a, home: { country: e.target.value } }))
                 }
                 placeholder="Country, e.g. Kazakhstan"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
 
@@ -618,7 +616,7 @@ function OnboardingPage() {
                       }))
                     }
                     placeholder="GPA e.g. 3.8"
-                    className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                    className="rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <select
                     value={answers.grades?.detailScale ?? ""}
@@ -631,7 +629,7 @@ function OnboardingPage() {
                         },
                       }))
                     }
-                    className="rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                    className="rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Scale…</option>
                     {GRADE_SCALES.map((s) => (
@@ -833,7 +831,7 @@ function OnboardingPage() {
                   }))
                 }
                 placeholder="e.g. software engineer, doctor, founder, researcher"
-                className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+                className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </Field>
           </Section>
@@ -842,7 +840,7 @@ function OnboardingPage() {
 
         {/* Submit */}
         <div className="sticky bottom-4 z-20 mt-12">
-          <div className="rounded-2xl border-2 border-on-surface bg-surface/95 p-4 backdrop-blur-md qc-hard-shadow sm:p-5">
+          <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="font-[var(--font-label)] text-label-md text-on-surface-variant">
                 {countFilled(answers)} of 14 answered
@@ -854,7 +852,7 @@ function OnboardingPage() {
                 type="button"
                 disabled={!canSubmit || submitting}
                 onClick={onSubmit}
-                className="group inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white qc-hard-shadow transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 font-display text-headline-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? (
                   <>
@@ -891,7 +889,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface/85 p-6 backdrop-blur-md qc-hard-shadow sm:p-8">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow sm:p-8">
       <header className="mb-6 flex items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-headline-lg font-bold text-on-surface">
@@ -902,7 +900,7 @@ function Section({
           )}
         </div>
         {required && (
-          <span className="inline-flex shrink-0 items-center rounded-full bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-container">
+          <span className="inline-flex shrink-0 items-center rounded-md bg-secondary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-secondary-fixed-variant">
             ★ Sharpens most
           </span>
         )}
@@ -970,7 +968,7 @@ function CsvField({
         );
       }}
       placeholder={placeholder}
-      className="w-full rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-on-surface focus:outline-none"
+      className="w-full rounded-lg border border-on-surface/15 bg-surface-container-lowest px-4 py-3 font-[var(--font-label)] text-label-lg text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
     />
   );
 }
@@ -991,11 +989,11 @@ function Pill({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center gap-1.5 rounded-full border-2 px-3.5 py-1.5 font-[var(--font-label)] text-label-md font-semibold capitalize transition-all ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-[var(--font-label)] text-label-md font-semibold capitalize transition-colors ${
         selected
-          ? "border-primary bg-primary-fixed text-on-primary-fixed"
-          : "border-on-surface/15 bg-surface-container-lowest text-on-surface hover:border-on-surface hover:-translate-y-0.5"
-      } ${disabled ? "cursor-not-allowed opacity-40 hover:translate-y-0" : ""}`}
+          ? "bg-primary-fixed/70 text-primary"
+          : "border border-on-surface/15 bg-surface-container-lowest text-on-surface hover:bg-on-surface/5"
+      } ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
     >
       {selected && <Check className="h-3 w-3" />}
       {children}
@@ -1054,7 +1052,7 @@ function ScorePicker({
           value={value && !bands.includes(value) ? value : ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder="or exact"
-          className="w-32 rounded-full border-2 border-on-surface/15 bg-surface-container-lowest px-3 py-1.5 font-[var(--font-label)] text-label-md text-on-surface focus:border-on-surface focus:outline-none"
+          className="w-32 rounded-full border border-on-surface/15 bg-surface-container-lowest px-3 py-1.5 font-[var(--font-label)] text-label-md text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
     </div>

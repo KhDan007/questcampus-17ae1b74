@@ -21,7 +21,7 @@ function ResumeBannerInner() {
     <Link
       to="/apply/$jobId"
       params={{ jobId: job.jobId }}
-      className="group flex items-center gap-3 rounded-2xl border-2 border-on-surface bg-primary/10 px-4 py-3 qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+      className="group flex items-center gap-3 rounded-2xl border border-on-surface/8 bg-primary-fixed/40 px-4 py-3 qc-soft-shadow transition-colors hover:bg-primary-fixed/60"
     >
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-white">
         <PlayCircle className="h-5 w-5" />

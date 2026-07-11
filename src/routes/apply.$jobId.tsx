@@ -15,7 +15,6 @@ import {
   Info,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LiveCanvas } from "@/components/apply/LiveCanvas";
 import { RunStepper } from "@/components/apply/RunStepper";
@@ -101,12 +100,11 @@ function ApplyRunPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12"
+          className="mx-auto w-full max-w-(--container-content) px-5 pt-20 sm:px-8 sm:pt-28 lg:px-12"
         >
-          <div className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface/15 bg-surface/80 px-4 py-2 text-body-sm text-on-surface-variant backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-4 py-2 text-body-sm text-on-surface-variant qc-soft-shadow">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading live application...
           </div>
         </main>
@@ -119,10 +117,9 @@ function ApplyRunPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-28 lg:px-12"
       >
         <Link
           to="/apply"
@@ -216,7 +213,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
   }
   if (job === null) {
     return (
-      <div className="mt-10 rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow-sm">
+      <div className="mt-10 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow">
         <p className="font-display text-headline-sm font-bold text-on-surface">
           Application not found
         </p>
@@ -254,7 +251,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
           <h1 className="mt-2 flex flex-wrap items-center gap-2 font-display text-display-md text-on-surface">
             <span>{job.targetName ?? job.externalId ?? "Application"}</span>
             {job.targetName === "Demo test run" && (
-              <span className="rounded-md border-2 border-on-surface bg-surface px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-on-surface">
+              <span className="rounded-md bg-secondary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wide text-on-secondary-fixed-variant">
                 Demo — nothing is submitted
               </span>
             )}
@@ -278,7 +275,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                 setActing(false);
               }
             }}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <XCircle className="h-4 w-4" /> Cancel
           </button>
@@ -291,7 +288,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       </div>
 
       {/* Stage guidance */}
-      <div className="mt-4 rounded-xl border-2 border-on-surface/20 bg-surface p-3 qc-hard-shadow-sm">
+      <div className="mt-4 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow">
         <p className="flex items-start gap-2 text-body-sm text-on-surface">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <span>{stageGuidance(visibleStatus, isDemo, job.checkpoint)}</span>
@@ -309,7 +306,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
       {/* Slim percent bar (only when there's real progress) */}
       {percent > 0 && (
         <>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full border-2 border-on-surface bg-surface-container-lowest">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-on-surface/10">
             <div
               className="h-full bg-primary transition-all duration-500"
               style={{ width: `${percent}%` }}
@@ -358,15 +355,12 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
         </div>
 
         {/* Activity feed */}
-        <aside className="rounded-2xl border-2 border-on-surface bg-surface/90 p-4 backdrop-blur-md qc-hard-shadow-sm">
+        <aside className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
           <h2 className="flex items-center gap-1.5 font-display text-headline-sm font-bold text-on-surface">
             <ListChecks className="h-4 w-4 text-primary" /> Activity
             {!terminal && (
               <span className="ml-1 inline-flex items-center gap-1 text-label-sm font-normal text-on-surface-variant">
-                <span className="relative inline-flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                </span>
+                <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
                 live
               </span>
             )}
@@ -450,7 +444,7 @@ function RunBody({ jobId, token }: { jobId: string; token: string }) {
                 setRetrying(false);
               }
             }}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
             {retrying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Try again
@@ -510,7 +504,7 @@ function CheckpointNudge({
 }) {
   const isLogin = checkpoint.kind === "login";
   return (
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-on-surface bg-surface p-3 qc-hard-shadow-sm">
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow">
       <p className="min-w-0 flex-1 text-body-sm text-on-surface">
         {isLogin || needsPortalAction
           ? "Use the live browser to create an account for this university portal, or log in if you already have one."
@@ -519,7 +513,7 @@ function CheckpointNudge({
       <button
         type="button"
         onClick={onOpen}
-        className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90"
       >
         <Info className="h-4 w-4" /> Instructions
       </button>
@@ -539,14 +533,10 @@ function QueuedWaitingCard({ createdAt }: { createdAt?: number }) {
   const ss = String(elapsedSec % 60).padStart(2, "0");
 
   return (
-    <div className="relative flex aspect-[16/10] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-on-surface bg-surface qc-hard-shadow">
-      <div
-        aria-hidden
-        className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_20%,rgba(0,0,0,0.04)_50%,transparent_80%)]"
-      />
+    <div className="relative flex aspect-[16/10] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest qc-soft-shadow">
       <div className="relative flex flex-col items-center gap-2 text-center">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
-          <Hourglass className="h-5 w-5 animate-pulse text-primary" />
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
+          <Hourglass className="h-5 w-5 animate-pulse" />
         </span>
         <p className="font-display text-headline-sm font-bold text-on-surface">
           Waiting for a worker to pick this up…
@@ -575,13 +565,13 @@ function Banner({
 }) {
   const cls =
     tone === "success"
-      ? "border-tertiary bg-tertiary-container/40 text-on-surface"
+      ? "border-tertiary/30 bg-tertiary-container/40 text-on-surface"
       : tone === "error"
-        ? "border-error bg-error-container/40 text-on-error-container"
-        : "border-on-surface bg-surface text-on-surface";
+        ? "border-error/30 bg-error-container/40 text-on-error-container"
+        : "border-on-surface/8 bg-surface-container-lowest text-on-surface";
   return (
     <div
-      className={`mt-6 flex items-start gap-3 rounded-2xl border-2 p-4 qc-hard-shadow-sm ${cls}`}
+      className={`mt-6 flex items-start gap-3 rounded-2xl border p-4 qc-soft-shadow ${cls}`}
     >
       <span className="mt-0.5 shrink-0">{icon}</span>
       <div>
@@ -624,7 +614,7 @@ function CheckpointModal({
             type="button"
             disabled={busy}
             onClick={() => onConfirm("logged_in")}
-            className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
             {isDemo ? "Continue" : "I'm in"}
@@ -660,7 +650,7 @@ function CheckpointModal({
         </p>
 
         {!reachedReview && (
-          <div className="mt-3 rounded-md border-2 border-error/60 bg-error-container/50 p-3">
+          <div className="mt-3 rounded-md border border-error/40 bg-error-container/50 p-3">
             <p className="font-[var(--font-label)] text-label-sm font-semibold text-on-error-container">
               Heads up: the agent couldn&apos;t reach the portal&apos;s review screen.
             </p>
@@ -707,7 +697,7 @@ function CheckpointModal({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
             >
               <LogIn className="h-4 w-4" /> Use live browser
             </button>
@@ -716,7 +706,7 @@ function CheckpointModal({
               type="button"
               disabled={busy}
               onClick={() => onConfirm("submitted")}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               I&apos;ve submitted
@@ -747,7 +737,7 @@ function Modal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-lg rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
+      <div className="w-full max-w-lg rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
         <div className="flex items-start gap-2">
           {icon}
           <h3 className="min-w-0 flex-1 font-display text-headline-sm font-bold text-on-surface">

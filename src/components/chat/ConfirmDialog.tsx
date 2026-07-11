@@ -48,8 +48,8 @@ export function ConfirmDialog({
 
   // Destructive uses the error token when it exists in the design system.
   const confirmClass = destructive
-    ? "border-on-surface bg-error text-on-error"
-    : "border-on-surface bg-primary text-white";
+    ? "bg-error text-on-error"
+    : "bg-primary text-white";
 
   return createPortal(
     <AnimatePresence>
@@ -75,7 +75,7 @@ export function ConfirmDialog({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-sm rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm"
+            className="relative w-full max-w-sm rounded-2xl border border-on-surface/10 bg-surface-container-lowest p-5 qc-soft-shadow"
           >
             <p className="font-display text-label-md font-bold text-on-surface">{title}</p>
             <p className="mt-2 text-body-sm text-on-surface-variant">{body}</p>
@@ -86,7 +86,7 @@ export function ConfirmDialog({
                   type="checkbox"
                   checked={dontAskAgain}
                   onChange={(e) => setDontAskAgain(e.target.checked)}
-                  className="h-4 w-4 shrink-0 rounded border-2 border-on-surface accent-primary"
+                  className="h-4 w-4 shrink-0 rounded border border-on-surface/30 accent-primary"
                 />
                 Don&apos;t ask again
               </label>
@@ -96,14 +96,14 @@ export function ConfirmDialog({
               <button
                 type="button"
                 onClick={onCancel}
-                className="rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+                className="rounded-lg border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => onConfirm(dontAskAgain)}
-                className={`rounded-md border-2 px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none ${confirmClass}`}
+                className={`rounded-lg px-3 py-1.5 font-[var(--font-label)] text-label-sm font-bold transition-colors hover:opacity-90 ${confirmClass}`}
               >
                 {confirmLabel}
               </button>

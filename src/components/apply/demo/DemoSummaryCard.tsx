@@ -11,7 +11,7 @@ export function DemoSummaryCard({ demo }: { demo: ApplyJobDemo }) {
   const totals = demo.totals ?? deriveTotals(demo);
 
   return (
-    <div className="mt-6 rounded-2xl border-2 border-on-surface bg-surface p-5 qc-hard-shadow-sm sm:p-6">
+    <div className="mt-6 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6">
       <p className="flex items-center gap-1.5 font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
         <Sparkles className="h-4 w-4" aria-hidden /> Demo complete
       </p>
@@ -32,7 +32,7 @@ export function DemoSummaryCard({ demo }: { demo: ApplyJobDemo }) {
       <div className="mt-5">
         <Link
           to="/extension"
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           This, on your real application — get the extension
           <ArrowRight className="h-4 w-4" aria-hidden />

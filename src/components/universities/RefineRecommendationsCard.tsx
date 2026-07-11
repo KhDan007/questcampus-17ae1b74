@@ -21,10 +21,10 @@ export function RefineRecommendationsCard({
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="mt-5 sm:mt-8"
     >
-      <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow sm:p-6">
+      <div className="overflow-hidden rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3 sm:gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
               <Compass className="h-5 w-5" />
             </span>
             <div className="min-w-0">
@@ -44,7 +44,7 @@ export function RefineRecommendationsCard({
           <Link
             to={isAuthenticated ? "/onboarding" : "/signin"}
             search={isAuthenticated ? undefined : ({ redirect: "/onboarding" } as never)}
-            className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-display text-label-md font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
           >
             Refine again
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

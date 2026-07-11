@@ -267,17 +267,17 @@ function FeedbackPage() {
                         type="button"
                         onClick={() => setCategory(c.key)}
                         aria-pressed={active}
-                        className={`flex flex-col items-start gap-1 rounded-2xl border-2 p-3 text-left transition-all ${
+                        className={`flex flex-col items-start gap-1 rounded-2xl border p-3 text-left transition-colors ${
                           active
-                            ? "border-on-surface bg-secondary-container text-on-surface qc-hard-shadow-sm"
-                            : "border-on-surface/20 bg-surface text-on-surface hover:border-on-surface/50 hover:bg-on-surface/[0.03]"
+                            ? "border-primary/30 bg-primary-fixed/70 text-primary"
+                            : "border-on-surface/10 bg-surface-container-lowest text-on-surface hover:bg-on-surface/5"
                         }`}
                       >
                         <span
-                          className={`grid h-8 w-8 place-items-center rounded-lg border-2 ${
+                          className={`grid h-8 w-8 place-items-center rounded-lg ${
                             active
-                              ? "border-on-surface bg-surface"
-                              : "border-on-surface/20 bg-on-surface/[0.03]"
+                              ? "bg-primary-fixed text-on-primary-fixed-variant"
+                              : "bg-surface-container text-on-surface-variant"
                           }`}
                         >
                           <Icon className="h-4 w-4" />
@@ -307,10 +307,10 @@ function FeedbackPage() {
                           type="button"
                           onClick={() => setSeverity(active ? null : s.key)}
                           aria-pressed={active}
-                          className={`rounded-full border-2 px-3.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-all ${
+                          className={`rounded-full px-3.5 py-1.5 font-[var(--font-label)] text-label-sm font-semibold transition-colors ${
                             active
-                              ? "border-on-surface bg-primary text-white qc-hard-shadow-sm"
-                              : "border-on-surface/20 bg-surface text-on-surface hover:border-on-surface/50"
+                              ? "bg-primary-fixed/70 text-primary"
+                              : "border border-on-surface/15 bg-surface text-on-surface hover:bg-on-surface/5"
                           }`}
                         >
                           {s.label}
@@ -335,7 +335,7 @@ function FeedbackPage() {
                   onChange={(e) => setMessage(e.target.value.slice(0, 5000))}
                   rows={5}
                   placeholder={category ? PLACEHOLDER[category] : "Tell us what's on your mind."}
-                  className="w-full resize-y rounded-2xl border-2 border-on-surface/20 bg-surface px-3.5 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
+                  className="w-full resize-y rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-3.5 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <p className="mt-1 text-right text-label-sm text-on-surface-variant/70">
                   {message.length}/5000
@@ -353,7 +353,7 @@ function FeedbackPage() {
                   </span>
                 </div>
                 {previewUrl ? (
-                  <div className="relative overflow-hidden rounded-2xl border-2 border-on-surface qc-hard-shadow-sm">
+                  <div className="relative overflow-hidden rounded-2xl border border-on-surface/10 qc-soft-shadow">
                     <img
                       src={previewUrl}
                       alt="Attached screenshot preview"
@@ -363,7 +363,7 @@ function FeedbackPage() {
                       type="button"
                       onClick={clearFile}
                       aria-label="Remove screenshot"
-                      className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface qc-hard-shadow-sm hover:bg-on-surface/5"
+                      className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-lg border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -382,13 +382,13 @@ function FeedbackPage() {
                       setDragOver(false);
                       attachFile(e.dataTransfer.files?.[0] ?? null);
                     }}
-                    className={`flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed px-4 py-7 text-center transition-colors ${
+                    className={`flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed px-4 py-7 text-center transition-colors ${
                       dragOver
-                        ? "border-on-surface bg-secondary-container/40"
-                        : "border-on-surface/30 bg-on-surface/[0.02] hover:border-on-surface/60"
+                        ? "border-primary/40 bg-primary-fixed/40"
+                        : "border-on-surface/20 bg-surface-container-lowest hover:bg-on-surface/[0.03]"
                     }`}
                   >
-                    <span className="grid h-10 w-10 place-items-center rounded-xl border-2 border-on-surface/25 bg-surface text-on-surface">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-container text-on-surface-variant">
                       <ImagePlus className="h-5 w-5" />
                     </span>
                     <span className="mt-0.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface">
@@ -425,7 +425,7 @@ function FeedbackPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-2xl border-2 border-on-surface/20 bg-surface px-3.5 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-on-surface focus:outline-none"
+                  className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-3.5 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
 
@@ -433,7 +433,7 @@ function FeedbackPage() {
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className="inline-flex items-center gap-2 rounded-xl border-2 border-on-surface bg-primary px-5 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
@@ -456,7 +456,7 @@ function FeedbackPage() {
 
 function ContactStrip() {
   return (
-    <div className="mt-8 rounded-2xl border-2 border-on-surface/15 bg-on-surface/[0.02] p-4">
+    <div className="mt-8 rounded-2xl border border-on-surface/8 bg-surface-container/50 p-4">
       <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">
         Prefer to reach us directly
       </p>
@@ -482,8 +482,8 @@ function ContactStrip() {
 
 function SuccessCard({ onAnother, onHome }: { onAnother: () => void; onHome: () => void }) {
   return (
-    <div className="rounded-2xl border-2 border-on-surface bg-surface p-8 text-center qc-hard-shadow-sm">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border-2 border-on-surface bg-tertiary text-on-tertiary">
+    <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-8 text-center qc-soft-shadow">
+      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-tertiary-fixed text-on-tertiary-fixed-variant">
         <Check className="h-7 w-7" />
       </span>
       <h2 className="mt-4 font-display text-headline-sm font-bold text-on-surface">
@@ -497,19 +497,19 @@ function SuccessCard({ onAnother, onHome }: { onAnother: () => void; onHome: () 
         <button
           type="button"
           onClick={onHome}
-          className="rounded-xl border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
         >
           Back to dashboard
         </button>
         <button
           type="button"
           onClick={onAnother}
-          className="rounded-xl border-2 border-on-surface/25 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface hover:border-on-surface"
+          className="rounded-lg border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           Send another
         </button>
       </div>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t-2 border-on-surface/10 pt-5 text-label-md text-on-surface-variant">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-on-surface/8 pt-5 text-label-md text-on-surface-variant">
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 font-semibold hover:text-on-surface hover:underline">
           <Mail className="h-4 w-4 shrink-0" /> {SUPPORT_EMAIL}
         </a>

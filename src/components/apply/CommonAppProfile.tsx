@@ -80,14 +80,14 @@ export function CommonAppProfile({
 
   if (profile === null) {
     return (
-      <div className="rounded-2xl border-2 border-on-surface/20 bg-surface p-6 text-body-md text-on-surface-variant">
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 text-body-md text-on-surface-variant qc-soft-shadow">
         Sign in to build your Common App profile.
       </div>
     );
   }
   if (schema === undefined || profile === undefined) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border-2 border-on-surface/20 bg-surface p-16">
+      <div className="flex items-center justify-center rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-16 qc-soft-shadow">
         <Loader2 className="h-5 w-5 animate-spin text-on-surface-variant" />
       </div>
     );
@@ -108,7 +108,7 @@ export function CommonAppProfile({
       )}
 
       {/* Header */}
-      <section className="rounded-2xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-8">
+      <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-8">
         <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
           Universal profile
         </p>
@@ -149,7 +149,7 @@ export function CommonAppProfile({
             type="button"
             onClick={onPrefill}
             disabled={prefilling}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {prefilling ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -165,7 +165,7 @@ export function CommonAppProfile({
         <button
           type="button"
           onClick={() => setActiveSection(undefined)}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface/25 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface hover:border-on-surface"
+          className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           Show all sections
         </button>
@@ -218,7 +218,7 @@ function SectionSummaryRow({
     <button
       type="button"
       onClick={onOpen}
-      className="group flex w-full items-start justify-between gap-3 rounded-2xl border-2 border-on-surface bg-surface p-4 text-left qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none sm:p-5"
+      className="group flex w-full items-start justify-between gap-3 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 text-left qc-soft-shadow qc-soft-shadow-hover sm:p-5"
     >
       <div className="min-w-0">
         <div className="flex items-center gap-2">
@@ -240,10 +240,10 @@ function SectionSummaryRow({
           {status && (
             <span
               className={
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 font-[var(--font-label)] text-label-sm " +
+                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-[var(--font-label)] text-label-sm " +
                 (done
-                  ? "border-tertiary/50 bg-tertiary/10 text-on-surface"
-                  : "border-on-surface/25 bg-surface text-on-surface-variant")
+                  ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+                  : "bg-surface-container text-on-surface-variant")
               }
             >
               {status.requiredDone}/{status.requiredTotal} required
@@ -270,7 +270,7 @@ function SectionCard({
 }) {
   const done = status?.complete ?? false;
   return (
-    <section className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-6">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="font-display text-headline-sm font-bold text-on-surface">
@@ -285,10 +285,10 @@ function SectionCard({
         {status && (
           <span
             className={
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 font-[var(--font-label)] text-label-sm " +
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-[var(--font-label)] text-label-sm " +
               (done
-                ? "border-tertiary/50 bg-tertiary/10 text-on-surface"
-                : "border-on-surface/25 bg-surface text-on-surface-variant")
+                ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+                : "bg-surface-container text-on-surface-variant")
             }
           >
             {done ? (
@@ -360,14 +360,14 @@ function ScalarField({
     return (
       <div className={"flex flex-col gap-1.5 " + wrapperClass}>
         <FieldLabel field={field} />
-        <div className="flex items-center justify-between gap-3 rounded-md border-2 border-on-surface/20 bg-surface-container-lowest px-3 py-3">
+        <div className="flex items-center justify-between gap-3 rounded-md border border-on-surface/8 bg-surface-container px-3 py-3">
           <p className="min-w-0 text-body-sm text-on-surface-variant">
             Written in the Essay Assistant.
           </p>
           <Link
             to="/essay"
             search={{ conceptKey: field.conceptKey } as never}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface qc-hard-shadow-sm hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <PenLine className="h-3.5 w-3.5 text-primary" />
             Write in Essay Assistant
@@ -381,7 +381,7 @@ function ScalarField({
   }
 
   const inputClass =
-    "w-full min-w-0 rounded-md border-2 border-on-surface/20 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none";
+    "w-full min-w-0 rounded-md border border-on-surface/15 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none";
 
   const maxAttr = field.maxChars ? { maxLength: field.maxChars } : {};
   const counter =
@@ -517,7 +517,7 @@ function RepeatGroupEditor({
       {indexes.map((index) => (
         <div
           key={index}
-          className="rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-4"
+          className="rounded-xl border border-on-surface/8 bg-surface-container/50 p-4"
         >
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
@@ -550,7 +550,7 @@ function RepeatGroupEditor({
         <button
           type="button"
           onClick={() => setCount((c) => Math.min(group.max, c + 1))}
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+          className="inline-flex items-center gap-1.5 rounded-md border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
         >
           <Plus className="h-4 w-4 text-primary" />
           Add another {group.itemLabel.toLowerCase()}

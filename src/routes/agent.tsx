@@ -19,7 +19,6 @@ import {
   Trophy,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -61,7 +60,6 @@ function AgentPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <SilentErrorBoundary fallback={<AgentFallback />}>
         {isHydrated ? <AgentCockpit /> : <AgentLoading />}
       </SilentErrorBoundary>
@@ -143,15 +141,15 @@ function AgentCockpit() {
   return (
     <main
       id="main-content"
-      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
+      className="mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
     >
-      <header className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-7">
+      <header className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-7">
         <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
-            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
+            <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.12em] text-on-surface-variant/70">
               Autonomous application cockpit
             </p>
-            <h1 className="mt-2 font-display text-display-md font-bold text-on-surface">
+            <h1 className="mt-2 font-display text-headline-lg font-bold text-on-surface">
               Deep agent, real roadmap, ready applications.
             </h1>
             <p className="mt-3 max-w-2xl text-body-lg text-on-surface-variant">
@@ -165,7 +163,7 @@ function AgentCockpit() {
               type="button"
               onClick={() => void onRefresh()}
               disabled={busy !== null}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
             >
               {busy === "refresh" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -178,7 +176,7 @@ function AgentCockpit() {
               type="button"
               onClick={() => void onStart()}
               disabled={busy !== null || runInFlight}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
               {busy === "start" || runInFlight ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,7 +193,7 @@ function AgentCockpit() {
         </div>
 
         {run && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border-2 border-on-surface/15 bg-surface px-4 py-3">
+          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-on-surface/8 bg-surface-container px-4 py-3">
             <span className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-primary">
               {runInFlight ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
               Agent run
@@ -210,7 +208,7 @@ function AgentCockpit() {
         )}
 
         {(startError || actionError) && (
-          <div className="mt-4 rounded-lg border-2 border-error bg-error-container/60 px-4 py-3 text-body-sm text-on-error-container">
+          <div className="mt-4 rounded-xl border border-error/20 bg-error-container/50 px-4 py-3 text-body-sm text-on-error-container">
             {actionError ?? startError}
           </div>
         )}
@@ -262,10 +260,10 @@ function AgentLoading() {
   return (
     <main
       id="main-content"
-      className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
+      className="mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12"
       aria-busy="true"
     >
-      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-7">
+      <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-7">
         <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <div className="h-4 w-52 rounded-full bg-primary/20" />
@@ -274,13 +272,13 @@ function AgentLoading() {
             <div className="mt-2 h-4 w-3/4 rounded-full bg-on-surface/10" />
           </div>
           <div className="flex shrink-0 gap-2">
-            <div className="h-11 w-36 rounded-md border-2 border-on-surface/20 bg-surface" />
-            <div className="h-11 w-40 rounded-md border-2 border-on-surface/20 bg-primary/20" />
+            <div className="h-11 w-36 rounded-lg border border-on-surface/10 bg-surface" />
+            <div className="h-11 w-40 rounded-lg border border-on-surface/10 bg-primary/20" />
           </div>
         </div>
         <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 xl:grid-cols-4">
           {["Saved targets", "Ready packages", "Scholarships", "Applied"].map((label) => (
-            <div key={label} className="rounded-lg border-2 border-on-surface/15 bg-surface p-4">
+            <div key={label} className="rounded-xl border border-on-surface/8 bg-surface-container p-4">
               <div className="h-3 w-24 rounded-full bg-on-surface/10" />
               <div className="mt-3 h-8 w-12 rounded bg-on-surface/10" />
               <div className="mt-2 h-3 w-32 rounded-full bg-on-surface/10" />
@@ -291,7 +289,7 @@ function AgentLoading() {
       <section className="mt-5 grid grid-cols-1 gap-4 sm:mt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-4">
           {[0, 1, 2].map((item) => (
-            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface/80 p-4 sm:p-5">
+            <div key={item} className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
               <div className="h-4 w-40 rounded-full bg-on-surface/10" />
               <div className="mt-4 h-7 w-2/3 rounded bg-on-surface/10" />
               <div className="mt-3 h-4 w-full rounded-full bg-on-surface/10" />
@@ -301,12 +299,12 @@ function AgentLoading() {
         </div>
         <aside className="space-y-4">
           {[0, 1, 2].map((item) => (
-            <div key={item} className="rounded-xl border-2 border-on-surface/15 bg-surface-container-lowest p-4 sm:p-5">
+            <div key={item} className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
               <div className="h-4 w-32 rounded-full bg-on-surface/10" />
               <div className="mt-4 space-y-2">
-                <div className="h-12 rounded-lg bg-surface" />
-                <div className="h-12 rounded-lg bg-surface" />
-                <div className="h-12 rounded-lg bg-surface" />
+                <div className="h-12 rounded-lg bg-surface-container" />
+                <div className="h-12 rounded-lg bg-surface-container" />
+                <div className="h-12 rounded-lg bg-surface-container" />
               </div>
             </div>
           ))}
@@ -318,8 +316,8 @@ function AgentLoading() {
 
 function AgentFallback() {
   return (
-    <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12">
-      <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow sm:p-6">
+    <main className="mx-auto w-full max-w-(--container-content) px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12">
+      <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-6">
         <div className="flex items-start gap-4">
           <AlertTriangle className="mt-1 h-6 w-6 shrink-0 text-primary" />
           <div>
@@ -331,7 +329,7 @@ function AgentFallback() {
             </p>
             <Link
               to="/apply"
-              className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
             >
               Applications <ArrowRight className="h-4 w-4" />
             </Link>
@@ -355,14 +353,14 @@ function MetricCard({
 }) {
   const toneClass =
     tone === "ready"
-      ? "bg-tertiary-fixed text-on-tertiary-fixed"
+      ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
       : tone === "aid"
-        ? "bg-secondary-container text-on-secondary-container"
+        ? "bg-secondary-fixed text-on-secondary-fixed-variant"
         : tone === "applied"
-          ? "bg-primary-fixed text-on-primary-fixed"
-          : "bg-surface text-on-surface";
+          ? "bg-primary-fixed text-on-primary-fixed-variant"
+          : "bg-surface-container text-on-surface";
   return (
-    <div className={`rounded-lg border-2 border-on-surface/20 p-4 ${toneClass}`}>
+    <div className={`rounded-xl p-4 ${toneClass}`}>
       <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] opacity-80">
         {label}
       </p>
@@ -395,33 +393,33 @@ function NextActionPanel({
     ? "The agent has generated usable roadmap artifacts. Check readiness, recommendations, affordability signals, evidence, and extension sync below."
     : "The agent will synthesize saved targets, matching results, scholarships, requirements, and extension readiness into one actionable plan.";
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-secondary-container p-4 qc-hard-shadow sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.16em] text-on-surface/70">
+          <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.12em] text-primary">
             Next best action
           </p>
           <h2 className="mt-1 font-display text-headline-md font-bold text-on-surface">
             {first?.label ?? fallbackTitle}
           </h2>
-          <p className="mt-2 max-w-2xl text-body-md text-on-surface/80">
+          <p className="mt-2 max-w-2xl text-body-md text-on-surface-variant">
             {roadmapSummary ?? fallbackSummary}
           </p>
           {running && (
-            <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-on-surface/20 bg-surface/70 px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-surface-container px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
               {run.progress?.message ?? run.status ?? "Agent running"}
               {typeof run.progress?.percent === "number" ? ` - ${run.progress.percent}%` : ""}
             </p>
           )}
           {hasRoadmapOutput && !run?.error && (
-            <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-tertiary/30 bg-tertiary-container/70 px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-tertiary-container">
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-tertiary-fixed px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-tertiary-fixed-variant">
               <CheckCircle2 className="h-3.5 w-3.5" />
               Latest roadmap ready
             </p>
           )}
           {run?.error && (
-            <p className="mt-3 rounded-md border border-error/40 bg-error-container/60 px-3 py-2 text-body-sm text-on-error-container">
+            <p className="mt-3 rounded-xl border border-error/20 bg-error-container/50 px-3 py-2 text-body-sm text-on-error-container">
               {run.error}
             </p>
           )}
@@ -438,7 +436,7 @@ function ActionDestination({ action }: { action?: RoadmapAction }) {
     <Link
       to={to.to as never}
       params={to.params as never}
-      className="inline-flex shrink-0 items-center gap-2 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+      className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
     >
       {to.label} <ArrowRight className="h-4 w-4" />
     </Link>
@@ -465,13 +463,13 @@ function TargetReadinessPanel({
   }
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface/95 p-4 qc-hard-shadow-sm sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={ShieldCheck}
         title="Target readiness"
         body="Same readiness contract used by the extension package gate."
       />
-      <div className="mt-4 divide-y-2 divide-on-surface/10">
+      <div className="mt-4 divide-y divide-on-surface/8">
         {targets.map((target) => {
           const key = targetKey(target);
           const submission = submissions.find((item) => item.targetId === key);
@@ -507,14 +505,14 @@ function TargetReadinessPanel({
                   <Link
                     to="/application/$system/$externalId"
                     params={{ system: target.system, externalId: target.externalId }}
-                    className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                    className="inline-flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface transition-colors hover:bg-on-surface/5"
                   >
                     Target detail <ArrowRight className="h-4 w-4" />
                   </Link>
                 ) : (
                   <Link
                     to="/apply"
-                    className="inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface transition-colors hover:bg-on-surface/5"
                   >
                     Guided prep <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -541,7 +539,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
     );
   }
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={Sparkles}
         title="Unsaved recommendations"
@@ -549,7 +547,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
       />
       <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         {targets.map((target) => (
-          <article key={targetKey(target)} className="min-w-0 rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest p-4">
+          <article key={targetKey(target)} className="min-w-0 rounded-xl border border-on-surface/8 bg-surface-container p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="truncate font-display text-headline-sm font-bold text-on-surface">
@@ -560,7 +558,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
                 </p>
               </div>
               {typeof target.aidScore === "number" && (
-                <span className="rounded-full bg-secondary-container px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-secondary-container">
+                <span className="rounded-full bg-secondary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-secondary-fixed-variant">
                   Aid {Math.round(target.aidScore * 100)}
                 </span>
               )}
@@ -593,7 +591,7 @@ function RecommendationPanel({ targets }: { targets: PortfolioTarget[] }) {
       <Link
         to="/universities"
         search={{ q: "" }}
-        className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-3 py-2 font-[var(--font-label)] text-label-sm font-bold text-on-surface transition-colors hover:bg-on-surface/5"
       >
         Open search <ArrowRight className="h-4 w-4" />
       </Link>
@@ -609,7 +607,7 @@ function ScholarshipPanel({
   programs: ScholarshipProgram[];
 }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-secondary-container/70 p-4 sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={Trophy}
         title="Scholarship path"
@@ -620,7 +618,7 @@ function ScholarshipPanel({
           {programs.map((program, index) => (
             <article
               key={`${program.name ?? "program"}-${index}`}
-              className="rounded-lg border-2 border-on-surface/15 bg-surface/80 p-3"
+              className="rounded-xl border border-on-surface/8 bg-surface-container p-3"
             >
               <h3 className="font-[var(--font-label)] text-label-md font-bold text-on-surface">
                 {program.name ?? "Scholarship program"}
@@ -644,7 +642,7 @@ function ScholarshipPanel({
           ))}
         </div>
       ) : (
-        <p className="mt-4 rounded-lg border-2 border-dashed border-on-surface/20 bg-surface/50 p-4 text-body-sm text-on-surface-variant">
+        <p className="mt-4 rounded-xl border border-dashed border-on-surface/20 bg-surface-container/50 p-4 text-body-sm text-on-surface-variant">
           Run roadmap after completing profile affordability details. Scholarship-backed
           programs show here with deadlines and eligibility.
         </p>
@@ -661,13 +659,13 @@ function ExtensionSyncPanel({
   eventCount: number;
 }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={BadgeCheck}
         title="Extension sync"
         body="Chrome and Firefox use target-specific ready packages only."
       />
-      <div className="mt-4 rounded-lg border-2 border-on-surface/15 bg-surface p-3">
+      <div className="mt-4 rounded-xl border border-on-surface/8 bg-surface-container p-3">
         <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-on-surface/70">
           Latest event
         </p>
@@ -785,13 +783,13 @@ function DecisionTracePanel({
   ] as const;
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={CalendarClock}
         title="Decision trace"
         body="What the agent can currently prove from your workspace."
       />
-      <div className="mt-4 rounded-lg border-2 border-on-surface/15 bg-surface p-3">
+      <div className="mt-4 rounded-xl border border-on-surface/8 bg-surface-container p-3">
         <p className="font-[var(--font-label)] text-label-sm font-bold uppercase tracking-[0.12em] text-on-surface/70">
           Last synthesis
         </p>
@@ -806,7 +804,7 @@ function DecisionTracePanel({
       </div>
       <div className="mt-3 space-y-2">
         {rows.map((row) => (
-          <div key={row.label} className="rounded-lg border-2 border-on-surface/10 bg-surface p-3">
+          <div key={row.label} className="rounded-xl border border-on-surface/8 bg-surface-container p-3">
             <div className="flex flex-col gap-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -844,7 +842,7 @@ function GuardrailsPanel() {
   ] as const;
 
   return (
-    <section className="rounded-xl border-2 border-on-surface bg-surface-container-lowest p-4 qc-hard-shadow-sm sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader
         icon={ShieldCheck}
         title="Agent guardrails"
@@ -852,7 +850,7 @@ function GuardrailsPanel() {
       />
       <div className="mt-4 space-y-2">
         {rails.map(([title, body]) => (
-          <div key={title} className="rounded-lg border-2 border-on-surface/15 bg-surface p-3">
+          <div key={title} className="rounded-xl border border-on-surface/8 bg-surface-container p-3">
             <p className="font-[var(--font-label)] text-label-md font-bold text-on-surface">{title}</p>
             <p className="mt-1 text-label-sm text-on-surface-variant">{body}</p>
           </div>
@@ -890,7 +888,7 @@ function TipsPanel({
   });
 
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader icon={FileText} title="Grounded tips" body="No generic advice passes the backend validator." />
       {hasBlockerTip && (
         <p className="mt-3 rounded-lg border border-on-surface/15 bg-surface-container px-3 py-2 text-label-sm text-on-surface-variant">
@@ -915,7 +913,7 @@ function TipsPanel({
             return (
               <article
                 key={tip.id ?? tip.title}
-                className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3"
+                className="rounded-xl border border-on-surface/8 bg-surface-container p-3"
               >
                 <div className="flex items-start gap-2">
                   <PriorityDot priority={tip.priority} />
@@ -968,7 +966,7 @@ function BlockerTipCard({
     (total > 0 ? `Complete ${total - done} required item${total - done === 1 ? "" : "s"}.` : "Complete required items.");
 
   return (
-    <article className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3">
+    <article className="rounded-xl border border-on-surface/8 bg-surface-container p-3">
       <div className="flex items-start gap-2">
         <PriorityDot priority={tip.priority} />
         <div className="min-w-0 flex-1">
@@ -979,7 +977,7 @@ function BlockerTipCard({
             <span className="font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant">
               {percent}% done · {done}/{total} required
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2 py-0.5 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed-variant">
               <AlertTriangle className="h-3 w-3" /> {blocking} blocker{blocking === 1 ? "" : "s"}
             </span>
           </div>
@@ -1001,7 +999,7 @@ function BlockerTipCard({
 
 function EventLog({ events }: { events: AgentEvent[] }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader icon={ScrollText} title="Run log" body="What the agent, web, worker, and extension checked." />
       {events.length ? (
         <ol className="mt-4 space-y-3">
@@ -1030,14 +1028,14 @@ function EventLog({ events }: { events: AgentEvent[] }) {
 
 function AppliedTracker({ submissions }: { submissions: ApplicationSubmission[] }) {
   return (
-    <section className="rounded-xl border-2 border-on-surface/20 bg-surface/90 p-4 sm:p-5">
+    <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
       <PanelHeader icon={CheckCircle2} title="Applied tracker" body="Fill success is not submission. Human confirmation wins." />
       {submissions.length ? (
         <div className="mt-4 space-y-2">
           {submissions.slice(0, 6).map((submission) => (
             <article
               key={submission._id ?? submission.targetId}
-              className="rounded-lg border-2 border-on-surface/10 bg-surface-container-lowest p-3"
+              className="rounded-xl border border-on-surface/8 bg-surface-container p-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -1082,7 +1080,7 @@ function EmptyPanel({
   cta: string;
 }) {
   return (
-    <section className="rounded-xl border-2 border-dashed border-on-surface/25 bg-surface/70 p-4 sm:p-6">
+    <section className="rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-4 sm:p-6">
       <div className="flex items-start gap-4">
         <Icon className="mt-1 h-6 w-6 shrink-0 text-primary" />
         <div>
@@ -1090,7 +1088,7 @@ function EmptyPanel({
           <p className="mt-1 max-w-2xl text-body-md text-on-surface-variant">{body}</p>
           <Link
             to={to as never}
-            className="mt-4 inline-flex items-center gap-2 rounded-md border-2 border-on-surface bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-4 py-2 font-[var(--font-label)] text-label-md font-bold text-on-surface transition-colors hover:bg-on-surface/5"
           >
             {cta} <ArrowRight className="h-4 w-4" />
           </Link>
@@ -1111,7 +1109,7 @@ function PanelHeader({
 }) {
   return (
     <header className="flex items-start gap-3">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border-2 border-on-surface/15 bg-surface text-primary">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-fixed text-on-primary-fixed-variant">
         <Icon className="h-5 w-5" />
       </span>
       <div>
@@ -1124,11 +1122,11 @@ function PanelHeader({
 
 function ReadinessBadge({ ready, blocking }: { ready: boolean; blocking: number }) {
   return ready ? (
-    <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-tertiary-fixed">
+    <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-tertiary-fixed-variant">
       <CheckCircle2 className="h-3.5 w-3.5" /> Ready
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed">
+    <span className="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-on-primary-fixed-variant">
       <AlertTriangle className="h-3.5 w-3.5" /> {blocking} blocker{blocking === 1 ? "" : "s"}
     </span>
   );
@@ -1140,7 +1138,7 @@ function StatusChip({ label, quiet = false }: { label: string; quiet?: boolean }
       className={`inline-flex rounded-full px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold ${
         quiet
           ? "bg-surface-container text-on-surface-variant"
-          : "bg-secondary-container text-on-secondary-container"
+          : "bg-secondary-fixed text-on-secondary-fixed-variant"
       }`}
     >
       {label}

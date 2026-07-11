@@ -16,7 +16,7 @@ export function DemoTicker({
 
   return (
     <div
-      className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border-2 border-on-surface/20 bg-surface px-3 py-2 qc-hard-shadow-sm"
+      className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2 qc-soft-shadow"
       aria-live="polite"
     >
       <span
@@ -29,10 +29,10 @@ export function DemoTicker({
         Filling <span className="font-semibold">{field.label}</span>
       </span>
       <span
-        className={`inline-flex items-center rounded-md border-2 px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
+        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
           yours
-            ? "border-tertiary/60 bg-tertiary-container/50 text-on-surface"
-            : "border-secondary/50 bg-secondary-container/60 text-on-surface"
+            ? "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+            : "bg-secondary-fixed text-on-secondary-fixed-variant"
         }`}
       >
         {yours ? "your answer" : "example"}

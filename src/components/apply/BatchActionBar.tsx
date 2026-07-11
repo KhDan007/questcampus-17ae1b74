@@ -74,7 +74,7 @@ export function BatchActionBar() {
           frame on throttled mobile browsers). */}
       {count > 0 && (
         <div
-          className="fixed inset-x-0 bottom-20 z-40 mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-2xl border-2 border-on-surface bg-surface/95 px-4 py-3 backdrop-blur-md qc-hard-shadow sm:bottom-4 sm:flex-row sm:items-center sm:gap-3"
+          className="fixed inset-x-0 bottom-20 z-40 mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-2xl border border-on-surface/8 bg-surface-container-lowest px-4 py-3 qc-soft-shadow sm:bottom-4 sm:flex-row sm:items-center sm:gap-3"
           style={{ width: "calc(100% - 2rem)" }}
         >
           <div className="flex items-center gap-2 sm:gap-3">
@@ -82,7 +82,7 @@ export function BatchActionBar() {
               type="button"
               onClick={clear}
               aria-label="Clear selection"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-on-surface bg-surface text-on-surface hover:bg-surface-container"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
             >
               <X className="h-4 w-4" />
             </button>
@@ -106,7 +106,7 @@ export function BatchActionBar() {
               type="button"
               disabled={busy}
               onClick={addAll}
-              className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-4"
+              className="inline-flex flex-1 shrink-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3.5 py-2 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-4"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               {toResearch.length === 0

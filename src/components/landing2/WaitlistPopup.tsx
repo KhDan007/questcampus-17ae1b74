@@ -85,7 +85,7 @@ export function WaitlistPopup({
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-[420px] rounded-2xl border-2 border-on-surface bg-surface p-6 qc-hard-shadow"
+            className="relative w-full max-w-[420px] rounded-2xl border border-on-surface/10 bg-surface-container-lowest p-6 qc-soft-shadow"
           >
             <button
               type="button"
@@ -98,7 +98,7 @@ export function WaitlistPopup({
 
             {!done ? (
               <form onSubmit={onSubmit}>
-                <div className="grid h-11 w-11 place-items-center rounded-full border-2 border-on-surface bg-primary text-white qc-hard-shadow-sm">
+                <div className="grid h-11 w-11 place-items-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <h3
@@ -116,7 +116,7 @@ export function WaitlistPopup({
                   Your email
                 </label>
                 <div
-                  className={`mt-2 flex items-center gap-2 rounded-sm border-2 bg-surface-container-lowest px-3 transition-colors focus-within:border-primary ${error ? "border-error" : "border-on-surface"}`}
+                  className={`mt-2 flex items-center gap-2 rounded-lg border bg-surface px-3 transition-colors focus-within:border-primary ${error ? "border-error" : "border-on-surface/15"}`}
                 >
                   <Mail className="h-4 w-4 text-on-surface-variant" />
                   <input
@@ -139,7 +139,7 @@ export function WaitlistPopup({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-display text-label-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join the waitlist"}
                 </button>
@@ -167,7 +167,7 @@ export function WaitlistPopup({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-md border-2 border-on-surface bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface qc-hard-shadow-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg border border-on-surface/15 bg-surface px-5 py-2.5 font-[var(--font-label)] text-label-md font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
                 >
                   Close
                 </button>

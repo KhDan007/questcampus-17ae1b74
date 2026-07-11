@@ -27,7 +27,6 @@ import {
   subMonths,
 } from "date-fns";
 import { api } from "@/convex/_generated/api";
-import { LivingBackground } from "@/components/landing2/LivingBackground";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
 
@@ -115,8 +114,7 @@ function PlanPage() {
   if (!isHydrated) {
     return (
       <DashboardShell>
-        <LivingBackground />
-        <main className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12">
+        <main className="mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12">
           <div className="inline-flex items-center gap-2 text-body-sm text-on-surface-variant">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading your plan...
           </div>
@@ -131,16 +129,15 @@ function PlanPage() {
 
   return (
     <DashboardShell>
-      <LivingBackground />
       <main
         id="main-content"
-        className="relative mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12"
+        className="mx-auto w-full max-w-(--container-content) px-5 pb-24 pt-20 sm:px-8 sm:pt-24 lg:px-12"
       >
         <header>
           <p className="font-[var(--font-label)] text-label-sm uppercase tracking-[0.18em] text-primary">
             Your plan
           </p>
-          <h1 className="mt-2 font-display text-display-md text-on-surface text-balance">
+          <h1 className="mt-2 font-display text-headline-lg font-bold text-on-surface text-balance">
             Every application, one schedule.
           </h1>
           <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
@@ -162,7 +159,7 @@ function PlanPage() {
 
         {/* View toggle */}
         <div className="mt-5 sm:mt-8">
-          <div className="inline-flex flex-wrap gap-1 rounded-full border-2 border-on-surface bg-surface p-1 qc-hard-shadow-sm">
+          <div className="inline-flex flex-wrap gap-1 rounded-full bg-surface-container p-1">
             {(
               [
                 { k: "todo", label: "To-do" },
@@ -175,9 +172,9 @@ function PlanPage() {
                   key={t.k}
                   type="button"
                   onClick={() => setView(t.k)}
-                  className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-all ${
+                  className={`rounded-full px-5 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-colors ${
                     active
-                      ? "bg-primary text-white qc-hard-shadow-sm"
+                      ? "bg-surface-container-lowest text-primary qc-soft-shadow"
                       : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
@@ -226,13 +223,13 @@ function SummaryChip({
   return (
     <span
       className={
-        "inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 font-[var(--font-label)] text-label-sm " +
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-[var(--font-label)] text-label-sm " +
         (tone === "error"
-          ? "border-error bg-error-container/40 text-on-surface"
-          : "border-on-surface/20 bg-surface text-on-surface-variant")
+          ? "bg-error-container/50 text-on-error-container"
+          : "bg-surface-container text-on-surface-variant")
       }
     >
-      <span className="font-bold text-on-surface">{value}</span> {label}
+      <span className={`font-bold ${tone === "error" ? "text-on-error-container" : "text-on-surface"}`}>{value}</span> {label}
     </span>
   );
 }
@@ -277,7 +274,7 @@ function TaskRow({
   const Icon = kindIcon(task.kind);
   const overdue = task.deadlineMs != null && task.deadlineMs < nowMs && !done;
   return (
-    <li className="flex items-start gap-3 rounded-xl border-2 border-on-surface/15 bg-surface p-3 qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none">
+    <li className="flex items-start gap-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-3 qc-soft-shadow transition-colors hover:bg-on-surface/[0.03]">
       <input
         type="checkbox"
         checked={done}
@@ -289,7 +286,7 @@ function TaskRow({
         href={task.route}
         className="flex min-w-0 flex-1 items-start gap-3"
       >
-        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-on-surface/15 bg-surface-container-lowest text-primary">
+        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-container text-on-surface-variant">
           <Icon className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
@@ -306,14 +303,14 @@ function TaskRow({
             </p>
           )}
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center rounded-full border border-on-surface/20 bg-surface px-2 py-0.5 text-label-sm text-on-surface-variant">
+            <span className="inline-flex items-center rounded-full bg-surface-container px-2 py-0.5 text-label-sm text-on-surface-variant">
               {task.targetName}
             </span>
             <span className="font-[var(--font-label)] text-label-sm text-on-surface/50">
               {task.estimateMin}m
             </span>
             {overdue && (
-              <span className="inline-flex items-center rounded-full border border-error bg-error-container/40 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface">
+              <span className="inline-flex items-center rounded-full bg-error-container/50 px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-error-container">
                 overdue
               </span>
             )}
@@ -353,13 +350,13 @@ function TodoView({
       {plan.days.map((day) => (
         <section
           key={day.date}
-          className="rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:p-5"
+          className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5"
         >
           <header className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-headline-sm font-bold text-on-surface">
               {dayHeading(day.date, nowMs)}
             </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/20 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
               <CalendarClock className="h-3.5 w-3.5" />
               {fmtMin(day.totalMin)}
             </span>
@@ -379,7 +376,7 @@ function TodoView({
       ))}
 
       {plan.unscheduled.length > 0 && (
-        <section className="rounded-2xl border-2 border-on-surface/15 bg-surface/80 p-4 qc-hard-shadow-sm sm:p-5">
+        <section className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
           <header className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-headline-sm font-bold text-on-surface">Anytime</h2>
             <span className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
@@ -450,7 +447,7 @@ function CalendarView({
             type="button"
             onClick={() => setCursor((c) => subMonths(c, 1))}
             aria-label="Previous month"
-            className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface transition-colors hover:border-on-surface"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -458,7 +455,7 @@ function CalendarView({
             type="button"
             onClick={() => setCursor((c) => addMonths(c, 1))}
             aria-label="Next month"
-            className="grid h-9 w-9 place-items-center rounded-md border-2 border-on-surface/20 bg-surface text-on-surface transition-colors hover:border-on-surface"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-on-surface/15 bg-surface text-on-surface transition-colors hover:bg-on-surface/5"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -493,14 +490,14 @@ function CalendarView({
               type="button"
               disabled={!hasTasks}
               onClick={() => setSelected(isSelected ? null : key)}
-              className={`flex min-h-[68px] min-w-0 flex-col rounded-lg border-2 p-1.5 text-left transition-colors sm:min-h-[92px] sm:p-2 ${
+              className={`flex min-h-[68px] min-w-0 flex-col rounded-lg border p-1.5 text-left transition-colors sm:min-h-[92px] sm:p-2 ${
                 isSelected
-                  ? "border-on-surface bg-secondary-container"
+                  ? "border-transparent bg-primary-fixed/70"
                   : hasTasks
-                    ? "border-on-surface/20 bg-surface hover:border-on-surface"
-                    : "border-on-surface/10 bg-surface/60"
+                    ? "border-on-surface/10 bg-surface-container-lowest hover:bg-on-surface/[0.03]"
+                    : "border-on-surface/8 bg-surface-container/40"
               } ${inMonth ? "" : "opacity-40"} ${
-                isToday ? "ring-2 ring-primary ring-offset-1 ring-offset-surface" : ""
+                isToday ? "ring-1 ring-primary ring-offset-1 ring-offset-surface" : ""
               } ${hasTasks ? "cursor-pointer" : "cursor-default"}`}
             >
               <span
@@ -518,7 +515,7 @@ function CalendarView({
                     {day.tasks.slice(0, 2).map((task) => (
                       <span
                         key={task.id}
-                        className="truncate rounded bg-primary/10 px-1 py-0.5 text-[10px] leading-tight text-on-surface"
+                        className="truncate rounded bg-primary-fixed/60 px-1 py-0.5 text-[10px] leading-tight text-on-primary-fixed-variant"
                       >
                         {task.label}
                       </span>
@@ -548,12 +545,12 @@ function CalendarView({
 
       {/* Selected-day panel */}
       {selectedDay && (
-        <section className="mt-5 rounded-2xl border-2 border-on-surface bg-surface p-4 qc-hard-shadow-sm sm:mt-6 sm:p-5">
+        <section className="mt-5 rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:mt-6 sm:p-5">
           <header className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-display text-headline-sm font-bold text-on-surface">
               {dayHeading(selectedDay.date, nowMs)}
             </h3>
-            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-on-surface/20 bg-surface px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3 py-1 font-[var(--font-label)] text-label-sm text-on-surface-variant">
               <CalendarClock className="h-3.5 w-3.5" />
               {fmtMin(selectedDay.totalMin)}
             </span>
@@ -581,8 +578,8 @@ function CalendarView({
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-on-surface/25 bg-surface/60 p-10 text-center">
-      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border-2 border-on-surface bg-surface qc-hard-shadow-sm">
+    <div className="rounded-2xl border border-dashed border-on-surface/20 bg-surface-container-lowest p-10 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-surface-container text-on-surface-variant">
         <CalendarClock className="h-5 w-5" />
       </div>
       <h2 className="mt-4 font-display text-title-lg font-bold text-on-surface">
@@ -595,7 +592,7 @@ function EmptyState() {
       <Link
         to="/universities"
         search={{ q: "" } as never}
-        className="mt-5 inline-flex items-center gap-1.5 rounded-md border-2 border-on-surface bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white qc-hard-shadow-sm transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-none"
+        className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
       >
         Find universities
       </Link>
