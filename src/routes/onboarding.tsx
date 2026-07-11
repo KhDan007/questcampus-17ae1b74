@@ -851,7 +851,7 @@ function OnboardingPage() {
                 type="button"
                 disabled={!canSubmit || submitting}
                 onClick={onSubmit}
-                className="group inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-display text-title-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3.5 sm:text-headline-sm"
+                className="group inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-display text-body-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3.5 sm:text-headline-sm"
               >
                 {submitting ? (
                   <>
