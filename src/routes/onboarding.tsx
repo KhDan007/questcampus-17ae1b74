@@ -838,7 +838,7 @@ function OnboardingPage() {
 
         </div>
 
-        <div className="sticky bottom-4 z-20 mt-12 pr-[5.5rem] sm:pr-0">
+        <div className="sticky bottom-4 z-20 mt-12 pr-24 sm:pr-0">
           <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
             <div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
               <p className="font-[var(--font-label)] text-label-md text-on-surface-variant">
