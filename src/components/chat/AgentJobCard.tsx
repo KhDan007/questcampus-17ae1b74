@@ -16,7 +16,10 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
   const [busy, setBusy] = useState(false);
 
   const cancellable = job.status === "queued" || job.status === "running";
-  const lastLog = job.log.length > 0 ? job.log[job.log.length - 1] : undefined;
+  // Guard the lists — a job row missing log/todos must not throw during render.
+  const log = Array.isArray(job.log) ? job.log : [];
+  const todos = Array.isArray(job.todos) ? job.todos : [];
+  const lastLog = log.length > 0 ? log[log.length - 1] : undefined;
 
   async function onCancel() {
     if (busy) return;
@@ -53,9 +56,9 @@ export function AgentJobCard({ job }: { job: AgentJob }) {
       </div>
 
       {/* Todo checklist */}
-      {job.todos.length > 0 && (
+      {todos.length > 0 && (
         <ul className="mt-2 space-y-1">
-          {job.todos.map((t) => (
+          {todos.map((t) => (
             <TodoRow key={t.id} todo={t} reduce={!!reduce} />
           ))}
         </ul>

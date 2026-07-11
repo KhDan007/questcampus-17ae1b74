@@ -98,17 +98,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             Go home
           </a>
         </div>
-        {/* Surface the real error so a crash on a real device can be read/
-            screenshotted without remote devtools. */}
-        <details className="mt-6 text-left">
-          <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
-            Error details
-          </summary>
-          <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-md border border-input bg-muted p-3 text-left text-[11px] leading-snug text-foreground">
-            {String((error && (error.message || error.toString())) || "Unknown error")}
-            {error?.stack ? `\n\n${error.stack}` : ""}
-          </pre>
-        </details>
       </div>
     </div>
   );
