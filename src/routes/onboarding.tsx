@@ -840,18 +840,18 @@ function OnboardingPage() {
 
         <div className="sticky bottom-4 z-20 mt-12 pr-24 sm:pr-0">
           <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow sm:p-5">
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
               <p className="font-[var(--font-label)] text-label-md text-on-surface-variant">
                 {countFilled(answers)} of 14 answered
                 {!canSubmit && (
-                  <span className="ml-1 block text-primary sm:inline">· pick at least one study field</span>
+                  <span className="mt-0.5 block text-primary sm:ml-1 sm:mt-0 sm:inline">· pick at least one study field</span>
                 )}
               </p>
               <button
                 type="button"
                 disabled={!canSubmit || submitting}
                 onClick={onSubmit}
-                className="group inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-display text-title-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3.5 sm:text-headline-sm"
+                className="group inline-flex min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-display text-body-lg font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:px-6 sm:py-3.5 sm:text-headline-sm"
               >
                 {submitting ? (
                   <>
