@@ -3,7 +3,11 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-type Props = { children: string; className?: string };
+type Props = {
+  children: string;
+  className?: string;
+  onInternalNavigate?: (href: string) => void;
+};
 
 /**
  * Compact, chat-friendly markdown renderer.
@@ -11,7 +15,7 @@ type Props = { children: string; className?: string };
  * - No raw HTML (input is untrusted LLM text)
  * - Headings downsized to inline chat text sizes
  */
-export function Markdown({ children, className }: Props) {
+export function Markdown({ children, className, onInternalNavigate }: Props) {
   return (
     <div
       className={`text-body-sm text-on-surface [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${className ?? ""}`}
@@ -26,16 +30,37 @@ export function Markdown({ children, className }: Props) {
             <strong className="font-semibold text-on-surface">{children}</strong>
           ),
           em: ({ children }) => <em className="italic">{children}</em>,
-          a: ({ children, href }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2 hover:opacity-80"
-            >
-              {children}
-            </a>
-          ),
+          a: ({ children, href }) => {
+            const h = typeof href === "string" ? href : "";
+            const isInternal = h.startsWith("/") && !h.startsWith("//");
+            if (isInternal) {
+              if (!onInternalNavigate) {
+                // No SPA handler wired here: plain in-page link so nothing is dead.
+                return (
+                  <a href={h} className="text-primary underline underline-offset-2 hover:opacity-80">
+                    {children}
+                  </a>
+                );
+              }
+              return (
+                <a
+                  href={h}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onInternalNavigate(h);
+                  }}
+                  className="cursor-pointer text-primary underline underline-offset-2 hover:opacity-80"
+                >
+                  {children}
+                </a>
+              );
+            }
+            return (
+              <a href={h} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:opacity-80">
+                {children}
+              </a>
+            );
+          },
           ul: ({ children }) => (
             <ul className="my-1 list-disc space-y-0.5 pl-5">{children}</ul>
           ),

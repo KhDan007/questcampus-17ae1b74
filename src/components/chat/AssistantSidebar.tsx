@@ -885,6 +885,7 @@ function MessageRow({
 }) {
   const isUser = message.role === "user";
   const friendlySteps = isUser ? [] : friendlyStepLabels(message.steps ?? []);
+  const navigate = useNavigate();
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -905,7 +906,15 @@ function MessageRow({
                 {friendlySteps.join(" · ")}
               </p>
             ) : null}
-            <Markdown>{message.content ?? ""}</Markdown>
+            <Markdown
+              onInternalNavigate={(href) => {
+                const normalized = normalizeAssistantRoute(href);
+                if (!normalized) return; // off-allowlist: ignore (link already rendered plainly)
+                void navigateInternal(normalized, navigate);
+              }}
+            >
+              {message.content ?? ""}
+            </Markdown>
             {message.streaming && (
               <span className="ml-0.5 inline-block h-3 w-[2px] animate-pulse bg-current align-middle" />
             )}
