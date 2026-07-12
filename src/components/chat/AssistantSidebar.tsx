@@ -349,6 +349,14 @@ function SidebarPanel({
             <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-surface bg-primary" />
           )}
         </button>
+        {credits && (
+          <span
+            title={`${credits.remaining} agent credits left (${credits.tier})`}
+            className="mt-2 rounded-full bg-primary-fixed/70 px-1.5 py-0.5 text-label-sm font-semibold text-primary"
+          >
+            {credits.remaining}
+          </span>
+        )}
       </motion.aside>
     );
   }
@@ -391,15 +399,17 @@ function SidebarPanel({
               title={
                 credits.remaining <= 0
                   ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
-                  : `${credits.remaining} of ${credits.grant} left — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+                  : `${credits.remaining} of ${credits.grant} left (${credits.tier}) — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
               }
-              className={`hidden shrink-0 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold @[420px]:inline-block ${
+              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
                 credits.remaining <= 0
                   ? "bg-surface-container text-on-surface-variant"
                   : "bg-primary-fixed/70 text-primary"
               }`}
             >
-              {credits.remaining} credits
+              <span>{credits.remaining}</span>
+              <span className="hidden @[360px]:inline">/ {credits.grant}</span>
+              <span className="hidden @[420px]:inline capitalize opacity-70">{credits.tier}</span>
             </span>
           )}
         </div>
