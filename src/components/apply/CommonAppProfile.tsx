@@ -6,6 +6,7 @@ import {
   Loader2,
   CheckCircle2,
   Circle,
+  Check,
   Sparkles,
   Plus,
   Trash2,
@@ -326,7 +327,7 @@ export function SectionCard({
   );
 }
 
-function ScalarField({
+export function ScalarField({
   field,
   value,
   onChange,
@@ -376,6 +377,49 @@ function ScalarField({
         {field.help && (
           <p className="text-label-sm text-on-surface-variant">{field.help}</p>
         )}
+      </div>
+    );
+  }
+
+  // Multi-select (Common App checkbox groups: grade levels, timing). Stored as
+  // a comma-joined string in option order so it round-trips through the answer
+  // store like any other field.
+  if (field.type === "multiselect") {
+    const selected = new Set(
+      local.split(",").map((s) => s.trim()).filter(Boolean),
+    );
+    const toggle = (opt: string) => {
+      const next = new Set(selected);
+      if (next.has(opt)) next.delete(opt);
+      else next.add(opt);
+      update((field.options ?? []).filter((o) => next.has(o)).join(", "));
+    };
+    return (
+      <div className={"flex flex-col gap-1.5 " + wrapperClass}>
+        <FieldLabel field={field} />
+        <div className="flex flex-wrap gap-2">
+          {(field.options ?? []).map((o) => {
+            const on = selected.has(o);
+            return (
+              <button
+                key={o}
+                type="button"
+                onClick={() => toggle(o)}
+                aria-pressed={on}
+                className={
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-[var(--font-label)] text-label-md font-semibold transition-colors " +
+                  (on
+                    ? "bg-primary-fixed/70 text-primary"
+                    : "border border-on-surface/15 bg-surface text-on-surface-variant hover:bg-on-surface/5")
+                }
+              >
+                {on ? <Check className="h-3.5 w-3.5" /> : null}
+                {o}
+              </button>
+            );
+          })}
+        </div>
+        {field.help && <p className="text-label-sm text-on-surface-variant">{field.help}</p>}
       </div>
     );
   }

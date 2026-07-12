@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Loader2, Sparkles, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { SectionCard } from "@/components/apply/CommonAppProfile";
+import { GuidedActivitiesEditor } from "@/components/apply/GuidedActivitiesEditor";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { Card, PageHeader, EmptyState } from "@/components/ui/calm";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -28,9 +29,11 @@ export const Route = createFileRoute("/activities")({
   component: ActivitiesPage,
 });
 
-// The activities + honors sections of the universal (Common App) profile,
-// matched by section key/title so it stays correct if the backend renames.
-const ACTIVITY_SECTION_RE = /activ|extracurric|honou?r|award|leadership/i;
+// Which universal-profile sections belong on this page: the real activities
+// repeat group (group key "activity") + any honors/awards section. Matching the
+// group key (not a loose title regex) avoids pulling in unrelated sections that
+// merely contain "activity" in their title.
+const HONORS_SECTION_RE = /honou?r|award/i;
 
 function ActivitiesPage() {
   const { isAuthenticated, isHydrated } = useAuth();
@@ -106,7 +109,10 @@ function ActivitiesBody() {
 
   const answers = profile?.answers ?? {};
   const sections = useMemo(
-    () => (schema ?? []).filter((s) => ACTIVITY_SECTION_RE.test(`${s.key} ${s.title}`)),
+    () =>
+      (schema ?? []).filter(
+        (s) => s.group?.groupKey === "activity" || HONORS_SECTION_RE.test(`${s.key} ${s.title}`),
+      ),
     [schema],
   );
 
@@ -187,15 +193,24 @@ function ActivitiesBody() {
           }
         />
       ) : (
-        sections.map((section) => (
-          <SectionCard
-            key={section.key}
-            section={section}
-            status={statusByKey.get(section.key)}
-            answers={answers}
-            setAnswer={setAnswer}
-          />
-        ))
+        sections.map((section) =>
+          section.group?.groupKey === "activity" ? (
+            <GuidedActivitiesEditor
+              key={section.key}
+              section={section}
+              answers={answers}
+              setAnswer={setAnswer}
+            />
+          ) : (
+            <SectionCard
+              key={section.key}
+              section={section}
+              status={statusByKey.get(section.key)}
+              answers={answers}
+              setAnswer={setAnswer}
+            />
+          ),
+        )
       )}
 
       <Card className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">

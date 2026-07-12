@@ -13,7 +13,8 @@ export type ProfileFieldType =
   | "enum"
   | "number"
   | "longtext"
-  | "essay";
+  | "essay"
+  | "multiselect";
 
 export type ProfileField = {
   conceptKey: string;
