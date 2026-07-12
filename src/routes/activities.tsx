@@ -1,18 +1,19 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Loader2, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Sparkles, Trophy, Lightbulb, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { SectionCard } from "@/components/apply/CommonAppProfile";
 import { GuidedActivitiesEditor } from "@/components/apply/GuidedActivitiesEditor";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
-import { Card, PageHeader, EmptyState } from "@/components/ui/calm";
+import { Card, PageHeader, SectionHeading, IconTile, EmptyState } from "@/components/ui/calm";
 import { useAuth } from "@/lib/auth/useAuth";
 import {
   useCommonAppSchema,
   useCommonAppProfile,
   usePrefillFromOnboarding,
 } from "@/lib/apply/commonAppProfile";
+import { useActivitySuggestions, useRefreshSuggestions } from "@/lib/apply/activityCoach";
 import { useSetAnswer } from "@/lib/apply/intake";
 
 export const Route = createFileRoute("/activities")({
@@ -213,6 +214,10 @@ function ActivitiesBody() {
         )
       )}
 
+      <SilentErrorBoundary>
+        <ActivitySuggestionsSection />
+      </SilentErrorBoundary>
+
       <Card className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
         <p className="min-w-0 text-body-sm text-on-surface-variant">
           These feed every application. Manage the rest of your universal profile in Applications.
@@ -225,5 +230,81 @@ function ActivitiesBody() {
         </Link>
       </Card>
     </div>
+  );
+}
+
+// Gap-filling new-activity suggestions (the "suggest activities" half of the
+// merged coach): a free ranked candidate list, with a paid AI-personalized
+// pitch for why each fits this student.
+function ActivitySuggestionsSection() {
+  const data = useActivitySuggestions();
+  const refresh = useRefreshSuggestions();
+  const { hasPaidAccess } = useAuth();
+  const [busy, setBusy] = useState(false);
+
+  if (data === undefined || data.candidates.length === 0) return null;
+
+  const anyPitch = data.candidates.some((c) => c.pitch);
+  const canPersonalize = hasPaidAccess && (data.suggestionsStale || !anyPitch);
+
+  async function personalize() {
+    if (busy) return;
+    setBusy(true);
+    const ok = await refresh();
+    if (!ok) toast.error("Couldn't personalize just now — try again.");
+    setBusy(false);
+  }
+
+  return (
+    <Card className="p-4 sm:p-6">
+      <SectionHeading
+        title="Ideas to strengthen your list"
+        subtitle="New activities that fill your current gaps, matched to your intended field."
+        aside={
+          canPersonalize ? (
+            <button
+              type="button"
+              onClick={personalize}
+              disabled={busy}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-on-surface/15 bg-surface px-3 py-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-primary" />}
+              Personalize
+            </button>
+          ) : undefined
+        }
+      />
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        {data.candidates.map((c) => (
+          <li
+            key={c.catalogId}
+            className="flex flex-col gap-2 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow"
+          >
+            <div className="flex items-start gap-3">
+              <IconTile icon={Lightbulb} tone="amber" size="sm" />
+              <div className="min-w-0">
+                <p className="font-[var(--font-label)] text-label-md font-bold text-on-surface">{c.title}</p>
+                <p className="mt-0.5 text-body-sm text-on-surface-variant">{c.blurb}</p>
+              </div>
+            </div>
+            {c.pitch ? (
+              <div className="mt-1 rounded-lg bg-primary-fixed/30 p-3">
+                <p className="text-body-sm text-on-surface">{c.pitch}</p>
+                {c.whyItHelps && (
+                  <p className="mt-1 text-label-sm text-on-surface-variant">{c.whyItHelps}</p>
+                )}
+              </div>
+            ) : !hasPaidAccess ? (
+              <Link
+                to="/unlock"
+                className="mt-auto inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-primary hover:underline"
+              >
+                <Lock className="h-3.5 w-3.5" /> Unlock a personalized pitch
+              </Link>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }

@@ -18,12 +18,19 @@ import {
   useAssessActivity,
   useRewriteActivity,
   ACTIVITY_TIPS,
+  FLAG_LABEL,
   ROLE_MAX,
   DESC_MAX,
   type Assessment,
   type Rewrite,
 } from "@/lib/apply/activityCoach";
-import { Card, IconTile, cx } from "@/components/ui/calm";
+import { Card, IconTile, Chip, cx } from "@/components/ui/calm";
+
+const TIER_TONE: Record<"strong" | "developing" | "weak", "green" | "amber" | "coral"> = {
+  strong: "green",
+  developing: "amber",
+  weak: "coral",
+};
 
 // Rich, guided editor for the Common App activities repeat group: the normal
 // fields (incl. the new multi-selects) PLUS per-activity coaching — tips, an AI
@@ -131,6 +138,9 @@ function ActivityItem({
   const category = answers[keyFor("type")] ?? "";
   const role = answers[keyFor("position")] ?? "";
   const description = answers[keyFor("description")] ?? "";
+  const gradeLevels = answers[keyFor("grade_levels")] ?? "";
+  const hoursPerWeek = answers[keyFor("hours_per_week")] ?? "";
+  const weeksPerYear = answers[keyFor("weeks_per_year")] ?? "";
 
   const assess = useAssessActivity();
   const rewrite = useRewriteActivity();
@@ -146,7 +156,7 @@ function ActivityItem({
     setBusy("assess");
     setError(null);
     setAssessment(null);
-    const res = await assess({ category, role, description });
+    const res = await assess({ category, role, description, gradeLevels, hoursPerWeek, weeksPerYear });
     if (res.ok) setAssessment(res.assessment);
     else setError(res.error);
     setBusy(null);
@@ -265,6 +275,23 @@ function AssessmentPanel({ assessment, onClose }: { assessment: Assessment; onCl
           </p>
           {assessment.headline && (
             <p className="mt-0.5 text-body-sm text-on-surface">{assessment.headline}</p>
+          )}
+          {(assessment.tier || (assessment.flags && assessment.flags.length > 0)) && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {assessment.tier && (
+                <Chip tone={TIER_TONE[assessment.tier]}>
+                  {assessment.tier[0].toUpperCase() + assessment.tier.slice(1)}
+                </Chip>
+              )}
+              {(assessment.flags ?? []).map((f) => (
+                <span
+                  key={f}
+                  className="rounded-md bg-surface-container px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold text-on-surface-variant"
+                >
+                  {FLAG_LABEL[f] ?? f}
+                </span>
+              ))}
+            </div>
           )}
         </div>
         <button
