@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   resolveConvexClientUrl,
   resolveConvexSiteUrl,
+  resolvePasswordResetUrl,
 } from "./backend";
 
 describe("backend URL resolution", () => {
@@ -42,5 +43,16 @@ describe("backend URL resolution", () => {
 
   it("throws clear error when client URL is missing", () => {
     assert.throws(() => resolveConvexClientUrl({}), /VITE_CONVEX_URL is not set/);
+  });
+
+  it("uses the dedicated password-reset edge URL without changing other API bases", () => {
+    const env = {
+      VITE_CONVEX_URL: "https://convex.questcampus.space",
+      VITE_CONVEX_SITE_URL: "https://api.questcampus.space",
+      VITE_PASSWORD_RESET_URL: "https://auth.questcampus.space/",
+    };
+
+    assert.equal(resolvePasswordResetUrl(env), "https://auth.questcampus.space");
+    assert.equal(resolveConvexSiteUrl(env), "https://api.questcampus.space");
   });
 });

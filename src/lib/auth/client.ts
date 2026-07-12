@@ -4,7 +4,7 @@
 
 // Referral system removed.
 
-import { resolveConvexSiteUrl } from "@/lib/backend";
+import { resolveConvexSiteUrl, resolvePasswordResetUrl } from "@/lib/backend";
 import { getCurrentLang, i18nHeaders } from "@/lib/i18n/I18nProvider";
 
 const TOKEN_KEY = "qc.auth.token";
@@ -37,8 +37,12 @@ function base(): string {
   return resolveConvexSiteUrl();
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${base()}${path}`, {
+function passwordResetBase(): string {
+  return resolvePasswordResetUrl();
+}
+
+async function postAt<T>(baseUrl: string, path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...i18nHeaders() },
     body: JSON.stringify(body),
@@ -55,6 +59,10 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     throw new Error(message);
   }
   return json as T;
+}
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+  return postAt(base(), path, body);
 }
 
 function localizedError(json: unknown, fallback: string): string {
@@ -147,6 +155,21 @@ export const auth = {
     });
     saveSession(session);
     return session;
+  },
+
+  async requestPasswordReset(email: string): Promise<{ ok: true; message: string }> {
+    return postAt(passwordResetBase(), "/api/auth/password-reset/request", {
+      email,
+      lang: getCurrentLang(),
+    });
+  },
+
+  async confirmPasswordReset(token: string, password: string): Promise<{ ok: true; message: string }> {
+    return postAt(passwordResetBase(), "/api/auth/password-reset/confirm", {
+      token,
+      password,
+      lang: getCurrentLang(),
+    });
   },
 
   signOut(): void {

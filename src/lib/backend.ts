@@ -1,6 +1,7 @@
 type PublicEnv = {
   VITE_CONVEX_URL?: string;
   VITE_CONVEX_SITE_URL?: string;
+  VITE_PASSWORD_RESET_URL?: string;
 };
 
 function trimTrailingSlash(url: string): string {
@@ -43,4 +44,9 @@ export function resolveConvexSiteUrl(env: PublicEnv = publicEnv()): string {
 
   const clientUrl = resolveConvexClientUrl(env);
   return deriveSiteUrl(clientUrl);
+}
+
+export function resolvePasswordResetUrl(env: PublicEnv = publicEnv()): string {
+  const explicit = env.VITE_PASSWORD_RESET_URL;
+  return explicit ? trimTrailingSlash(explicit) : resolveConvexSiteUrl(env);
 }
