@@ -48,6 +48,7 @@ import type { GuideRow } from "@/lib/apply/guidance";
 import { ApplicationPlanView } from "@/components/apply/ApplicationPlanView";
 import { RequirementEditorDialog } from "@/components/apply/RequirementEditorDialog";
 import { ResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
+import { TargetReadinessStepper } from "@/components/apply/TargetReadinessStepper";
 import { AgentCommandCard } from "@/components/agent/AgentCommandCard";
 
 function ApplicationRouteError({ reset }: { error: Error; reset: () => void }) {
@@ -184,6 +185,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
   const checklistPer = checklist?.perTarget.find(
     (c) => c.system === system && c.externalId === externalId,
   );
+  const qualityStatus = checklistPer?.qualityStatus;
   const ready = !!checklistPer?.checklist?.ready && eligPer?.verdict !== "ineligible";
 
   const specItems = specific?.items ?? [];
@@ -233,7 +235,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              <ResearchStatusBadge research={research} compact />
+              <ResearchStatusBadge research={research} qualityStatus={qualityStatus} compact />
               <StatusPill found={found} ready={ready} />
               <SilentErrorBoundary>
                 <ApplyCTA target={target} ready={ready} />
@@ -252,6 +254,11 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
             </nav>
           )}
         </header>
+
+        {/* Linear progress: one clear state for this university */}
+        <section className="mt-4 rounded-2xl border border-on-surface/8 bg-surface-container-lowest px-5 py-4 qc-soft-shadow">
+          <TargetReadinessStepper qualityStatus={qualityStatus} />
+        </section>
 
         {/* Tabs */}
         <div className="mt-6 flex gap-2" role="tablist" aria-label="Application view">
@@ -335,7 +342,7 @@ function ApplicationDetailContent({ system, externalId }: { system: string; exte
 
             {/* Right rail */}
             <aside className="space-y-5">
-              <ResearchStatusBadge research={research} />
+              <ResearchStatusBadge research={research} qualityStatus={qualityStatus} />
               <AgentCommandCard
                 compact
                 title="Add this target to deep roadmap"

@@ -95,6 +95,9 @@ export type ChecklistResult = {
     system: string;
     externalId: string;
     found: boolean;
+    qualityStatus?: string;
+    blockedReason?: string | null;
+    failedGates?: string[];
     checklist: { ready: boolean; [k: string]: unknown } | null;
   }[];
 };
