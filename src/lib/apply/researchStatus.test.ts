@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { researchStatusView } from "./researchStatus";
+import { researchStatusView, qualityStatusView } from "./researchStatus";
 
 describe("researchStatusView", () => {
   it("shows a loading state while the Convex query is unresolved", () => {
@@ -45,5 +45,33 @@ describe("researchStatusView", () => {
     });
     assert.equal(partial.label, "Partial requirements ready");
     assert.equal(full.label, "Requirements ready");
+  });
+});
+
+describe("qualityStatusView", () => {
+  it("ready_to_fill is the only green state", () => {
+    const v = qualityStatusView({ qualityStatus: "ready_to_fill", blockedReason: null });
+    assert.equal(v.tone, "ready");
+    assert.equal(v.percent, 100);
+  });
+
+  it("needs_research shows a calm researching state, not error", () => {
+    const v = qualityStatusView({ qualityStatus: "needs_research", blockedReason: "partial_coverage" });
+    assert.equal(v.tone, "researching");
+  });
+
+  it("needs_user_input asks for info", () => {
+    const v = qualityStatusView({ qualityStatus: "needs_user_input", blockedReason: "missing_user_inputs" });
+    assert.equal(v.tone, "partial");
+  });
+
+  it("unsupported is a manual-portal state", () => {
+    const v = qualityStatusView({ qualityStatus: "unsupported", blockedReason: "national_portal" });
+    assert.equal(v.tone, "blocked");
+  });
+
+  it("unknown status falls back to researching, never ready", () => {
+    const v = qualityStatusView({ qualityStatus: "something_new" });
+    assert.equal(v.tone, "researching");
   });
 });

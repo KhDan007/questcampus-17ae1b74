@@ -81,3 +81,43 @@ export function researchStatusView(
     percent,
   };
 }
+
+// Maps the backend readiness quality status (checklistForTargets.perTarget[].
+// qualityStatus, from the full data-quality gate) to a badge view. "ready_to_fill"
+// is the ONLY green state — a thin or partial catalog never reads as ready.
+export function qualityStatusView(input: {
+  qualityStatus: string;
+  blockedReason?: string | null;
+}): ResearchStatusView {
+  switch (input.qualityStatus) {
+    case "ready_to_fill":
+      return {
+        tone: "ready",
+        label: "Ready to apply",
+        detail: "Requirements, your details, and the portal mapping are all set.",
+        percent: 100,
+      };
+    case "needs_user_input":
+      return {
+        tone: "partial",
+        label: "Add your info",
+        detail: "We have the requirements; a few of your details are still needed.",
+        percent: null,
+      };
+    case "unsupported":
+      return {
+        tone: "blocked",
+        label: "Manual portal",
+        detail: "This portal needs a manual step. We'll guide you through it.",
+        percent: null,
+      };
+    case "needs_research":
+    default:
+      return {
+        tone: "researching",
+        label: "Still researching",
+        detail: "We're still confirming this university's requirements.",
+        percent: null,
+      };
+  }
+}

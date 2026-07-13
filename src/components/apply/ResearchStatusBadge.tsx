@@ -9,11 +9,16 @@ import {
   Lock,
   Sparkles,
 } from "lucide-react";
-import { researchStatusView, type ResearchStatusTone } from "@/lib/apply/researchStatus";
+import { researchStatusView, qualityStatusView, type ResearchStatusTone } from "@/lib/apply/researchStatus";
 import { useResearchProgress, type ResearchProgress } from "@/lib/apply/uniData";
 
 type Props = {
   research: ResearchProgress | null | undefined;
+  // When provided, the true readiness quality gate (checklistForTargets.
+  // perTarget[].qualityStatus) drives the badge instead of raw crawl progress —
+  // so "ready" only shows when the target genuinely clears the full gate.
+  qualityStatus?: string | null;
+  blockedReason?: string | null;
   compact?: boolean;
   className?: string;
 };
@@ -47,8 +52,11 @@ function cx(...parts: Array<string | undefined | false>): string {
   return parts.filter(Boolean).join(" ");
 }
 
-export function ResearchStatusBadge({ research, compact = false, className }: Props) {
-  const view = researchStatusView(research);
+export function ResearchStatusBadge({ research, qualityStatus, blockedReason, compact = false, className }: Props) {
+  const view =
+    qualityStatus != null
+      ? qualityStatusView({ qualityStatus, blockedReason })
+      : researchStatusView(research);
   const Icon = ICON_BY_TONE[view.tone];
   const spinning = view.tone === "loading";
 
