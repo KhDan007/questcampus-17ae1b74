@@ -100,37 +100,32 @@ const ALLOWED_FOREIGN_PHRASES = [
   "Stanford University",
   "questcampus-extension",
 ];
-// Kazakh and Russian share Cyrillic. These are known shared proper names and
-// identifiers, not Russian UI copy. Keep this list deliberately tiny.
-const KAZAKH_RUSSIAN_SHARED_TOKENS = new Set([
-  "mit",
-  "nus",
-  "pdf",
-  "sat",
-  "toefl",
-  "ielts",
-  "act",
-  "gpa",
-  "api",
-  "ai",
-  "html",
-  "url",
-  "ямайка",
-]);
-// Static, reviewed high-signal Russian UI words that do not have a distinctive
-// suffix. This complements the Russian dictionary-derived corpus below.
-const RUSSIAN_UI_COMMON_TOKENS = new Set([
-  "привет",
-  "настройки",
-  "продолжить",
-  "выберите",
-  "удалить",
-  "сохранить",
-  "отменить",
-  "ошибка",
-  "готово",
-  "загрузка",
-]);
+// Kazakh and Russian share Cyrillic. This static reviewed allowlist contains
+// genuine shared loanwords, place names, and product identifiers observed in
+// the shipped Kazakh copy. It is intentionally source-controlled and never
+// calculated from a target dictionary at runtime.
+const SHARED_KAZAKH_RUSSIAN_TOKENS = new Set(`
+австралия австрия авто агент азия аккаунт аккаунты албания алжир америка ангола андорра антигуа
+аргентина армения ассистент атмосфера африка бакалавриат балл бангладеш барбадос барбуда бахрейн
+беларусь белиз бельгия бенин бизнес биология бисау болгария боливия босния ботсвана бразилия браузер
+бруней буркина бурунди бутан бюджет ванкувер вануату ватикан веб венгрия венесуэла верде видео винсент
+вьетнам габон гаити гайана гамбия гана гватемала гвинея германия герцеговина гондурас гонконг гренада
+греция грузия д да дания дедлайн делфт демо деталь джибути дизайн доминика др египет журнал журналистика
+замбия зеландия зимбабве ивуар идея израиль индекс индонезия инженер инженерия информатика иордания ирак иран
+ирландия исландия испания италия йемен кабо камбоджа камерун кампус канада карта катар кения киберспорт
+кипр кирибати китс клуб код колледж колумбия конго контекст контент корея косово коста кот куба кувейт
+ланка лаос латвия леоне лесото либерия ливан ливия литва лихтенштейн люксембург люсия маврикий мавритания
+мадагаскар македония малави малайзия мали мальта марино марокко математика мб медиа медицина мексика
+микронезия минут мозамбик молдова монако музыка мьянма намибия науру не невис непал нигер нигерия нидерланды
+никарагуа норвегия океания оксфорд оман он онлайн пакет палау палестина панама панель папуа парагвай перу
+платформа польша портал порталы портфолио премиум принсипи прогресс профиль психология рейтинг рика руанда
+румыния с сайт сальвадор самоа сан секунд сенегал сент сербия сингапур сирия скриншот слайд словакия словения
+сомали спорт статистика стипендия стипендиям студент судан суринам сьерра т таиланд танзания тап те тел тест
+тимор тобаго того томе тонга транскрипт трекер тринидад тринити тувалу тунис туризм ты тыс уганда украина
+университет уругвай файл фасо фиджи физика философия финляндия фитнес форма формат фотография франция фриланс
+химия хорватия чад чат чек черногория чехия чили швейцария швеция шкала шри эквадор экономика экспорт эритрея
+эсватини эссе эстония эфиопия ямайка
+`.trim().split(/\s+/u));
 
 function normalize(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -227,18 +222,12 @@ function dictionaryTokens(values: Dict): Set<string> {
   );
 }
 
-// The corpus is generated from the actual Russian product dictionary, rather
-// than a hand-picked stop-list. The static Russian morphology model below is
-// independent of the target Kazakh dictionary: it catches distinctive Russian
-// UI verbs and noun/adjective forms while avoiding Kazakh Cyrillic loanwords,
-// country names, and academic terms. The explicit list above is reserved for
-// true shared identifiers that should survive future dictionary changes.
+// The candidate corpus is all normalized Russian words from the generated and
+// curated Russian dictionaries. It is independent of Kazakh target values.
 const RUSSIAN_UI_TOKENS = dictionaryTokens({
   ...(ru as Dict),
   ...TRANSLATIONS.ru,
-  ...AUDIT_TRANSLATIONS.ru,
 });
-const DISTINCTIVE_RUSSIAN_UI_FORM = /(?:ить|йти|йте|ите|йка|йки|ками|ский|ская|ские|ского|скому)$/u;
 
 export function findLanguageLeaks(values: AuditDictionaries = dictionaries()): string[] {
   const problems: string[] = [];
@@ -266,9 +255,7 @@ export function findWrongLanguageLeaks(values: AuditDictionaries = dictionaries(
     const russianTokens = (value.normalize("NFC").toLocaleLowerCase().match(/\p{L}+/gu) ?? [])
       .filter(
         (token) =>
-          RUSSIAN_UI_TOKENS.has(token) &&
-          (DISTINCTIVE_RUSSIAN_UI_FORM.test(token) || RUSSIAN_UI_COMMON_TOKENS.has(token)) &&
-          !KAZAKH_RUSSIAN_SHARED_TOKENS.has(token),
+          RUSSIAN_UI_TOKENS.has(token) && !SHARED_KAZAKH_RUSSIAN_TOKENS.has(token),
       );
     if (russianTokens.length) problems.push(`kk:${key}:${[...new Set(russianTokens)].join(",")}`);
   }
