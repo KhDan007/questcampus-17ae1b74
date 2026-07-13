@@ -27,6 +27,7 @@ import { WaitlistPopup } from "@/components/landing2/WaitlistPopup";
 import { PlanDialog } from "@/components/dashboard/PlanDialog";
 import { QuestCampusLogo } from "@/components/brand/QuestCampusLogo";
 import { useAuth, useFreeHook } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type SidebarUser = {
   name?: string | null;
@@ -139,6 +140,7 @@ const LS_WIDTH = "qc:sidebar:width";
 const LS_COLLAPSED = "qc:sidebar:collapsed";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, hasPaidAccess } = useAuth();
   const [waitlist, setWaitlist] = useState<string | null>(null);
@@ -235,10 +237,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   // Live paid sync
   const token = auth.getSession()?.token;
-  const entitlement = useQuery(
-    api.payments.entitlement,
-    token ? { token } : "skip",
-  ) as { paid: boolean } | undefined;
+  const entitlement = useQuery(api.payments.entitlement, token ? { token } : "skip") as
+    | { paid: boolean }
+    | undefined;
   const livePaid = entitlement?.paid === true;
   useEffect(() => {
     if (livePaid && !hasPaidAccess && user) {
@@ -305,7 +306,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         createPortal(
           <AnimatePresence>
             {mobileOpen && (
-              <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true" aria-label="Workspace menu">
+              <div
+                className="fixed inset-0 z-[9999] lg:hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Workspace menu"
+              >
                 {/* Plain elements, no JS-driven entry animation: framer's rAF
                     animation can freeze at its initial frame on throttled
                     mobile browsers, leaving the drawer shifted or invisible. */}
@@ -353,8 +359,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <WaitlistPopup
         open={!!waitlist}
         onClose={() => setWaitlist(null)}
-        title={waitlist ? `${waitlist} — coming soon` : "Coming soon"}
-        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
+        title={
+          waitlist
+            ? t("dashboard.waitlist.titleWithFeature", { feature: waitlist })
+            : t("dashboard.waitlist.title")
+        }
+        body={t("dashboard.waitlist.body", { discount: WAITLIST_BASE_DISCOUNT })}
         feature={waitlist ?? undefined}
       />
 
@@ -387,7 +397,9 @@ function SidebarBody({
   return (
     <div className="flex h-full min-h-0 flex-col p-3">
       {!hideCollapseToggle && (
-        <div className={`flex items-center pb-1 ${collapsed ? "justify-center" : "justify-end px-1"}`}>
+        <div
+          className={`flex items-center pb-1 ${collapsed ? "justify-center" : "justify-end px-1"}`}
+        >
           <button
             type="button"
             onClick={onToggleCollapsed}
@@ -447,15 +459,19 @@ function SidebarBody({
               <p className="inline-flex items-center gap-1.5 font-[var(--font-label)] text-label-sm font-semibold text-on-secondary-fixed-variant">
                 <Crown className="h-3.5 w-3.5" /> Full access
               </p>
-              <p className="mt-0.5 text-label-sm text-on-surface/65">
-                Manage your subscription
-              </p>
+              <p className="mt-0.5 text-label-sm text-on-surface/65">Manage your subscription</p>
             </button>
           )
         ) : (
           <Link
             to="/unlock"
-            title={collapsed ? (freeHook ? "Start free trial — $15/mo after" : "Upgrade — $15/month") : undefined}
+            title={
+              collapsed
+                ? freeHook
+                  ? "Start free trial — $15/mo after"
+                  : "Upgrade — $15/month"
+                : undefined
+            }
             className={`group rounded-xl bg-primary text-white transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 qc-hard-shadow-sm hover:shadow-none ${
               collapsed ? "mx-auto grid h-10 w-10 place-items-center" : "block p-3"
             }`}
@@ -476,7 +492,14 @@ function SidebarBody({
         )}
 
         <NavRow
-          item={{ kind: "link", key: "feedback", label: "Send feedback", to: "/feedback", icon: MessageSquare, match: (p) => p.startsWith("/feedback") }}
+          item={{
+            kind: "link",
+            key: "feedback",
+            label: "Send feedback",
+            to: "/feedback",
+            icon: MessageSquare,
+            match: (p) => p.startsWith("/feedback"),
+          }}
           pathname={pathname}
           collapsed={collapsed}
           onWaitlist={onWaitlist}

@@ -25,21 +25,10 @@ import { MyUniversitiesSection } from "@/components/profile/MyUniversitiesSectio
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { Switch } from "@/components/ui/switch";
-import {
-  Card,
-  Tabs,
-  IconTile,
-  Chip,
-  PrimaryButton,
-  EmptyState,
-  cx,
-} from "@/components/ui/calm";
+import { Card, Tabs, IconTile, Chip, PrimaryButton, EmptyState, cx } from "@/components/ui/calm";
 import { useAuth } from "@/lib/auth/useAuth";
 import { auth } from "@/lib/auth/client";
-import {
-  readChatPageContextEnabled,
-  writeChatPageContextEnabled,
-} from "@/lib/chat/pageContext";
+import { readChatPageContextEnabled, writeChatPageContextEnabled } from "@/lib/chat/pageContext";
 import { getSessionId } from "@/lib/onboarding/session";
 import { useProgress, nextStep } from "@/lib/progress";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
@@ -67,7 +56,10 @@ type PaidPayload = {
   results: RecRow[];
 };
 
-const BUCKET_CHIP: Record<NonNullable<RecRow["bucket"]>, { label: string; tone: "green" | "amber" | "coral" }> = {
+const BUCKET_CHIP: Record<
+  NonNullable<RecRow["bucket"]>,
+  { label: string; tone: "green" | "amber" | "coral" }
+> = {
   safety: { label: "Safety", tone: "green" },
   target: { label: "Target", tone: "amber" },
   reach: { label: "Reach", tone: "coral" },
@@ -77,7 +69,7 @@ type TabKey = "matches" | "universities" | "invite" | "settings";
 
 function ProfilePage() {
   const { user, isAuthenticated, token } = useAuth();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const progress = useProgress();
   const { saved } = useSavedUniversities();
   const savedCount = saved?.length ?? 0;
@@ -176,10 +168,34 @@ function ProfilePage() {
   const hasMatches = (recs?.length ?? 0) > 0;
 
   const completion = [
-    { key: "account", label: "Create your account", done: isAuthenticated, weight: 10, to: "/signin" },
-    { key: "quiz", label: "Complete the matching quiz", done: hasMatches, weight: 20, to: "/onboarding" },
-    { key: "refine", label: "Refine your recommendations", done: refined, weight: 20, to: "/onboarding" },
-    { key: "save", label: "Save 3+ universities", done: savedCount >= 3, weight: 15, to: "/universities" },
+    {
+      key: "account",
+      label: "Create your account",
+      done: isAuthenticated,
+      weight: 10,
+      to: "/signin",
+    },
+    {
+      key: "quiz",
+      label: "Complete the matching quiz",
+      done: hasMatches,
+      weight: 20,
+      to: "/onboarding",
+    },
+    {
+      key: "refine",
+      label: "Refine your recommendations",
+      done: refined,
+      weight: 20,
+      to: "/onboarding",
+    },
+    {
+      key: "save",
+      label: "Save 3+ universities",
+      done: savedCount >= 3,
+      weight: 15,
+      to: "/universities",
+    },
     { key: "essay", label: "Draft a personal statement", done: drafted, weight: 20, to: "/essay" },
     { key: "invite", label: "Invite a friend", done: invited, weight: 15, to: "/profile" },
   ];
@@ -209,7 +225,9 @@ function ProfilePage() {
                     {user?.avatarUrl ? (
                       <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
                     ) : initials ? (
-                      <span className="font-display text-headline-lg font-bold leading-none">{initials}</span>
+                      <span className="font-display text-headline-lg font-bold leading-none">
+                        {initials}
+                      </span>
                     ) : (
                       <UserCircle2 className="h-10 w-10" />
                     )}
@@ -253,17 +271,10 @@ function ProfilePage() {
                   </div>
                 </div>
 
-                <Tabs
-                  className="mt-8"
-                  tabs={tabs}
-                  value={tab}
-                  onChange={(k) => setTab(k)}
-                />
+                <Tabs className="mt-8" tabs={tabs} value={tab} onChange={(k) => setTab(k)} />
 
                 <div className="mt-6">
-                  {tab === "matches" && (
-                    <MatchesTab recStatus={recStatus} recs={recs} />
-                  )}
+                  {tab === "matches" && <MatchesTab recStatus={recStatus} recs={recs} />}
                   {tab === "universities" && (
                     <SilentErrorBoundary>
                       <MyUniversitiesSection />
@@ -275,7 +286,9 @@ function ProfilePage() {
                     </SilentErrorBoundary>
                   )}
                   {tab === "invite" && token && !(referrals && referrals.referralCode) && (
-                    <p className="text-body-sm text-on-surface-variant">Loading your invite link…</p>
+                    <p className="text-body-sm text-on-surface-variant">
+                      Loading your invite link…
+                    </p>
                   )}
                   {tab === "settings" && (
                     <AssistantSettingsPanel
@@ -301,15 +314,35 @@ function ProfilePage() {
                   Quick actions
                 </p>
                 <div className="mt-3 flex flex-col gap-2">
-                  <QuickAction to="/dashboard" icon={Compass} tone="coral" title="Open dashboard" desc="Your next steps in one place." />
-                  <QuickAction to="/essay" icon={PenLine} tone="amber" title="Write your essay" desc="First draft is free." />
-                  <QuickAction to="/universities" icon={GraduationCap} tone="green" title="Browse universities" desc="Search 11,000+ schools." />
+                  <QuickAction
+                    to="/dashboard"
+                    icon={Compass}
+                    tone="coral"
+                    title="Open dashboard"
+                    desc="Your next steps in one place."
+                  />
+                  <QuickAction
+                    to="/essay"
+                    icon={PenLine}
+                    tone="amber"
+                    title="Write your essay"
+                    desc="First draft is free."
+                  />
+                  <QuickAction
+                    to="/universities"
+                    icon={GraduationCap}
+                    tone="green"
+                    title="Browse universities"
+                    desc="Search 11,000+ schools."
+                  />
                 </div>
               </Card>
 
               {!isAuthenticated && (
                 <Card className="p-4 sm:p-5">
-                  <h2 className="font-display text-headline-sm font-bold text-on-surface">Save your work</h2>
+                  <h2 className="font-display text-headline-sm font-bold text-on-surface">
+                    Save your work
+                  </h2>
                   <p className="mt-1 text-body-sm text-on-surface-variant">
                     Create a free account to keep this synced across devices.
                   </p>
@@ -331,7 +364,7 @@ function ProfilePage() {
         open={waitlistOpen}
         onClose={() => setWaitlistOpen(false)}
         title="Coming soon"
-        body={`Join the waitlist and we'll email you the moment this is ready — ${WAITLIST_BASE_DISCOUNT}% off monthly access locked in.`}
+        body={t("profile.waitlist.body", { discount: WAITLIST_BASE_DISCOUNT })}
       />
     </>
   );
@@ -348,7 +381,10 @@ function MatchesTab({
     return (
       <div className="grid gap-2 sm:grid-cols-2">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-12 animate-pulse rounded-xl border border-on-surface/8 bg-surface-container" />
+          <div
+            key={i}
+            className="h-12 animate-pulse rounded-xl border border-on-surface/8 bg-surface-container"
+          />
         ))}
       </div>
     );
@@ -426,7 +462,9 @@ function CompletionCard({
       <div className="flex items-center gap-4 border-b border-on-surface/8 bg-primary-fixed/40 p-4 sm:p-5">
         <CompletionRing percent={percent} />
         <div className="min-w-0">
-          <p className="font-display text-headline-md font-bold text-on-surface tabular-nums">{percent}%</p>
+          <p className="font-display text-headline-md font-bold text-on-surface tabular-nums">
+            {percent}%
+          </p>
           <p className="font-[var(--font-label)] text-label-sm font-semibold uppercase tracking-[0.12em] text-on-surface-variant">
             Profile complete
           </p>
@@ -482,7 +520,15 @@ function CompletionRing({ percent }: { percent: number }) {
   const dash = (Math.max(0, Math.min(100, percent)) / 100) * c;
   return (
     <svg width="52" height="52" viewBox="0 0 52 52" className="shrink-0" aria-hidden>
-      <circle cx="26" cy="26" r={r} fill="none" stroke="var(--color-on-surface)" strokeOpacity="0.1" strokeWidth="5" />
+      <circle
+        cx="26"
+        cy="26"
+        r={r}
+        fill="none"
+        stroke="var(--color-on-surface)"
+        strokeOpacity="0.1"
+        strokeWidth="5"
+      />
       <circle
         cx="26"
         cy="26"
@@ -518,7 +564,9 @@ function QuickAction({
     >
       <IconTile icon={icon} tone={tone} size="sm" />
       <div className="min-w-0 flex-1">
-        <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">{title}</p>
+        <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
+          {title}
+        </p>
         <p className="truncate text-label-sm text-on-surface-variant">{desc}</p>
       </div>
       <ArrowRight className="h-4 w-4 shrink-0 text-on-surface/30 transition-transform group-hover:translate-x-0.5 group-hover:text-on-surface" />
@@ -597,7 +645,9 @@ function ReferralPanel({ referrals }: { referrals: ReferralSummary }) {
             {referrals.maxPercent}%.
           </p>
         </div>
-        <Chip tone="amber">{pct}% / {referrals.maxPercent}%</Chip>
+        <Chip tone="amber">
+          {pct}% / {referrals.maxPercent}%
+        </Chip>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -617,7 +667,8 @@ function ReferralPanel({ referrals }: { referrals: ReferralSummary }) {
 
       {(qualified > 0 || pending > 0) && (
         <p className="text-label-sm text-on-surface-variant">
-          {qualified > 0 && `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
+          {qualified > 0 &&
+            `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
           {qualified > 0 && pending > 0 && " "}
           {pending > 0 && `${pending} more signed up, waiting on onboarding to qualify.`}
         </p>

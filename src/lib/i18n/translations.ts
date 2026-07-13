@@ -7,6 +7,8 @@ export type Dict = Record<string, string>;
 
 export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
   en: {
+    "profile.waitlist.body":
+      "Join the waitlist and we'll email you the moment this is ready — {discount}% off monthly access locked in.",
     "signin.forgotPassword": "Forgot password?",
     "forgotPassword.title": "Reset your password",
     "forgotPassword.subtitle": "Enter your email and we'll send you a reset link.",
@@ -664,16 +666,19 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
   },
 
   ru: {
+    "profile.waitlist.body":
+      "Присоединяйтесь к списку ожидания — мы напишем вам, как только всё будет готово. Скидка {discount}% на ежемесячный доступ уже закреплена.",
     "signin.forgotPassword": "Забыли пароль?",
     "forgotPassword.title": "Сбросьте пароль",
-    "forgotPassword.subtitle": "Введите email, и мы отправим ссылку для сброса пароля.",
-    "forgotPassword.emailLabel": "Email",
+    "forgotPassword.subtitle":
+      "Введите адрес электронной почты, и мы отправим ссылку для сброса пароля.",
+    "forgotPassword.emailLabel": "Адрес электронной почты",
     "forgotPassword.emailPlaceholder": "you@example.com",
     "forgotPassword.submit": "Отправить ссылку",
     "forgotPassword.successTitle": "Проверьте почту",
     "forgotPassword.successBody":
-      "Если аккаунт с таким email существует, вы вскоре получите ссылку для сброса пароля.",
-    "forgotPassword.errorEmail": "Введите корректный email.",
+      "Если аккаунт с таким адресом электронной почты существует, вы вскоре получите ссылку для сброса пароля.",
+    "forgotPassword.errorEmail": "Введите корректный адрес электронной почты.",
     "forgotPassword.errorGeneric": "Не удалось отправить ссылку. Попробуйте ещё раз.",
     "forgotPassword.signinLink": "Вернуться ко входу",
     "resetPassword.title": "Создайте новый пароль",
@@ -749,7 +754,7 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
     "pricing.paid.subtitle": "3-day free trial, then $15/month",
     "pricing.paid.compare": "{anchor}+ у частного консультанта",
     "pricing.paid.f1": "Всё из бесплатного плана",
-    "pricing.paid.f2": "Полный список: safety / target / reach",
+    "pricing.paid.f2": "Полный список: запасные / целевые / амбициозные",
     "pricing.paid.f3": "Фильтры по стране, типу стипендии, дедлайну",
     "pricing.paid.f4": "Прямые ссылки на подачу",
     "pricing.paid.f5": "Приоритетная поддержка",
@@ -1012,16 +1017,19 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
   },
 
   kk: {
+    "profile.waitlist.body":
+      "Күту тізіміне қосылыңыз — бәрі дайын болған сәтте сізге хабарлаймыз. Айлық қолжетімділікке {discount}% жеңілдік бекітілді.",
     "signin.forgotPassword": "Құпиясөзді ұмыттыңыз ба?",
     "forgotPassword.title": "Құпиясөзді қалпына келтіру",
-    "forgotPassword.subtitle": "Email-іңізді енгізіңіз, біз қалпына келтіру сілтемесін жібереміз.",
-    "forgotPassword.emailLabel": "Email мекенжайы",
+    "forgotPassword.subtitle":
+      "Электрондық пошта мекенжайыңызды енгізіңіз, біз қалпына келтіру сілтемесін жібереміз.",
+    "forgotPassword.emailLabel": "Электрондық пошта мекенжайы",
     "forgotPassword.emailPlaceholder": "you@example.com",
     "forgotPassword.submit": "Сілтемені жіберу",
     "forgotPassword.successTitle": "Поштаңызды тексеріңіз",
     "forgotPassword.successBody":
-      "Егер осы email-мен тіркелгі бар болса, құпиясөзді қалпына келтіру сілтемесі жақында жіберіледі.",
-    "forgotPassword.errorEmail": "Жарамды email мекенжайын енгізіңіз.",
+      "Егер осы электрондық пошта мекенжайымен тіркелгі бар болса, құпиясөзді қалпына келтіру сілтемесі жақында жіберіледі.",
+    "forgotPassword.errorEmail": "Жарамды электрондық пошта мекенжайын енгізіңіз.",
     "forgotPassword.errorGeneric": "Сілтемені жіберу мүмкін болмады. Қайталап көріңіз.",
     "forgotPassword.signinLink": "Кіруге оралу",
     "resetPassword.title": "Жаңа құпиясөз орнатыңыз",
@@ -1095,7 +1103,7 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
     "pricing.paid.subtitle": "3-day free trial, then $15/month",
     "pricing.paid.compare": "Жеке кеңесшіде {anchor}+",
     "pricing.paid.f1": "Тегін жоспардың бәрі",
-    "pricing.paid.f2": "Толық safety / target / reach тізімі",
+    "pricing.paid.f2": "Қауіпсіз / мақсатты / амбициялы толық тізім",
     "pricing.paid.f3": "Ел, стипендия түрі, мерзім бойынша сүзгілер",
     "pricing.paid.f4": "Тікелей өтінім сілтемелері",
     "pricing.paid.f5": "Басым қолдау",
@@ -1146,6 +1154,13 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
 // and accessible attributes without leaving English copy in Russian or Kazakh.
 export const AUDIT_TRANSLATIONS: Record<"en" | "ru" | "kk", Dict> = {
   en: {
+    "audit.applicationPlan.sharedWork":
+      "Meanwhile, your shared work (profile, personal statement, transcript) is already in",
+    "audit.applicationPlan.fullPlan": "your full plan",
+    "dashboard.waitlist.title": "Coming soon",
+    "dashboard.waitlist.titleWithFeature": "{feature} — coming soon",
+    "dashboard.waitlist.body":
+      "Join the waitlist to be first in line and lock in {discount}% off monthly access.",
     "forgotPassword.emailPlaceholder": "you@example.com",
     "pricing.paid.subtitle": "3-day free trial, then $15/month",
     "signin.placeholder.email": "you@school.edu",
@@ -1181,6 +1196,13 @@ export const AUDIT_TRANSLATIONS: Record<"en" | "ru" | "kk", Dict> = {
     "audit.university.examples": "Oxford, MIT, NUS, Sciences Po",
   },
   ru: {
+    "audit.applicationPlan.sharedWork":
+      "Тем временем ваши общие материалы (профиль, личное заявление, выписка) уже есть в",
+    "audit.applicationPlan.fullPlan": "вашем полном плане",
+    "dashboard.waitlist.title": "Скоро появится",
+    "dashboard.waitlist.titleWithFeature": "{feature} — скоро появится",
+    "dashboard.waitlist.body":
+      "Присоединяйтесь к списку ожидания, чтобы быть в числе первых и получить скидку {discount}% на ежемесячный доступ.",
     "forgotPassword.emailPlaceholder": "вы@пример.рф",
     "pricing.paid.subtitle": "3 дня бесплатно, затем $15 в месяц",
     "signin.placeholder.email": "вы@школа.рф",
@@ -1216,6 +1238,13 @@ export const AUDIT_TRANSLATIONS: Record<"en" | "ru" | "kk", Dict> = {
     "audit.university.examples": "Оксфорд, MIT, NUS, Sciences Po",
   },
   kk: {
+    "audit.applicationPlan.sharedWork":
+      "Осы уақытта ортақ материалдарыңыз (профиль, жеке мәлімдеме, транскрипт) мына жерде бар:",
+    "audit.applicationPlan.fullPlan": "толық жоспарыңызда",
+    "dashboard.waitlist.title": "Жақында қолжетімді",
+    "dashboard.waitlist.titleWithFeature": "{feature} — жақында қолжетімді",
+    "dashboard.waitlist.body":
+      "Алғашқылардың қатарында болу және айлық қолжетімділікке {discount}% жеңілдік алу үшін күту тізіміне қосылыңыз.",
     "forgotPassword.emailPlaceholder": "сіз@үлгі.kz",
     "pricing.paid.subtitle": "3 күн тегін, кейін айына $15",
     "signin.placeholder.email": "сіз@мектеп.kz",

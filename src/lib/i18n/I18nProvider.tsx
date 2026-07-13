@@ -115,7 +115,7 @@ function dictionary(lang: LangCode): Dict {
 }
 
 function lookup(lang: LangCode, key: string): string | undefined {
-  return dictionary(lang)[key] ?? dictionary(DEFAULT_LANG)[key];
+  return dictionary(lang)[key];
 }
 
 function buildLiteralIndexes(): Record<LangCode, Map<string, string>> {
@@ -148,7 +148,8 @@ function translateLiteral(lang: LangCode, text: string): string | null {
 }
 
 function makeT(lang: LangCode) {
-  return (key: string, vars?: Vars) => interpolate(lookup(lang, key) ?? key, vars);
+  return (key: string, vars?: Vars) =>
+    interpolate(lookup(lang, key) ?? (lang === DEFAULT_LANG ? key : "—"), vars);
 }
 
 function hasEnglishLetters(text: string): boolean {

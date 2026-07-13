@@ -151,7 +151,7 @@ function recsToSaved(recs: RecCard[]): SavedPayload {
 function DashboardPage() {
   const reduce = useReducedMotion();
   const { user, isAuthenticated, token, isHydrated, hasPaidAccess } = useAuth();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const { saved: savedUnis } = useSavedUniversities();
   const savedCount = savedUnis?.length ?? 0;
   const showBrowseAll = hasPaidAccess && savedCount >= 20;
@@ -299,15 +299,14 @@ function DashboardPage() {
                 </SilentErrorBoundary>
               )}
 
-              {!showBrowseAll &&
-                (loading || (saved && saved.matches.length > 0) || !saved) && (
-                  <QuizMatchesSection
-                    loading={loading}
-                    saved={saved}
-                    subtitle={quizSubtitle}
-                    justRefreshed={justRefreshed}
-                  />
-                )}
+              {!showBrowseAll && (loading || (saved && saved.matches.length > 0) || !saved) && (
+                <QuizMatchesSection
+                  loading={loading}
+                  saved={saved}
+                  subtitle={quizSubtitle}
+                  justRefreshed={justRefreshed}
+                />
+              )}
 
               {authed && (
                 <SilentErrorBoundary>
@@ -360,8 +359,12 @@ function DashboardPage() {
       <WaitlistPopup
         open={!!modal}
         onClose={() => setModal(null)}
-        title={modal ? `${modal.title} — coming soon` : "Coming soon"}
-        body={`Join the waitlist to be first in line and lock in ${WAITLIST_BASE_DISCOUNT}% off monthly access.`}
+        title={
+          modal
+            ? t("dashboard.waitlist.titleWithFeature", { feature: modal.title })
+            : t("dashboard.waitlist.title")
+        }
+        body={t("dashboard.waitlist.body", { discount: WAITLIST_BASE_DISCOUNT })}
         feature={modal?.title}
       />
     </>
@@ -468,8 +471,7 @@ function ThingsToDo({ isAuthenticated }: { isAuthenticated: boolean }) {
   const progress = useProgress();
   const { saved } = useSavedUniversities();
   const targets: BackendTarget[] = useMemo(
-    () =>
-      (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
+    () => (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
     [saved],
   );
   const plan = useIntakePlan(targets);
@@ -597,7 +599,9 @@ function TodoRow({ item }: { item: TodoItem }) {
         params={item.params as never}
         className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-on-surface/[0.03]"
       >
-        <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${TILE[item.tone]}`}>
+        <span
+          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${TILE[item.tone]}`}
+        >
           <Icon className={`h-[18px] w-[18px] ${spin ? "animate-spin" : ""}`} />
         </span>
         <div className="min-w-0 flex-1">
@@ -624,8 +628,7 @@ function TodoRow({ item }: { item: TodoItem }) {
 function SnapshotCard({ quizMatches }: { quizMatches: number }) {
   const { saved } = useSavedUniversities();
   const targets: BackendTarget[] = useMemo(
-    () =>
-      (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
+    () => (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
     [saved],
   );
   const plan = useIntakePlan(targets);
@@ -694,8 +697,7 @@ function SnapshotCard({ quizMatches }: { quizMatches: number }) {
 function YourPicksRail() {
   const { saved } = useSavedUniversities();
   const targets: BackendTarget[] = useMemo(
-    () =>
-      (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
+    () => (saved ?? []).map((s) => ({ system: s.source, externalId: s.externalId, name: s.name })),
     [saved],
   );
   const plan = useIntakePlan(targets);
@@ -731,7 +733,9 @@ function YourPicksRail() {
                 params={{ system: s.source, externalId: s.externalId }}
                 className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-on-surface/[0.03]"
               >
-                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${found ? TILE.green : TILE.muted}`}>
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${found ? TILE.green : TILE.muted}`}
+                >
                   <GraduationCap className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -772,7 +776,9 @@ function DemoCard() {
           <Play className="h-[18px] w-[18px]" />
         </span>
         <div className="min-w-0">
-          <h2 className="font-display text-headline-sm font-bold text-on-surface">See it in action</h2>
+          <h2 className="font-display text-headline-sm font-bold text-on-surface">
+            See it in action
+          </h2>
           <p className="mt-0.5 text-body-sm text-on-surface-variant">
             Watch us fill 3 real applications from your answers in 60 seconds. Nothing is submitted.
           </p>
@@ -821,7 +827,10 @@ function SearchRail() {
 function ComingSoonRail({ onOpen }: { onOpen: (title: string) => void }) {
   return (
     <Card className="p-4 sm:p-5">
-      <SectionHeading title="What's next" subtitle={`Join the waitlist · ${WAITLIST_BASE_DISCOUNT}% off`} />
+      <SectionHeading
+        title="What's next"
+        subtitle={`Join the waitlist · ${WAITLIST_BASE_DISCOUNT}% off`}
+      />
       <ul className="mt-3 flex flex-col divide-y divide-on-surface/8">
         {COMING_SOON.map((t) => {
           const Icon = t.icon;
@@ -832,7 +841,9 @@ function ComingSoonRail({ onOpen }: { onOpen: (title: string) => void }) {
                 onClick={() => onOpen(t.title)}
                 className="group -mx-2 flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-on-surface/[0.03]"
               >
-                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${TILE.muted}`}>
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${TILE.muted}`}
+                >
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -854,7 +865,9 @@ function ComingSoonRail({ onOpen }: { onOpen: (title: string) => void }) {
 function GuestSaveCard() {
   return (
     <Card className="p-4 sm:p-5">
-      <h2 className="font-display text-headline-sm font-bold text-on-surface">Save this workspace</h2>
+      <h2 className="font-display text-headline-sm font-bold text-on-surface">
+        Save this workspace
+      </h2>
       <p className="mt-1 text-body-sm text-on-surface-variant">
         Create a free account to save picks, essays, and answers across devices.
       </p>
@@ -904,7 +917,10 @@ function QuizMatchesSection({
         {loading ? (
           <div className="grid gap-3 sm:grid-cols-2">
             {[0, 1].map((i) => (
-              <div key={i} className="h-40 animate-pulse rounded-2xl border border-on-surface/8 bg-surface-container-lowest" />
+              <div
+                key={i}
+                className="h-40 animate-pulse rounded-2xl border border-on-surface/8 bg-surface-container-lowest"
+              />
             ))}
           </div>
         ) : saved && saved.matches.length > 0 ? (
@@ -975,7 +991,9 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
           <span className="font-display text-headline-md font-bold text-primary tabular-nums">
             {match.match}
           </span>
-          <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/70">%</span>
+          <span className="font-[var(--font-label)] text-label-md font-semibold text-primary/70">
+            %
+          </span>
         </div>
       </div>
       <h3 className="mt-3 font-display text-headline-sm font-bold text-on-surface">{match.name}</h3>
@@ -986,7 +1004,10 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
       )}
       {match.why && (
         <div className="mt-3 flex-1">
-          <WhyReasons why={translatedWhy ?? match.why} className="text-body-sm text-on-surface/75" />
+          <WhyReasons
+            why={translatedWhy ?? match.why}
+            className="text-body-sm text-on-surface/75"
+          />
         </div>
       )}
 
@@ -1024,7 +1045,9 @@ function MatchCard({ match, celebrate = false }: { match: SavedMatch; celebrate?
           <button
             type="button"
             onClick={() =>
-              askAssistant(`Is ${match.name} a good fit for me? Give me the key pros and cons for my profile.`)
+              askAssistant(
+                `Is ${match.name} a good fit for me? Give me the key pros and cons for my profile.`,
+              )
             }
             className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-[var(--font-label)] text-label-sm font-semibold text-on-surface transition-colors hover:bg-on-surface/5"
           >
@@ -1062,7 +1085,8 @@ function BrowseAllCard({ savedCount }: { savedCount: number }) {
             Your shortlist is looking strong
           </h2>
           <p className="mt-1 text-body-sm text-on-surface-variant">
-            {savedCount} universities saved. Explore the full catalogue of 11,000+ to find your next add.
+            {savedCount} universities saved. Explore the full catalogue of 11,000+ to find your next
+            add.
           </p>
         </div>
       </div>
