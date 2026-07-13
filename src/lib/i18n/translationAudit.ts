@@ -227,6 +227,7 @@ function dictionaryTokens(values: Dict): Set<string> {
 const RUSSIAN_UI_TOKENS = dictionaryTokens({
   ...(ru as Dict),
   ...TRANSLATIONS.ru,
+  ...AUDIT_TRANSLATIONS.ru,
 });
 
 export function findLanguageLeaks(values: AuditDictionaries = dictionaries()): string[] {
