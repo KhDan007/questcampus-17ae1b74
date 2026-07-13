@@ -33,14 +33,67 @@ test("audit rejects missing, English-fallback, and wrong-language dictionary val
   assert.deepEqual(findLanguageLeaks(dictionaries), ["ru:greeting:Welcome"]);
 });
 
-test("audit rejects Russian copy in English and Russian stop-words in Kazakh", () => {
+test("audit rejects Russian copy in English and Russian UI tokens in Kazakh", () => {
   const dictionaries = {
     en: { greeting: "Привет" },
     ru: { greeting: "Привет" },
     kk: { greeting: "Привет" },
   };
 
-  assert.deepEqual(findWrongLanguageLeaks(dictionaries), ["en:greeting", "kk:greeting"]);
+  assert.deepEqual(findWrongLanguageLeaks(dictionaries), ["en:greeting", "kk:greeting:привет"]);
+});
+
+test("audit rejects generic English leaks and Russian UI copy without rejecting Kazakh Cyrillic", () => {
+  const foreignCopy = {
+    en: {
+      anywhere: "Anywhere",
+      backend: "Backend unavailable",
+      gap: "Gap year",
+      live: "Live browser",
+      waitlist: "Waitlist pricing",
+    },
+    ru: {
+      anywhere: "Anywhere",
+      backend: "Backend недоступен",
+      gap: "Gap year",
+      live: "Live browser",
+      waitlist: "Waitlist-цены",
+    },
+    kk: {
+      anywhere: "Anywhere",
+      backend: "Backend қолжетімсіз",
+      gap: "Gap year",
+      live: "Live browser",
+      waitlist: "Waitlist бағасы",
+    },
+  };
+
+  assert.deepEqual(findLanguageLeaks(foreignCopy), [
+    "kk:anywhere:Anywhere",
+    "kk:backend:Backend",
+    "kk:gap:Gap,year",
+    "kk:live:Live,browser",
+    "kk:waitlist:Waitlist",
+    "ru:anywhere:Anywhere",
+    "ru:backend:Backend",
+    "ru:gap:Gap,year",
+    "ru:live:Live,browser",
+    "ru:waitlist:Waitlist",
+  ]);
+
+  assert.deepEqual(
+    findWrongLanguageLeaks({
+      en: { continue: "Continue", select: "Select", settings: "Settings", validKazakh: "Kazakh" },
+      ru: {},
+      kk: {
+        continue: "Продолжить",
+        select: "Выберите",
+        settings: "Настройки",
+        validKazakh: "Баптауларды таңдаңыз",
+      },
+    }),
+    ["kk:continue:продолжить", "kk:select:выберите", "kk:settings:настройки"],
+  );
 });
 
 test("audit permits localized attributes but rejects English JSX expression templates", () => {
