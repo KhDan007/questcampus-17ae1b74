@@ -9,7 +9,7 @@ function trimTrailingSlash(url: string): string {
 }
 
 function publicEnv(): PublicEnv {
-  return import.meta.env as PublicEnv;
+  return (import.meta.env ?? (typeof process !== "undefined" ? process.env : {})) as PublicEnv;
 }
 
 function deriveSiteUrl(clientUrl: string): string {

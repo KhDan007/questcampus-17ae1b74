@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UniversitiesRouteImport } from './routes/universities'
 import { Route as TosRouteImport } from './routes/tos'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as EssayRouteImport } from './routes/essay'
@@ -52,6 +54,11 @@ const SigninRoute = SigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -70,6 +77,11 @@ const PlanRoute = PlanRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedbackRoute = FeedbackRouteImport.update({
@@ -186,10 +198,12 @@ export interface FileRoutesByFullPath {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/feedback': typeof FeedbackRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
@@ -215,10 +229,12 @@ export interface FileRoutesByTo {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/feedback': typeof FeedbackRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
@@ -245,10 +261,12 @@ export interface FileRoutesById {
   '/essay': typeof EssayRoute
   '/extension': typeof ExtensionRoute
   '/feedback': typeof FeedbackRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof OnboardingRoute
   '/plan': typeof PlanRoute
   '/prep': typeof PrepRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/tos': typeof TosRoute
   '/universities': typeof UniversitiesRoute
@@ -276,10 +294,12 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/feedback'
+    | '/forgot-password'
     | '/onboarding'
     | '/plan'
     | '/prep'
     | '/profile'
+    | '/reset-password'
     | '/signin'
     | '/tos'
     | '/universities'
@@ -305,10 +325,12 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/feedback'
+    | '/forgot-password'
     | '/onboarding'
     | '/plan'
     | '/prep'
     | '/profile'
+    | '/reset-password'
     | '/signin'
     | '/tos'
     | '/universities'
@@ -334,10 +356,12 @@ export interface FileRouteTypes {
     | '/essay'
     | '/extension'
     | '/feedback'
+    | '/forgot-password'
     | '/onboarding'
     | '/plan'
     | '/prep'
     | '/profile'
+    | '/reset-password'
     | '/signin'
     | '/tos'
     | '/universities'
@@ -364,10 +388,12 @@ export interface RootRouteChildren {
   EssayRoute: typeof EssayRoute
   ExtensionRoute: typeof ExtensionRoute
   FeedbackRoute: typeof FeedbackRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   OnboardingRoute: typeof OnboardingRoute
   PlanRoute: typeof PlanRoute
   PrepRoute: typeof PrepRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
   TosRoute: typeof TosRoute
   UniversitiesRoute: typeof UniversitiesRoute
@@ -404,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -430,6 +463,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feedback': {
@@ -599,10 +639,12 @@ const rootRouteChildren: RootRouteChildren = {
   EssayRoute: EssayRoute,
   ExtensionRoute: ExtensionRoute,
   FeedbackRoute: FeedbackRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   OnboardingRoute: OnboardingRoute,
   PlanRoute: PlanRoute,
   PrepRoute: PrepRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
   TosRoute: TosRoute,
   UniversitiesRoute: UniversitiesRoute,

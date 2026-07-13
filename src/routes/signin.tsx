@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Sparkles, ShieldCheck, Bookmark } from "lucide-react";
@@ -187,7 +187,8 @@ function SignInPage() {
                 Bookmark schools, track deadlines, and never re-do your answers.
               </Perk>
               <Perk icon={<ShieldCheck className="h-4 w-4" />} title="Waitlist pricing">
-                {WAITLIST_BASE_DISCOUNT}% off monthly access on the Essay Assistant, Tracker, and Auto-Apply.
+                {WAITLIST_BASE_DISCOUNT}% off monthly access on the Essay Assistant, Tracker, and
+                Auto-Apply.
               </Perk>
             </ul>
           </motion.aside>
@@ -276,6 +277,15 @@ function SignInPage() {
                   </button>
                 </div>
               </Field>
+
+              {mode === "signin" && (
+                <Link
+                  to="/forgot-password"
+                  className="-mt-1 w-fit text-body-sm font-medium text-primary hover:underline"
+                >
+                  {t("signin.forgotPassword")}
+                </Link>
+              )}
 
               {error && (
                 <p

@@ -159,7 +159,7 @@ export const auth = {
 
   async requestPasswordReset(email: string): Promise<{ ok: true; message: string }> {
     return postAt(passwordResetBase(), "/api/auth/password-reset/request", {
-      email,
+      email: email.trim().toLowerCase(),
       lang: getCurrentLang(),
     });
   },
