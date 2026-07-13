@@ -72,7 +72,6 @@ const ALLOWED_FOREIGN_TOKENS = new Set([
   "PDF",
   "QuestCampus",
   "SAT",
-  "Sciences",
   "TOEFL",
   "URL",
   "YouTube",
@@ -91,13 +90,14 @@ const ALLOWED_FOREIGN_TOKENS = new Set([
   "Stanford",
   "STEM",
   "txt",
-  "University",
 ]);
 const ALLOWED_FOREIGN_PHRASES = [
   "A-Levels",
   "Chrome Web Store",
   "Common App",
   "Sciences Po",
+  "Northwestern University",
+  "Stanford University",
   "questcampus-extension",
 ];
 // Kazakh and Russian share Cyrillic. These are known shared proper names and
@@ -115,6 +115,18 @@ const KAZAKH_RUSSIAN_SHARED_TOKENS = new Set([
   "ai",
   "html",
   "url",
+  "ямайка",
+]);
+// Static, reviewed high-signal Russian UI words that do not have a distinctive
+// suffix. This complements the Russian dictionary-derived corpus below.
+const RUSSIAN_UI_COMMON_TOKENS = new Set([
+  "привет",
+  "настройки",
+  "продолжить",
+  "выберите",
+  "удалить",
+  "сохранить",
+  "отменить",
 ]);
 
 function normalize(value: string): string {
@@ -213,23 +225,17 @@ function dictionaryTokens(values: Dict): Set<string> {
 }
 
 // The corpus is generated from the actual Russian product dictionary, rather
-// than a hand-picked stop-list. To avoid treating legitimate Kazakh Cyrillic
-// loanwords, country names, and shared academic terms as Russian, remove the
-// current Kazakh vocabulary before auditing. The explicit list above remains
-// for true shared identifiers that should survive future dictionary changes.
+// than a hand-picked stop-list. The static Russian morphology model below is
+// independent of the target Kazakh dictionary: it catches distinctive Russian
+// UI verbs and noun/adjective forms while avoiding Kazakh Cyrillic loanwords,
+// country names, and academic terms. The explicit list above is reserved for
+// true shared identifiers that should survive future dictionary changes.
 const RUSSIAN_UI_TOKENS = dictionaryTokens({
   ...(ru as Dict),
   ...TRANSLATIONS.ru,
   ...AUDIT_TRANSLATIONS.ru,
 });
-const KAZAKH_UI_TOKENS = dictionaryTokens({
-  ...(kk as Dict),
-  ...TRANSLATIONS.kk,
-  ...AUDIT_TRANSLATIONS.kk,
-});
-const DISTINCTIVE_RUSSIAN_UI_TOKENS = new Set(
-  [...RUSSIAN_UI_TOKENS].filter((token) => !KAZAKH_UI_TOKENS.has(token)),
-);
+const DISTINCTIVE_RUSSIAN_UI_FORM = /(?:ить|йти|йте|ите|йка|йки|ками|ский|ская|ские|ского|скому)$/u;
 
 export function findLanguageLeaks(values: AuditDictionaries = dictionaries()): string[] {
   const problems: string[] = [];
@@ -257,7 +263,8 @@ export function findWrongLanguageLeaks(values: AuditDictionaries = dictionaries(
     const russianTokens = (value.normalize("NFC").toLocaleLowerCase().match(/\p{L}+/gu) ?? [])
       .filter(
         (token) =>
-          DISTINCTIVE_RUSSIAN_UI_TOKENS.has(token) &&
+          RUSSIAN_UI_TOKENS.has(token) &&
+          (DISTINCTIVE_RUSSIAN_UI_FORM.test(token) || RUSSIAN_UI_COMMON_TOKENS.has(token)) &&
           !KAZAKH_RUSSIAN_SHARED_TOKENS.has(token),
       );
     if (russianTokens.length) problems.push(`kk:${key}:${[...new Set(russianTokens)].join(",")}`);

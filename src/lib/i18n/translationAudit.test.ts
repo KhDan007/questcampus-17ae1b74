@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import en from "./generated/en.json";
+import kk from "./generated/kk.json";
+import ru from "./generated/ru.json";
 
 import {
   findEnglishFallbacks,
@@ -94,6 +97,33 @@ test("audit rejects generic English leaks and Russian UI copy without rejecting 
     }),
     ["kk:continue:продолжить", "kk:select:выберите", "kk:settings:настройки"],
   );
+});
+
+test("actual Kazakh dictionary mutations cannot self-whitelist Russian UI copy", () => {
+  const mutatedKazakh = {
+    ...kk,
+    "test.russianInjection": "Настройки Продолжить Выберите",
+  };
+
+  assert.deepEqual(
+    findWrongLanguageLeaks({ en, ru, kk: mutatedKazakh }).filter((problem) => problem.startsWith("kk:test.")),
+    ["kk:test.russianInjection:настройки,продолжить,выберите"],
+  );
+});
+
+test("audit permits full institution names but rejects isolated English institution terms", () => {
+  const dictionaries = {
+    en: { sciences: "Sciences", sciencesPo: "Sciences Po", university: "University" },
+    ru: { sciences: "Sciences", sciencesPo: "Sciences Po", university: "University" },
+    kk: { sciences: "Sciences", sciencesPo: "Sciences Po", university: "University" },
+  };
+
+  assert.deepEqual(findLanguageLeaks(dictionaries), [
+    "kk:sciences:Sciences",
+    "kk:university:University",
+    "ru:sciences:Sciences",
+    "ru:university:University",
+  ]);
 });
 
 test("audit permits localized attributes but rejects English JSX expression templates", () => {
