@@ -95,6 +95,48 @@ export function useApplicationPlan(
   return useQuery(api.applicationPlan.getPlan, args) as ApplicationPlan | undefined;
 }
 
+// The single source of readiness truth for one target: the full data-quality
+// gate (checklistForTargets.perTarget[].qualityStatus). Drives the honest badge,
+// the apply stepper, and whether the per-uni plan is shown or held behind a
+// "still researching" panel — so every surface agrees on the same state.
+export type TargetReadiness = {
+  qualityStatus: string;
+  blockedReason: string | null;
+  ready: boolean;
+};
+
+export function useTargetReadiness(
+  system: string | undefined,
+  externalId: string | undefined,
+): TargetReadiness | undefined {
+  const { token } = useAuth();
+  const args =
+    token && system && externalId
+      ? ({ token, targets: [{ system, externalId }] } as never)
+      : ("skip" as const);
+  const res = useQuery(api.applications.checklistForTargets, args) as
+    | {
+        perTarget: Array<{
+          system: string;
+          externalId: string;
+          qualityStatus?: string;
+          blockedReason?: string | null;
+        }>;
+      }
+    | null
+    | undefined;
+  return useMemo(() => {
+    if (res === undefined) return undefined;
+    const row = res?.perTarget?.[0];
+    const qualityStatus = row?.qualityStatus ?? "needs_research";
+    return {
+      qualityStatus,
+      blockedReason: row?.blockedReason ?? null,
+      ready: qualityStatus === "ready_to_fill",
+    };
+  }, [res]);
+}
+
 export function useSetPlanDeadline() {
   const { token } = useAuth();
   const mut = useMutation(api.applicationPlan.setPlanDeadline);

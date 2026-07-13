@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Loader2, CheckCircle2, Circle, ChevronDown, ChevronRight, CalendarClock, BookOpen } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   useApplicationPlan,
   useSetPlanDeadline,
   useSetTaskDone,
   useEssaysForTarget,
+  useTargetReadiness,
   type PlanTask,
   type EssayForTarget,
 } from "@/lib/apply/plan";
@@ -46,6 +48,7 @@ export function ApplicationPlanView({
   externalId: string;
 }) {
   const plan = useApplicationPlan(system, externalId);
+  const readiness = useTargetReadiness(system, externalId);
   const setDeadline = useSetPlanDeadline();
   const setTaskDone = useSetTaskDone();
   const essays = useEssaysForTarget(system, externalId);
@@ -79,6 +82,33 @@ export function ApplicationPlanView({
     return (
       <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 text-body-md text-on-surface-variant qc-soft-shadow">
         We&apos;re still researching this university&apos;s requirements.
+      </div>
+    );
+  }
+
+  // Hold the full plan behind a consistent panel until the target clears the
+  // data-quality gate (same truth /plan uses to keep unresearched targets out of
+  // the schedule). needs_user_input still shows the plan — that IS how the user
+  // supplies what's missing. Only needs_research / unsupported are held.
+  if (readiness && (readiness.qualityStatus === "needs_research" || readiness.qualityStatus === "unsupported")) {
+    const researching = readiness.qualityStatus === "needs_research";
+    return (
+      <div className="rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-6 qc-soft-shadow">
+        <h3 className="font-display text-headline-sm font-bold text-on-surface">
+          {researching ? "Still researching this university" : "This portal needs a manual step"}
+        </h3>
+        <p className="mt-1 text-body-md text-on-surface-variant">
+          {researching
+            ? "We're confirming this university's exact requirements. Your step-by-step plan appears here as soon as the data is trustworthy — no guessing, no half-filled forms."
+            : "This university's portal can't be prepared automatically yet. We'll guide you through the manual steps."}
+        </p>
+        <p className="mt-3 text-body-sm text-on-surface-variant">
+          Meanwhile, your shared work (profile, personal statement, transcript) is already in{" "}
+          <Link to="/plan" className="font-semibold text-primary underline-offset-2 hover:underline">
+            your full plan
+          </Link>
+          .
+        </p>
       </div>
     );
   }
