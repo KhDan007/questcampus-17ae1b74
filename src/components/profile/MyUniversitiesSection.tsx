@@ -15,10 +15,12 @@ import {
   useSavedUniversities,
   type SavedUniversity,
 } from "@/lib/universities/savedClient";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 const PREVIEW_COUNT = 5;
 
 export function MyUniversitiesSection() {
+  const { t } = useI18n();
   const reduce = useReducedMotion();
   const { saved, isAuthenticated, removeById } = useSavedUniversities();
 
@@ -55,7 +57,7 @@ export function MyUniversitiesSection() {
           <p className="mt-1 text-body-md text-on-surface-variant">
             {list.length === 0
               ? "Your saved shortlist will appear here."
-              : `${list.length} saved · preview of your shortlist.`}
+              : t("audit.profile.savedPreview", { count: list.length })}
           </p>
         </div>
         <Link

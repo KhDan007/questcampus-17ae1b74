@@ -21,6 +21,7 @@ import {
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { SilentErrorBoundary } from "@/components/SilentErrorBoundary";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import { useChecklist } from "@/lib/apply/intake";
 import { buildAgentCockpitModel, savedUniversitiesToBackendTargets } from "@/lib/agent/cockpitModel";
@@ -68,6 +69,7 @@ function AgentPage() {
 }
 
 function AgentCockpit() {
+  const { t } = useI18n();
   const {
     latestBrain,
     roadmap,
@@ -487,7 +489,7 @@ function TargetReadinessPanel({
                 <p className="mt-1 text-body-sm text-on-surface-variant">
                   {target.ready
                     ? "Ready package can be requested by the browser extension. Human still reviews and submits."
-                    : `${target.requiredSatisfied ?? 0} of ${target.requiredTotal ?? 0} required items satisfied. ${target.blocking ?? 0} blocker${(target.blocking ?? 0) === 1 ? "" : "s"} remain.`}
+                    : t((target.blocking ?? 0) === 1 ? "audit.agent.requiredItems.one" : "audit.agent.requiredItems.many", { satisfied: target.requiredSatisfied ?? 0, total: target.requiredTotal ?? 0, blockers: target.blocking ?? 0 })}
                 </p>
                 {!!target.nextActions?.length && (
                   <ul className="mt-2 space-y-1">
@@ -707,6 +709,7 @@ function DecisionTracePanel({
   submissionCount: number;
   evidenceCount: number;
 }) {
+  const { t } = useI18n();
   const profile = latestBrain?.profileSnapshot;
   const profileComplete = !!profile?.completed;
   const profileFacts = [
@@ -798,7 +801,7 @@ function DecisionTracePanel({
         </p>
         <p className="mt-1 text-body-sm text-on-surface-variant">
           {latestBrain?.staleFlags?.length
-            ? `${latestBrain.staleFlags.length} stale signal${latestBrain.staleFlags.length === 1 ? "" : "s"} need review before trusting the roadmap.`
+            ? t(latestBrain.staleFlags.length === 1 ? "audit.agent.staleSignals.one" : "audit.agent.staleSignals.many", { count: latestBrain.staleFlags.length })
             : "Freshness, source coverage, and gaps stay visible before the agent recommends action."}
         </p>
       </div>

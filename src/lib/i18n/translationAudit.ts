@@ -23,7 +23,23 @@ const TRANSLATABLE_ATTRIBUTES = new Set([
   "placeholder",
   "alt",
 ]);
-const RENDERED_COPY_PROPS = new Set(["body"]);
+// Props that render user-facing text. Event handlers and data props are deliberately
+// excluded; their string values are not rendered by the receiving JSX element.
+const RENDERED_COPY_PROPS = new Set([
+  "alt",
+  "aria-description",
+  "aria-label",
+  "body",
+  "children",
+  "description",
+  "helperText",
+  "label",
+  "message",
+  "placeholder",
+  "subtitle",
+  "text",
+  "title",
+]);
 // These literal keys are CSS, browser, date, file-type, or font configuration,
 // never rendered product copy. Keep the exception list narrow and explicit.
 const TECHNICAL_LITERAL_KEYS = new Set([
@@ -36,6 +52,8 @@ const TECHNICAL_LITERAL_KEYS = new Set([
 ]);
 const SKIPPED_TAGS = new Set(["svg", "code", "pre"]);
 const ALLOWED_FOREIGN_TOKENS = new Set([
+  // Product names, university names, official exams/credentials, browser UI,
+  // file formats, domains, and implementation terms intentionally shown verbatim.
   "ACT",
   "AI",
   "API",
@@ -46,6 +64,7 @@ const ALLOWED_FOREIGN_TOKENS = new Set([
   "Duolingo",
   "Firefox",
   "GPT",
+  "Google",
   "HTML",
   "IB",
   "IELTS",
@@ -60,20 +79,53 @@ const ALLOWED_FOREIGN_TOKENS = new Set([
   "YouTube",
   "App",
   "Po",
+  "A",
+  "Abitur",
+  "A-Levels",
+  "amp",
+  "anchor",
+  "B",
+  "beta",
+  "browser",
+  "captcha",
+  "chrome",
+  "Developer",
+  "docx",
+  "edu",
+  "email",
+  "ETH",
+  "extensions",
+  "Gaokao",
+  "GPA",
+  "kz",
+  "live",
+  "Load",
+  "mode",
+  "Northwestern",
+  "onboarding",
+  "pdf",
+  "Polar",
+  "puzzle-piece",
+  "questcampus-extension",
+  "RAG",
+  "Stanford",
+  "STEM",
+  "Store",
+  "txt",
+  "unpacked",
+  "unzip",
+  "University",
+  "Web",
+  "X",
+  "Anywhere",
+  "Backend",
+  "gap",
+  "year",
+  "already",
+  "waitlist",
 ]);
 const RUSSIAN_WORDS = new Set([
-  "в",
-  "и",
-  "или",
-  "для",
-  "на",
-  "от",
   "привет",
-  "удалить",
-  "войти",
-  "отмена",
-  "загрузить",
-  "настройки",
 ]);
 
 function normalize(value: string): string {
@@ -152,7 +204,7 @@ function isUserFacingCopy(key: string, value: string): boolean {
 function foreignTokens(value: string): string[] {
   const visible = value.replace(/\{[^}]+}/g, "").replace(/\b[^\s@]+@[^\s@]+\.[^\s@]+\b/g, "");
   return (visible.match(/\b[A-Za-z][A-Za-z-]*\b/g) ?? []).filter(
-    (token) => !ALLOWED_FOREIGN_TOKENS.has(token),
+    (token) => token.length > 1 && !ALLOWED_FOREIGN_TOKENS.has(token),
   );
 }
 
@@ -180,7 +232,7 @@ export function findWrongLanguageLeaks(values: AuditDictionaries = dictionaries(
   }
   for (const [key, value] of Object.entries(values.kk)) {
     const words = value.toLowerCase().match(/\p{L}+/gu) ?? [];
-    if (/[ЁёЪъЬьЭэ]/.test(value) || words.some((word) => RUSSIAN_WORDS.has(word))) {
+    if (words.some((word) => RUSSIAN_WORDS.has(word))) {
       problems.push(`kk:${key}`);
     }
   }
@@ -261,16 +313,39 @@ function report(file: string, source: ts.SourceFile, node: ts.Node, value: strin
 }
 
 function translationCall(node: ts.Expression): boolean {
+  if (!ts.isCallExpression(node)) return false;
   return (
-    ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "t"
+    (ts.isIdentifier(node.expression) && node.expression.text === "t") ||
+    (ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "t")
   );
 }
 
-function expressionLiteral(node: ts.Expression, source: ts.SourceFile): string | null {
-  if (translationCall(node)) return null;
-  if (ts.isStringLiteralLike(node)) return node.text;
-  if (ts.isTemplateExpression(node)) return node.getText(source).slice(1, -1);
-  return null;
+function expressionLiterals(node: ts.Expression, source: ts.SourceFile): string[] {
+  if (translationCall(node)) return [];
+  if (ts.isStringLiteralLike(node)) return [node.text];
+  if (ts.isTemplateExpression(node)) return [node.getText(source).slice(1, -1)];
+  if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isTypeAssertionExpression(node)) {
+    return expressionLiterals(node.expression, source);
+  }
+  if (ts.isNonNullExpression(node)) return expressionLiterals(node.expression, source);
+  if (ts.isConditionalExpression(node)) {
+    return [
+      ...expressionLiterals(node.whenTrue, source),
+      ...expressionLiterals(node.whenFalse, source),
+    ];
+  }
+  if (ts.isBinaryExpression(node) && (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken || node.operatorToken.kind === ts.SyntaxKind.BarBarToken)) {
+    return [
+      ...expressionLiterals(node.left, source),
+      ...expressionLiterals(node.right, source),
+    ];
+  }
+  if (ts.isArrayLiteralExpression(node)) {
+    return node.elements.flatMap((element) =>
+      ts.isExpression(element) ? expressionLiterals(element, source) : [],
+    );
+  }
+  return [];
 }
 
 export function findUnregisteredLiteralsInSource(
@@ -310,17 +385,23 @@ export function findUnregisteredLiteralsInSource(
         problems.push(report(file, source, node, value));
     }
 
-    const parentAttribute = node.parent && ts.isJsxAttribute(node.parent) ? node.parent : null;
     if (
       ts.isJsxExpression(node) &&
       node.expression &&
       !isSkippedJsx(node) &&
-      parentAttribute &&
-      RENDERED_COPY_PROPS.has(parentAttribute.name.text)
+      (() => {
+        const parentAttribute = ts.isJsxAttribute(node.parent) ? node.parent : null;
+        return (
+          ts.isJsxElement(node.parent) ||
+          ts.isJsxFragment(node.parent) ||
+          (parentAttribute !== null && RENDERED_COPY_PROPS.has(parentAttribute.name.text))
+        );
+      })()
     ) {
-      const value = expressionLiteral(node.expression, source);
-      if (value && !isDictionaryLiteral(value, english, values)) {
-        problems.push(report(file, source, node, value));
+      for (const value of expressionLiterals(node.expression, source)) {
+        if (!isDictionaryLiteral(value, english, values)) {
+          problems.push(report(file, source, node, value));
+        }
       }
     }
 

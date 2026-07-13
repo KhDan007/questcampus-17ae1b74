@@ -41,20 +41,8 @@ const GENERATED: Record<LangCode, Dict> = {
 };
 const DICTIONARIES: Record<LangCode, Dict> = {
   en: { ...GENERATED.en, ...(TRANSLATIONS.en ?? {}), ...AUDIT_TRANSLATIONS.en },
-  ru: {
-    ...GENERATED.en,
-    ...(TRANSLATIONS.en ?? {}),
-    ...GENERATED.ru,
-    ...(TRANSLATIONS.ru ?? {}),
-    ...AUDIT_TRANSLATIONS.ru,
-  },
-  kk: {
-    ...GENERATED.en,
-    ...(TRANSLATIONS.en ?? {}),
-    ...GENERATED.kk,
-    ...(TRANSLATIONS.kk ?? {}),
-    ...AUDIT_TRANSLATIONS.kk,
-  },
+  ru: { ...GENERATED.ru, ...(TRANSLATIONS.ru ?? {}), ...AUDIT_TRANSLATIONS.ru },
+  kk: { ...GENERATED.kk, ...(TRANSLATIONS.kk ?? {}), ...AUDIT_TRANSLATIONS.kk },
 };
 const ATTRS = ["aria-label", "aria-description", "title", "placeholder", "alt"] as const;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "CODE", "PRE", "TEXTAREA", "NOSCRIPT", "SVG"]);

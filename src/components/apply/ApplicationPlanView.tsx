@@ -14,6 +14,7 @@ import {
   type EssayForTarget,
 } from "@/lib/apply/plan";
 import { TaskGuideDialog } from "@/components/apply/TaskGuideDialog";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 function fmtDate(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, {
@@ -47,6 +48,7 @@ export function ApplicationPlanView({
   system: string;
   externalId: string;
 }) {
+  const { t } = useI18n();
   const plan = useApplicationPlan(system, externalId);
   const readiness = useTargetReadiness(system, externalId);
   const setDeadline = useSetPlanDeadline();
@@ -99,7 +101,7 @@ export function ApplicationPlanView({
         </h3>
         <p className="mt-1 text-body-md text-on-surface-variant">
           {researching
-            ? "We're confirming this university's exact requirements. Your step-by-step plan appears here as soon as the data is trustworthy — no guessing, no half-filled forms."
+            ? t("audit.applicationPlan.researchingBody")
             : "This university's portal can't be prepared automatically yet. We'll guide you through the manual steps."}
         </p>
         <p className="mt-3 text-body-sm text-on-surface-variant">
@@ -234,6 +236,7 @@ function TaskRow({
   matchingEssays: EssayForTarget[];
   onToggle: () => Promise<void> | void;
 }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [draftsOpen, setDraftsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -298,7 +301,7 @@ function TaskRow({
                 : "bg-surface-container text-on-surface-variant")
             }
           >
-            {overdue ? "Overdue" : `due ${fmtDate(task.dueMs)}`}
+            {overdue ? "Overdue" : t("audit.applicationPlan.due", { date: fmtDate(task.dueMs) })}
           </span>
           {task.wordLimit ? (
             <span className="text-label-sm text-on-surface-variant">

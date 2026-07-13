@@ -25,6 +25,7 @@ import {
   type Rewrite,
 } from "@/lib/apply/activityCoach";
 import { Card, IconTile, Chip, cx } from "@/components/ui/calm";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 const TIER_TONE: Record<"strong" | "developing" | "weak", "green" | "amber" | "coral"> = {
   strong: "green",
@@ -363,6 +364,7 @@ function SuggestionPanel({
   onApply: () => void;
   onDismiss: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="mt-3 rounded-xl border border-on-surface/8 bg-surface-container-lowest p-4 qc-soft-shadow">
       <div className="flex items-center gap-2">
@@ -371,8 +373,8 @@ function SuggestionPanel({
       </div>
 
       <div className="mt-3 flex flex-col gap-2">
-        <SuggestedField label={`Role (${suggestion.role.length}/${ROLE_MAX})`} value={suggestion.role} />
-        <SuggestedField label={`Description (${suggestion.description.length}/${DESC_MAX})`} value={suggestion.description} />
+        <SuggestedField label={t("audit.activities.roleCount", { count: suggestion.role.length, max: ROLE_MAX })} value={suggestion.role} />
+        <SuggestedField label={t("audit.activities.descriptionCount", { count: suggestion.description.length, max: DESC_MAX })} value={suggestion.description} />
       </div>
 
       {suggestion.changes.length > 0 && (

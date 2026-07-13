@@ -392,6 +392,7 @@ function SidebarBody({
   onOpenPlan: () => void;
   hideCollapseToggle?: boolean;
 }) {
+  const { t } = useI18n();
   const freeHook = useFreeHook();
 
   return (
@@ -404,7 +405,7 @@ function SidebarBody({
             type="button"
             onClick={onToggleCollapsed}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={`${collapsed ? "Expand" : "Collapse"} sidebar (⌘B)`}
+            title={t(collapsed ? "audit.dashboard.sidebarExpand" : "audit.dashboard.sidebarCollapse")}
             className="grid h-8 w-8 place-items-center rounded-md text-on-surface/50 transition-colors hover:bg-on-surface/5 hover:text-on-surface"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

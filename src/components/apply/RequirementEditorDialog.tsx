@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { IntakeItem } from "@/lib/apply/intake";
 import { IntakeItemField } from "@/components/apply/collect/RequirementField";
 import { useNavigate } from "@tanstack/react-router";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   open: boolean;
@@ -17,6 +18,7 @@ type Props = {
 
 export function RequirementEditorDialog({ open, onClose, item, system, externalId, onSave }: Props) {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return;
@@ -59,7 +61,7 @@ export function RequirementEditorDialog({ open, onClose, item, system, externalI
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`Edit ${item.label}`}
+        aria-label={t("audit.requirementEditor.title", { label: item.label })}
         className="relative w-full max-w-xl rounded-2xl border border-on-surface/8 bg-surface-container-lowest p-5 qc-soft-shadow sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >

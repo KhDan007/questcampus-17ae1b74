@@ -66,6 +66,7 @@ import {
 } from "@/lib/chat/navigationRoutes";
 import { userVisibleChatContent } from "@/lib/chat/pageContext";
 import { friendlyStepLabels } from "@/lib/chat/stepLabels";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 const SUGGESTIONS = [
   "What is my safest next action?",
@@ -164,6 +165,7 @@ function SidebarPanel({
   initialPrompt?: { prompt: string; id: number } | null;
   onConsumed?: () => void;
 }) {
+  const { t } = useI18n();
   const { width, collapsed, setCollapsed, setWidth, isDesktop } = useChatDock();
   const threads = useChatThreads();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
@@ -385,7 +387,7 @@ function SidebarPanel({
         </button>
         {credits && (
           <span
-            title={`${credits.remaining} agent credits left (${credits.tier})`}
+            title={t("audit.chat.creditsRemaining", { remaining: credits.remaining, tier: credits.tier })}
             className="mt-2 rounded-full bg-primary-fixed/70 px-1.5 py-0.5 text-label-sm font-semibold text-primary"
           >
             {credits.remaining}
@@ -432,8 +434,8 @@ function SidebarPanel({
             <span
               title={
                 credits.remaining <= 0
-                  ? `Agent credits used — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
-                  : `${credits.remaining} of ${credits.grant} left (${credits.tier}) — resets ${new Date(credits.resetsAt).toLocaleDateString()}`
+                  ? t("audit.chat.creditsExhausted", { date: new Date(credits.resetsAt).toLocaleDateString() })
+                  : t("audit.chat.creditsAvailable", { remaining: credits.remaining, grant: credits.grant, tier: credits.tier, date: new Date(credits.resetsAt).toLocaleDateString() })
               }
               className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-[var(--font-label)] text-label-sm font-semibold ${
                 credits.remaining <= 0

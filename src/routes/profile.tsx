@@ -668,9 +668,9 @@ function ReferralPanel({ referrals }: { referrals: ReferralSummary }) {
       {(qualified > 0 || pending > 0) && (
         <p className="text-label-sm text-on-surface-variant">
           {qualified > 0 &&
-            `${qualified} friend${qualified === 1 ? "" : "s"} joined and qualified.`}
+            t(qualified === 1 ? "audit.profile.qualified.one" : "audit.profile.qualified.many", { count: qualified })}
           {qualified > 0 && pending > 0 && " "}
-          {pending > 0 && `${pending} more signed up, waiting on onboarding to qualify.`}
+          {pending > 0 && t("audit.profile.pending", { count: pending })}
         </p>
       )}
     </div>

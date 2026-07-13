@@ -24,6 +24,7 @@ import {
   type RepeatGroup,
 } from "@/lib/apply/commonAppProfile";
 import { useSetAnswer } from "@/lib/apply/intake";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 
 
@@ -31,6 +32,7 @@ export function CommonAppProfile({
   focusSection,
   embedded = false,
 }: { focusSection?: string; embedded?: boolean } = {}) {
+  const { t } = useI18n();
   const schema = useCommonAppSchema();
   const profile = useCommonAppProfile();
   const setAnswer = useSetAnswer();
@@ -124,7 +126,7 @@ export function CommonAppProfile({
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-3">
               <p className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
-                {complete ? "Profile complete" : `${percent}% complete`}
+                {complete ? "Profile complete" : t("audit.commonApp.complete", { percent })}
               </p>
               <p className="text-label-sm text-on-surface-variant">
                 {completeness?.requiredDone ?? 0}/{completeness?.requiredTotal ?? 0} required fields

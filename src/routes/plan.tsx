@@ -29,6 +29,7 @@ import {
 import { api } from "@/convex/_generated/api";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 // -----------------------------------------------------------------------------
 // Backend contract (planner.unifiedPlan). The generated api is an untyped stub,
@@ -271,6 +272,7 @@ function TaskRow({
   done: boolean;
   onToggle: (task: UnifiedTask, next: boolean) => void;
 }) {
+  const { t } = useI18n();
   const Icon = kindIcon(task.kind);
   const overdue = task.deadlineMs != null && task.deadlineMs < nowMs && !done;
   return (
@@ -279,7 +281,7 @@ function TaskRow({
         type="checkbox"
         checked={done}
         onChange={(e) => onToggle(task, e.target.checked)}
-        aria-label={`Mark "${task.label}" ${done ? "not done" : "done"}`}
+        aria-label={t("audit.plan.markTask", { task: task.label, status: t(done ? "audit.plan.notDone" : "audit.plan.done") })}
         className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-primary"
       />
       <a

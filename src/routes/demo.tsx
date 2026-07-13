@@ -19,6 +19,7 @@ import {
   type PortalReplicaStep,
 } from "@/components/demo/PortalReplica";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 /* ── Local types for the (untyped) demo.plan contract ───────────────────── */
 
@@ -419,6 +420,7 @@ function PortalChip({
   reduce: boolean;
   onClick: () => void;
 }) {
+  const { t } = useI18n();
   const done = state === "done";
   const filling = state === "filling";
   const icon = done ? (
@@ -434,7 +436,7 @@ function PortalChip({
       <button
         type="button"
         onClick={onClick}
-        title={`Scroll to ${university}`}
+        title={t("audit.demo.scrollTo", { university })}
         className={`flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-on-surface/8 bg-surface-container-lowest px-3 py-2.5 text-left qc-soft-shadow transition-colors hover:bg-on-surface/[0.03] ${
           active ? "ring-1 ring-primary/30" : ""
         }`}

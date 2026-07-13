@@ -257,7 +257,7 @@ export function EssayReview({
   onAutoEssayConsumed?: () => void;
 }) {
   const reduce = useReducedMotion();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const [mode, setMode] = useState<Mode>("paste");
   const [pasted, setPasted] = useState("");
   const [pickedEssayId, setPickedEssayId] = useState<string | null>(null);
@@ -467,7 +467,7 @@ export function EssayReview({
             />
             <p className="mt-1.5 text-label-sm text-on-surface-variant">
               {pasted.trim()
-                ? `${pasted.trim().split(/\s+/).length} words`
+                ? t("audit.essay.wordCount", { count: pasted.trim().split(/\s+/).length })
                 : "Aim for at least ~120 words for real feedback."}
             </p>
           </div>
@@ -624,6 +624,7 @@ function ResultCard({
   essayId: string | null;
 }) {
   const reduce = useReducedMotion();
+  const { t } = useI18n();
   const { free, paid, locked, sourceLabel, wordCount } = result;
   const tier = tierColor(free.overall, free.band, free.bandLabel);
 
@@ -960,7 +961,7 @@ function Workspace({
           <div className="flex items-center justify-between gap-3">
             <h3 className="font-display text-headline-sm font-bold text-on-surface">Your essay</h3>
             <p className="font-[var(--font-label)] text-label-sm text-on-surface-variant">
-              {workingText.trim() ? `${workingText.trim().split(/\s+/).length} words` : ""}
+              {workingText.trim() ? t("audit.essay.wordCount", { count: workingText.trim().split(/\s+/).length }) : ""}
             </p>
           </div>
           <p className="mt-1 text-label-sm text-on-surface-variant">
@@ -1230,8 +1231,9 @@ function ScoreRing({
 }
 
 function Dots({ score }: { score: number }) {
+  const { t } = useI18n();
   return (
-    <div className="flex items-center gap-1" aria-label={`${score} out of 5`}>
+    <div className="flex items-center gap-1" aria-label={t("essay.score.outOfFive", { score })}>
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
@@ -1291,6 +1293,7 @@ function LockedTeaser({
   dimensions: Dimension[];
   reduce: boolean;
 }) {
+  const { t } = useI18n();
   return (
     <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
       <ul className="grid gap-2">
@@ -1329,7 +1332,7 @@ function LockedTeaser({
         <div className="mt-5">
           <UnlockButton
             token={token}
-            label={`Unlock for $${PRICE_MVP}/month`}
+            label={t("audit.essay.unlock", { price: PRICE_MVP })}
             className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 font-[var(--font-label)] text-label-lg font-bold text-white transition-colors hover:bg-primary/90"
           />
         </div>

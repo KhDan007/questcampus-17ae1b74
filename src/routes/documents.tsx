@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import { useSavedUniversities } from "@/lib/universities/savedClient";
 import {
   DOC_KIND_OPTIONS,
@@ -170,6 +171,7 @@ function DocCard({
   };
   onRemoveRequest: () => void;
 }) {
+  const { t } = useI18n();
   const kindLabel =
     DOC_KIND_OPTIONS.find((o) => o.kind === doc.docKind)?.label ?? doc.docKind;
   return (
@@ -178,7 +180,7 @@ function DocCard({
         to="/documents/$id"
         params={{ id: doc.id }}
         className="absolute inset-0 z-10"
-        aria-label={`Open ${doc.title}`}
+        aria-label={t("audit.documents.openTitle", { title: doc.title })}
       />
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

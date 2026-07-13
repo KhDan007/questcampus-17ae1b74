@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, ChevronDown, ExternalLink } from "lucide-react";
 import type { EligibilityResult, EligQuestion } from "@/lib/apply/intake";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   eligibility: EligibilityResult;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [openWhy, setOpenWhy] = useState<string | null>(null);
   const [local, setLocal] = useState<Record<string, string>>({});
@@ -48,9 +50,9 @@ export function EligibilityCard({ eligibility, onAnswer, showQuestions = true }:
             </h3>
             <p className="mt-0.5 text-body-sm text-on-surface-variant">
               {showQuestions && questions.length > 0
-                ? `${questions.length} quick ${questions.length === 1 ? "question" : "questions"} to confirm fit.`
+                ? t(questions.length === 1 ? "audit.eligibility.questions.one" : "audit.eligibility.questions.many", { count: questions.length })
                 : "Confirm your fit for each university."}
-              {ineligible.length > 0 && ` · ${ineligible.length} may not be a match.`}
+              {ineligible.length > 0 && t("audit.eligibility.notMatch", { count: ineligible.length })}
             </p>
           </div>
         </div>

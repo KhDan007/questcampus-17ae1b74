@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Check, Loader2, CircleDashed, AlertTriangle, Send } from "lucide-react";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
 import type { IntakeTarget, EligibilityPerTarget, ChecklistResult } from "@/lib/apply/intake";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   targets: IntakeTarget[];
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function ReadinessRail({ targets, eligibility, checklist }: Props) {
+  const { t } = useI18n();
   const applyGate = useAutoApplyGate();
   const navigate = useNavigate();
   const [busyKey, setBusyKey] = useState<string | null>(null);
@@ -108,7 +110,7 @@ export function ReadinessRail({ targets, eligibility, checklist }: Props) {
                   type="button"
                   onClick={() => void applyOne(t)}
                   disabled={busyKey === key}
-                  aria-label={`Auto-apply to ${t.name ?? t.externalId}`}
+                  aria-label={t("audit.readiness.autoApply", { name: t.name ?? t.externalId })}
                   className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-primary px-2.5 py-1 font-[var(--font-label)] text-label-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
                 >
                   {busyKey === key ? (

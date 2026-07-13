@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Upload, FileText, Loader2 } from "lucide-react";
 import type { IntakeItem } from "@/lib/apply/intake";
 import { useApplicationDocuments, type DocType } from "@/lib/applyQueue/client";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   item: IntakeItem;
@@ -117,6 +118,7 @@ function EssayInput({ item, value, onChange }: { item: IntakeItem; value: string
 }
 
 function DocumentUploadSlot({ item }: { item: IntakeItem }) {
+  const { t } = useI18n();
   const { docs, upload, getDownloadUrl, remove } = useApplicationDocuments();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -227,7 +229,7 @@ function DocumentUploadSlot({ item }: { item: IntakeItem }) {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-on-surface/20 bg-surface px-3 py-3 font-[var(--font-label)] text-label-md text-on-surface transition-colors hover:bg-on-surface/5 disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-          {busy ? "Uploading…" : `Upload ${item.label.toLowerCase()}`}
+          {busy ? "Uploading…" : t("audit.upload.forLabel", { label: item.label.toLowerCase() })}
         </button>
       )}
       <input

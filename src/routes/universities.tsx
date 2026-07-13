@@ -95,7 +95,7 @@ function UniversitiesPage() {
   const initial = Route.useSearch();
   const navigate = Route.useNavigate();
   const { user, token, isAdmin, isAuthenticated } = useAuth();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const progress = useProgress();
 
   // Entitlement (live)
@@ -350,7 +350,7 @@ function UniversitiesPage() {
             <h1 className="mt-2 font-display text-display-md text-on-surface">Universities</h1>
             <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">
               {isPaid
-                ? `${matchesToRender.length} matches. Search and save schools.`
+                ? t("audit.universities.matchesSummary", { count: matchesToRender.length })
                 : "Your top 3 matches, search, and saved list — all in one place."}
             </p>
           </div>
@@ -438,7 +438,16 @@ function UniversitiesPage() {
                       {matchesLoading
                         ? "Loading your matches…"
                         : isPaid
-                          ? `${matchesToRender.length} match${matchesToRender.length === 1 ? "" : "es"}${hiddenCount > 0 ? `, ${hiddenCount} hidden` : ""}`
+                          ? t(
+                              hiddenCount > 0
+                                ? matchesToRender.length === 1
+                                  ? "audit.universities.matchCountHidden.one"
+                                  : "audit.universities.matchCountHidden.many"
+                                : matchesToRender.length === 1
+                                  ? "audit.universities.matchCount.one"
+                                  : "audit.universities.matchCount.many",
+                              { count: matchesToRender.length, hidden: hiddenCount },
+                            )
                           : "Top picks across Safety, Target, and Reach — unlock the full list."}
                     </p>
                   </div>

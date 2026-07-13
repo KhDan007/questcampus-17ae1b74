@@ -28,6 +28,7 @@ import { useGuides } from "@/lib/apply/guidance";
 import { GuideBlock } from "@/components/apply/GuideBlock";
 import { RequirementsZone } from "./RequirementsZone";
 import { IntakeItemField } from "./RequirementField";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   targets: BackendTarget[];
@@ -77,6 +78,7 @@ export function GuidedPrep({
   onSetAnswer,
   onAnswerEligibility,
 }: Props) {
+  const { t } = useI18n();
   const guided = useGuidedSteps(targets);
   const [showAll, setShowAll] = useState(false);
   const [cursor, setCursor] = useState(0);
@@ -125,7 +127,7 @@ export function GuidedPrep({
               {total === 0
                 ? "Your steps will appear here the moment requirements land."
                 : step
-                  ? `Step ${Math.min(done + 1, total)} of ${total} · ${percent}% complete`
+                  ? t("audit.guided.stepProgress", { current: Math.min(done + 1, total), total, percent })
                   : "All required items are done — launch when ready."}
             </p>
           </div>
@@ -509,6 +511,7 @@ function EligibilityInput({
 }
 
 function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
+  const { t } = useI18n();
   const { docs, upload } = useApplicationDocuments();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -566,7 +569,7 @@ function DocumentStep({ docType, label }: { docType: DocType; label: string }) {
             )}
           </span>
           <span className="font-[var(--font-label)] text-label-md font-semibold text-on-surface">
-            {busy ? "Uploading…" : `Upload ${label.toLowerCase()}`}
+            {busy ? "Uploading…" : t("audit.upload.forLabel", { label: label.toLowerCase() })}
           </span>
           <span className="text-label-sm text-on-surface-variant">
             PDF, DOC, or image · up to 20 MB

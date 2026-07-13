@@ -13,6 +13,8 @@ import {
 test("Russian and Kazakh dictionaries cover every English translation", () => {
   assert.deepEqual(findMissingTranslations(), []);
   assert.deepEqual(findEnglishFallbacks(), []);
+  assert.deepEqual(findLanguageLeaks(), []);
+  assert.deepEqual(findWrongLanguageLeaks(), []);
 });
 
 test("rendered JSX copy is registered with distinct Russian and Kazakh translations", () => {
@@ -49,9 +51,17 @@ test("audit permits localized attributes but rejects English JSX expression temp
   };
   const localized = `<button aria-label="Remove image">{t("label")}</button>`;
   const leakedTemplate = `<Card body={\`Join the waitlist for \${discount}% off\`} />`;
+  const leakedSubtitle = `<SectionHeading subtitle={\`Join the waitlist · \${discount}% off\`} />`;
+  const leakedAccessibleLabel = `<div aria-label={\`\${score} out of 5\`} />`;
 
   assert.deepEqual(findUnregisteredLiteralsInSource(localized, dictionaries), []);
   assert.deepEqual(findUnregisteredLiteralsInSource(leakedTemplate, dictionaries), [
     "fixture.tsx:1:Join the waitlist for ${discount}% off",
+  ]);
+  assert.deepEqual(findUnregisteredLiteralsInSource(leakedSubtitle, dictionaries), [
+    "fixture.tsx:1:Join the waitlist · ${discount}% off",
+  ]);
+  assert.deepEqual(findUnregisteredLiteralsInSource(leakedAccessibleLabel, dictionaries), [
+    "fixture.tsx:1:${score} out of 5",
   ]);
 });

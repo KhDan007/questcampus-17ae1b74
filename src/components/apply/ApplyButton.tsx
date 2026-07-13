@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAutoApplyGate } from "@/lib/apply/autoApplyGate";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   source: string;
@@ -27,6 +28,7 @@ export function ApplyButton({
   // All hooks unconditionally at the top — Rules of Hooks.
   const navigate = useNavigate();
   const gate = useAutoApplyGate();
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
 
   const cls =
@@ -69,7 +71,7 @@ export function ApplyButton({
         }
       }}
       className={cls}
-      title={targetName ? `Apply to ${targetName}` : "Apply"}
+      title={targetName ? t("audit.applyButton.title", { name: targetName }) : "Apply"}
     >
       {busy ? (
         <Loader2 className={size === "md" ? "h-4 w-4 animate-spin" : "h-3.5 w-3.5 animate-spin"} />

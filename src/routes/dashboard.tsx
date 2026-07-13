@@ -243,7 +243,7 @@ function DashboardPage() {
           <header className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
               <h1 className="font-display text-headline-lg font-bold text-on-surface">
-                {firstName ? `Hey ${firstName}` : "Welcome to QuestCampus"}
+                {firstName ? t("audit.dashboard.greeting", { name: firstName }) : "Welcome to QuestCampus"}
               </h1>
               <p className="mt-1 text-body-md text-on-surface-variant">
                 {authed
@@ -825,11 +825,12 @@ function SearchRail() {
 }
 
 function ComingSoonRail({ onOpen }: { onOpen: (title: string) => void }) {
+  const { t } = useI18n();
   return (
     <Card className="p-4 sm:p-5">
       <SectionHeading
         title="What's next"
-        subtitle={`Join the waitlist · ${WAITLIST_BASE_DISCOUNT}% off`}
+        subtitle={t("dashboard.waitlist.discountSubtitle", { discount: WAITLIST_BASE_DISCOUNT })}
       />
       <ul className="mt-3 flex flex-col divide-y divide-on-surface/8">
         {COMING_SOON.map((t) => {

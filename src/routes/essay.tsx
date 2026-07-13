@@ -289,7 +289,7 @@ function EssayPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const token = auth.getSession()?.token;
   const search = Route.useSearch();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -602,7 +602,7 @@ function EssayPage() {
             <p className="mt-4 max-w-2xl text-body-lg text-on-surface-variant">
               {isPaid
                 ? "Grounded in what you actually told us — never invented."
-                : `Grounded in what you actually told us — never invented. The opening is free. Unlock the full essay with the $${PRICE_MVP}/month subscription (also unlocks all your university matches).`}
+                : t("audit.essay.groundedPaid", { price: PRICE_MVP })}
             </p>
           </motion.div>
 
@@ -1295,7 +1295,7 @@ function QuestionsForm({
             <div className="mt-4">
               <UnlockButton
                 token={token}
-                label={`Unlock for $${PRICE_MVP}/month & generate`}
+                label={t("audit.essay.unlockGenerate", { price: PRICE_MVP })}
                 className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary px-5 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90"
               />
             </div>

@@ -8,8 +8,10 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useApplySelection } from "@/lib/applyQueue/selection";
 import { ResearchProgressModal } from "@/components/apply/ResearchProgressModal";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 export function BatchActionBar() {
+  const { t } = useI18n();
   const { items, count, clear } = useApplySelection();
   const { token } = useAuth();
   const addMut = useMutation(api.userUniversities.add);
@@ -88,15 +90,15 @@ export function BatchActionBar() {
             </button>
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-label-lg font-bold text-on-surface">
-                {`${count} ${count === 1 ? "university" : "universities"} selected`}
+                {t(count === 1 ? "audit.batch.selected.one" : "audit.batch.selected.many", { count })}
               </p>
               <p className="truncate text-label-sm text-on-surface-variant">
                 {err
                   ? err
                   : researchedCount === count
-                    ? `All ${count} already researched — we'll just save them to your list.`
+                    ? t("audit.batch.allResearched", { count })
                     : researchedCount > 0
-                      ? `${researchedCount} already researched · ${toResearch.length} new to research.`
+                      ? t("audit.batch.partlyResearched", { researched: researchedCount, newCount: toResearch.length })
                       : "We'll save them and start deep-researching each one live."}
               </p>
             </div>
@@ -110,7 +112,7 @@ export function BatchActionBar() {
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               {toResearch.length === 0
-                ? `Save ${count} to my list`
+                ? t("audit.batch.save", { count })
                 : `Deep research ${toResearch.length}`}
             </button>
           </div>

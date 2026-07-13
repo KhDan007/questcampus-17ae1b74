@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/lib/auth/useAuth";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import {
   countWords,
   isEssayKind,
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/documents/$id")({
 });
 
 function DocumentEditorPage() {
+  const { t } = useI18n();
   const { id } = Route.useParams();
   const { isAuthenticated, isHydrated } = useAuth();
   const navigate = useNavigate();
@@ -201,7 +203,7 @@ function DocumentEditorPage() {
                 {doc.docKind === "activities" && (
                   <p className="mt-4 rounded-md border border-on-surface/15 bg-surface-container-lowest px-3 py-2 text-label-sm text-on-surface-variant">
                     One activity per line
-                    {spec.perItemMaxChars ? `, ≤${spec.perItemMaxChars} chars each` : ""}.
+                    {spec.perItemMaxChars ? t("audit.documents.charLimit", { count: spec.perItemMaxChars }) : ""}.
                   </p>
                 )}
                 <textarea

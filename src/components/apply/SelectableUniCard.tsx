@@ -3,6 +3,7 @@
 import { Check, GraduationCap, MapPin, Plus, Sparkles, X } from "lucide-react";
 import { LiveResearchStatusBadge } from "@/components/apply/ResearchStatusBadge";
 import { useApplySelection } from "@/lib/applyQueue/selection";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   source: string;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function SelectableUniCard({ source, externalId, name, city, country, researched, onApplyNow }: Props) {
+  const { t } = useI18n();
   const { isSelected, toggle, remove } = useApplySelection();
   const selected = isSelected(source, externalId);
   const location = [city, country].filter(Boolean).join(", ");
@@ -31,7 +33,7 @@ export function SelectableUniCard({ source, externalId, name, city, country, res
       type="button"
       onClick={selected ? drop : add}
       aria-pressed={selected}
-      aria-label={selected ? `Remove ${name} from batch` : `Add ${name} to batch`}
+      aria-label={selected ? t("audit.selection.remove", { name }) : t("audit.selection.add", { name })}
       className={`group relative flex w-full flex-col rounded-2xl border bg-surface-container-lowest p-4 text-left qc-soft-shadow transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
         selected
           ? "border-primary/50 bg-primary-fixed/40"

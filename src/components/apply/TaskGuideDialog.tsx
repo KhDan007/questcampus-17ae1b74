@@ -30,6 +30,7 @@ import {
   type DocType,
 } from "@/lib/applyQueue/client";
 import type { PlanTask } from "@/lib/apply/plan";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   open: boolean;
@@ -327,6 +328,7 @@ function UploadInline({
   label: string;
   onUploaded?: () => void;
 }) {
+  const { t } = useI18n();
   const { docs, upload } = useApplicationDocuments();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -398,7 +400,7 @@ function UploadInline({
           ) : (
             <Upload className="h-4 w-4" />
           )}
-          {busy ? "Uploading…" : `Upload ${label.toLowerCase()}`}
+          {busy ? "Uploading…" : t("audit.upload.forLabel", { label: label.toLowerCase() })}
         </button>
       )}
       <input

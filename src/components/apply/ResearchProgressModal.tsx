@@ -15,6 +15,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { useIntakePlan, type BackendTarget } from "@/lib/apply/intake";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   open: boolean;
@@ -47,6 +48,7 @@ const SIDE_ACTIONS = [
 ] as const;
 
 export function ResearchProgressModal({ open, targets, onClose }: Props) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const plan = useIntakePlan(open ? targets : []);
 
@@ -127,7 +129,7 @@ export function ResearchProgressModal({ open, targets, onClose }: Props) {
                   <h2 className="font-display text-headline-md font-bold text-on-surface">
                     {allDone
                       ? "Ready for the next step."
-                      : `Researching ${rows.length} universit${rows.length === 1 ? "y" : "ies"}…`}
+                      : t(rows.length === 1 ? "audit.researchProgress.title.one" : "audit.researchProgress.title.many", { count: rows.length })}
                   </h2>
                   <p className="mt-0.5 text-body-sm text-on-surface-variant">
                     {allDone

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, Check, ShieldCheck, AlertTriangle, HelpCircle, Loader2, RefreshCw } from "lucide-react";
 import type { IntakeItem, TargetCoverage } from "@/lib/apply/intake";
 import { IntakeItemField } from "./RequirementField";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   title: string;
@@ -61,6 +62,7 @@ export function RequirementsZone({
   onRescan,
   rescanning = false,
 }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(defaultOpen);
   const [showAnswered, setShowAnswered] = useState(false);
 
@@ -195,7 +197,7 @@ export function RequirementsZone({
                     onClick={() => setShowAnswered((s) => !s)}
                     className="text-label-sm text-on-surface-variant underline underline-offset-2 hover:text-on-surface"
                   >
-                    {showAnswered ? "Hide answered" : `Show ${answered.length} answered`}
+                    {showAnswered ? "Hide answered" : t("audit.requirements.showAnswered", { count: answered.length })}
                   </button>
                 </div>
               )}
