@@ -127,6 +127,9 @@ const RUSSIAN_UI_COMMON_TOKENS = new Set([
   "удалить",
   "сохранить",
   "отменить",
+  "ошибка",
+  "готово",
+  "загрузка",
 ]);
 
 function normalize(value: string): string {

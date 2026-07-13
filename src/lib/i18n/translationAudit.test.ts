@@ -102,12 +102,12 @@ test("audit rejects generic English leaks and Russian UI copy without rejecting 
 test("actual Kazakh dictionary mutations cannot self-whitelist Russian UI copy", () => {
   const mutatedKazakh = {
     ...kk,
-    "test.russianInjection": "Настройки Продолжить Выберите",
+    "test.russianInjection": "Настройки Продолжить Выберите Ошибка Готово Загрузка",
   };
 
   assert.deepEqual(
     findWrongLanguageLeaks({ en, ru, kk: mutatedKazakh }).filter((problem) => problem.startsWith("kk:test.")),
-    ["kk:test.russianInjection:настройки,продолжить,выберите"],
+    ["kk:test.russianInjection:настройки,продолжить,выберите,ошибка,готово,загрузка"],
   );
 });
 
