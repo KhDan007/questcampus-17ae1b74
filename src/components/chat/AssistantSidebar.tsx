@@ -25,6 +25,7 @@ import {
   ShieldAlert,
   PanelRightClose,
   Paperclip,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import { useConvex, useQuery } from "convex/react";
@@ -40,6 +41,8 @@ import {
   useAgentJobsForThread,
   useStartAgentJob,
   useDeleteThread,
+  useGenerateChatImageUploadUrl,
+  useMessageImages,
   type ChatAction,
   type ChatMessage,
   type ChatThread,
@@ -206,6 +209,35 @@ function SidebarPanel({
     }
   }
 
+  // ── Pasted/dropped images (composer) ──────────────────────────────────────
+  const [pendingImages, setPendingImages] = useState<{ id: string; url: string }[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const genImageUrl = useGenerateChatImageUploadUrl();
+
+  async function uploadImageBlob(file: File) {
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("Image too large (max 4MB)");
+      return;
+    }
+    try {
+      const url = await genImageUrl();
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = (await res.json()) as { storageId: string };
+      setPendingImages((p) => [...p, { id: storageId, url: URL.createObjectURL(file) }].slice(0, 4));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Image upload failed");
+    }
+  }
+
+  function removePendingImage(id: string) {
+    setPendingImages((p) => p.filter((im) => im.id !== id));
+  }
+
   const seededIdRef = useRef<number>(-1);
   const deleteThread = useDeleteThread();
   // Bypass mode (auto-approve action cards). Persisted, OFF by default.
@@ -257,17 +289,19 @@ function SidebarPanel({
 
   async function submit(text: string) {
     const t = text.trim();
-    // Allow sending an attachment note with no typed text.
-    if ((!t && !attachment) || disabled) return;
+    // Allow sending an attachment note or pasted images with no typed text.
+    if ((!t && !attachment && pendingImages.length === 0) || disabled) return;
     // The upload already wrote to Convex; send a hidden hint so the agent reads it as saved data.
     const outbound = attachment
       ? `[Attached file saved to documents: ${attachment.fileName} as ${attachment.docType}]\n${t}`
       : t;
+    const imageIds = pendingImages.map((p) => p.id);
     setInput("");
     setAttachment(null);
+    setPendingImages([]);
     setSending(true);
     try {
-    const res = await send(outbound, activeThreadId);
+    const res = await send(outbound, activeThreadId, imageIds.length ? imageIds : undefined);
       setForceNew(false);
       setSelectedId(res.threadId);
     } catch (e) {
@@ -501,7 +535,24 @@ function SidebarPanel({
           e.preventDefault();
           void submit(input);
         }}
-        className="border-t border-on-surface/10 bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        onDragOver={(e) => {
+          if (e.dataTransfer.types.includes("Files")) {
+            e.preventDefault();
+            setDragActive(true);
+          }
+        }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={(e) => {
+          if (!e.dataTransfer.files?.length) return;
+          e.preventDefault();
+          setDragActive(false);
+          Array.from(e.dataTransfer.files)
+            .filter((f) => f.type.startsWith("image/"))
+            .forEach((f) => void uploadImageBlob(f));
+        }}
+        className={`border-t bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-colors ${
+          dragActive ? "border-primary bg-primary-fixed/20" : "border-on-surface/10"
+        }`}
       >
         <input
           ref={fileInputRef}
@@ -509,6 +560,36 @@ function SidebarPanel({
           className="hidden"
           onChange={onPickFile}
         />
+
+        {dragActive && (
+          <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-dashed border-primary bg-primary-fixed/30 px-2.5 py-2 text-label-sm font-semibold text-primary">
+            <ImageIcon className="h-3.5 w-3.5" />
+            Drop image to attach
+          </div>
+        )}
+
+        {/* Pending pasted/dropped images (up to 4), removable before send */}
+        {pendingImages.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {pendingImages.map((im) => (
+              <div key={im.id} className="relative">
+                <img
+                  src={im.url}
+                  alt="Pasted attachment"
+                  className="h-14 w-14 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  aria-label="Remove image"
+                  onClick={() => removePendingImage(im.id)}
+                  className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-on-surface text-surface"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Attachment status: docType picker → uploading chip → done chip */}
         {pickerFile && (
@@ -579,6 +660,17 @@ function SidebarPanel({
                 void submit(input);
               }
             }}
+            onPaste={(e) => {
+              const items = Array.from(e.clipboardData?.items ?? []);
+              const imgs = items.filter((it) => it.type.startsWith("image/"));
+              if (imgs.length) {
+                e.preventDefault();
+                imgs.forEach((it) => {
+                  const f = it.getAsFile();
+                  if (f) void uploadImageBlob(f);
+                });
+              }
+            }}
             rows={2}
             placeholder="Ask anything about your applications..."
             className="min-h-[44px] flex-1 resize-none rounded-lg border border-on-surface/15 bg-surface px-2.5 py-2 text-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none"
@@ -586,7 +678,7 @@ function SidebarPanel({
           <button
             type="submit"
             aria-label={sending || streaming ? "Sending message" : "Send message"}
-            disabled={disabled || (!input.trim() && !attachment)}
+            disabled={disabled || (!input.trim() && !attachment && pendingImages.length === 0)}
             className="inline-flex h-11 shrink-0 items-center gap-1 rounded-lg bg-primary px-3 font-[var(--font-label)] text-label-md font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {sending || streaming ? (
@@ -886,6 +978,8 @@ function MessageRow({
   const isUser = message.role === "user";
   const friendlySteps = isUser ? [] : friendlyStepLabels(message.steps ?? []);
   const navigate = useNavigate();
+  const hasImages = isUser && (message.imageIds?.length ?? 0) > 0;
+  const imageUrls = useMessageImages(message._id, hasImages);
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -896,9 +990,23 @@ function MessageRow({
         }`}
       >
         {isUser ? (
-          <p data-i18n-skip="true" className="whitespace-pre-wrap break-words">
-            {userVisibleChatContent(message.content)}
-          </p>
+          <>
+            {hasImages && imageUrls && imageUrls.length > 0 && (
+              <div className="mb-1.5 flex flex-wrap gap-1.5">
+                {imageUrls.map((url) => (
+                  <img
+                    key={url}
+                    src={url}
+                    alt="Pasted attachment"
+                    className="mt-1 max-h-40 rounded-lg"
+                  />
+                ))}
+              </div>
+            )}
+            <p data-i18n-skip="true" className="whitespace-pre-wrap break-words">
+              {userVisibleChatContent(message.content)}
+            </p>
+          </>
         ) : (
           <div data-i18n-skip="true" className="break-words">
             {friendlySteps.length ? (

@@ -45,6 +45,7 @@ export type ChatMessage = {
   streaming?: boolean;
   actions?: ChatAction[];
   steps?: string[];
+  imageIds?: string[];
   createdAt: number;
 };
 
@@ -97,7 +98,7 @@ export function useSendChat() {
   const send = useAction(api.chat.send);
   const { token } = useAuth();
   const location = useRouterState({ select: (s) => s.location });
-  return async (message: string, threadId?: string) => {
+  return async (message: string, threadId?: string, imageStorageIds?: string[]) => {
     if (!token) throw new Error("Sign in");
     const wantsPageContext = shouldAttachPageContext(message, readChatPageContextEnabled());
     const ctx = wantsPageContext
@@ -107,11 +108,40 @@ export function useSendChat() {
         )
       : "";
     const outbound = ctx ? `${ctx}\n${message}` : message;
-    return (await send({ token, threadId, message: outbound, lang: getCurrentLang() } as never)) as {
+    return (await send({
+      token,
+      threadId,
+      message: outbound,
+      lang: getCurrentLang(),
+      imageStorageIds,
+    } as never)) as {
       threadId: string;
       assistantId: string;
     };
   };
+}
+
+/** Mint a short-lived upload URL for a pasted/dropped chat image. */
+export function useGenerateChatImageUploadUrl() {
+  const m = useMutation(api.chat.generateImageUploadUrl);
+  const { token } = useAuth();
+  return async () => {
+    if (!token) throw new Error("Sign in");
+    return (await m({ token } as never)) as string;
+  };
+}
+
+/** Reactive: resolved display urls for a message's pasted images. Only fires
+ * the query when `hasImages` is true, so most rows never call it. */
+export function useMessageImages(
+  messageId: string | undefined,
+  hasImages: boolean,
+): string[] | undefined {
+  const { token } = useAuth();
+  return useQuery(
+    api.chat.messageImageUrls,
+    token && messageId && hasImages ? ({ token, messageId } as never) : "skip",
+  ) as string[] | undefined;
 }
 
 export function useSetActionStatus() {
