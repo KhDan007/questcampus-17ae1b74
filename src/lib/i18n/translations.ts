@@ -1140,3 +1140,114 @@ export const TRANSLATIONS: Record<string, Dict> & Record<LangCode, Dict> = {
     "footer.copyright": "© 2026 QuestCampus · Құпиялық · Шарттар",
   },
 };
+
+// Audited literals which are rendered outside a component-level `t()` call.
+// Keep these exact English values so the provider can translate legacy JSX text
+// and accessible attributes without leaving English copy in Russian or Kazakh.
+export const AUDIT_TRANSLATIONS: Record<"en" | "ru" | "kk", Dict> = {
+  en: {
+    "forgotPassword.emailPlaceholder": "you@example.com",
+    "pricing.paid.subtitle": "3-day free trial, then $15/month",
+    "signin.placeholder.email": "you@school.edu",
+    "signin.placeholder.name": "Jane Doe",
+    "step.6.opt.duolingo.label": "Duolingo English Test",
+    "wait.emailPh": "you@example.com",
+    "audit.taskGuide.whatItIs": "What it is:",
+    "audit.chat.dropImage": "Drop image to attach",
+    "audit.chat.pastedAttachment": "Pasted attachment",
+    "audit.chat.removeImage": "Remove image",
+    "audit.university.tuDelft": "TU Delft",
+    "audit.email.school": "you@school.edu",
+    "audit.a11y.breadcrumb": "breadcrumb",
+    "audit.a11y.pagination": "pagination",
+    "audit.documents.print": "Print / Save as PDF",
+    "audit.documents.targetItems": "target items:",
+    "audit.action.delete": "Delete",
+    "audit.action.ok": "OK",
+    "audit.essay.nextStory": "Next: your story",
+    "audit.email.example": "you@example.com",
+    "audit.address.state": "State / province",
+    "audit.address.postal": "ZIP / postal code",
+    "audit.prep.upNext": "Up next:",
+    "audit.tos.account":
+      "When you create an account, you are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account. We reserve the right to terminate or suspend accounts that violate these terms.",
+    "audit.tos.intellectualProperty":
+      "QuestCampus and its original content, features, and functionality are and will remain the exclusive property of QuestCampus and its licensors. The service is protected by copyright, trademark, and other laws. Our trademarks and trade dress may not be used in connection with any product or service without prior written consent.",
+    "audit.tos.disclaimer":
+      'QuestCampus is provided on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the reliability, accuracy, or completeness of any information on the platform. University data, rankings, and admission statistics are sourced from third parties and may not always reflect the most current information.',
+    "audit.tos.liability":
+      "In no event shall QuestCampus, its directors, employees, partners, or affiliates be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.",
+    "audit.tos.email": "Email:",
+    "audit.university.examples": "Oxford, MIT, NUS, Sciences Po",
+  },
+  ru: {
+    "forgotPassword.emailPlaceholder": "вы@пример.рф",
+    "pricing.paid.subtitle": "3 дня бесплатно, затем $15 в месяц",
+    "signin.placeholder.email": "вы@школа.рф",
+    "signin.placeholder.name": "Иван Иванов",
+    "step.6.opt.duolingo.label": "Экзамен Duolingo",
+    "wait.emailPh": "вы@пример.рф",
+    "audit.taskGuide.whatItIs": "Что это:",
+    "audit.chat.dropImage": "Перетащите изображение, чтобы прикрепить",
+    "audit.chat.pastedAttachment": "Вставленное вложение",
+    "audit.chat.removeImage": "Удалить изображение",
+    "audit.university.tuDelft": "Технический университет Делфта",
+    "audit.email.school": "вы@школа.рф",
+    "audit.a11y.breadcrumb": "хлебные крошки",
+    "audit.a11y.pagination": "нумерация страниц",
+    "audit.documents.print": "Печать / сохранить в PDF",
+    "audit.documents.targetItems": "целевые пункты:",
+    "audit.action.delete": "Удалить",
+    "audit.action.ok": "ОК",
+    "audit.essay.nextStory": "Далее: ваша история",
+    "audit.email.example": "вы@пример.рф",
+    "audit.address.state": "Регион / область",
+    "audit.address.postal": "Почтовый индекс",
+    "audit.prep.upNext": "Далее:",
+    "audit.tos.account":
+      "Создавая аккаунт, вы отвечаете за конфиденциальность своих учётных данных и за все действия, совершённые через аккаунт. Немедленно сообщайте нам о любом несанкционированном использовании. Мы вправе прекратить или приостановить аккаунты, нарушающие эти условия.",
+    "audit.tos.intellectualProperty":
+      "QuestCampus, исходный контент, функции и возможности сервиса являются исключительной собственностью QuestCampus и его лицензиаров. Сервис защищён авторским правом, товарными знаками и другими законами. Наши товарные знаки и фирменный стиль нельзя использовать в связи с каким-либо продуктом или сервисом без предварительного письменного согласия.",
+    "audit.tos.disclaimer":
+      "QuestCampus предоставляется «как есть» и «по мере доступности». Мы не даём явных или подразумеваемых гарантий надёжности, точности или полноты информации на платформе. Данные об университетах, рейтинги и статистика поступления получены от третьих лиц и могут не отражать самую актуальную информацию.",
+    "audit.tos.liability":
+      "Ни при каких обстоятельствах QuestCampus, его директора, сотрудники, партнёры или аффилированные лица не несут ответственности за косвенные, случайные, специальные, последующие или штрафные убытки, включая упущенную выгоду, данные, использование, деловую репутацию и другие нематериальные потери, возникшие вследствие доступа к сервису, его использования или невозможности его использовать.",
+    "audit.tos.email": "Эл. почта:",
+    "audit.university.examples": "Оксфорд, MIT, NUS, Sciences Po",
+  },
+  kk: {
+    "forgotPassword.emailPlaceholder": "сіз@үлгі.kz",
+    "pricing.paid.subtitle": "3 күн тегін, кейін айына $15",
+    "signin.placeholder.email": "сіз@мектеп.kz",
+    "signin.placeholder.name": "Аян Жақыпов",
+    "step.6.opt.duolingo.label": "Duolingo емтиханы",
+    "wait.emailPh": "сіз@үлгі.kz",
+    "audit.taskGuide.whatItIs": "Бұл не:",
+    "audit.chat.dropImage": "Тіркеу үшін суретті осы жерге әкеліңіз",
+    "audit.chat.pastedAttachment": "Қойылған тіркеме",
+    "audit.chat.removeImage": "Суретті жою",
+    "audit.university.tuDelft": "Делфт техникалық университеті",
+    "audit.email.school": "сіз@мектеп.kz",
+    "audit.a11y.breadcrumb": "навигация жолы",
+    "audit.a11y.pagination": "беттеу",
+    "audit.documents.print": "Басып шығару / PDF ретінде сақтау",
+    "audit.documents.targetItems": "мақсатты тармақтар:",
+    "audit.action.delete": "Жою",
+    "audit.action.ok": "Жарайды",
+    "audit.essay.nextStory": "Келесі: сіздің тарихыңыз",
+    "audit.email.example": "сіз@үлгі.kz",
+    "audit.address.state": "Облыс / аймақ",
+    "audit.address.postal": "Пошталық индекс",
+    "audit.prep.upNext": "Келесі:",
+    "audit.tos.account":
+      "Аккаунт ашқанда, тіркелгі деректеріңіздің құпиялылығына және аккаунтыңыз арқылы орындалған барлық әрекетке өзіңіз жауап бересіз. Рұқсатсыз пайдалану туралы бізге дереу хабарлауыңыз керек. Осы шарттарды бұзатын аккаунттарды тоқтатуға немесе бұғаттауға құқығымыз бар.",
+    "audit.tos.intellectualProperty":
+      "QuestCampus, оның бастапқы контенті, мүмкіндіктері мен функционалы QuestCampus және оның лицензиарларының айрықша меншігі болып қала береді. Қызмет авторлық құқықпен, тауар белгілерімен және басқа заңдармен қорғалған. Біздің тауар белгілеріміз бен фирмалық стилімізді алдын ала жазбаша келісімсіз ешбір өніммен не қызметпен байланысты қолдануға болмайды.",
+    "audit.tos.disclaimer":
+      "QuestCampus «сол күйінде» және «қолжетімділігіне қарай» ұсынылады. Платформадағы ақпараттың сенімділігіне, дәлдігіне немесе толықтығына қатысты тікелей де, жанама да кепілдік бермейміз. Университет деректері, рейтингтер мен қабылдау статистикасы үшінші тараптардан алынған және әрдайым ең өзекті ақпаратты көрсетпеуі мүмкін.",
+    "audit.tos.liability":
+      "Ешбір жағдайда QuestCampus, оның директорлары, қызметкерлері, серіктестері немесе еншілес тұлғалары қызметке кіруден, оны пайдаланудан не пайдалана алмаудан туындайтын жанама, кездейсоқ, арнайы, салдарлы немесе айыппұл сипатындағы шығындар, соның ішінде жоғалған пайда, деректер, пайдалану, іскерлік бедел және басқа материалдық емес шығындар үшін жауап бермейді.",
+    "audit.tos.email": "Электрондық пошта:",
+    "audit.university.examples": "Оксфорд, MIT, NUS және Sciences Po",
+  },
+};

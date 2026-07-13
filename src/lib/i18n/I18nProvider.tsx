@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { DEFAULT_LANG, LANGUAGES, RTL_LANGS, isLangCode, type LangCode } from "./languages";
-import { TRANSLATIONS, type Dict } from "./translations";
+import { AUDIT_TRANSLATIONS, TRANSLATIONS, type Dict } from "./translations";
 import en from "./generated/en.json";
 import ru from "./generated/ru.json";
 import kk from "./generated/kk.json";
@@ -40,9 +40,21 @@ const GENERATED: Record<LangCode, Dict> = {
   kk: kk as Dict,
 };
 const DICTIONARIES: Record<LangCode, Dict> = {
-  en: { ...(TRANSLATIONS.en ?? {}), ...GENERATED.en },
-  ru: { ...(TRANSLATIONS.en ?? {}), ...GENERATED.en, ...(TRANSLATIONS.ru ?? {}), ...GENERATED.ru },
-  kk: { ...(TRANSLATIONS.en ?? {}), ...GENERATED.en, ...(TRANSLATIONS.kk ?? {}), ...GENERATED.kk },
+  en: { ...GENERATED.en, ...(TRANSLATIONS.en ?? {}), ...AUDIT_TRANSLATIONS.en },
+  ru: {
+    ...GENERATED.en,
+    ...(TRANSLATIONS.en ?? {}),
+    ...GENERATED.ru,
+    ...(TRANSLATIONS.ru ?? {}),
+    ...AUDIT_TRANSLATIONS.ru,
+  },
+  kk: {
+    ...GENERATED.en,
+    ...(TRANSLATIONS.en ?? {}),
+    ...GENERATED.kk,
+    ...(TRANSLATIONS.kk ?? {}),
+    ...AUDIT_TRANSLATIONS.kk,
+  },
 };
 const ATTRS = ["aria-label", "aria-description", "title", "placeholder", "alt"] as const;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "CODE", "PRE", "TEXTAREA", "NOSCRIPT", "SVG"]);
@@ -248,7 +260,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         const node = n as Text;
         const source = node.textContent ?? "";
         const record = textRecords.current.get(node);
-        if (record?.lang === lang && (record.source === source || record.output === source)) continue;
+        if (record?.lang === lang && (record.source === source || record.output === source))
+          continue;
 
         const literal = translateLiteral(lang, source);
         if (literal) {
@@ -264,7 +277,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
           const value = el.getAttribute(attr);
           if (!value || !hasEnglishLetters(value)) continue;
           const record = attrRecords.current.get(el)?.get(attr);
-          if (record?.lang === lang && (record.source === value || record.output === value)) continue;
+          if (record?.lang === lang && (record.source === value || record.output === value))
+            continue;
           const literal = translateLiteral(lang, value);
           if (literal) {
             let map = attrRecords.current.get(el);
@@ -306,7 +320,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 }
 
 export function useI18n(): I18nCtx {
-  return useContext(I18nContext) ?? { lang: DEFAULT_LANG, setLang: () => {}, t: makeT(DEFAULT_LANG) };
+  return (
+    useContext(I18nContext) ?? { lang: DEFAULT_LANG, setLang: () => {}, t: makeT(DEFAULT_LANG) }
+  );
 }
 
 export { LANGUAGES };

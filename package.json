@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "test": "tsx --test src/**/*.test.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "npx --yes wrangler --cwd .output dev",
