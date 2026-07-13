@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { auth } from "@/lib/auth/client";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { errorClassName, inputClassName, primaryButtonClassName } from "./forgot-password";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Choose a new password — QuestCampus" }] }),
+  head: () => ({ meta: [] }),
   validateSearch: (search: Record<string, unknown>) => ({
     token: typeof search.token === "string" ? search.token : "",
   }),
@@ -23,6 +23,10 @@ function ResetPasswordPage() {
     isValidResetToken(token) ? null : t("resetPassword.errorToken"),
   );
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = `${t("resetPassword.title")} — QuestCampus`;
+  }, [t]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

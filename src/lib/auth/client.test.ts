@@ -37,7 +37,7 @@ test("requestPasswordReset posts a normalized email to the reset endpoint", asyn
   const request = await captureRequest(() => auth.requestPasswordReset(" Student@Example.COM "));
 
   assert.equal(request.method, "POST");
-  assert.match(request.url, /\/api\/auth\/password-reset\/request$/);
+  assert.equal(request.url, "https://auth.example.test/api/auth/password-reset/request");
   assert.deepEqual(JSON.parse(request.body ?? "{}"), {
     email: "student@example.com",
     lang: "en",
@@ -49,7 +49,7 @@ test("confirmPasswordReset posts a token and new password to the reset endpoint"
   const request = await captureRequest(() => auth.confirmPasswordReset(token, "new-password"));
 
   assert.equal(request.method, "POST");
-  assert.match(request.url, /\/api\/auth\/password-reset\/confirm$/);
+  assert.equal(request.url, "https://auth.example.test/api/auth/password-reset/confirm");
   assert.deepEqual(JSON.parse(request.body ?? "{}"), {
     token,
     password: "new-password",
