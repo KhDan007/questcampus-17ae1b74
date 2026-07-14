@@ -452,6 +452,8 @@ function TargetReadinessPanel({
   targets: PortfolioTarget[];
   submissions: ApplicationSubmission[];
 }) {
+  const { t } = useI18n();
+
   if (!targets.length) {
     return (
       <EmptyPanel
